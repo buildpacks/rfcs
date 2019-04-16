@@ -45,7 +45,7 @@ The existing `buildpack` would now contain an optional `root` element.
 root = "<directory name>" # the directory where the `bin/` scripts are located
 ```
 
-This element would define the location of the `bin/{detect|compile}` scripts.
+This element would define the location of the `bin/{detect|build}` scripts.
 
 ## New Element: project.root
 
@@ -73,7 +73,7 @@ uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
 
 * `id` (string, required): the ID ([as defined in the spec](https://github.com/buildpack/spec/blob/master/buildpack.md#buildpacktoml-toml) of another buildpack
 * `version` (string, optional, default=`latest`): the version ([as defined in the spec](https://github.com/buildpack/spec/blob/master/buildpack.md#buildpacktoml-toml) of the dependent buildpack. The default is to use the latest available version of the buildpack (resolution of this value may be platform-dependent).
-* `optional` (bool, optional, default=`false`): Defines whether this buildpack will be optional in `group.toml`.
+* `optional` (bool, optional, default=`false`): Defines whether this buildpack will be optional in `order.toml`.
 * `uri` (string, optional, default=`urn:buildpack:<id>`): The exact location of the dependent buildpack. If not specified the platform will resolve the `urn:buildpack:<id>` (making the resolution platform dependent).
 
 ## New Element: project.env
@@ -125,7 +125,7 @@ If `project.root` is set, the lifecycle will execute against this directory inst
 
 ## Codified Buildpacks
 
-Given an app with a `buildpack.toml`, the lifecycle will read the `project.buildpacks` and construct an `group.toml` that overrides the default buildpack groups in `order.toml`. Only the buildpacks listed in `project.buildpacks` will be run. For example, an app might contain:
+Given an app with a `buildpack.toml`, the lifecycle will read the `project.buildpacks` and construct an ephemeral `order.toml` that overrides the default buildpack groups in `order.toml`. Only the buildpacks listed in `project.buildpacks` will be run. For example, an app might contain:
 
 ```toml
 [[project.buildpacks]]
@@ -136,7 +136,7 @@ If the app also contains a `Gemfile` and the `heroku/buildpacks` builder image i
 
 ## Buildpack Dependencies
 
-Given an buildpack with a `buildpack.toml`, the lifecycle will read the `project.buildpacks` and construct an `group.toml` entry with those buildpacks included with the primary buildpack. The `project.buildpacks` of the dependent buildpacks will also be resolved into the `group.toml`.
+Given an buildpack with a `buildpack.toml`, the lifecycle will read the `project.buildpacks` and construct an ephemeral `order.toml` entry with those buildpacks included with the primary buildpack. The `project.buildpacks` of the dependent buildpacks will also be resolved into the `order.toml`.
 
 This same scheme can be used to self-reference (effectively overriding the default buildpack groups). For example:
 
