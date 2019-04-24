@@ -54,17 +54,17 @@ To get an RFC into Cloud Native Buildpacks, first the RFC needs to be merged int
 
 - Fork the RFC repo: <https://github.com/buildpack/rfcs>
 - Copy `0000-template.md` to `text/0000-my-feature.md` (where 'my-feature' is descriptive. don't assign an RFC number yet).
-- Fill in RFC
+- Fill in RFC. Any section can be marked as "N/A" if not applicable.
 - Submit a pull request. The pull request is the time to get review of the proposal from the larger community.
 - Build consensus and integrate feedback. RFCs that have broad support are much more likely to make progress than those that don't receive any comments.
 
 Once a pull request is opened, the RFC is now in development and the following will happen:
 
-- It will be triaged and assigned to a team member in a future working group meeting.
-- That team member will be responsible for championing that RFC and ensuring it gets comments, feedback, or closed.
+- It will be triaged, labeled, and discussed in a future working group meeting. Working group meetings happen on a weekly cadence barring exceptions. Labeling marks a RFC as general or specific to a subteam.
 - The team will discuss as much as possible in the RFC pull request directly. Any outside discussion will be summarized in the comment thread.
 - When deemed "ready", a team member will propose a "motion for final comment period (FCP)" along with a disposition of the outcome (merge, close, or postpone). This is step taken when enough discussion of the tradeoffs have taken place and the team is in a position to make a decision. Before entering FCP, super majority of the team must sign off.
-- The FCP will lasts 10 days, so it's open for at least 5 business days.
+- The FCP will last 7 days. If there's unanimous agreement among the team the FCP can close early.
+- For voting, the binding votes are comprised of the core team (and subteam maintainers if labeled as a subteam RFC). Acceptance requires super majority of binding votes in favor. The voting options are the following: Affirmative, Negative, and Abstinence. Non-binding votes are of course welcome.
 - If no substantial new arguments or ideas are raised, the FCP will follow the outcome decided. If there are substantial new arguments, then the RFC will go back into development.
 
 Once an RFC has been accepted, the team member who merges the pull request should do the following:
