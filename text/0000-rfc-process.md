@@ -19,7 +19,7 @@ Now that we've entered the beta and people are trying out Cloud Native Buildpack
 # What it is
 [what-it-is]: #what-it-is
 
-RFCs record potential change and with the context and information at the given time. This process provides a defined process for anyone wishing to contribute to the Cloud Native Buildpacks project as well as collect a diverse set of inputs give opportunity for engagement. Anyone who chooses not to actively partcipate in any RFC is presumed to trust their colleagues on the matter. Once a RFC is accepted, they can be referenced as read-only documents in this repository until replaced or ammended by another RFC when context has significantly changed.
+RFCs record potential change and with the context and information at the given time. This process provides a defined process for anyone wishing to contribute to the Cloud Native Buildpacks project as well as collect a diverse set of inputs give opportunity for engagement. Anyone who chooses not to actively partcipate in any RFC is presumed to trust their colleagues on the matter. Once an RFC is accepted, they can be referenced as read-only documents in this repository until replaced or ammended by another RFC when context has significantly changed.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -46,11 +46,11 @@ What constitutes a "substantial" change may include the following:
 - process changes (project contributor)
 - governance (project contributor)
 
-If you submit a pull request the team deems warrants a RFC will politely closed with a request for one to be opened first.
+If you submit a pull request the team deems warrants an RFC, it will be politely closed with a request for an RFC to be opened first.
 
 ## Process
 
-To get a RFC into Cloud Native Buildpacks, first the RFC needs to be merged into the RFC repo. Once a RFC is merged, it's considered 'active' and may be implemented to be included in the project. These steps will get a RFC to be considered:
+To get an RFC into Cloud Native Buildpacks, first the RFC needs to be merged into the RFC repo. Once an RFC is merged, it's considered 'active' and may be implemented to be included in the project. These steps will get an RFC to be considered:
 
 - Fork the RFC repo: <https://github.com/buildpack/rfcs>
 - Copy `0000-template.md` to `text/0000-my-feature.md` (where 'my-feature' is descriptive. don't assign an RFC number yet).
@@ -67,7 +67,7 @@ Once a pull request is opened, the RFC is now in development and the following w
 - The FCP will lasts 10 days, so it's open for at least 5 business days.
 - If no substantial new arguments or ideas are raised, the FCP will follow the outcome decided. If there are substantial new arguments, then the RFC will go back into development.
 
-Once a RFC has been accepted, the team member who merges the pull request should do the following:
+Once an RFC has been accepted, the team member who merges the pull request should do the following:
 
 - Assign an id based off the pull request number.
 - Rename the file based off the id inside `text/`.
@@ -88,7 +88,7 @@ Though RFCs are intendend to be lightweight, this introduces extra process than 
 # Prior Art
 [prior-art]: #prior-art
 
-The basic format of RFCs was [invented in the 1960s by Steve Crocker](https://en.wikipedia.org/wiki/Request_for_Comments#History). The current RFC process has been derived heavily from [Rust](https://rust-lang.github.io/rfcs/). Many other open source projects have adopted a RFC process:
+The basic format of RFCs was [invented in the 1960s by Steve Crocker](https://en.wikipedia.org/wiki/Request_for_Comments#History). The current RFC process has been derived heavily from [Rust](https://rust-lang.github.io/rfcs/). Many other open source projects have adopted an RFC process:
 
 - [Rust](https://github.com/rust-lang/rfcs)
   - FCP lasts 10 days
