@@ -14,23 +14,25 @@ The "RFC" (request for comments) process provide a consistent and controlled pat
 # Motivation
 [motivation]: #motivation
 
-Now that we've entered the beta and people are trying out Cloud Native Buildpacks in the wild, we need to take more care in introducing change. As part of road of incubation, we need to demonstrate maturity and stability. This process documents a path for anyone to contribute and have input on features.
+Now that we've entered the beta and people are trying out Cloud Native Buildpacks in the wild, we need to take more care in introducing change. As part of the road to incubation, we need to demonstrate maturity and stability. This process documents a path for anyone to contribute and have input on features.
 
 # What it is
 [what-it-is]: #what-it-is
 
-RFCs record potential change and with the context and information at the given time. This process provides a defined process for anyone wishing to contribute to the Cloud Native Buildpacks project as well as collect a diverse set of inputs give opportunity for engagement. Anyone who chooses not to actively partcipate in any RFC is presumed to trust their colleagues on the matter. Once an RFC is accepted, they can be referenced as read-only documents in this repository until replaced or ammended by another RFC when context has significantly changed.
+RFCs record potential change and with the context and information at the given time. This provides a defined process for anyone wishing to contribute to the Cloud Native Buildpacks project as well as collect a diverse set of inputs and give opportunity for engagement. Anyone who chooses not to actively partcipate in any RFC is presumed to trust their colleagues on the matter. Once an RFC is accepted, they can be referenced as read-only documents in this repository until replaced or ammended by another RFC when context has significantly changed.
 
 # How it Works
 [how-it-works]: #how-it-works
 
 Many changes, including bug fixes and documentation improvements can be implemented and reviewed via the normal GitHub pull request workflow.
 
-Some changes though are "substantial", and we ask that these be put through a bit of a design process and produce a consensus among the community and the core team / respective subteam (team).
+Some changes though are "substantial", and we ask that these be put through a bit of a design process and produce a consensus among the community and the core team / respective subteam.
 
 ## What's in Scope
 
-You'll need to follow this process for anything considered "substantial". The things that we consider "substantial" will evolve over time, but they will generally be any user facing change. The Cloud Native Buildpacks project currently has users in 5 types:
+You'll need to follow this process for anything considered "substantial". The things that we consider "substantial" will evolve over time, but will generally be user facing changes.
+
+The Cloud Native Buildpacks project has 5 types of users:
 
 - Buildpack Users - these are developers who want to go from source code to container image
 - Buildpack Authors - these are developers who are building the buildpacks
@@ -38,17 +40,20 @@ You'll need to follow this process for anything considered "substantial". The th
 - Platform Implementor - these are developers who will be implementing the buildpack infrastructure
 - Project Contributor - people contributing to the Cloud Native Buildpacks project
 
-What constitutes a "substantial" change may include the following:
+What constitutes a "substantial" change may include the following but is not limited to:
 
 - changes to the spec (buildpack author, platform operator)
-- adding/removing/changing pack commands (buildpack user, buildpack author)
+- adding/removing pack commands (buildpack user, buildpack author)
 - lifecycle library interface (platform implementor)
 - process changes (project contributor)
 - governance (project contributor)
+- issues that need more discussion or clarification
 
-If you submit a pull request the team deems warrants an RFC, it will be politely closed with a request for an RFC to be opened first.
+If you submit a pull request the team deems warrants an RFC, it will be politely closed with a request for an RFC.
 
 ## Process
+
+### RFCs
 
 To get an RFC into Cloud Native Buildpacks, first the RFC needs to be merged into the RFC repo. Once an RFC is merged, it's considered 'active' and may be implemented to be included in the project. These steps will get an RFC to be considered:
 
@@ -60,11 +65,11 @@ To get an RFC into Cloud Native Buildpacks, first the RFC needs to be merged int
 
 Once a pull request is opened, the RFC is now in development and the following will happen:
 
-- It will be triaged, labeled, and discussed in a future working group meeting. Working group meetings happen on a weekly cadence barring exceptions. Labeling marks a RFC as general or specific to a subteam.
+- It will be labeled and discussed on a future working group meeting. Working group meetings happen on a weekly cadence barring exceptions. Labeling marks a RFC as general or specific to a subteam.
 - The team will discuss as much as possible in the RFC pull request directly. Any outside discussion will be summarized in the comment thread.
 - When deemed "ready", a team member will propose a "motion for final comment period (FCP)" along with a disposition of the outcome (merge, close, or postpone). This is step taken when enough discussion of the tradeoffs have taken place and the team is in a position to make a decision. Before entering FCP, super majority of the team must sign off.
 - The FCP will last 7 days. If there's unanimous agreement among the team the FCP can close early.
-- For voting, the binding votes are comprised of the core team (and subteam maintainers if labeled as a subteam RFC). Acceptance requires super majority of binding votes in favor. The voting options are the following: Affirmative, Negative, and Abstinence. Non-binding votes are of course welcome.
+- For voting, the binding votes are comprised of the core team (and subteam maintainers if labeled as a subteam RFC). Acceptance requires super majority of binding votes in favor. The voting options are the following: Affirmative, Negative, and Abstinence. Non-binding votes are of course welcome. Super majority means 2/3 or greater and no single company can have more than 50% of countable votes.
 - If no substantial new arguments or ideas are raised, the FCP will follow the outcome decided. If there are substantial new arguments, then the RFC will go back into development.
 
 Once an RFC has been accepted, the team member who merges the pull request should do the following:
@@ -74,6 +79,10 @@ Once an RFC has been accepted, the team member who merges the pull request shoul
 - Create a corresponding issue in the appropriate repo.
 - Fill in the remaining metadata at the top.
 - Commit everything.
+
+### Pull Requests / Issues
+
+During the Planning Working Group meeting, the team will go over open pull requests / issues. If the change is considered substantial or more clarity/discussion is warranted, the issue will be closed and the author will be asked to be opened.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -103,7 +112,5 @@ The basic format of RFCs was [invented in the 1960s by Steve Crocker](https://en
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Other classes of changes that should be in scope?
-- Changes to the target users?
-- Is this too much process?
+- What clearly defines a "substantial" change?
 - How long should the Final Comment Period be?
