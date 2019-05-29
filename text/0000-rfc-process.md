@@ -44,10 +44,10 @@ What constitutes a "substantial" change may include the following but is not lim
 
 - changes to the spec (buildpack author, platform operator)
 - adding/removing pack commands (buildpack user, buildpack author)
-- lifecycle library interface (platform implementor)
+- breaking changes to the lifecycle library interface such as the lifecycle/platform or lifecycle/platform contracts (platform implementor)
 - process changes (project contributor)
 - governance (project contributor)
-- issues that need more discussion or clarification
+- issues that need more discussion or clarification as determined by the project owners and maintainers
 
 If you submit a pull request the team deems warrants an RFC, it will be politely closed with a request for an RFC.
 
