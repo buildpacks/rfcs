@@ -14,19 +14,20 @@ Adds Source URL and hash properties to app metadata in the manifest, `Config.Lab
 # Motivation
 [motivation]: #motivation
 
-- Why should we do this?
+- **Why should we do this?**
 The provenance of the app should be transparent, and the image should be
 reproducible.  Providing metadata about the source URL and commit hash of the App assists
 in achieving this.
 
-- What use cases does it support?
+- **What use cases does it support?**
 ### Case 1
 This supports providing buildpack users, including users with quality assurance, legal or security roles, with data about the origin of packaged material.  This helps in their understanding of the provenance of the app.
 
 ### Case 2
 This supports providing a buildpack user with information that would allow them to attempt to reproduce the build/packaging.  This may be done as part of a verification step related to the above use case.
 
-- What is the expected outcome?
+- **What is the expected outcome?**
+
 Additional metadata would be provided to allow for verification of the source and reproduction of the build.
 
 # What it is
@@ -69,6 +70,8 @@ Unencoded, `io.buildpacks.lifecycle.metadata` is:
 The lifecycle may be provided additional metadata values, and this should be marshalled to the image manifest.
 Platforms may or may not use these additional properties.
 
+In terms of the lifecycle implementation, this is likely to require an additional property to [Lifecycle Builder](https://github.com/buildpack/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/cmd/builder/main.go#L66-L75), the [Builder struct](https://github.com/buildpack/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/cmd/builder/main.go#L66-L75), plus the [AppMetadata struct](https://github.com/buildpack/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/metadata/metadata.go#L21-L23) and changes to the [exporter](https://github.com/buildpack/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/exporter.go#L50-L54).
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -91,12 +94,16 @@ None known.
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What parts of the design do you expect to be resolved before this gets merged?
+- **What parts of the design do you expect to be resolved before this gets merged?**
+
 The property names and schema should be agreed.
-- What parts of the design do you expect to be resolved through implementation of the feature?
+
+- **What parts of the design do you expect to be resolved through implementation of the feature?**
+
 The entry point of this data into the lifecycle.  We expect the data to be
 provided by the platform, and for the lifecycle to write it verbatim into the
 manifest without need to alter or otherwise manipulate the provided data.
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 
+- **What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?**
 
+Adding further/arbitrary metadata related to the app.
