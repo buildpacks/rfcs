@@ -56,8 +56,8 @@ Unencoded, `io.buildpacks.lifecycle.metadata` is:
 {
   "app": {
     "source": {
-      "url": "https://githubcom/buildpack/rfcs.git",
-      "hash": " a33a985597b04c36aeefd6b17c4ef593adb5dc01"
+      "url": "https://github.com/buildpack/rfcs.git",
+      "hash": "a33a985597b04c36aeefd6b17c4ef593adb5dc01"
     }
   }
 }
