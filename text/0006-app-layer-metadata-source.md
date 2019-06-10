@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Manifest - App metadata - add source url & hash
+- Name: Manifest - App metadata - add source uri & sha
 - Start Date: 2019-06-10
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -9,14 +9,14 @@
 # Summary
 [summary]: #summary
 
-Adds Source URL and hash properties to app metadata in the manifest, `Config.Labels."io.buildpacks.lifecycle.metadata".app`.
+Adds Source uri and sha properties to app metadata in the manifest, `Config.Labels."io.buildpacks.lifecycle.metadata".app`.
 
 # Motivation
 [motivation]: #motivation
 
 - **Why should we do this?**
 The provenance of the app should be transparent, and the image should be
-reproducible.  Providing metadata about the source URL and commit hash of the App assists
+reproducible.  Providing metadata about the source uri and commit sha of the App assists
 in achieving this.
 
 - **What use cases does it support?**
@@ -34,19 +34,19 @@ Additional metadata would be provided to allow for verification of the source an
 [what-it-is]: #what-it-is
 
 This feature adds additional metadata to the image manifest.  It introduces two
-new properties related to the App layer.  These properties are the URL and hash
+new properties related to the App layer.  These properties are the uri and sha
 of the source.
 
 It is proposed that these properties would be added as children of `Config.Labels."io.buildpacks.lifecycle.metadata".app`.
 
-We propose `source.url` and `source.hash` properties.
+We propose `source.uri` and `source.sha` properties.
 
 Example:
 ```
 {
   Config: {
     Labels: {
-      "io.buildpacks.lifecycle.metadata":"{\"app\":{\"source\":{\"url\":\"https://github.com/buildpack/rfcs.git\", \"hash\":\"a33a985597b04c36aeefd6b17c4ef593adb5dc01\"}}}"
+      "io.buildpacks.lifecycle.metadata":"{\"app\":{\"source\":{\"uri\":\"https://github.com/buildpack/rfcs.git\", \"sha\":\"a33a985597b04c36aeefd6b17c4ef593adb5dc01\"}}}"
     }
   }
 }
@@ -57,8 +57,8 @@ Unencoded, `io.buildpacks.lifecycle.metadata` is:
 {
   "app": {
     "source": {
-      "url": "https://github.com/buildpack/rfcs.git",
-      "hash": "a33a985597b04c36aeefd6b17c4ef593adb5dc01"
+      "uri": "https://github.com/buildpack/rfcs.git",
+      "sha": "a33a985597b04c36aeefd6b17c4ef593adb5dc01"
     }
   }
 }
@@ -80,11 +80,19 @@ There may be a risk in the future that these suggested keys may not align with d
 # Alternatives
 [alternatives]: #alternatives
 
-We considered [OCI pre-defined annotation
+1. We considered [OCI pre-defined annotation
 keys](https://github.com/opencontainers/image-spec/blob/master/annotations.md#pre-defined-annotation-keys).
-These are semantically applied at the image level.  However, it is possible that the source
-for building the image is separate from the source for building the app layer.
-Therefore we need metadata to describe the app separately.
+*  **Pro**:
+    * Follows existing OCI specification
+*  **Con**:
+    * it is possible that the source for building the image is separate from the source for building the app layer.  This attribute would not allow both to be added, and would not allow differentiation between the two.
+1. A buildpack could be created which would add the metadata.
+    *  **Pro**:
+        * Does not have to be part of the specification.
+        * Extensible to additional buildpacks to provide different types of metadata (e.g. from other source control repositories)
+    *  **Con**:
+        * This would require the buildpack user to specify this additional buildpack.
+        * This would put the metadata in the specific buildpack layer, and not with the other app metadata.
 
 # Prior Art
 [prior-art]: #prior-art
