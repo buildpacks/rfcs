@@ -17,7 +17,7 @@ It provides a developer-friendly interface that abstracts away complex buildpack
 [what-it-is]: #what-it-is
 
 This RFC proposes an official way to distribute buildpacks that conform to the CNB buildpack v3 specification.
-Changes would consist of a new Buildpack Distribution specification, modifications the lifecycle builder, and modifications to the pack CLI.
+Changes would consist of a new Buildpack Distribution specification, modifications to the lifecycle builder, and modifications to the pack CLI.
 
 It affects all personas that interact with buildpacks.
 
@@ -46,7 +46,6 @@ A buildpack blob is a tgz containing a `buildpack.toml`. Example format:
 id = "io.buildpacks.nodejs"
 name = "Node.js Buildpack"
 version = "0.0.9"
-
 [[buildpacks.order]]
 group = [
    { id = "io.buildpacks.node", version = "0.0.5" },
@@ -60,6 +59,8 @@ version = "0.0.7"
 path = "./npm-cnb/"
 [buildpacks.metadata]
 # ...
+[[buildpacks.stacks]]
+id = "io.buildpacks.stacks.bionic"
 
 [[buildpacks]]
 id = "io.buildpacks.node"
@@ -68,6 +69,9 @@ version = "0.0.5"
 path = "./node-cnb/"
 [buildpacks.metadata]
 # ...
+[[buildpacks.stacks]]
+id = "io.buildpacks.stacks.bionic"
+
 ```
 
 Each `path` must reference a valid buildpack implementation.
@@ -83,7 +87,8 @@ A `.cnb` file is an uncompressed tar archive containing an OCI image. Its file n
 
 ### Layer Blob
 
-Each FS layer blob in the image contains a single buildpack blob tgz and a series of symlinks.
+Each FS layer blob in the image contains a single buildpack blob tgz and at least one symlink.
+A symlink should be created for each buildpack version that the blob is assembled to support.
 
 ```
 /cnb/blobs/<sha256 checksum of buildpack blob tgz>/
@@ -101,36 +106,31 @@ Example:
 /cnb/by-id/io.buildpacks.node/0.0.5 -> /cnb/blobs/bc4c24181ed3ce6666444deeb95e1f61940bffee70dd13972beb331f5d111e9b/
 ```
 
-### Default Buildpack
+## Buildpackage Metadata
 
-The buildpack contains a single metadata layer that references the default buildpack for the buildpackage.
+A buildpack ID, buildpack version, and at least one stack must be provided in the OCI image metadata.
 
-```
-/cnb/package.toml
-```
-
-containing:
-```
-[default]
-id = "<buildpack ID>"
-version = "<buildpack version>"
-```
-
-## CNB Package Metadata
-
-All supported stacks must be provided in the OCI image metadata.
-```
-Label: io.buildpacks.cnb.metadata
-JSON:
+Label: `io.buildpacks.cnb.metadata`
+```json
 {
-  "stacks": {
-    "id": "io.buildpacks.stacks.bionic",
-    "mixins": ["mysql"]
-   }
+  "id": "io.buildpacks.nodejs",
+  "version": "0.0.9",
+  "stacks": [
+    {
+      "id": "io.buildpacks.stacks.bionic",
+      "mixins": ["build:git"]
+    }
+  ]
 }
 ```
-For a buildpackage to be valid, each entry in `buildpack.toml` must have all listed stacks. Each stack ID should only be present once, and the `mixins` list should enumerate all the required mixins for that stack for all included buildpacks.
 
+The buildpack ID and version must match a buildpack provided by a layer blob.
+For each listed stack, all associated buildpacks must be a candidate for detection when the specified buildpack ID and version are selected.
+
+For a buildpackage to be valid, each entry in `buildpack.toml` must have all listed stacks.
+Each stack ID should only be present once, and the `mixins` list should enumerate all the required mixins for that stack to support all included buildpacks.
+
+Fewer stack entries as well as additional mixins for a stack entry may be specified to restrict builders that are created from the buildpackage.
 
 ### Execution Order
 
@@ -191,30 +191,104 @@ C, &amp; D, &amp; G, &amp; H \\
 
 ### App Developer
 
-`pack build` should accept a list of buildpack IDs via the `--buildpack` flag. 
+`pack build` should accept a list of buildpacks via the `--buildpack` flag.
+The flag may be passed multiple times to construct a buildpack group.
+
+The value of each flag must be one of:
+- A buildpack ID of a buildpack on the builder, optionally followed by `@` and a version
+- A path to a buildpackage on the local filesystem
+- A reference to a buildpackage on a Docker registry  
+
+A version must be specified if the version is ambiguous.
 
 ### Buildpack Developer
 
-`pack create-cnb` will package a selection of
+`pack create-package` will package a selection of
 
-- buildpack blobs (tgz)
+- gzip compressed, tar archived buildpack blobs
 - other buildpackages
-- a default buildpack ID and version (defaults to last selected buildpackage if present)
+- stack and buildpack metadata
 
 into a `.cnb` file, OCI image in a registry, or OCI image in a Docker daemon.
 
-These properties will be specified in a `cnb.toml` file.
+These properties will be specified in a `package.toml` file.
 
-Instead of builder.toml, `pack create-builder` will generate a builder image from a buildpackage and stack ID.
+```toml
+id = "io.buildpacks.nodejs"
+version = "0.0.9"
+
+[[blobs]]
+uri = "https://example.com/nodejs.tgz"
+[[blobs.buildpacks]]
+id = "io.buildpacks.nodejs"
+version = "0.0.9"
+[[blobs.buildpacks]]
+id = "io.buildpacks.npm"
+version = "0.0.7"
+[[blobs.buildpacks]]
+id = "io.buildpacks.node"
+version = "0.0.5"
+
+[[packages]]
+ref = "registry.example.com/ruby"
+
+[[stacks]]
+id = "io.buildpacks.stacks.bionic"
+mixins = ["build:git"]
+```
+
+`pack create-builder` will generate a builder image from buildpackages, buildpack blobs, and stack metadata.
+
+These properties will be specified in a `builder.toml` file.
+
+```toml
+[[blobs]]
+uri = "https://example.com/nodejs.tgz"
+[[blobs.buildpacks]]
+id = "io.buildpacks.nodejs"
+version = "0.0.9"
+[[blobs.buildpacks]]
+id = "io.buildpacks.npm"
+version = "0.0.7"
+[[blobs.buildpacks]]
+id = "io.buildpacks.node"
+version = "0.0.5"
+
+[[packages]]
+ref = "registry.example.com/ruby"
+
+[[order]]
+group = [
+   { id = "io.buildpacks.nodejs", version = "0.0.9" },
+   { id = "io.buildpacks.ruby", version = "0.1.0" },
+]
+
+
+[stack]
+id = "io.buildpacks.stacks.bionic"
+mixins = ["build:git"]
+build-image = "registry.example.com/build"
+run-image = "registry.example.com/run"
+run-image-mirrors = ["registry2.example.com/run"]
+```
+
+If `order` is not specified, the first buildpackage in `packages` becomes the default buildpack when no buildpacks are specified for `pack build`.
 
 # Unanswered Questions
 [questions]: #questions
 
-Format needed for cnb.toml.
 
-What happens when a resolved ordering of buildpacks has the same ID within a group?
+1. What happens when a resolved ordering of buildpacks has the same ID within a group?
+   Suggestion: use first, make non-optional if any others are non-optional.
 
-Suggestion: use first, make non-optional if any others are non-optional.
+2. Should we allow any buildpack blobs to be present in a buildpackage, regardless of stack?
+   Suggestion: no, we can define a different format for a large repository of buildpack blobs.
+
+3. For simplicity, should builders be restricted to a single buildpackage, no blobs, and no order definition?
+   Suggestion: no, the proposed model simplifies the workflow.
+   
+4. Should we remove symlinks in a buildpackage to buildpacks that don't match a buildpackage stack?
+   Suggestion: no, this makes dynamic builder generation difficult.
 
 # Drawbacks
 [drawbacks]: #drawbacks
