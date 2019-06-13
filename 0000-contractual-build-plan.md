@@ -8,19 +8,28 @@
 # Motivation
 [motivation]: #motivation
 
-This proposal suggests a new contract for generating the build plan and bill-of-materials that is easy to understand and more straightforward.
+This proposal suggests a new contract for generating the build plan and bill-of-materials that is easier to understand and more straightforward.
+In addition, it fixes a critical design flaw in the current build plan mechanism: two buildpacks that require the same dependency at different stages (build vs. launch) will always result in unclear build failures due to the second request overriding the first request.
 
-While the current build plan contract is superficially simple, buildpacks use currently use it in ways that are occasionally difficult to understand or explain.
+## Drawbacks of the current model
 
+While the current build plan contract is superficially simple, buildpacks currently use it in ways that are occasionally difficult to understand or explain.
 For example, some buildpacks "push" dependencies they plan to provide into the build plan, while other buildpacks "pull" dependencies they need from other buildpacks by placing them in the build plan.
 
 Additionally, reading an incremental build plan during the detection phase isn't necessary to accomplish the current use cases for the build plan.
+
+## Benefits of the proposed model
+
+- Accounts for all current use cases while applying a tighter, "pull-only" contract
+- Speeds up detection
+- Simplifies writing modular buildpacks
+- Easier to understand
 
 # What it is
 [what-it-is]: #what-it-is
 
 This RFC proposes a breaking change to the build plan contract.
-Changes would consist of modifications to the buildpack specification and to the lifecycle detector.
+Changes would consist of modifications to the buildpack specification and lifecycle.
 
 It affects buildpack developers who implement modular, interdependent buildpacks.
 
@@ -36,43 +45,74 @@ It affects buildpack developers who implement modular, interdependent buildpacks
 - If an optional buildpack provides a dependency that is not required, it is excluded from consideration.
 - If an optional buildpack requires a dependency that is not provided, it is excluded from consideration.
 - Multiple buildpacks may require or provide the same dependency.
+- `/bin/build` no longer receives a build plan on stdin.
+- `/bin/build`'s build plan argument contains required dependencies that it provides.
+- `/bin/build` may refine its build plan to contain additional dependency metadata. 
+- `/bin/build` may remove all entries for a dependency in its build plan to allow a subsequent buildpack to provide that dependency.
 
-## Build Plan Contributions during Detection
+## Examples
 
-Example: 
-```
-[[requires]]
-name = "nodejs"
-version = "1.x"
-[[requires.metadata]]
-something = "12"
+### Build Plan Contributions during Detection
 
+Node Engine Buildpack:
+```toml
 [[provides]]
 name = "nodejs"
 ```
 
-## Build Plan Output during Build
-
-Example:
-```
-[[nodejs]]
+NPM Buildpack:
+```toml
+[[requires]]
 name = "nodejs"
 version = "1.x"
-[[nodejs.metadata]]
+[requires.metadata]
+something = "12"
+
+[[requires]]
+name =  "node_modules"
+
+[[provides]]
+name = "node_modules"
+```
+
+### Build Plan Input during Build
+
+Node Engine Buildpack:
+```toml
+[[nodejs]]
+version = "1.x"
+[nodejs.metadata]
 something = "12"
 ```
 
-## User Interface
+NPM Buildpack:
+```toml
+[[node_modules]]
+```
 
-### Buildpack Developer
+## Bill-of-Materials
+
+When combined:
+```toml
+[[nodejs]]
+version = "1.2.3"
+[nodejs.metadata]
+something = "12"
+arch = "x86_64"
+
+[[node_modules]]
+packages = ["..."]
+```
 
 # Unanswered Questions
 [questions]: #questions
 
+TBD
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
+It's no longer possible to push structured data to subsequent buildpacks during detection.
 
 # Alternatives
 [alternatives]: #alternatives
