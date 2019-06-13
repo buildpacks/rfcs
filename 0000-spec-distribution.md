@@ -36,6 +36,7 @@ It affects all personas that interact with buildpacks.
 - A buildpackage is a collection of buildpack repositories with `buildpack.toml` files.
 - A buildpackage can have a default buildpack.
 - Labels are removed from the specification.
+- The lifecycle moves into `/cnb/lifecycle/`.
 
 ## Buildpack Blob Format
 
@@ -136,7 +137,7 @@ Fewer stack entries as well as additional mixins for a stack entry may be specif
 
 During detection, a buildpack ID or list of buildpack IDs is resolved into individual buildpack implementation that include a `path` field.
 
-First, the detector determines the user's choice of buildpack IDs or selects the default one from `/cnb/package.toml`.
+First, the detector determines the user's choice of buildpack IDs or builder's order definition.
 
 Next, the 2-D ordering of buildpacks is derived as follows:
 
