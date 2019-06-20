@@ -71,7 +71,7 @@ Unencoded, `io.buildpacks.app.metadata` is:
 The lifecycle may be provided additional metadata values, and this should be marshalled to the image manifest.
 Platforms may or may not use these additional properties.
 
-In terms of the lifecycle implementation, this is likely to require an additional property to [Lifecycle Builder](https://github.com/buildpack/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/cmd/builder/main.go#L66-L75), the [Builder struct](https://github.com/buildpack/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/cmd/builder/main.go#L66-L75), plus the [AppMetadata struct](https://github.com/buildpack/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/metadata/metadata.go#L21-L23) and changes to the [exporter](https://github.com/buildpack/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/exporter.go#L50-L54).
+In terms of the lifecycle implementation, this is likely to require changes to the [exporter](https://github.com/buildpack/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/exporter.go#L50-L54) to add the additional app metadata.
 
 # Drawbacks
 [drawbacks]: #drawbacks
