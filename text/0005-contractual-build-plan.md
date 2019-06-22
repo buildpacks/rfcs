@@ -8,15 +8,15 @@
 # Motivation
 [motivation]: #motivation
 
-This proposal suggests a new contract for generating the build plan and bill-of-materials that is easier to understand and more straightforward.
-In addition, it fixes a critical design flaw in the current build plan mechanism: two buildpacks that require the same dependency at different stages (build vs. launch) will always result in unclear build failures due to the second request overriding the first request.
+This proposal suggests a new contract for generating the build plan and bill-of-materials that is easier to understand and more straightforward compared to the current method.
+In addition, it fixes a critical design flaw in the current build plan mechanism: two buildpacks that require the same dependency at different stages (build vs. launch) will often result in unclear build failures due to the second request overriding the first request.
 
 ## Drawbacks of the current model
 
 While the current build plan contract is superficially simple, buildpacks currently use it in ways that are occasionally difficult to understand or explain.
 For example, some buildpacks "push" dependencies they plan to provide into the build plan, while other buildpacks "pull" dependencies they need from other buildpacks by placing them in the build plan.
 
-Additionally, reading an incremental build plan during the detection phase isn't necessary to accomplish the current use cases for the build plan.
+Additionally, reading an incremental build plan during the detection phase is not necessary to accomplish the current use cases for the build plan.
 
 ## Benefits of the proposed model
 
@@ -40,8 +40,8 @@ It affects buildpack developers who implement modular, interdependent buildpacks
 
 - `/bin/detect` no longer receives a build plan on stdin.
 - In `/bin/detect`, buildpacks contribute two sections to the build plan: `requires` and `provides`
-- Every required dependency must be provided for detection to pass.
-- Every provided dependency must be required for detection to pass.
+- Every required dependency must be provided by the current buildpack or a previous buildpack one or more times for detection to pass.
+- Every provided dependency must be required one or more times for detection to pass.
 - If an optional buildpack provides a dependency that is not required, it is excluded from consideration.
 - If an optional buildpack requires a dependency that is not provided, it is excluded from consideration.
 - Multiple buildpacks may require or provide the same dependency.
@@ -104,11 +104,14 @@ arch = "x86_64"
 packages = ["..."]
 ```
 
-# Unanswered Questions
+# Questions
 [questions]: #questions
 
-Should we provide an alternative version of `[[require]]` that also provides?
-Alternatively, should `[[require]]` have a `provide = true` option?
+1. Should we provide an alternative version of `[[require]]` that also provides? Alternatively, should `[[require]]` have a `provide = true` option?
+
+2. How can a buildpack require either of two different dependencies, but not both?
+
+   With the [distribution spec](https://github.com/buildpack/rfcs/blob/dist-spec/0000-spec-distribution.md), complex logic can be expressed by multiple buildpacks that live in the same repository. These buildpacks may have the same source.
 
 # Drawbacks
 [drawbacks]: #drawbacks
