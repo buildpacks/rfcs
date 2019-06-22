@@ -78,6 +78,7 @@ id = "io.buildpacks.stacks.bionic"
 Each `path` must reference a valid buildpack implementation.
 However, buildpacks defined in `[[buildpacks.order]]` do not need to be included in the buildpack blob.
 
+So that a buildpack can identify its corresponding entry in `buildpack.toml`, the buildpack ID is now set during the detection and build phases in `$BP_ID`.
 
 ## Buildpackage Format
 
