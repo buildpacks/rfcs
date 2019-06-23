@@ -188,6 +188,10 @@ C, &amp; D, &amp; G, &amp; H \\
 \end{bmatrix}
 " />
 
+Note that buildpack IDs are expanded depth-first in left-to-right order.
+
+If a buildpack entry within a group has the parameter `optional = true`, the a copy of the group without the entry is repeated after the original group. This is functionally equivalent to the current meaning of optional for a single buildpack implementation. The current meaning of optional for a single buildpack implementation will remain unchanged, as it is more performant and results in the same behavior.
+
 
 ## User Interface
 
