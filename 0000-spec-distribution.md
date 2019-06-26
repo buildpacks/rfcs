@@ -251,7 +251,7 @@ id = "io.buildpacks.rails"
 version = "0.0.3"
 
 [[blobs]]
-uri = "https://example.com/nodejs.tgz"
+uri = "https://example.com/rails.tgz"
 [[blobs.buildpacks]]
 id = "io.buildpacks.rails"
 version = "0.0.3"
