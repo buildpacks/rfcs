@@ -219,7 +219,10 @@ into a `.cnb` file, OCI image in a registry, or OCI image in a Docker daemon.
 
 These properties will be specified in a `package.toml` file.
 
+Example `package.toml` for Node.js with just blobs:
+
 ```toml
+[default]
 id = "io.buildpacks.nodejs"
 version = "0.0.9"
 
@@ -235,13 +238,35 @@ version = "0.0.7"
 id = "io.buildpacks.node"
 version = "0.0.5"
 
+[[stacks]]
+id = "io.buildpacks.stacks.bionic"
+mixins = ["build:git"]
+```
+
+Example `package.toml` for Rails with blobs and packages:
+
+```toml
+[default]
+id = "io.buildpacks.rails"
+version = "0.0.3"
+
+[[blobs]]
+uri = "https://example.com/nodejs.tgz"
+[[blobs.buildpacks]]
+id = "io.buildpacks.rails"
+version = "0.0.3"
+
 [[packages]]
-ref = "registry.example.com/ruby"
+ref = "registry.example.com/nodejs:0.0.9"
+[[packages]]
+ref = "registry.example.com/ruby:0.0.4"
 
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
 mixins = ["build:git"]
 ```
+
+
 
 `pack create-builder` will generate a builder image from buildpackages, buildpack blobs, and stack metadata.
 
@@ -261,7 +286,7 @@ id = "io.buildpacks.node"
 version = "0.0.5"
 
 [[packages]]
-ref = "registry.example.com/ruby"
+ref = "registry.example.com/ruby" 
 
 [[order]]
 group = [
