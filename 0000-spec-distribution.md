@@ -40,7 +40,8 @@ It affects all personas that interact with buildpacks.
 
 ## Buildpack Blob Format
 
-A buildpack blob is a tgz containing a `buildpack.toml`. Example format:
+A buildpack blob is a tgz containing a `buildpack.toml`, which is a configuration file defined in the CNB buildpack specification.
+Example format:
 
 ```toml
 [[buildpacks]]
@@ -78,14 +79,13 @@ id = "io.buildpacks.stacks.bionic"
 Each `path` must reference a valid buildpack implementation.
 However, buildpacks defined in `[[buildpacks.order]]` do not need to be included in the buildpack blob.
 
-So that a buildpack can identify its corresponding entry in `buildpack.toml`, the buildpack ID is now set during the detection and build phases in `$BP_ID`.
+So that a buildpack can identify its corresponding entry in `buildpack.toml`, the buildpack ID is set during the detection and build phases in `$BP_ID`.
 
 ## Buildpackage Format
 
 A buildpackage may exist as an OCI image on an image registry, an OCI image in a Docker daemon, or a `.cnb` file.
 
 A `.cnb` file is an uncompressed tar archive containing an OCI image. Its file name should end in `.cnb`.
-
 
 ### Layer Blob
 
@@ -217,7 +217,7 @@ A version must be specified if the version is ambiguous.
 
 into a `.cnb` file, OCI image in a registry, or OCI image in a Docker daemon.
 
-These properties will be specified in a `package.toml` file.
+These properties will be specified in a `package.toml` file. This file is a configuration file for the pack CLI, and is not specified in the buildpack, platform, or distribution specification.
 
 Example `package.toml` for Node.js with just blobs:
 
@@ -228,15 +228,6 @@ version = "0.0.9"
 
 [[blobs]]
 uri = "https://example.com/nodejs.tgz"
-[[blobs.buildpacks]]
-id = "io.buildpacks.nodejs"
-version = "0.0.9"
-[[blobs.buildpacks]]
-id = "io.buildpacks.npm"
-version = "0.0.7"
-[[blobs.buildpacks]]
-id = "io.buildpacks.node"
-version = "0.0.5"
 
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
@@ -252,9 +243,6 @@ version = "0.0.3"
 
 [[blobs]]
 uri = "https://example.com/rails.tgz"
-[[blobs.buildpacks]]
-id = "io.buildpacks.rails"
-version = "0.0.3"
 
 [[packages]]
 ref = "registry.example.com/nodejs:0.0.9"
@@ -266,24 +254,13 @@ id = "io.buildpacks.stacks.bionic"
 mixins = ["build:git"]
 ```
 
-
-
 `pack create-builder` will generate a builder image from buildpackages, buildpack blobs, and stack metadata.
 
-These properties will be specified in a `builder.toml` file.
+These properties will be specified in a `builder.toml` file. This file is a configuration file for the pack CLI, and is not specified in the buildpack, platform, or distribution specification.
 
 ```toml
 [[blobs]]
 uri = "https://example.com/nodejs.tgz"
-[[blobs.buildpacks]]
-id = "io.buildpacks.nodejs"
-version = "0.0.9"
-[[blobs.buildpacks]]
-id = "io.buildpacks.npm"
-version = "0.0.7"
-[[blobs.buildpacks]]
-id = "io.buildpacks.node"
-version = "0.0.5"
 
 [[packages]]
 ref = "registry.example.com/ruby" 
@@ -293,7 +270,6 @@ group = [
    { id = "io.buildpacks.nodejs", version = "0.0.9" },
    { id = "io.buildpacks.ruby", version = "0.1.0" },
 ]
-
 
 [stack]
 id = "io.buildpacks.stacks.bionic"
@@ -320,6 +296,11 @@ If `order` is not specified, the first buildpackage in `packages` becomes the de
    
 4. Should we remove symlinks in a buildpackage to buildpacks that don't match a buildpackage stack?
    Suggestion: no, this makes dynamic builder generation difficult.
+   
+5. Is `package.toml` really necessary?
+   Suggestion: it's necessary until we develop a buildpack registry that allows you to download a buildpack based on its ID.
+   Once there is a registry, we should deprecate `package.toml` so packages can be generated directly from `buildpack.toml`.
+   At that point, we should add a `ref` field to `buildpacks[].order[].group[]` so that registry locations can be overridden.
 
 # Drawbacks
 [drawbacks]: #drawbacks
