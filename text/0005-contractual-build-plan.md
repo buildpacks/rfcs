@@ -121,7 +121,9 @@ N/A
 # Drawbacks
 [drawbacks]: #drawbacks
 
-It's no longer possible to push structured data to subsequent buildpacks during detection.
+1. It's no longer possible to push structured data to subsequent buildpacks during detection.
+
+2. Breaking change for all current buildpacks that use the build plan.
 
 # Alternatives
 [alternatives]: #alternatives
