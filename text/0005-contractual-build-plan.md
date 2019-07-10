@@ -107,7 +107,8 @@ packages = ["..."]
 # Unanswered Questions
 [questions]: #questions
 
-TBD
+Should we provide an alternative version of `[[require]]` that also provides?
+Alternatively, should `[[require]]` have a `provide = true` option?
 
 # Drawbacks
 [drawbacks]: #drawbacks
