@@ -79,7 +79,7 @@ id = "io.buildpacks.stacks.bionic"
 Each `path` must reference a valid buildpack implementation.
 However, buildpacks defined in `[[buildpacks.order]]` do not need to be included in the buildpack blob.
 
-So that a buildpack can identify its corresponding entry in `buildpack.toml`, the buildpack ID is set during the detection and build phases in `$BP_ID`.
+So that a buildpack can identify its corresponding entry in `buildpack.toml`, the buildpack ID is set during the detection and build phases as `$BP_ID`.
 
 ## Buildpackage Format
 
@@ -203,7 +203,10 @@ The flag may be passed multiple times to construct a buildpack group.
 The value of each flag must be one of:
 - A buildpack ID of a buildpack on the builder, optionally followed by `@` and a version
 - A path to a buildpackage on the local filesystem
-- A reference to a buildpackage on a Docker registry  
+- A reference to a buildpackage on a Docker registry
+- A URI or local filesystem path to a blob
+
+When a blob is specified, the first buildpack in `buildpack.toml` is assumed to be the desired buildpack.
 
 A version must be specified if the version is ambiguous.
 
@@ -253,6 +256,10 @@ ref = "registry.example.com/ruby:0.0.4"
 id = "io.buildpacks.stacks.bionic"
 mixins = ["build:git"]
 ```
+
+If `stacks` is not specified, the buildpackage automatically includes stack metadata for all common stacks specified in the selected buildpacks.
+
+If `pack create-package` is run directly on a blob instead of a `package.toml`, the first buildpack in `buildpack.toml` is assumed to be the `default` buildpack, the single blob is used as a source, and the `stacks` are automatically determined as specified above.
 
 `pack create-builder` will generate a builder image from buildpackages, buildpack blobs, and stack metadata.
 
