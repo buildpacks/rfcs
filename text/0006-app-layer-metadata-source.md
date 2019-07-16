@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Manifest - App metadata - add source uri, branch & ref
+- Name: Manifest - App metadata - add source type, version and metadata
 - Start Date: 2019-06-10
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -9,17 +9,19 @@
 # Summary
 [summary]: #summary
 
-Adds `Config.Labels."io.buildpacks.app.metadata"` property to the manifest to hold app specific metadata.
+Adds `Config.Labels."io.buildpacks.app.source"` property to the manifest to hold app specific source information.
 
-This RFC further proposes to add a source uri, branch and ref properties to this new app metadata property, `Config.Labels."io.buildpacks.app.metadata".source.uri`, `Config.Labels."io.buildpacks.app.metadata".source.branch` & `Config.Labels."io.buildpacks.app.metadata".source.ref`.
+This RFC further proposes to add type, version and metadata properties to this new app source property.
+* `Config.Labels."io.buildpacks.app.source".type` (the type of the source - e.g. git, svn, image)
+* `Config.Labels."io.buildpacks.app.source".version` (the version of the source - this depends on the source type - e.g commit for git or shasum for images)
+* `Config.Labels."io.buildpacks.app.source".metadata` (additional metadata related to the source - e.g a git source branch and url, an image repository and digest)
 
 # Motivation
 [motivation]: #motivation
 
 - **Why should we do this?**
 The provenance of the app should be transparent, and the image should be
-reproducible.  Providing metadata about the source uri, branch and ref of the App assists
-in achieving this.
+reproducible.  Providing information about the source of an App assists in achieving this.
 
 - **What use cases does it support?**
 ### Case 1
@@ -30,37 +32,64 @@ This supports providing a buildpack user with information that would allow them 
 
 - **What is the expected outcome?**
 
-Additional metadata would be provided to allow for verification of the source and reproduction of the build.
+Additional source information would be provided to allow for verification of the source and reproduction of the build.
 
 # What it is
 [what-it-is]: #what-it-is
 
-This feature adds additional metadata to the image manifest.  It introduces
-three new properties related to the App layer.  These properties are the uri, branch and ref
+This feature adds additional source information to the image manifest.  It introduces
+three new properties related to the App layer.  These properties are the type, version and metadata
 of the source.
 
-It is proposed that these properties would be added as children of `Config.Labels."io.buildpacks.app.metadata"`.
+It is proposed that these properties would be added as children of `Config.Labels."io.buildpacks.app.source"`.
 
-We propose `source.uri`, `source.branch` and `source.ref` properties.
+We propose `type`, `version` and `metadata` properties.
 
 Example:
+
+Source:
 ```
 {
   Config: {
     Labels: {
-      "io.buildpacks.app.metadata":"{\"source\":{\"uri\":\"https://github.com/buildpack/rfcs.git\", \"branch\":\"master\", \"ref\":\"a33a985597b04c36aeefd6b17c4ef593adb5dc01\"}}"
+      "io.buildpacks.app.source":"{\"type\":\"image\",\"version\":{\"digest\":\"146c4bce42545e6a4575283b32a7f01924ef86ce848273079693a42b52b27321\"},\"metadata\":{\"path\":\"/source\",\"repository\":\"hub.docker.io/example/image\",\"refs\":[\"example/image:mytag\"]}}"
     }
   }
 }
 ```
 
-Unencoded, `io.buildpacks.app.metadata` is:
+Unencoded, `io.buildpacks.app.source` is:
 ```
 {
-  "source": {
-    "uri": "https://github.com/buildpack/rfcs.git",
-    "branch": "master",
-    "ref": "a33a985597b04c36aeefd6b17c4ef593adb5dc01"
+   "type": "image",
+   "version": { "digest": "146c4bce42545e6a4575283b32a7f01924ef86ce848273079693a42b52b27321" },
+   "metadata": {
+      "path": "/source",
+      "repository": "hub.docker.io/example/image",
+      "refs": ["example/image:mytag"]
+   }
+}
+```
+
+Git:
+```
+{
+  Config: {
+    Labels: {
+      "io.buildpacks.app.source":"{\"type\":\"git\",\"version\":{\"commit\":\"60d5fb7a7ad7c3b357a9d783b740f765d2a0d4d5\"},\"metadata\":{\"refs\":[\"master\",\"v3.0\"],\"url\":\"https://github.com/example/source\"}}"
+    }
+  }
+}
+```
+
+Unencoded, `io.buildpacks.app.source` is:
+```
+{
+  "type": "git",
+  "version": { "commit": "60d5fb7a7ad7c3b357a9d783b740f765d2a0d4d5" },
+  "metadata": {
+    "refs": ["master", "v3.0"],
+    "url": "https://github.com/example/source"
   }
 }
 ```
