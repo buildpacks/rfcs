@@ -112,12 +112,12 @@ Defines properties of the image(s) that are output from a build.
 
 ```toml
 [[images]]
-name = "<image name>"
+id = "<image name>"
 path = "."
 stack = "<buildpack stack>"
 ```
 
-* `name` (string, optional): by default inherits from `[project.name]`. If set will override the OCI image produced
+* `id` (string, optional): by default inherits from `[project.name]`. If set will override the OCI image produced
 * `path` (string, optional): by default uses the directory where this file lives
 * `stack` = (string, optional): stack to build against
 
@@ -258,14 +258,14 @@ id = "io.buildpacks.monorepo-app"
 version = "0.1"
 
 [[images]]
-name = "my-service"
+id = "my-service"
 path = "service/"
   [[images.processes]]
   name = "web"
   cmd = "java -jar target/service.jar"
 
 [[images]]
-name = "my-gateway"
+id = "my-gateway"
 path = "gateway/"
   # array of processes used to run the image
   [[images.processes]]
@@ -340,6 +340,5 @@ In this case, the inline NPM buildpack is combined with a Node engine buildpack 
 
 - Is `path` overriding `uri` and other elements confusing? Should these be the same key, and the execution environment figures out how to handle (i.e. `/user/local` versus `https://example.com`).
 - Do multiple `[[images]]`  result in multiple builds, or are the images derived from a single build?
-- Should `[[images]]` have an `id` key? What would it mean?
 - Is only one of `[project]`, `[[images]]`, or `[buildpack]` required?
 - Should `[[project.buildpacks]]` support a key that allows it to point to the `[buildpack]` table?
