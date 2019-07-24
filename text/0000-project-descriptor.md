@@ -32,6 +32,7 @@ Terminology:
 
 * **project**: a repository containing source code for an app, service, function, buildpack or a monorepo containing any combination of those.
 * **image**: the output of a running a buildpack(s) against a project
+* **inline buildpack**: a buildpack that is part of a project's source code
 
 The target personas for this proposal is buildpack users who need to enrich or configure buildpack execution. The new elements in  `buildpack.toml` support many different use cases including two new top level tables:
 
@@ -249,6 +250,8 @@ version = "0.0.1"
 id = "io.buildpacks.inline"
 version = "0.0.1"
 ```
+
+The `stack` key is optional for inline buildpacks, since they're meant to be used against the stack the project is using.
 
 There is an open question as to whether or not we should simplify the above example so that `[[project.buildpacks]]` can have a pointer to the buildpack defined in `[buildpack]` instead of repeating the `id` and `version`.
 
