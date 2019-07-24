@@ -79,7 +79,7 @@ exclude = [
 ]
 ```
 
-The `.gitignore` pattern is used in both cases. The `exclude` and `include` keys are mutually exclusive. Last one defined wins. These lists apply to both buildpacks built with `pack create-package` and apps built with `pack build`.
+The `.gitignore` pattern is used in both cases. The `exclude` and `include` keys are mutually exclusive, and if both are present the Lifecycle will error out. These lists apply to both buildpacks built with `pack create-package` and apps built with `pack build`.
 
 ## `[project.publish]`
 
