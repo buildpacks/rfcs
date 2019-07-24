@@ -188,6 +188,9 @@ This is a complete `buildpack.toml` for a simple buildpack:
 [buildpack]
 id = "io.buildpacks.node"
 version = "0.1"
+
+[[buildpack.stacks]]
+id = "io.buildpacks.stacks.bionic"
 ```
 
 No other configuration is required. Alternatively, the `[project]` table could be used, but the `buildpack` would be required to define buildpack specific elements. For example:
@@ -196,6 +199,9 @@ No other configuration is required. Alternatively, the `[project]` table could b
 [project]
 id = "io.buildpacks.node"
 version = "0.1"
+
+[[buildpack.stacks]]
+id = "io.buildpacks.stacks.bionic"
 
 [[buildpack.order]]
 group = [
