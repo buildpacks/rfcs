@@ -39,7 +39,6 @@ The target personas for this proposal is buildpack users who need to enrich or c
 - `[[images]]`: (optional) defines configuration for an image
 - `[metadata]`: (optional) metadata about the repository
 
-
 ## `[project]`
 
 The top-level `[project]` table may contain configuration about the repository, including `id` and `version`, but also metadata about how it is authored, documented, and version controlled. If any of these values are redefined in `[buildpack]` or `[[images]]` they will override the values in `[project]`.
@@ -80,7 +79,7 @@ exclude = [
 ]
 ```
 
-The `.gitignore` pattern is used in both cases. The `exclude` and `include` keys are mutually exclusive. Last one defined wins.
+The `.gitignore` pattern is used in both cases. The `exclude` and `include` keys are mutually exclusive. Last one defined wins. These lists apply to both buildpacks built with `pack create-package` and apps built with `pack build`.
 
 ## `[project.publish]`
 
@@ -179,7 +178,45 @@ pipeline = "foobar"
 
 Given the elements described above, we seek to satisfy the following use cases:
 
-## Inline buildpacks
+## Example: Basic buildpack
+
+This is a complete `buildpack.toml` for a simple buildpack:
+
+```toml
+[buildpack]
+id = "io.buildpacks.node"
+version = "0.1"
+```
+
+No other configuration is required. Alternatively, the `[project]` table could be used, but the `buildpack` would be required to define buildpack specific elements. For example:
+
+```toml
+[project]
+id = "io.buildpacks.node"
+version = "0.1"
+
+[[buildpack.order]]
+group = [
+  { id = "io.buildpacks.node-engine", version = "0.1" },
+  { id = "io.buildpacks.npm", version = "0.1" }
+]
+```
+
+This defines a valid buildpack.
+
+## Example: Basic app
+
+This is a complete `buildpack.toml` for a simple app:
+
+```toml
+[project]
+id = "io.buildpacks.my-app"
+version = "0.1"
+```
+
+No other configuration is required.
+
+## Example: Inline buildpacks
 
 When a `buildpack.toml` is found in the root directory of a project, and it contains the following elements:
 
@@ -191,11 +228,17 @@ version = "0.0.1"
 
 Then this buildpack can be referenced in the `[[project.buildpacks]]` array. The schema for the `[buildpack]` table remains the same, and all capabilities available to a normal buildpack (dependencies, order, stacks, etc) are available to an inline buildpack.
 
-## Monorepos
+If the repository was packaged with a command like `pack create-package`, then the `id` and `version` would override any values defined in the `[project]` table of the same `buildpack.toml`. Thus, you would always create a `io.buildpacks.inline` buildpackage.
+
+## Example: Monorepos
 
 The `[[images]]` array of tables allows the buildpack lifecycle to generate more than one image per build. Each table in the array may contain configuration that defines a different image for different parts of the code. For example:
 
 ```toml
+[project]
+id = "io.buildpacks.monorepo-app"
+version = "0.1"
+
 [[images]]
 name = "my-service"
 path = "service/"
@@ -212,11 +255,11 @@ path = "gateway/"
   cmd = "java -jar target/gateway.jar"
 ```
 
-There is an open question about how we handle different buildpack groups for each image. It's also unclear if we actually run distinct builds, or if the images are derived from a single build.
+There is an open question about how if actually run distinct builds, or if the images are derived from a single build.
 
-## Codified Buildpacks
+## Example: Codified Buildpacks
 
-Given an app with a `buildpack.toml`, the lifecycle will read the `project.buildpacks` a buildpack group in the builder image. Only the buildpacks listed in `project.buildpacks` will be run (no other groups will be run). For example, an app might contain:
+Given an app with a `buildpack.toml`, the lifecycle will read the `project.buildpacks` and generate an ephemeral buildpack group in the lifecycle. Only the buildpacks listed in `project.buildpacks` will be run (no other groups will be run). For example, an app might contain:
 
 ```toml
 [[project.buildpacks]]
@@ -279,3 +322,5 @@ In this case, the inline NPM buildpack is combined with a Node engine buildpack 
 
 - Is `path` overriding `uri` and other elements confusing? Should these be the same key, and the execution environment figures out how to handle (i.e. `/user/local` versus `https://example.com`).
 - Do multiple `[[images]]`  result in multiple builds, or are the images derived from a single build?
+- Should `[[images]]` have an `id` key? What would it mean?
+- Is only one of `[project]`, `[[images]]`, or `[buildpack]` required?
