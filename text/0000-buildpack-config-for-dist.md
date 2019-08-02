@@ -67,7 +67,6 @@ We propose the following changes to `buildpack.toml`:
 - Add a required top level `[buildpack]` table that describes buildpack configuration.
 - Remove the `[[buildpacks]]` array of tables.
 - Add support for `[[order]]` array, which defines the ordering of buildpack.
-- Add support for `path` to the `order.group = [{}]` table so that `id` and `version` do not have to be repeated and can instead be derived from a nested `buildpack.toml`.
 - Add a `[metadata]` table that is unstructured.
 - Add a `[[stacks]]` array of tables that is required for buildpacks that do not define a `[[order]]` (i.e. non-metabuildpacks). The `stacks` table contains an `id` with the name of a stack.
 
@@ -79,19 +78,7 @@ id = "<string>"
 version = "<string>"
 ```
 
-The top level `[buildpack]` table may contain an `order` key. This key has a schema similar to the `[[buildpack.order]]` described in the Distribution Spec, but now with support for a `path` key in a group. The `path` key can be used to reduce redundancy in the `buildpack.toml` by pointing to a nested `buildpack.toml` files that contain buildpack metadata. For example:
-
-```toml
-[[order]]
-group = [
-  { path = "node-cnb" },
-  { path = "buildpack.npm.toml" },
-]
-```
-
-In this case, the `node-cnb/` directory contains a `buildpack.toml`. In this way, the `id` and `version` do not have to be repeated, which reduces the need to change/update them in multiple places. It also reduces the risk of mistakes. Similarly, the repository contains a `buildpack.npm.toml` at the root, which contains configuration for an `npm` buildpack.
-
-Alternatively, the `group` may contain a `id` and `version` like this:
+The top level `[[order]]` table has a schema similar to the `[[buildpack.order]]` described in the Distribution Spec. The `group` key may contain an `id` and `version` like this:
 
 ```toml
 [[order]]
@@ -100,6 +87,8 @@ group = [
    { id = "io.buildpacks.npm", version = "0.0.7" },
 ]
 ```
+
+The `id` and `version` pair will be resolved to a buildpack by the platform.
 
 ## Optional Build Plan Groups
 To simplify `buildpack.toml`, this RFC will also be extending the [Contractual Build Plan RFC](https://github.com/buildpack/rfcs/blob/master/text/0005-contractual-build-plan.md) to include the ability to add additional groupings of `provides` and `requires` inside of a `[[or]]` Array.
@@ -143,66 +132,7 @@ As long as this repository also contains a valid `bin/detect` and `bin/build`, i
 
 ## Example: Node.js buildpack with multiple `buildpack.toml` files
 
-This example describes a buildpack defined in the same repository as the buildpacks it's composed from, but with separate `buildpack.toml` files to define the constituents. The directory structure is:
-
-```
-nodejs-cnb/
-├── buildpack.toml
-├── node-cnb
-│   └── buildpack.toml
-└── npm-cnb
-    └── buildpack.toml
-```
-
-The root `buildpack.toml` contains the following:
-
-```toml
-[buildpack]
-id = "io.buildpacks.npm-nodejs"
-name = "NPM Node.js Buildpack"
-version = "0.0.9"
-[[order]]
-group = [
-  { path = "node-cnb" },
-  { path = "npm-cnb" },
-]
-```
-
-The `node-cnb/buildpack.toml` contains the following:
-
-```toml
-[buildpack]
-id = "io.buildpacks.node"
-name = "Node Engine Buildpack"
-version = "0.0.5"
-
-[[stacks]]
-id = "io.buildpacks.stacks.bionic"
-
-[[stacks]]
-id = "org.cloudfoundry.stacks.cflinuxfs3"
-
-[metadata.dependencies]
-id      = "node"
-name    = "Node.js runtime"
-version = "0.1.1"
-uri     = "https://example.org/node.tgz"
-sha256  = "18682e55a8cefcc5a7b76000138ab6856a75d5e607aa7af5d28f84e2217fc66a"
-```
-
-The `npm-cnb/buildpack.toml` contains the following:
-
-```toml
-[buildpack]
-id = "io.buildpacks.npm"
-name = "NPM Buildpack"
-version = "0.0.7"
-
-[[stacks]]
-id = "io.buildpacks.stacks.bionic"
-```
-
-In this example, the configuration for each buildpack in the metabuildpack is decomposed into separate `buildpack.toml` files such that they can be used or published on their own.
+This proposal does not include support for a monorepo buildpack (i.e. a repository that contains source code for multiple distinct buildpacks).
 
 # Drawbacks
 [drawbacks]: #drawbacks
