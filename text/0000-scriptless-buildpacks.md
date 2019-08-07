@@ -189,6 +189,7 @@ The buildpack provides a `jdk`. It has one layer that is made available to launc
 [alternatives]: #alternatives
 
 - The inline buildpack approach described in the Project Descriptor RFC helps solve this problem too, but still requires the scripts.
+- Instead of tables under `buildpack`, we could use top-level `[detect]` and `[build]` tables. This matches the top-level `[[order]]` and `[[stacks]]` tables, but might cause confusion because these represent very different concepts.
 
 # Prior Art
 [prior-art]: #prior-art
