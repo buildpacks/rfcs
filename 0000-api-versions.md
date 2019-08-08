@@ -21,23 +21,30 @@ To enable logic and/or validation based on `api`. For instance, we could keep us
 
 There would be two pieces to this:
 
-1. A reference to the current versions of all APIs placed somewhere in the spec (location within spec TBA). For instance, a Buildpack API and a Platform API.
+1. A reference to the current versions of all APIs placed in the spec. Currently, we would version the Buildpack API (buildpack-to-lifecycle contract) and the Platform API (lifecycle-to-platform contract).
 2. An `api` field in TOML files for entities that are dependent on a specific version of an API. For instance, `buildpack.toml` would have an `api` to represent the version of the buildpack API to which the buildpack conforms.
 
 Example `api` field for `buildpack.toml`:
 
 ```toml
-api = "<version>"
+api = "<major>.<minor>"
 
 [buildpack]
 id = "<string>"
 # ...
 ```
 
+The format of a version would be `<major>.<minor>` or `<major>` (with a `minor` of `0` implied). A change to the `major` version of an API would indicate a non-backwards-compatible change, while a change to the `minor` version would indicate availability of one or more opt-in features.
+
+A **missing or empty** `api` key would indicate `1.0` (the current version of the Buildpack API and Platform API, as of this writing). The next breaking change to either of the current APIs would bump that API version to `2.0`.
+
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Given the current state of the project, what would we deem to be the first "APIs?" Potentially there are two to begin with: a Buildpack API and a Platform API, but more may be warranted in the future.
-- What format should the version take? Integer? Semver?
-- Given the answer to the above, what version should we begin with for each API?
+- Where in the spec should we document current API versions?
 - What about files that are not spec'd, but rather are related to the `pack` implementation (e.g. `builder.toml`)?
+- Will it be confusing that the spec is already titled "Buildpack API v3 - Specification", while the Buildpack API version to be documented inside of it references only a subset of the spec (which begins at `1.0`, not `3.0`)?
+
+# Related RFCs
+[related-rfcs]: #related-rfcs
+[RFC: Lifecycle descriptor](https://github.com/buildpack/rfcs/pull/20)
