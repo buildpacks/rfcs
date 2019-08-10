@@ -37,8 +37,8 @@ Stack image creators may add the following executables to their run and/or build
   * if the chosen run/build base image digest is the same, proceed to status
 
 ```
-/cnb/image/build/status (pkg-cache-dir) | cwd: (app)
-/cnb/image/run/status (pkg-cache-dir) | cwd: (app)
+/cnb/image/build/status (pkg-cache-dir) | cwd: (app-dir)
+/cnb/image/run/status (pkg-cache-dir) | cwd: (app-dir)
 ```
 * executes on last-built extended run or build image (determined from last-built app image labels)
 * exit status 100 = needs extension
@@ -53,6 +53,8 @@ The status executable must be invoked occasionally to poll for updates.
 Platforms may extend app images using the above interface by running the `extend` executable as root in a new container and creating an image from the result.
 Extending an image should generate a single layer.
 This should happen prior to the normal CNB build or rebase process.
+The `app` directory is used to determine what packages to install.
+The `pkg-cache` directory is used to cache package databases (e.g. to speed up `apt-get update`).
 
 # Drawbacks
 [drawbacks]: #drawbacks
