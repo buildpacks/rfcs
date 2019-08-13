@@ -35,16 +35,17 @@ Stack image creators may add the following executables to their run and/or build
 /cnb/image/run/extend (pkg-cache-dir) (run-metadata-toml-file) | cwd: /
 ```
 * executes on base run or build images
+* writes metadata to `/cnb/image/build/metadata.toml` or `/cnb/image/run/metadata.toml`
 * on subsequent builds, lookup latest upstream base image digest:
-  * if the digest is different than extended image's base, the new digest is extended
+  * if the digest is different than extended image's base, the new upstream digest is extended
   * if the digest is the same, proceed to status
 
 ```
 /cnb/image/build/status (pkg-cache-dir) (build-metadata-toml-file) | cwd: /
 /cnb/image/run/status (pkg-cache-dir) (run-metadata-toml-file) | cwd: /
 ```
-* executes on last-built extended run or build image (determined from last-built app image labels)
-* metadata guaranteed to be the same as extend
+* executes on run or build base images
+* metadata arg is `/cnb/image/build/metadata.toml` or `/cnb/image/run/metadata.toml`
 * exit status 100 = existing base image digest is extended 
 * exit status 0 = does not need extension
 * exit status other = unknown
