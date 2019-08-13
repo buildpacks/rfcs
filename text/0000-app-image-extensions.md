@@ -69,13 +69,33 @@ run-image-mirrors = ["example.org/run"]
 [extend]
 run-image = "sclevine/run"
 run-image-mirrors = ["scl.sh/run"]
-[extend.run] # run-metadata-toml-file (stored on run image metadata)
+[extend.run] # run-metadata-toml-file (stored on new run image metadata)
 packages = ["git"]
 [extend.build] # build-metadata-toml-file (stored on builder image metadata)
 packages = ["git"]
 ```
 
-Behavior: creates builder extended with packages as well as `sclevine/run` extended with packages.
+Behavior: creates a new builder with additional packages as well as a new run image (`sclevine/run`) with additional packages.
+
+### Extended an Existing Builder
+
+`pack extend-builder sclevine/builder -e extend.toml`
+
+extend.toml:
+```toml
+[builder]
+image = "example.com/builder"
+
+[extend]
+run-image = "sclevine/run"
+run-image-mirrors = ["scl.sh/run"]
+[extend.run] # run-metadata-toml-file (stored on new run image metadata)
+packages = ["git"]
+[extend.build] # build-metadata-toml-file (stored on new builder image metadata)
+packages = ["git"]
+```
+
+Behavior: creates a new version of an existing builder with additional packages as well as a new run image (`sclevine/run`) with additional packages.
 
 ### Upgrade an Extended Builder
 
@@ -115,3 +135,22 @@ If running `pack upgrade` on an app, perform operation against run image (with e
 
 - Requires kaniko (or a similar tool) when a docker daemon is unavailable
 - Fully rebasing apps with package dependencies becomes many orders of magnitude slower, due to upgrade needs
+
+# Questions
+[questions]: #questions
+
+What happens if you try to extend an extended builder?
+
+Three options:
+
+1. Fail
+
+2. Treat the extended builder as a normal builder, and override the metadata.
+   Advantages: Allows controlled, multi-level distribution model for changes. Easy to implement.
+   Disadvantages: Requires `pack upgrade`ing multiple levels of builders to fully patch the most extended builder. 
+
+3. Always save the existing metadata and the run image references each time. On `pack upgrade`, replay each extension.
+   Advantages: Easy to upgrade builders with confidence.
+   Disadvantages: Consumers of extended builders may upgrade them unintentionally (by upgrading their own nested extensions).
+
+My preference is (3), but (1) would be a good place to start.
