@@ -69,10 +69,10 @@ run-image-mirrors = ["example.org/run"]
 [extend]
 run-image = "sclevine/run"
 run-image-mirrors = ["scl.sh/run"]
-[extend.run]
-packages = ["git"] # run-metadata-toml-file (stored on run image metadata)
-[extend.build]
-packages = ["git"] # build-metadata-toml-file (stored on builder image metadata)
+[extend.run] # run-metadata-toml-file (stored on run image metadata)
+packages = ["git"]
+[extend.build] # build-metadata-toml-file (stored on builder image metadata)
+packages = ["git"]
 ```
 
 Behavior: creates builder extended with packages as well as `sclevine/run` extended with packages.
