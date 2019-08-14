@@ -77,6 +77,8 @@ packages = ["git"]
 
 Behavior: creates a new builder with additional packages as well as a new run image (`sclevine/run`) with additional packages.
 
+If `extend.run-image` is not specified, `extend.run` is stored on the builder metadata and used to dynamically extend the run image on `pack build`.
+
 ### Extended an Existing Builder
 
 `pack extend-builder sclevine/builder -e extend.toml`
@@ -97,6 +99,26 @@ packages = ["git"]
 
 Behavior: creates a new version of an existing builder with additional packages as well as a new run image (`sclevine/run`) with additional packages.
 
+If `extend.run-image` is not specified, `extend.run` is stored on the new builder metadata and used to dynamically extend the run image on `pack build`.
+
+### Building an App with Additional Packages
+
+`pack build sclevine/myapp`
+
+project.toml:
+```toml
+...
+[extend.run] # run-metadata-toml-file (stored on new run image metadata)
+packages = ["git"]
+[extend.build] # build-metadata-toml-file (stored on new builder image metadata)
+packages = ["git"]
+...
+```
+
+Behavior: creates a version of the current builder with additional packages and an ephemeral run image with additional packages, then does a normal `pack build`.
+
+Question: should we store the new builder image to make rebuild faster? If so, where? Should we generate a tag for it?
+
 ### Upgrade an Extended Builder
 
 Both build and run images: `pack upgrade sclevine/builder`
@@ -107,7 +129,9 @@ Run images (including mirrors): `pack upgrade sclevine/run`
 
 `pack upgrade sclevine/myapp`
 
-This will run `pack upgrade sclevine/run`, generate an ephemeral image, and then run `pack rebase sclevine/run`.
+This will run `pack upgrade sclevine/run`, generate an ephemeral image, and then do the equivalent of `pack rebase sclevine/myapp`.
+
+Attempting to rebase an app directly after it's been upgraded is not permitted and will fail, because the current base is now ephemeral.
 
 # How it Works
 [how-it-works]: #how-it-works
