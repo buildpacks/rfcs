@@ -25,12 +25,14 @@ Lifecycle can include a `lifecycle.toml` at it's root. Initially, the only suppo
 
 ```toml
 [api]
- platform = "1"
- buildpack = "1"
+ platform = "<major>.<minor>"
+ buildpack = "<major>.<minor>"
 
 [lifecycle]
-  version = "v0.4.0"
+  version = "<major>.<minor>.<patch>"
 ```
+
+The format of a api version would be <major>.<minor> or <major> (with a minor of 0 implied). A change to the major version of an API would indicate a non-backwards-compatible change, while a change to the minor version would indicate availability of one or more opt-in features.
 
 When `lifeycle.toml` exists but either of the `api.x` fields is omitted, `pack` will be assume that the lifecycle implements the latest API known to that version of `pack`. When `lifecycle.toml` is omitted, `pack` will initially warn users and assume the lifecycle implements the oldest known api version, for backwards compatibility. Eventually `pack` may require the presence of `lifecycle.toml`.
 
@@ -39,16 +41,17 @@ When `lifeycle.toml` exists but either of the `api.x` fields is omitted, `pack` 
 
 When `pack create-builder` creates a builder. The lifecycle API versions will be added to the `io.buildpacks.builder.metadata` label.
 
+Example:
 ```json
 {
 ...
-"lifecycle": {"version":  "v0.4.0", "api": {"platform":  "1", "buildpack":  "1"}}
+"lifecycle": {"version":  "0.4.0", "api": {"platform":  "1.0", "buildpack":  "1.1"}}
 }
 ```
 
 `pack` would ensure that the `api.buildpack` version matches the `api` version provided by all of the buildpacks that are added to the given builder.
 
-When `pack build` executes, it will check `lifecycle.api.platform` and it will either execute the correct commands for the given platform API, or fail if the platform API version is not supported. For example, if in the future we combine restorer/analyzer and cacher/exporter, then the platform API version of the next lifecycle release would be incremented. This will allow `pack` to know which binaries to execute with which flags.
+When `pack build` executes, it will check `api.platform` and it will either execute the correct commands for the given platform API, or fail if the platform API version is not supported. For example, if in the future we combine restorer/analyzer and cacher/exporter, then the platform API version of the next lifecycle release would be incremented. This will allow `pack` to know which binaries to execute with which flags.
 
 When `pack build` is run with the `--buildpack` flag, `pack` may use the buildpack api version from the builder metadata to determine whether the buildpack supplied with the `--buildpack` flag is compatible with the builder's lifecycle.
 
