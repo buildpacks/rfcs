@@ -34,7 +34,7 @@ Lifecycle can include a `lifecycle.toml` at it's root. Initially, the only suppo
 
 The format of a api version would be <major>.<minor> or <major> (with a minor of 0 implied). A change to the major version of an API would indicate a non-backwards-compatible change, while a change to the minor version would indicate availability of one or more additional features. For example, a lifecycle that specifies version 1.2 of the buildpack api supports buildpacks that specify versions 1.0, 1.1, 1.2, but not those that specify 1.3.
 
-When `lifeycle.toml` exists but either of the `api.x` fields is omitted, `pack` will be assume that the lifecycle implements the latest API known to that version of `pack`. When `lifecycle.toml` is omitted, `pack` will initially warn users and assume the lifecycle implements the oldest known api version, for backwards compatibility. Eventually `pack` may require the presence of `lifecycle.toml`.
+When `lifecycle.toml` exists, both of the`api.x` fields are required. When `lifecycle.toml` is omitted, `pack` will warn users and assume the lifecycle implements the oldest known api version, for backwards compatibility. Eventually `pack` may require the presence of `lifecycle.toml`.
 
 # How it Works
 [how-it-works]: #how-it-works
