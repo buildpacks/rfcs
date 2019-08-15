@@ -50,74 +50,36 @@ It should be noted that this specification does not describe the contents of the
 [p]: https://kubernetes.io/docs/concepts/configuration/secret/#protections
 
 
-With the mounting of secrets as files as a baseline, the question then becomes how to communicate the additional metadata attached to a service.  There are a couple of different strategies.
+With the mounting of secrets as files as a baseline, the question then becomes how to communicate the additional metadata attached to a service.
 
-## Metadata TOML File
-In this scenario, the secrets for a given service are mounted at `/platform/services/<service-name>`, with files for each key containing the contents of the secret.  Next to each directory is a `/platform/services/<service-name>.toml` file that contains extensible metadata about the service itself.
+## Metadata Directory
+The secrets for a given service are mounted at `/platform/services/<service-name>`, with files for each key containing the contents of the secret.  Next to each directory is a `/platform/services/<service-name>.metadata` directory that contains extensible metadata about the service itself with files for each key containing the contents of the metadata.
 
 ### Structure
 ```plain
 platform
 └── services
-    ├── primary-db.toml
+    ├── primary-db.metadata
+    │   ├── kind
+    │   ├── provider
+    │   ├── tags
+    │   └── connection-count
     ├── primary-db
     │   ├── endpoint
     │   ├── password
     │   └── username
-    ├── secondary-db.toml
+    ├── secondary-db.metadata
+    │   ├── kind
+    │   ├── provider
+    │   ├── tags
+    │   └── connection-count
     └── secondary-db
         ├── endpoint
         ├── password
         └── username
 ```
 
-### service.toml
-```toml
-kind     = "MySQLInstance"
-provider = "cleardb"
-tags     = ["rdbms", "cleardb", "mysql", "primary"]
-
-[metadata]
-connection-count = 4
-```
-
-## Service Kind Directory
-In this scenario, the secrets for a given service are mounted at `/platform/services/<service-kind>/<service-name>`, with files for each key containing the contents of the secret.  The directory path encodes the general "kind" of service that it is (e.g. `MySQLInstance`) but does not have more detailed information about which provider is used for the service, descriptive tags for the service, or any arbitrary metadata about the service.
-
-### Structure
-```plain
-platform
-└── services
-    └── MySQLInstance
-        ├── primary-db
-        │   ├── endpoint
-        │   ├── password
-        │   └── username
-        └── secondary-db
-            ├── endpoint
-            ├── password
-            └── username
-```
-
-## Service Kind and Service Class Directories
-In this scenario, the secrets for a given service are mounted at `/platform/services/<service-kind>/<service-provider>/<service-name>`,  with files for each key containing the contents of the secret.  The directory path encodes the general "kind" of service that it is (e.g. `MySQLInstance`) and "provider" of the service (e.g. `clear-db`), but does not have descriptive tags for the service, or any arbitrary metadata about the service.
-
-### Structure
-```plain
-platform
-└── services
-    └── MySQLInstance
-        ├── cleardb
-        │   └── primary-db
-        │       ├── endpoint
-        │       ├── password
-        │       └── username
-        └── p-mysql
-            └── secondary-db
-                ├── endpoint
-                ├── password
-                └── username
-```
+In this scenario, `kind`, `profider`, and `tags` would be special and mandatory entries for service metadata.  List entries like the contents of `tags` would be newline delimited.  All other entries would be optional and arbitrary, specific to each service that is bound.  Note, that this RFC uses these special keys as examples and is not binding; the actual spec update will codify mandatory metadata entries.
 
 # Drawbacks
 [drawbacks]: #drawbacks
