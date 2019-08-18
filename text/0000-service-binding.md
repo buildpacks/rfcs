@@ -52,31 +52,33 @@ It should be noted that this specification does not describe the contents of the
 
 With the mounting of secrets as files as a baseline, the question then becomes how to communicate the additional metadata attached to a service.
 
-## Metadata Directory
-The secrets for a given service are mounted at `/platform/services/<service-name>`, with files for each key containing the contents of the secret.  Next to each directory is a `/platform/services/<service-name>.metadata` directory that contains extensible metadata about the service itself with files for each key containing the contents of the metadata.
+## Metadata and Secret Directories
+A service is exposed as a directory at `/platform/services/<service-name>`.  Within that directory is a `metadata` directory that contains extensible metadata about the service itself files for each key, containing the contents of the metadata.  Also within that directory is a `secret` directory that contains files for each key within the secret, containing the values of each of those keys.
 
 ### Structure
 ```plain
 platform
 └── services
-    ├── primary-db.metadata
-    │   ├── kind
-    │   ├── provider
-    │   ├── tags
-    │   └── connection-count
     ├── primary-db
-    │   ├── endpoint
-    │   ├── password
-    │   └── username
-    ├── secondary-db.metadata
-    │   ├── kind
-    │   ├── provider
-    │   ├── tags
-    │   └── connection-count
+    │   ├── metadata
+    │   │   ├── connection-count
+    │   │   ├── kind
+    │   │   ├── provider
+    │   │   └── tags
+    │   └── secret
+    │       ├── endpoint
+    │       ├── password
+    │       └── username
     └── secondary-db
-        ├── endpoint
-        ├── password
-        └── username
+        ├── metadata
+        │   ├── connection-count
+        │   ├── kind
+        │   ├── provider
+        │   └── tags
+        └── secret
+            ├── endpoint
+            ├── password
+            └── username
 ```
 
 In this scenario, `kind`, `profider`, and `tags` would be special and mandatory entries for service metadata.  List entries like the contents of `tags` would be newline delimited.  All other entries would be optional and arbitrary, specific to each service that is bound.  Note, that this RFC uses these special keys as examples and is not binding; the actual spec update will codify mandatory metadata entries.
