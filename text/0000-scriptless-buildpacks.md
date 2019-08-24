@@ -41,8 +41,16 @@ Both of these new tables are mutually exclusive with `[[buildpack.order]]`.
 ```toml
 [buildpack.detect]
 run = ["<string>"] # bash commands
-requires = [ "<string>"] # defines required entries in the build plan
-provides = [ "<string>" ] # defines provided entries in the build plan
+
+[[buildpack.detect.provides]]
+name = "<dependency name>"
+
+[[buildpack.detect.requires]]
+name = "<dependency name>"
+version = "<dependency version>"
+
+[[buildpack.detect.or]]
+# this section will match the actual build plan schema
 ```
 
 If `buildpack.detect.run` is not defined, and either `buildpack.detect` or `buildpack.build` are defined, then detection will always pass. Otherwise, the exit code of the last `run` command is used.
