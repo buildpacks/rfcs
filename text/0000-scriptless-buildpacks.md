@@ -151,7 +151,7 @@ provides = [
 [[buildpack.build.layers]]
 id = "jdk"
 cache = true
-launch = "true"
+launch = true
 build = "true"
 run = [
   "export JDK_URL=https://cdn.azul.com/zulu/bin/zulu8.28.0.1-jdk8.0.163-linux_x64.tar.gz",
