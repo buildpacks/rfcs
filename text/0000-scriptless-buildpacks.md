@@ -76,7 +76,6 @@ run = [ "<string>" ]
 
   [[buildpack.build.layers.profile]]
   # each table in this array will be turned into a <layer_dir>/profile.d script
-  name = "<string>"
   script = "<string>"
 
 [[buildpack.build.launch.processes]]
