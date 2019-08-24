@@ -150,7 +150,7 @@ provides = [
 
 [[buildpack.build.layers]]
 id = "jdk"
-cache = "true"
+cache = true
 launch = "true"
 build = "true"
 run = [
