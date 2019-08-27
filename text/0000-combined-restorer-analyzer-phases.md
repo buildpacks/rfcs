@@ -110,7 +110,7 @@ The spec will formalize the (combined) `exporter` phase like this:
 | `-group`        | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
 | `-layers`       | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
 | `-platform`     | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
-| `-base`         | optional | `CNB_RUN_IMAGE`    | -              | repository url for the base image to build on top of, if not specifed, must be set by env var |
+| `-run-image`    | optional | `CNB_RUN_IMAGE`    | -              | repository url for the run image to build on top of, if not specifed, must be set by env var |
 | `-cache-volume` | optional | -                  | -              | local directory, may not be used with `-cache-image` |
 | `-cache-image`  | optional | -                  | -              | cache image repository, may not be used with `-cache-volume` |
 | `-app`          | optional | `CNB_APP_DIR`      | `/workspace`   | application source directory |
