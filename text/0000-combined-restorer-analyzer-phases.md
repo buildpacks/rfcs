@@ -51,7 +51,7 @@ efficiencies.
 
 The spec will formalize the `analyzer` phase as follows:
 
-###`/lifecycle/analyzer`
+### `/lifecycle/analyzer`
 
 | Flag        | Required | Env var            | Default        | Description |
 | ----------- | -------- | ------------------ | -------------- | ------------|
@@ -69,7 +69,7 @@ directory.
 
 The spec will formalize the `restorer` phase as follows:
 
-###`/lifecycle/restorer`
+### `/lifecycle/restorer`
 
 | Flag        | Required | Env var            | Default        | Description |
 | ----------- | -------- | ------------------ | -------------- | ------------|
@@ -101,7 +101,7 @@ phases.**
 
 The spec will formalize the (combined) `exporter` phase like this:
 
-###`/lifecycle/exporter`
+### `/lifecycle/exporter`
 
 | Flag        | Required | Env var            | Default        | Description |
 | ----------- | -------- | ------------------ | -------------- | ------------|
