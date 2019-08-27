@@ -52,6 +52,7 @@ efficiencies.
 The spec will formalize the `analyzer` phase as follows:
 
 ###`/lifecycle/analyzer`
+
 | Flag        | Required | Env var            | Default        | Description |
 | ----------- | -------- | ------------------ | -------------- | ------------|
 | `-group`    | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
@@ -69,6 +70,7 @@ directory.
 The spec will formalize the `restorer` phase as follows:
 
 ###`/lifecycle/restorer`
+
 | Flag        | Required | Env var            | Default        | Description |
 | ----------- | -------- | ------------------ | -------------- | ------------|
 | `-group`    | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
@@ -100,6 +102,7 @@ phases.**
 The spec will formalize the (combined) `exporter` phase like this:
 
 ###`/lifecycle/exporter`
+
 | Flag        | Required | Env var            | Default        | Description |
 | ----------- | -------- | ------------------ | -------------- | ------------|
 | `-group`    | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
