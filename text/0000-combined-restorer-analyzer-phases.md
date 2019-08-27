@@ -112,7 +112,6 @@ The spec will formalize the (combined) `exporter` phase like this:
 | `-cache`    | optional | `CNB_CACHE_IMAGE`  | `/platform`    | local directory, or repository url for cache image |
 | `-app`      | optional | `CNB_APP_DIR`      | `/workspace`   | application source directory |
 | `-image`    | required | -                  | -              | repository url for new application image |
-```
 
 The `exporter` phase will be responsible for the combined activities of the
 previous `exporter` and `cacher` phases
