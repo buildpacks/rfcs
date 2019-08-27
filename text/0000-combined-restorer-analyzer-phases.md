@@ -103,7 +103,7 @@ phases.**
 
 The spec will formalize the (combined) `exporter` phase like this:
 
-### `/lifecycle/exporter`
+### `/lifecycle/exporter [image1] <image2>...`
 
 | Flag            | Required | Env var            | Default        | Description |
 | --------------- | -------- | ------------------ | -------------- | ------------|
@@ -111,10 +111,12 @@ The spec will formalize the (combined) `exporter` phase like this:
 | `-layers`       | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
 | `-platform`     | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
 | `-run-image`    | optional | `CNB_RUN_IMAGE`    | -              | repository url for the run image to build on top of, if not specifed, must be set by env var |
+| `-app`          | optional | `CNB_APP_DIR`      | `/workspace`   | application source directory |
 | `-cache-volume` | optional | -                  | -              | local directory, may not be used with `-cache-image` |
 | `-cache-image`  | optional | -                  | -              | cache image repository, may not be used with `-cache-volume` |
-| `-app`          | optional | `CNB_APP_DIR`      | `/workspace`   | application source directory |
-| `-image`        | required | -                  | -              | repository url for new application image |
+
+At least one image name must be provided, and multiple image names can be
+provided (all named images will have the same layers).
 
 The `exporter` phase will be responsible for the combined activities of the
 previous `exporter` and `cacher` phases
