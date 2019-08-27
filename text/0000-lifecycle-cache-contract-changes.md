@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Combined restorer/analyzer and cacher/exporter phases.
+- Name: Lifecycle cache contract changes.
 - Start Date: 2019-08-02
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -17,8 +17,9 @@ lifecycle reference implementation contain the following four phases:
 - `/lifecycle/exporter`
 - `/lifecycle/cacher` (considered an optional platform step)
 
-This proposal seeks to combine `restorer` with `analyzer` (to be named
-`restorer`) and `cacher` with `exporter` (to be named `exporter`).
+This proposal seeks to reverse the order of `analyzer` and `restorer`.
+It also seeks to combine the `exporter` and `cacher` phases into a single
+phase called `exporter`.
 
 # Motivation
 [motivation]: #motivation
@@ -33,19 +34,37 @@ fetch them in the first place.
 
 The determination of cache layer validity can frequently be performed
 through the analysis of metadata: comparing metadata from the cache image with
-metadata from the previous application image. However, this comparison can
-only be performed with a combined `restorer` and `analyzer` phase.
+metadata from the previous application image. If we reverse the order of
+the `restorer` and `anaylzer` phases, the `analyzer` phase can examine metadata
+and pass this information through to the `restorer`, allowing for optimzed
+fetching of required layers.
 
-A parallel optimization potential exists when combining the `cacher` and
-`exporter` phases.
+During the `cacher` and `exporter` phases, duplicative work can be avoided
+by combining these two phases. For example, a layer that is both
+`launch=true` and `cache=true` can be processed once, allowing for better
+efficiencies.
 
 # What it is
 [what-it-is]: #what-it-is
 
-## Combined `restorer` phase.
+## Reversed `analyzer` and `restorer` phases, with a formalized spec
 
-The spec will formalize the (combined) `restorer` phase like this:
+The spec will formalize the `analyzer` phase as follows:
+```
+/lifecycle/analyzer \
+  -group=[(required) group.toml file] \
+  -layers=[(required) layers directory] \
+  -image=[(optional) repository url for existing application image] \
+  -cache=[(optional) local directory, or repository url for cache image]
+```
 
+The `analyzer` phase is able to compare metadata from a pre-existing
+application `-image` and a pre-existing `-cache` image (both optional) to
+determine the best course of action for the subsequent `restorer` phase.
+This infomration can be conveyed through files stored in the `-layers`
+directory.
+
+The spec will formalize the `restorer` phase as follows:
 ```
 /lifecycle/restorer \
   -group=[(required) group.toml file] \
@@ -54,11 +73,22 @@ The spec will formalize the (combined) `restorer` phase like this:
   -cache=[(optional) local directory, or repository url for cache image]
 ```
 
-The `restorer` phase will be responsible for the combined activities of the
-previous `restorer` and `analyzer` phases
-(see https://github.com/buildpack/spec/blob/master/buildpack.md#phase-2-analysis).
+The `restorer` phase is responsible to make available images and layers from
+previous builds to improve the efficiency of the current build. It will
+typically use information assembled by the `analyzer` phase to do so.
 
-The previous `/lifecycle/analyzer` phase will be removed from the spec.
+###Why two phases, and not one?
+
+This proposal envisions a future extension to the spec where the buildpack
+itself can be involved in analysis, possible via an optional `/bin/analyze`
+hook. This would allow the buildpack to have input into whether or not
+particular layers should be made available. For example, a Node.js buildpack
+could determine via a hash of a `package-lock.json` file that a given cache
+layer is no longer useful and thus need not be made available.
+
+**This document does not propose `/bin/analyze` at this time and it only
+mentioning it as justification for two seperate `analyzer` / `restorer`
+phases.**
 
 
 ## Combined `exporter` phase.
@@ -80,17 +110,6 @@ previous `exporter` and `cacher` phases
 (see https://github.com/buildpack/spec/blob/master/buildpack.md#phase-4-export).
 
 The previous `/lifecycle/cacher` phase will be removed from the spec.
-
-# How it Works
-[how-it-works]: #how-it-works
-
-Effectively, we are taking the union of two sets of flags
-(i.e., the union of `restorer`/`analyzer` and the union of `exporter`/`cacher`)
-and merging the responsibilities into a single lifecycle invocation
-(`/lifecycle/restorer` for the former and `/lifecycle/exporter` for the latter).
-
-Combining these phases provides implementers more opportunity to build
-better performing solutions, particularly around caching.
 
 # Drawbacks
 [drawbacks]: #drawbacks
