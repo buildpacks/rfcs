@@ -53,13 +53,14 @@ The spec will formalize the `analyzer` phase as follows:
 
 ### `/lifecycle/analyzer`
 
-| Flag        | Required | Env var            | Default        | Description |
-| ----------- | -------- | ------------------ | -------------- | ------------|
-| `-group`    | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
-| `-layers`   | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
-| `-platform` | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
-| `-image`    | optional | -                  | -              | repository url for existing application image |
-| `-cache`    | optional | -                  | -              | local directory, or repository url for cache image |
+| Flag            | Required | Env var            | Default        | Description |
+| --------------- | -------- | ------------------ | -------------- | ------------|
+| `-group`        | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
+| `-layers`       | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
+| `-platform`     | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
+| `-image`        | optional | -                  | -              | repository url for existing application image |
+| `-cache-volume` | optional | -                  | -              | local directory, may not be used with `-cache-image` |
+| `-cache-image`  | optional | -                  | -              | cache image repository, may not be used with `-cache-volume` |
 
 The `analyzer` phase is able to compare metadata from a pre-existing
 application `-image` and a pre-existing `-cache` image (both optional) to
@@ -71,13 +72,14 @@ The spec will formalize the `restorer` phase as follows:
 
 ### `/lifecycle/restorer`
 
-| Flag        | Required | Env var            | Default        | Description |
-| ----------- | -------- | ------------------ | -------------- | ------------|
-| `-group`    | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
-| `-layers`   | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
-| `-platform` | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
-| `-image`    | optional | -                  | -              | repository url for existing application image |
-| `-cache`    | optional | -                  | -              | local directory, or repository url for cache image |
+| Flag            | Required | Env var            | Default        | Description |
+| --------------- | -------- | ------------------ | -------------- | ------------|
+| `-group`        | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
+| `-layers`       | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
+| `-platform`     | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
+| `-image`        | optional | -                  | -              | repository url for existing application image |
+| `-cache-volume` | optional | -                  | -              | local directory, may not be used with `-cache-image` |
+| `-cache-image`  | optional | -                  | -              | cache image repository, may not be used with `-cache-volume` |
 
 The `restorer` phase is responsible to make available images and layers from
 previous builds to improve the efficiency of the current build. It will
@@ -103,15 +105,16 @@ The spec will formalize the (combined) `exporter` phase like this:
 
 ### `/lifecycle/exporter`
 
-| Flag        | Required | Env var            | Default        | Description |
-| ----------- | -------- | ------------------ | -------------- | ------------|
-| `-group`    | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
-| `-layers`   | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
-| `-platform` | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
-| `-base`     | optional | `CNB_RUN_IMAGE`    | -              | repository url for the base image to build on top of, if not specifed, must be set by env var |
-| `-cache`    | optional | `CNB_CACHE_IMAGE`  | `/platform`    | local directory, or repository url for cache image |
-| `-app`      | optional | `CNB_APP_DIR`      | `/workspace`   | application source directory |
-| `-image`    | required | -                  | -              | repository url for new application image |
+| Flag            | Required | Env var            | Default        | Description |
+| --------------- | -------- | ------------------ | -------------- | ------------|
+| `-group`        | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
+| `-layers`       | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
+| `-platform`     | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
+| `-base`         | optional | `CNB_RUN_IMAGE`    | -              | repository url for the base image to build on top of, if not specifed, must be set by env var |
+| `-cache-volume` | optional | -                  | -              | local directory, may not be used with `-cache-image` |
+| `-cache-image`  | optional | -                  | -              | cache image repository, may not be used with `-cache-volume` |
+| `-app`          | optional | `CNB_APP_DIR`      | `/workspace`   | application source directory |
+| `-image`        | required | -                  | -              | repository url for new application image |
 
 The `exporter` phase will be responsible for the combined activities of the
 previous `exporter` and `cacher` phases
