@@ -50,14 +50,15 @@ efficiencies.
 ## Reversed `analyzer` and `restorer` phases, with a formalized spec
 
 The spec will formalize the `analyzer` phase as follows:
-```
-/lifecycle/analyzer \
-  -group=[(optional) group.toml file, can be set by `CNB_GROUP_PATH`, defaults to `./group.toml`] \
-  -layers=[(optional) layers directory, can be set by `CNB_LAYERS_DIR`, defaults to `/layers`] \
-  -platform=[(optional) platform directory, can be set by `CNB_PLATFORM_DIR`, defaults to `/platform`] \
-  -image=[(optional) repository url for existing application image] \
-  -cache=[(optional) local directory, or repository url for cache image]
-```
+
+###`/lifecycle/analyzer`
+| Flag        | Required | Env var            | Default        | Description |
+| ----------- | -------- | ------------------ | -------------- | ------------|
+| `-group`    | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
+| `-layers`   | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
+| `-platform` | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
+| `-image`    | optional | -                  | -              | repository url for existing application image |
+| `-cache`    | optional | -                  | -              | local directory, or repository url for cache image |
 
 The `analyzer` phase is able to compare metadata from a pre-existing
 application `-image` and a pre-existing `-cache` image (both optional) to
@@ -66,14 +67,15 @@ This infomration can be conveyed through files stored in the `-platform`
 directory.
 
 The spec will formalize the `restorer` phase as follows:
-```
-/lifecycle/restorer \
-  -group=[(optional) group.toml file, can be set by `CNB_GROUP_PATH`, defaults to `./group.toml`] \
-  -layers=[(optional) layers directory, can be  set by `CNB_LAYERS_DIR`, defaults to `/layers`] \
-  -platform=[(optional) platform directory, can be set by `CNB_PLATFORM_DIR`, defaults to `/platform`] \
-  -image=[(optional) repository url for existing application image] \
-  -cache=[(optional) local directory, or repository url for cache image]
-```
+
+###`/lifecycle/restorer`
+| Flag        | Required | Env var            | Default        | Description |
+| ----------- | -------- | ------------------ | -------------- | ------------|
+| `-group`    | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
+| `-layers`   | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
+| `-platform` | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
+| `-image`    | optional | -                  | -              | repository url for existing application image |
+| `-cache`    | optional | -                  | -              | local directory, or repository url for cache image |
 
 The `restorer` phase is responsible to make available images and layers from
 previous builds to improve the efficiency of the current build. It will
@@ -97,15 +99,16 @@ phases.**
 
 The spec will formalize the (combined) `exporter` phase like this:
 
-```
-/lifecycle/exporter \
-  -group=[(optional) group.toml file, can be set by `CNB_GROUP_PATH`, defaults to `./group.toml`] \
-  -layers=[(optional) layers directory, can be  set by `CNB_LAYERS_DIR`, defaults to `/layers`] \
-  -platform=[(optional) platform directory, can be set by `CNB_PLATFORM_DIR`, defaults to `/platform`] \
-  -app=[(required) the application source directory, can be set by `CNB_APP_DIR`, defaults to `/workspace`] \
-  -base=[(required) repository url for the base image to build on top of, can be set by `CNB_RUN_IMAGE`] \
-  -image=[(required) repository url for new application image] \
-  -cache=[(optional) local directory, or repository url for cache image, can be set by `CNB_CACHE_IMAGE`]
+###`/lifecycle/exporter`
+| Flag        | Required | Env var            | Default        | Description |
+| ----------- | -------- | ------------------ | -------------- | ------------|
+| `-group`    | optional | `CNB_GROUP_PATH`   | `./group.toml` | group.toml file |
+| `-layers`   | optional | `CNB_LAYERS_DIR`   | `/layers`      | layers directory |
+| `-platform` | optional | `CNB_PLATFORM_DIR` | `/platform`    | platform directory |
+| `-base`     | optional | `CNB_RUN_IMAGE`    | -              | repository url for the base image to build on top of, if not specifed, must be set by env var |
+| `-cache`    | optional | `CNB_CACHE_IMAGE`  | `/platform`    | local directory, or repository url for cache image |
+| `-app`      | optional | `CNB_APP_DIR`      | `/workspace`   | application source directory |
+| `-image`    | required | -                  | -              | repository url for new application image |
 ```
 
 The `exporter` phase will be responsible for the combined activities of the
