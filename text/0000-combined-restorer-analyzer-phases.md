@@ -83,7 +83,7 @@ The `restorer` phase is responsible to make available images and layers from
 previous builds to improve the efficiency of the current build. It will
 typically use information assembled by the `analyzer` phase to do so.
 
-###Why two phases, and not one?
+### Why two phases, and not one?
 
 This proposal envisions a future extension to the spec where the buildpack
 itself can be involved in analysis, possible via an optional `/bin/analyze`
