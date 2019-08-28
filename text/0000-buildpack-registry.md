@@ -56,15 +56,15 @@ $ pack publish docker.io/foo/bar registry.buildpacks.io/myname/mycnb
 
 This will push the buildpackage to a Docker registry (`docker.io` in this example, but we will support others). Then it will register that image with the Buildpack Registry as a buildpack (`myname/mycnb` in this example). To ensure that the buildpack author has access to the account and the published image, the Buildpack Registry will do the following:
 
-1. Create a temporary private/public key pair
+1. Create a temporary public key
 1. Generate a random token
-1. Encrypt the token
-1. Add the encrypted token to the buildpackage metadata.
+1. Sign the token
+1. Add the signed token to the buildpackage metadata.
 1. Send the random token and the public key to the Buildpack Registry
-1. The Buildpack Registry will use the public key to encrypt the random token
-1. If the encrypted token matches the encrypted token stored in the image metadata we know the client is the one who published that image.
+1. The Buildpack Registry will use the public key to sign the random token
+1. If the signed token matches the value stored in the image metadata we know the client is the one who published that image.
 
-(I think this works, but if not, we could keep the private key in the Buildpack Registry, and the client could request the public key to use. I'm fairly certain that works, but it requires an extra step that I think isn't necessary)
+(I think this works, but if not, we could keep a private key in the Buildpack Registry, and the client could request the public key to use then encrypt the token. I'm fairly certain that works, but it requires an extra step that I think isn't necessary)
 
 To download a buildpack, any client may run:
 
