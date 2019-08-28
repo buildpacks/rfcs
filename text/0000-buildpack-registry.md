@@ -74,6 +74,17 @@ $ docker pull registry.buildpacks.io/myname/mycnb
 
 All buildpacks will be publicly accessible, so there is no access control required to read buildpacks.
 
+Buildpack users/consumers will be able to search for buildpacks using the `pack` CLI:
+
+```
+$ pack search Node.js
+Buildpack                        Category   Description
+───────────────────────────────  ─────────  ────────────────────────────────────
+heroku/nodejs                    languages  Official Heroku Buildpack for Node…
+```
+
+The buildpacks in the regsitry can be used in a `buildpack.toml` or a `builder.toml`.
+
 # How it Works
 [how-it-works]: #how-it-works
 
