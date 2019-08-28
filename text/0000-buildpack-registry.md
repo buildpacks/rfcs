@@ -24,8 +24,7 @@ registry to search discover existing buildpacks.
 
 One of the advantages buildpacks have over other mechanisms for creating Docker
 images is their reusability. Once a buildpack is written, it can run on any app,
-and a consume can leverage the work that has gone into it instead of rewriting
-it themselves. The registry will facilitate this process.
+and can leverage the work that has gone into it. Most buildpack consumes won't need to write a buildpack. The registry will facilitate this process.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -52,10 +51,10 @@ The registry will not store any secrets. It will only store a mapping of Buildpa
 To publish a buildpack, a buildpack author may then run a command like:
 
 ```
-$ pack publish registry.buildpacks.io/myname/mycnb
+$ pack publish docker.io/foo/bar registry.buildpacks.io/myname/mycnb
 ```
 
-This will push the buildpackage to a Docker registry. Then it will register that image with the Buildpack Registry as a buildpack. To ensure that the buildpack author has access to the account and the image that has been publish, the Buildpack Registry will do the following:
+This will push the buildpackage to a Docker registry (`docker.io` in this example, but we will support others). Then it will register that image with the Buildpack Registry as a buildpack (`myname/mycnb` in this example). To ensure that the buildpack author has access to the account and the published image, the Buildpack Registry will do the following:
 
 1. Create a temporary private/public key pair
 1. Generate a random token
@@ -78,7 +77,14 @@ All buildpacks will be publicly accessible, so there is no access control requir
 # How it Works
 [how-it-works]: #how-it-works
 
-Proxy to an Docker registry backend.
+The Buildpack Registry will support a federated backend. Users can push buildpackages (in the form of an OCI image) to many Docker Registries, including:
+
+* Docker Hub
+* gcr.io
+* AWS ECR
+* Github Package Registry
+
+The Buildpack Registry will proxy requests to each of these registries to provide the OCI images they contain as a buildpackage. In this way, the Buildpack Registry will support a subset of the [Docker Registry HTTP API v2](https://docs.docker.com/registry/spec/api/). Additional endpoints will be provided for authentication and buildpack CRUD.
 
 ## Endpoints
 
@@ -144,6 +150,7 @@ Does the oauth dance with a third-party service to get a token. Then it verifies
 [alternatives]: #alternatives
 
 - Use a 307 redirect to a registry instead of a proxy
+  - we attempted to prototype this but found that it might be *impossible* to implement for some regsitries. For example, we can't do this with Docker Hub because of the way the token is generated, and then passed to different HTTP calls.
 - Use central backend storage instead of a federated backend
 
 # Prior Art
