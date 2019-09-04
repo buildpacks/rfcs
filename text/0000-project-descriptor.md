@@ -160,7 +160,6 @@ uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
 * `version` (string, optional, default=`latest`): the version ([as defined in the spec](https://github.com/buildpack/spec/blob/master/buildpack.md#buildpacktoml-toml) of the dependent buildpack. The default is to use the latest available version of the buildpack (resolution of this value may be platform-dependent).
 * `optional` (bool, optional, default=`false`): Defines whether this buildpack will be optional in `order.toml`.
 * `uri` (string, optional, default=`urn:buildpack:<id>`): The exact location of the buildpack. If not specified the platform will resolve the `urn:buildpack:<id>` (making the resolution platform dependent).
-* `path` (string, optional): The exact location in the repo of an inline buildpack. Overrides `uri`
 
 The `uri` and `path` keys are mutually exclusive. These keys can be used to override buildpacks on the existing builder image (and in the future the registry).
 
@@ -219,7 +218,6 @@ id = "<buildpack ID (required)>"
 version = "<buildpack version (optional default=latest)>"
 optional = "<bool (optional default=false)>"
 uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
-path = "<path to an inline buildpack (optional)"
 ```
 
 The array of buildpacks defined here will override the array in `[[project.buildpacks]]`, which allows for each image to be built from a different group of buildpacks.
