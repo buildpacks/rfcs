@@ -11,6 +11,8 @@
 
 This is a proposal to add new tables and keys to `buildpack.toml` that allow it to contain configuration for apps, services, functions, and buildpacks.
 
+**NOTE:** One of the proposed alternatives uses the filename `project.toml` with the same schema described in this RFC.
+
 # Motivation
 [motivation]: #motivation
 
@@ -40,6 +42,62 @@ The target personas for this proposal is buildpack users who need to enrich or c
 - `[[images]]`: (optional) defines configuration for an image
 - `[metadata]`: (optional) metadata about the repository
 
+Here is an overview of the complete schema:
+
+```toml
+[project]
+id = "<string>"
+name = "<string>"
+version = "<string>"
+authors = ["<string>"]
+documentation = "<url>"
+license = "<string>"
+source = "<url>"
+include = ["<string>"]
+exclude = ["<string>"]
+publish = "<boolean>"
+
+  [[project.buildpacks]]
+  id = "<string>" # may reference [buildpack.id] in this file
+  version = "<string>"
+  optional = "<boolean>" # question: is there actually a use case for this?
+  uri = "<url or path>"
+
+[buildpack] # used for inline buildpack
+# matches buildpack.toml
+
+[[order]] # used for inline buildpack
+# matches buildpack.toml
+
+[[stacks]] # allowed, but ignored for inline buildpack
+# matches buildpack.toml
+
+[[images]]
+id = "<string>"
+path = "."
+stack = "<string>"
+
+  [images.launch.env]
+  key1 = "<string>"
+  key2 = "<string>"
+
+  [images.build.env]
+  key1 = "<string>"
+  key2 = "<string>"
+
+  [[images.processes]]
+  name = "<string>"
+  cmd = "<string>"
+
+  [[images.buildpacks]]
+  id = "<string>"
+  version = "<string>"
+  optional = "<boolean>"
+  uri = "<url or path>"
+```
+
+The following sections describe each part of the schema in detail.
+
 ## `[project]`
 
 The top-level `[project]` table may contain configuration about the repository, including `id` and `version`, but also metadata about how it is authored, documented, and version controlled. If any of these values are redefined in `[buildpack]` or `[[images]]` they will override the values in `[project]`.
@@ -52,9 +110,9 @@ id = "<string>"
 name = "<string>"
 version = "<string>"
 authors = ["<string>"]
-documentation = "<string>"
+documentation = "<url>"
 license = "<string>"
-source = "<string>"
+source = "<url>"
 ```
 
 ## `[project.include]` and `[project.exclude]`
@@ -96,7 +154,6 @@ id = "<buildpack ID (required)>"
 version = "<buildpack version (optional default=latest)>"
 optional = "<bool (optional default=false)>"
 uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
-path = "<path to an inline buildpack (optional)"
 ```
 
 * `id` (string, required): the ID ([as defined in the spec](https://github.com/buildpack/spec/blob/master/buildpack.md#buildpacktoml-toml) of another buildpack
@@ -190,7 +247,7 @@ This is a complete `buildpack.toml` for a simple buildpack:
 id = "io.buildpacks.node"
 version = "0.1"
 
-[[buildpack.stacks]]
+[[stacks]]
 id = "io.buildpacks.stacks.bionic"
 ```
 
@@ -201,10 +258,10 @@ No other configuration is required. Alternatively, the `[project]` table could b
 id = "io.buildpacks.node"
 version = "0.1"
 
-[[buildpack.stacks]]
+[[stacks]]
 id = "io.buildpacks.stacks.bionic"
 
-[[buildpack.order]]
+[[order]]
 group = [
   { id = "io.buildpacks.node-engine", version = "0.1" },
   { id = "io.buildpacks.npm", version = "0.1" }
@@ -307,17 +364,11 @@ version = "0.9"
 id = "my-node-buildpack"
 name = "My Node Buildpack"
 version = "0.9"
-[[buildpack.order]]
+[[order]]
 group = [
    { id = "io.buildpacks.node", version = "0.0.5" },
    { id = "io.buildpacks.npm", version = "0.0.7" },
 ]
-
-[[buildpack.dependencies]]
-id = "my-npm"
-name = "My NPM Buildpack"
-version = "0.0.7"
-path = "./npm-cnb/"
 ```
 
 In this case, the inline NPM buildpack is combined with a Node engine buildpack to create a custom Node buildpack.
@@ -347,7 +398,6 @@ In this case, the inline NPM buildpack is combined with a Node engine buildpack 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Is `path` overriding `uri` and other elements confusing? Should these be the same key, and the execution environment figures out how to handle (i.e. `/user/local` versus `https://example.com`).
 - Do multiple `[[images]]`  result in multiple builds, or are the images derived from a single build?
 - Is only one of `[project]`, `[[images]]`, or `[buildpack]` required?
 - Should `[[project.buildpacks]]` support a key that allows it to point to the `[buildpack]` table?
