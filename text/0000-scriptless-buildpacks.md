@@ -40,7 +40,10 @@ Both of these new tables are mutually exclusive with `[[buildpack.order]]`.
 
 ```toml
 [buildpack.detect]
-run = ["<string>"] # bash commands
+shell = "<string>" # bash or something else
+inline = "
+<string>
+"
 
 [[buildpack.detect.provides]]
 name = "<dependency name>"
@@ -59,24 +62,34 @@ If `buildpack.detect.run` is not defined, and either `buildpack.detect` or `buil
 
 ```toml
 [buildpack.build]
-run = [ "<string>" ]
+shell = "<string>"
+inline = "
+<string>
+"
 
 [[buildpack.build.layers]]
-id = "<string>"
+name = "<string>"
 cache = "<boolean>"
 launch = "<boolean>"
 build = "<boolean>"
-run = [ "<string>" ]
+shell = "<string>"
+inline = "
+<string>
+"
 
   [buildpack.build.layers.metadata]
   key = "<string>" # arbitrary elements that will be put directly into the layer metadata
 
   [buildpack.build.layers.env]
-  KEY = "<string>" # env vars that will be put into `<layer_dir>/env`
+  name = "<string>"
+  value = "<string>"
 
   [[buildpack.build.layers.profile]]
   # each table in this array will be turned into a <layer_dir>/profile.d script
-  script = "<string>"
+  shell = "<string>"
+  inline = "
+<string>
+"
 
 [[buildpack.build.launch.processes]]
 # each table in this array will be turned into an entry in `launch.toml`
@@ -84,11 +97,11 @@ type = "<string>"
 command = "<string>"
 ```
 
-The lifecycle will use the `layer.id` value to determine if the layer should be regenerated. If the layer is already present (because of caching) and the metadata matches it will skip all other behavior defined in this table. This behavior is effectively described by the following Bash code:
+The lifecycle will use the `layer.name` value to determine if the layer should be regenerated. If the layer is already present (because of caching) and the metadata matches it will skip all other behavior defined in this table. This behavior is effectively described by the following Bash code:
 
 ```bash
-if [[ -f ${layers_dir}/${layer_id}.toml ]]; then
-  if [[ "$(cat ${layers_dir}/${layer_id}.toml)" != "${derived_layer_toml}" ]]; then
+if [[ -f ${layers_dir}/${layer_name}.toml ]]; then
+  if [[ "$(cat ${layers_dir}/${layer_name}.toml)" != "${derived_layer_toml}" ]]; then
    # execute `run` and other directives
   fi
 fi
@@ -96,7 +109,7 @@ fi
 
 Thus, if you want to force a layer to regenerate, the `[buildpack.build.layers.metadata]` must contain appropriate keys to determine if they layer has changed.
 
-The commands defined in any `run` element will have access to script arguments (i.e. `$1`, `$2`, etc) as defined in the [Buildpack Spec](https://github.com/buildpack/spec/blob/master/buildpack.md), as well as other environment variables the lifecycle makes available.
+The commands defined in any `inline` element will have access to script arguments (i.e. `$1`, `$2`, etc) as defined in the [Buildpack Spec](https://github.com/buildpack/spec/blob/master/buildpack.md), as well as other environment variables the lifecycle makes available.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -125,10 +138,10 @@ provides = [
 
 # if there is a bin/build, this will always run first.
 [buildpack.build]
-run = [
-  "rake war",
-  "rake db:migrate"
-]
+inline = "
+  rake war
+  rake db:migrate
+"
 
 [[buildpack.build.launch.processes]]
 type = "web"
@@ -156,14 +169,14 @@ provides = [
 ]
 
 [[buildpack.build.layers]]
-id = "jdk"
+name = "jdk"
 cache = true
 launch = true
 build = true
-run = [
-  "export JDK_URL=https://cdn.azul.com/zulu/bin/zulu8.28.0.1-jdk8.0.163-linux_x64.tar.gz",
-  "wget -q -O - $JDK_URL | tar pxz -C $1/jdk --strip-components=1"
-]
+inline = "
+  export JDK_URL='https://cdn.azul.com/zulu/bin/zulu8.28.0.1-jdk8.0.163-linux_x64.tar.gz'
+  wget -q -O - $JDK_URL | tar pxz -C $1/jdk --strip-components=1
+"
 
   [buildpack.build.layers.metadata]
   version = "zulu-1.8.0_163"
@@ -174,10 +187,10 @@ run = [
 
   [[buildpack.build.layers.profile]]
   name = "jdk.sh"
-  script = [
-    "export JAVA_HOME=$1/jdk",
-    "export LD_LIBRARY_PATH=$JAVA_HOME/jre/lib/amd64/server"
-  ]
+  inline = "
+    export JAVA_HOME=$1/jdk
+    export LD_LIBRARY_PATH=$JAVA_HOME/jre/lib/amd64/server
+"
 
 [[buildpack.build.launch.processes]]
 type = "web"
@@ -185,6 +198,8 @@ command = "java -jar *.jar"
 ```
 
 The buildpack provides a `jdk`. It has one layer that is made available to launch, build, and cache.
+
+Because `build` is set to true in the layer TOML, the lifecycle will put the `<layer>/bin` directory on the path so that later steps in the buildpack can use it. It will also export the environment variables defined by `buildpack.build.layers.env`, and add `<layer>/lib` to `LD_LIBRARY_PATH` (just as it would for a subsequent buildpack).
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -197,6 +212,26 @@ The buildpack provides a `jdk`. It has one layer that is made available to launc
 
 - The inline buildpack approach described in the Project Descriptor RFC helps solve this problem too, but still requires the scripts.
 - Instead of tables under `buildpack`, we could use top-level `[detect]` and `[build]` tables. This matches the top-level `[[order]]` and `[[stacks]]` tables, but might cause confusion because these represent very different concepts.
+
+## Layer Alternatives
+
+The approach described above has two drawbacks:
+
+1. The comparison of the old layer metadata to the current layer metadata to determine if the layer should be rebuilt (and thus it's scripts rerun) is magic/smarts.
+1. The positional arguments to the script(s) require that the layer name be repeated.
+1. The positional arguments to the script(s) let them to easily (accidentally?) access the wrong layer.
+
+For these reasons we should consider the following alternatives:
+
+### Using a Single Build Script
+
+We could remove the script (or `inline`) field from the `layers` table while keeping the other fields. This would require that all operations be performed in a single `[buildpack.build] inline` script.
+
+The drawback of this approach is that it prevents us from magically checking the layer metadata and avoiding rerunning a particular layer's logic in the build script. It also still allows a user to access the wrong layer, but this is no different than a normal buildpack.
+
+### Restricting Layer Access in Scripts
+
+We could change the positional arguments passed to the `[[buildpack.build.layers]] inline` script so that the `$1` is scoped to the specific layer being acted upon. In this way, it would prevent users from accidentally accessing the wrong layer, and from repeating the layer name in the script.
 
 # Prior Art
 [prior-art]: #prior-art
