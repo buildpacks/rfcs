@@ -233,6 +233,8 @@ The drawback of this approach is that it prevents us from magically checking the
 
 We could change the positional arguments passed to the `[[buildpack.build.layers]] inline` script so that the `$1` is scoped to the specific layer being acted upon. In this way, it would prevent users from accidentally accessing the wrong layer, and from repeating the layer name in the script.
 
+Or we could set an environment variable `$LAYER` to the value `$1/<layer>`.
+
 # Prior Art
 [prior-art]: #prior-art
 
