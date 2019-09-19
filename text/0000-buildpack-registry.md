@@ -56,15 +56,15 @@ $ pack publish docker.io/foo/bar registry.buildpacks.io/myname/mycnb
 
 This will push the buildpackage to a Docker registry (`docker.io` in this example, but we will support others). Then it will register that image with the Buildpack Registry as a buildpack (`myname/mycnb` in this example). To ensure that the buildpack author has access to the account and the published image, the Buildpack Registry will do the following:
 
-1. Create a temporary public key
+1. Create a temporary private/public key pair
 1. Generate a random token
-1. Sign the token
-1. Add the signed token to the buildpackage metadata.
+1. Sign the token using the private key
+1. Add the token signature to the buildpackage metadata.
 1. Send the random token and the public key to the Buildpack Registry
-1. The Buildpack Registry will use the public key to sign the random token
-1. If the signed token matches the value stored in the image metadata we know the client is the one who published that image.
+1. The Buildpack Registry will use the public key and the signature in the metadata to verify the token
+1. If the signature is valid we know the client is the one who published that image.
 
-(I think this works, but if not, we could keep a private key in the Buildpack Registry, and the client could request the public key to use then encrypt the token. I'm fairly certain that works, but it requires an extra step that I think isn't necessary)
+This prevents the user from needing to login on two different systems (the buildpack registry and DockerHub or whatever backend registry they're using).
 
 To download a buildpack, any client may run:
 
@@ -152,6 +152,9 @@ Does the oauth dance with a third-party service to get a token. Then it verifies
 # Drawbacks
 [drawbacks]: #drawbacks
 
+- The token signing process prevents arbitrary images from being publish (i.e. they need to have created the image with pack)
+- The token signing process prevents someone from pushing to DockerHub (or whatever registry), and publishing to the buildpack registry later. They have to be done in one step or we'll lose/discard the key/token.
+    - We could keep the private key in the registry so that you can always publish later. But more security risk that way.
 - The Cloud Native Buildpacks team will need to maintain and operate the service
 - The are some security concerns related to the third-party auth
 - We risk screwing up, and allowing someone to publish a malicious buildpack
@@ -163,6 +166,8 @@ Does the oauth dance with a third-party service to get a token. Then it verifies
 - Use a 307 redirect to a registry instead of a proxy
   - we attempted to prototype this but found that it might be *impossible* to implement for some regsitries. For example, we can't do this with Docker Hub because of the way the token is generated, and then passed to different HTTP calls.
 - Use central backend storage instead of a federated backend
+- Use SSO for login and omit the token, key, signing business.
+    - This requires keeping some login session around, and probably a token in `~/.pack`.
 
 # Prior Art
 [prior-art]: #prior-art
