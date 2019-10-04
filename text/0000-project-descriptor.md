@@ -37,6 +37,7 @@ The target personas for this proposal is buildpack users who need to enrich or c
 - `[project]`: (optional) defines configuration for a project
 - `[[images]]`: (optional) defines configuration for an image
 - `[metadata]`: (optional) metadata about the repository
+- `[extensions]`: (optional) extensions to the spec
 
 Here is an overview of the complete schema:
 
@@ -45,34 +46,41 @@ Here is an overview of the complete schema:
 id = "<string>"
 name = "<string>"
 version = "<string>"
-authors = ["<string>"]
-documentation = "<url>"
-license = "<string>"
-source = "<url>"
 include = ["<string>"]
 exclude = ["<string>"]
-publish = "<boolean>"
 
 [[images]]
 id = "<string>"
 path = "."
-stack = "<string>"
 
   [[images.launch.env]]
   name = "<string>"
+  value = "<string>"
 
   [[images.build.env]]
   name = "<string>"
+  value = "<string>"
 
   [[images.processes]]
-  name = "<string>"
-  cmd = "<string>"
+  type = "<process type>"
+  command = "<command>"
+  args = ["<arguments>"]
+  direct = false
 
   [[images.buildpacks]]
   id = "<string>"
   version = "<string>"
-  optional = "<boolean>" # is this necessary?
   uri = "<url or path>"
+
+[metadata]
+authors = ["<string>"]
+documentation = "<url>"
+license = "<string>"
+source = "<url>"
+# additional arbitrary keys allowed
+
+[extensions]
+# TBD
 ```
 
 The following sections describe each part of the schema in detail.
@@ -88,10 +96,6 @@ The `project.id`
 id = "<string>"
 name = "<string>"
 version = "<string>"
-authors = ["<string>"]
-documentation = "<url>"
-license = "<string>"
-source = "<url>"
 ```
 
 ## `[project.include]` and `[project.exclude]`
@@ -119,10 +123,6 @@ exclude = [
 
 The `.gitignore` pattern is used in both cases. The `exclude` and `include` keys are mutually exclusive, and if both are present the Lifecycle will error out. These lists apply to both buildpacks built with `pack create-package` and apps built with `pack build`.
 
-## `[project.publish]`
-
-A boolean that, when set to `false`, will prevent a platform from publishing the image generated from a build to a registry.
-
 ## `[[images]]`
 
 Defines properties of the image(s) that are output from a build.
@@ -131,12 +131,10 @@ Defines properties of the image(s) that are output from a build.
 [[images]]
 id = "<image name>"
 path = "."
-stack = "<buildpack stack>"
 ```
 
 * `id` (string, optional): by default inherits from `[project.name]`. If set will override the OCI image produced
 * `path` (string, optional): by default uses the directory where this file lives
-* `stack` = (string, optional): stack to build against
 
 ## `[image.launch.env]` and `[image.build.env]`
 
@@ -176,7 +174,6 @@ The images table may also contain an array of buildpacks. The schema for this ta
 [[images.buildpacks]]
 id = "<buildpack ID (required)>"
 version = "<buildpack version (optional default=latest)>"
-optional = "<bool (optional default=false)>"
 uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
 ```
 
@@ -184,11 +181,21 @@ This allows for each image to be built from a different group of buildpacks. The
 
 ## `[metadata]`
 
-Keys in this table are not validated. It can be used to add platform specific metadata. For example:
+This table includes a some defined keys, but additional keys are not validated. It can be used to add platform specific metadata. For example:
 
 ```toml
 [metadata.heroku]
 pipeline = "foobar"
+```
+
+The defined keys are:
+
+```toml
+[metadata]
+authors = ["<string>"]
+documentation = "<url>"
+license = "<string>"
+source = "<url>"
 ```
 
 # How it Works
@@ -222,7 +229,7 @@ id = "my-service"
 path = "service/"
   [[images.processes]]
   name = "web"
-  cmd = "java -jar target/service.jar"
+  command = "java -jar target/service.jar"
 
 [[images]]
 id = "my-gateway"
@@ -230,7 +237,7 @@ path = "gateway/"
   # array of processes used to run the image
   [[images.processes]]
   name = "web"
-  cmd = "java -jar target/gateway.jar"
+  command = "java -jar target/gateway.jar"
 ```
 
 There is an open question about how if actually run distinct builds, or if the images are derived from a single build.
@@ -275,7 +282,8 @@ These entries override any defaults in the builder image. If, for example, the p
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Do multiple `[[images]]`  result in multiple builds, or are the images derived from a single build?
+- Do multiple `[[images]]` with the same buildpacks result in multiple builds, or are the images derived from a single build?
 - How do we prevent users from needing to copy/paste `[[images.buildpacks]]` over and over in the same file?
     - could we add an additional top-level table that defines buildpack groups, which can be referenced in images?
     - could we add an additional top-level table that defines default buildpack groups if not defined in `[[images]]`?
+- Should the `[[images]]` table contain `stack`, `builder`, and/or `lifecycle`?
