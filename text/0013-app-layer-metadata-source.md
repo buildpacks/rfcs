@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Manifest - App metadata - add source type, version and metadata
 - Start Date: 2019-06-10
-- CNB Pull Request: (leave blank)
+- CNB Pull Request: [rfcs#9](https://github.com/buildpack/rfcs/pull/9)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
 
