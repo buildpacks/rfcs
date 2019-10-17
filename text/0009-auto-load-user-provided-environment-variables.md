@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Auto-load User-provided Environment Variables
 - Start Date: 2019-06-17
-- CNB Pull Requests: (spec PR to follow)
+- CNB Pull Requests: [rfcs#14](https://github.com/buildpack/rfcs/pull/14), [spec#55](https://github.com/buildpack/spec/pull/55), [lifecycle#163](https://github.com/buildpack/lifecycle/pull/163)
 - CNB Issues: (lifecycle issues to follow)
 
 

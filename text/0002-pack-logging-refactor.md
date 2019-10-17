@@ -2,7 +2,8 @@
 [meta]: #meta
 - Name: Pack Logging Interface
 - Start Date: 2019-05-06
-- CNB Pull Request: (leave blank)
+- CNB Pull Request: [rfcs#6](https://github.com/buildpack/rfcs/pull/6), [pack#182](https://github.com/buildpack/pack/pull/182)
+- CNB Issue: (leave blank)
 - Supersedes: N/A
 
 # Summary

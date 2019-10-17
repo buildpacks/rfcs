@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Service Binding
 - Start Date: 2019-08-06
-- CNB Pull Request:
+- CNB Pull Request: [rfcs#22](https://github.com/buildpack/rfcs/pull/22), [spec#57](https://github.com/buildpack/spec/pull/57)
 - CNB Issue:
 - Supersedes: N/A
 

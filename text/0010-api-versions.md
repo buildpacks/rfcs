@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: API Versions
 - Start Date: 2019-08-05
-- CNB Pull Request: (leave blank)
+- CNB Pull Request: [rfcs#19](https://github.com/buildpack/rfcs/pull/19), [pack#282](https://github.com/buildpack/pack/pull/282)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
 

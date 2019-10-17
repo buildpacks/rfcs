@@ -2,7 +2,8 @@
 [meta]: #meta
 - Name: Inspect Image
 - Start Date: 2019-04-25
-- CNB Pull Request: (leave blank)
+- CNB Pull Request: [rfcs#5](https://github.com/buildpack/rfcs/pull/5)
+- CNB Issue:
 - Supersedes: N/A
 
 # Summary
