@@ -133,7 +133,7 @@ id = "<image name>"
 path = "."
 ```
 
-* `id` (string, optional): by default inherits from `[project.name]`. If set will override the OCI image produced
+* `id` (string, optional): by default inherits from `[project.name]`. If set will be used as a suffix for the tag of the OCI image produced
 * `path` (string, optional): by default uses the directory where this file lives
 
 ## `[image.launch.env]` and `[image.build.env]`
@@ -258,6 +258,36 @@ Given an app with a `project.toml`, the lifecycle will read the `images.buildpac
 ```
 
 These entries override any defaults in the builder image. If, for example, the project code contains a `Gemfile` and the `heroku/buildpacks` builder image is used, this will override the default buildpack groups, which would normally detect and run the `heroku/ruby` buildpack.
+
+## Example: Custom Image Prefix
+
+The `id` field of an `[[images]]` table is used as a suffix for the tag of the OCI image produced. If no prefex is provided, then it represents the entire tag. For example:
+
+```toml
+[[images]]
+id = "gcr.io/example/myimage:42"
+
+[[images]]
+id = "gcr.io/example/myimage:latest"
+```
+
+However, a given platform may support a prefix, in which the follow could be used:
+
+```toml
+[[images]]
+id = ":42"
+
+[[images]]
+id = ":latest"
+```
+
+A platform such as `pack` may then allow a command where the provided image name is a prefix, like:
+
+```
+$ pack build gcr.io/example/myimage
+```
+
+This would produce two images with tags `gcr.io/example/myimage:42` and `gcr.io/example/myimage:latest`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
