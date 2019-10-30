@@ -46,11 +46,16 @@ Here is an overview of the complete schema:
 id = "<string>"
 name = "<string>"
 version = "<string>"
+authors = ["<string>"]
+documentation = "<url>"
+license = "<string>"
+source = "<url>"
 include = ["<string>"]
 exclude = ["<string>"]
 
 [[images]]
-id = "<string>"
+ref = "<string>"
+suffix = "<string>"
 path = "."
 
   [[images.launch.env]]
@@ -73,10 +78,6 @@ path = "."
   uri = "<url or path>"
 
 [metadata]
-authors = ["<string>"]
-documentation = "<url>"
-license = "<string>"
-source = "<url>"
 # additional arbitrary keys allowed
 
 [extensions]
@@ -123,17 +124,21 @@ exclude = [
 
 The `.gitignore` pattern is used in both cases. The `exclude` and `include` keys are mutually exclusive, and if both are present the Lifecycle will error out. These lists apply to both buildpacks built with `pack create-package` and apps built with `pack build`.
 
+Any files that are excluded (either via `include` or `exclude`) will be excluded before the build (i.e. not only exluded from the final image).
+
 ## `[[images]]`
 
 Defines properties of the image(s) that are output from a build.
 
 ```toml
 [[images]]
-id = "<image name>"
+ref = "<string>"
+suffix = "<string>"
 path = "."
 ```
 
-* `id` (string, optional): by default inherits from `[project.name]`. If set will be used as a suffix for the tag of the OCI image produced
+* `ref` (string, optional): by default inherits from `[project.id]`. If set will be used as the tag of the OCI image produced
+* `suffix` (string, optional): If set will be used as the suffix to the tag of the OCI image produced
 * `path` (string, optional): by default uses the directory where this file lives
 
 ## `[image.launch.env]` and `[image.build.env]`
@@ -225,14 +230,14 @@ id = "io.buildpacks.monorepo-app"
 version = "0.1"
 
 [[images]]
-id = "my-service"
+ref = "my-service"
 path = "service/"
   [[images.processes]]
   name = "web"
   command = "java -jar target/service.jar"
 
 [[images]]
-id = "my-gateway"
+ref = "my-gateway"
 path = "gateway/"
   # array of processes used to run the image
   [[images.processes]]
@@ -261,24 +266,24 @@ These entries override any defaults in the builder image. If, for example, the p
 
 ## Example: Custom Image Prefix
 
-The `id` field of an `[[images]]` table is used as a suffix for the tag of the OCI image produced. If no prefex is provided, then it represents the entire tag. For example:
+The `ref` field of an `[[images]]` table is used as the tag of the OCI image produced. If no suffix is provided, then it represents the entire tag. For example:
 
 ```toml
 [[images]]
-id = "gcr.io/example/myimage:42"
+ref = "gcr.io/example/myimage:42"
 
 [[images]]
-id = "gcr.io/example/myimage:latest"
+ref = "gcr.io/example/myimage:latest"
 ```
 
-However, a given platform may support a prefix, in which the follow could be used:
+However, a given platform may override the ref, in which case the tag will be combined with the suffix:
 
 ```toml
 [[images]]
-id = ":42"
+suffix = ":42"
 
 [[images]]
-id = ":latest"
+suffix = ":latest"
 ```
 
 A platform such as `pack` may then allow a command where the provided image name is a prefix, like:
