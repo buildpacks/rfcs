@@ -24,15 +24,15 @@ In addition, this feature aligns with some of the functionality being exposed by
 This proposes adding a new flag to `pack build` that will change the default process type in the built image:
 
 ```
-$ pack build --process <process name> <image name>`
+$ pack build --default-process <process name> <image name>`
 ```
 
-The `<process name>` must be a valid process name provided by the buildpacks.
+The `<process name>` must be a valid process name in `launch.toml`.
 
 # How it Works
 [how-it-works]: #how-it-works
 
-When running `pack build --process <process name>` this will output a OCI Image where `Cmd` is set to the argument to be passed `/lifecycle/launcher`. This when when booting the image, the lifecycle knows which process to run.
+When running `pack build --default-process <process name>` this will output a OCI Image where the `CNB_PROCESS_TYPE` is set to `<process name>`. This allows users to override the default process type at runtime by setting the environmant variable.  This will then be used by `/lifecycle/launcher` at runtime so it knows which process to run.
 
 `<process name>` must be a valid process name in the process table by running the buildpacks. If the process can not be found, then `pack build` will return an error code failing the build.
 
@@ -41,9 +41,12 @@ When running `pack build --process <process name>` this will output a OCI Image 
 
 This adds another flag to an already crowded list of flags available for `pack build`. Once `project.toml` lands, `pack` users will have another way to do this.
 
+`CNB_PROCESS_TYPE` is a CNB spcific thing, so it may not be obvious to users when inspecting the image.
+
 # Alternatives
 [alternatives]: #alternatives
 
+- `pack build --default-process` sets `Cmd` in the OCI Image. Though this may be more intuitive to non CNB users, but processes are a CNB concept so it may not make sense as a `Cmd`. This also does not require us to change the precedence relationship between `CNB_PROCESS_TYPE` and `Cmd`. If `Cmd` is set, setting `CNB_PROCESS_TYPE` will do nothing.
 - Wait for `project.toml`
 - Use `Dockerfile` or other container tooling to override the `Cmd` field in the OCI image
 
