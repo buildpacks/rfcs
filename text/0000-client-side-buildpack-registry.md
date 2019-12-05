@@ -95,7 +95,7 @@ However, instead of multiple JSON files, we will use a single `index.json` at th
       "uri" : "<uri>",
     }
   ],
-  "indicies": [
+  "indices": [
     {
       "uri": "<uri>"
     }
@@ -113,7 +113,7 @@ The `buildpacks` fields are defined as follows:
 * `yanked` - whether or not the buildpack has been removed from the registry
 * `uri` - the address of the image stored in a Docker Registry (ex. `"docker.io/jkutner/lua"`)
 
-The `indicies` array contains a list of locations of other index files. This will be used in the future to decompose the `index.json` into separate files to improve performance of searching and updating. Its fields are defined as:
+The `indices` array contains a list of locations of other index files. This will be used in the future to decompose the `index.json` into separate files to improve performance of searching and updating. Its fields are defined as:
 
 * `uri` - The location of an index file with the same structure as this file (note: We will want to support relative paths too, which may mean `uri` is too specific)
 
@@ -162,7 +162,7 @@ The index would consist of multiple JSON files, split into directories based on 
         └── heroku_java.json
 ```
 
-The `indicies` section of the index file allows us to adopt this format in the future.
+The `indices` section of the index file allows us to adopt this format in the future.
 
 ## TOML Files
 
