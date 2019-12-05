@@ -1,10 +1,10 @@
 # Meta
 [meta]: #meta
-- Name: Project Descriptor
+- Name: Minimal Project Descriptor
 - Start Date: 2019-06-11
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
-- Supersedes: https://github.com/buildpack/rfcs/pull/16
+- Supersedes: https://github.com/buildpack/rfcs/pull/25
 
 # Summary
 [summary]: #summary
@@ -17,12 +17,8 @@ This is a proposal for a new file, `project.toml`, containing configuration for 
 This proposal is meant to address all of the following issues:
 
 * Build metadata (i.e. information about the code being built)
-* [Monorepos](https://github.com/buildpack/spec/issues/39)
 * [Application descriptor](https://github.com/buildpack/spec/issues/44)
 * [Ignoring files](https://github.com/buildpack/pack/issues/210)
-* Multiple images (i.e. one build, multiple images as output)
-* Custom launch configuration
-* Codified buildpacks
 
 # What it is
 [what-it-is]: #what-it-is
@@ -35,7 +31,6 @@ Terminology:
 The target personas for this proposal is buildpack users who need to enrich or configure buildpack execution. The elements in  `project.toml` support many different use cases including three top level tables:
 
 - `[project]`: (optional) defines configuration for a project
-- `[[images]]`: (optional) defines configuration for an image
 - `[metadata]`: (optional) metadata about the repository
 - `[extensions]`: (optional) extensions to the spec
 
@@ -52,30 +47,6 @@ license = "<string>"
 source = "<url>"
 include = ["<string>"]
 exclude = ["<string>"]
-
-[[images]]
-ref = "<string>"
-suffix = "<string>"
-path = "."
-
-  [[images.launch.env]]
-  name = "<string>"
-  value = "<string>"
-
-  [[images.build.env]]
-  name = "<string>"
-  value = "<string>"
-
-  [[images.processes]]
-  type = "<process type>"
-  command = "<command>"
-  args = ["<arguments>"]
-  direct = false
-
-  [[images.buildpacks]]
-  id = "<string>"
-  version = "<string>"
-  uri = "<url or path>"
 
 [metadata]
 # additional arbitrary keys allowed
@@ -126,64 +97,6 @@ The `.gitignore` pattern is used in both cases. The `exclude` and `include` keys
 
 Any files that are excluded (either via `include` or `exclude`) will be excluded before the build (i.e. not only exluded from the final image).
 
-## `[[images]]`
-
-Defines properties of the image(s) that are output from a build.
-
-```toml
-[[images]]
-ref = "<string>"
-suffix = "<string>"
-path = "."
-```
-
-* `ref` (string, optional): by default inherits from `[project.id]`. If set will be used as the tag of the OCI image produced
-* `suffix` (string, optional): If set will be used as the suffix to the tag of the OCI image produced
-* `path` (string, optional): by default uses the directory where this file lives
-
-## `[image.launch.env]` and `[image.build.env]`
-
-Used to set environment variables at launch time, for example:
-
-```toml
-[[images.launch.env]]
-name = "JAVA_OPTS"
-value = "-Xmx4g"
-```
-
-Or set environment variables at build time:
-
-```toml
-[[images.build.env]]
-name = "JAVA_OPTS"
-value = "-Xmx1g"
-```
-
-## `[[images.processes]]`
-
-Defines the default processes used to run an image.
-
-```toml
-[[images.processes]]
-name = "<process name>"
-cmd = "..."
-```
-
-This should mirror what is supported in `launch.toml`, which means that if `args` are added to support scratch images, they should be added here too.
-
-## `[[images.buildpacks]]`
-
-The images table may also contain an array of buildpacks. The schema for this table is:
-
-```toml
-[[images.buildpacks]]
-id = "<buildpack ID (required)>"
-version = "<buildpack version (optional default=latest)>"
-uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
-```
-
-This allows for each image to be built from a different group of buildpacks. There is an open question about how to simplify this interface if the buildpacks are the same for a number of a different `[[images]]`.
-
 ## `[metadata]`
 
 This table includes a some defined keys, but additional keys are not validated. It can be used to add platform specific metadata. For example:
@@ -220,85 +133,11 @@ version = "0.1"
 
 No other configuration is required.
 
-## Example: Monorepos
-
-The `[[images]]` array of tables allows the buildpack lifecycle to generate more than one image per build. Each table in the array may contain configuration that defines a different image for different parts of the code. For example:
-
-```toml
-[project]
-id = "io.buildpacks.monorepo-app"
-version = "0.1"
-
-[[images]]
-ref = "my-service"
-path = "service/"
-  [[images.processes]]
-  name = "web"
-  command = "java -jar target/service.jar"
-
-[[images]]
-ref = "my-gateway"
-path = "gateway/"
-  # array of processes used to run the image
-  [[images.processes]]
-  name = "web"
-  command = "java -jar target/gateway.jar"
-```
-
-There is an open question about how if actually run distinct builds, or if the images are derived from a single build.
-
-## Example: Codified Buildpacks
-
-Given an app with a `project.toml`, the lifecycle will read the `images.buildpacks` and generate an ephemeral buildpack group in the lifecycle. Only the buildpacks listed in `images.buildpacks` will be run (no other groups will be run). For example, an app might contain:
-
-```toml
-[[images]]
-  [[images.buildpacks]]
-  id = "io.buildpacks/java"
-  version = "1.0"
-
-  [[images.buildpacks]]
-  id = "io.buildpacks/nodejs"
-  version = "1.0"
-```
-
-These entries override any defaults in the builder image. If, for example, the project code contains a `Gemfile` and the `heroku/buildpacks` builder image is used, this will override the default buildpack groups, which would normally detect and run the `heroku/ruby` buildpack.
-
-## Example: Custom Image Prefix
-
-The `ref` field of an `[[images]]` table is used as the tag of the OCI image produced. If no suffix is provided, then it represents the entire tag. For example:
-
-```toml
-[[images]]
-ref = "gcr.io/example/myimage:42"
-
-[[images]]
-ref = "gcr.io/example/myimage:latest"
-```
-
-However, a given platform may override the ref, in which case the tag will be combined with the suffix:
-
-```toml
-[[images]]
-suffix = ":42"
-
-[[images]]
-suffix = ":latest"
-```
-
-A platform such as `pack` may then allow a command where the provided image name is a prefix, like:
-
-```
-$ pack build gcr.io/example/myimage
-```
-
-This would produce two images with tags `gcr.io/example/myimage:42` and `gcr.io/example/myimage:latest`.
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- This proposal merges to previously distinct concepts: projects/apps and buildpacks. However, by both concepts have many similar attributes and combining them enables the use of buildpacks to build buildpacks.
 - The use of the filename `project.toml` does not strongly indicate that it can be used with buildpacks
+- Conflicts with `Project.toml` from Julia
 
 # Alternatives
 [alternatives]: #alternatives
@@ -317,8 +156,4 @@ This would produce two images with tags `gcr.io/example/myimage:42` and `gcr.io/
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Do multiple `[[images]]` with the same buildpacks result in multiple builds, or are the images derived from a single build?
-- How do we prevent users from needing to copy/paste `[[images.buildpacks]]` over and over in the same file?
-    - could we add an additional top-level table that defines buildpack groups, which can be referenced in images?
-    - could we add an additional top-level table that defines default buildpack groups if not defined in `[[images]]`?
-- Should the `[[images]]` table contain `stack`, `builder`, and/or `lifecycle`?
+- How do we support `[[images]]` in the future?
