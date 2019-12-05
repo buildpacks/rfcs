@@ -32,7 +32,6 @@ The target personas for this proposal is buildpack users who need to enrich or c
 
 - `[project]`: (optional) defines configuration for a project
 - `[metadata]`: (optional) metadata about the repository
-- `[extensions]`: (optional) extensions to the spec
 
 Here is an overview of the complete schema:
 
@@ -42,24 +41,24 @@ id = "<string>"
 name = "<string>"
 version = "<string>"
 authors = ["<string>"]
-documentation = "<url>"
-license = "<string>"
-source = "<url>"
+documentation-url = "<url>"
+source-url = "<url>"
 include = ["<string>"]
 exclude = ["<string>"]
 
+[[project.licenses]]
+type = "<string>"
+uri = "<uri>"
+
 [metadata]
 # additional arbitrary keys allowed
-
-[extensions]
-# TBD
 ```
 
 The following sections describe each part of the schema in detail.
 
 ## `[project]`
 
-The top-level `[project]` table may contain configuration about the repository, including `id` and `version`, but also metadata about how it is authored, documented, and version controlled. If any of these values are redefined in `[buildpack]` or `[[images]]` they will override the values in `[project]`.
+The top-level `[project]` table may contain configuration about the repository, including `id` and `version`, but also metadata about how it is authored, documented, and version controlled.
 
 The `project.id`
 
@@ -97,6 +96,8 @@ The `.gitignore` pattern is used in both cases. The `exclude` and `include` keys
 
 Any files that are excluded (either via `include` or `exclude`) will be excluded before the build (i.e. not only exluded from the final image).
 
+If both `exclude` and `include` are defined, the build process will error out.
+
 ## `[metadata]`
 
 This table includes a some defined keys, but additional keys are not validated. It can be used to add platform specific metadata. For example:
@@ -106,20 +107,10 @@ This table includes a some defined keys, but additional keys are not validated. 
 pipeline = "foobar"
 ```
 
-The defined keys are:
-
-```toml
-[metadata]
-authors = ["<string>"]
-documentation = "<url>"
-license = "<string>"
-source = "<url>"
-```
-
 # How it Works
 [how-it-works]: #how-it-works
 
-Given the elements described above, we seek to satisfy the following use cases:
+The `project.toml` contents will be read by the platform and/or the lifecycle. The launch image will contain labels for the data in all fields except `include` and `exclude`.
 
 ## Example: Basic app
 
