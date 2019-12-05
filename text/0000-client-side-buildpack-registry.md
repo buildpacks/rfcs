@@ -82,42 +82,40 @@ When no `uri` is provided in the `[[order.group]]`, the `pack create-package` co
 
 The registry index will be stored in a Github repo similar to [crates.io-index](https://github.com/rust-lang/crates.io-index).
 
-The index will consist of multiple JSON files, split into directories based on the `id` of the buildpack.
+However, instead of multiple JSON files, we will use a single `index.json` at the root of the repo. This file will have the following structure:
 
 ```
-├── ex
-│   └── am
-│       ├── example_foo.json
-│       └── example_lua.json
-└── he
-    └── ro
-        └── heroku_java.json
+{
+  "buildpacks" : [
+    {
+      "id" : "<string>",
+      "version" : "<string",
+      "cksum" : "<string>",
+      "yanked" : <boolean>,
+      "uri" : "<uri>",
+    }
+  ],
+  "indicies": [
+    {
+      "uri": "<uri>"
+    }
+  ]
+}
 ```
 
-*Note:* We may not include the `.json` extension in the name of the file
 *Note:* We may want to split the `id` into two fields, including a `namespace`, which would alter this dir structure
 
-Each JSON file will have a minified version of the following structure:
-
-```
-[
-  {
-    "id" : "<string>",
-    "version" : "<string",
-    "cksum" : "<string>",
-    "yanked" : <boolean>,
-    "uri" : "<uri>",
-  }
-]
-```
-
-The fields included in each entry are defined as follows:
+The `buildpacks` fields are defined as follows:
 
 * `id` - the globally unique identifier of the buildpack, which will be used in commands like `pack pull-buildpack example/lua`
 * `version` - the version of the buildpack (must match the version in the `buildpack.toml` of the buildpack)
 * `cksum` - the image ID of the OCI image that represents the buildpack (used for validation)
 * `yanked` - whether or not the buildpack has been removed from the registry
 * `uri` - the address of the image stored in a Docker Registry (ex. `"docker.io/jkutner/lua"`)
+
+The `indicies` array contains a list of locations of other index files. This will be used in the future to decompose the `index.json` into separate files to improve performance of searching and updating. Its fields are defined as:
+
+* `uri` - The location of an index file with the same structure as this file (note: We will want to support relative paths too, which may mean `uri` is too specific)
 
 New entries will be added with a Pull Request, which can be crafted by the `pack` command.
 
@@ -149,6 +147,26 @@ This component will be considered non-critical, and end-users who require a more
 [alternatives]: #alternatives
 
 - All of the options in: https://github.com/buildpack/rfcs/pull/24
+
+## Crates.io Format
+
+The index would consist of multiple JSON files, split into directories based on the `id` of the buildpack.
+
+```
+├── ex
+│   └── am
+│       ├── example_foo.json
+│       └── example_lua.json
+└── he
+    └── ro
+        └── heroku_java.json
+```
+
+The `indicies` section of the index file allows us to adopt this format in the future.
+
+## TOML Files
+
+Instead of JSON we may want to use TOML, which would allow us to append to an index file. This may provide a performance improvement, but the specifics are unclear.
 
 # Prior Art
 [prior-art]: #prior-art
