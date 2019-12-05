@@ -23,8 +23,8 @@ Furthermore, other mediums like Slack lack a history that is both durable, gener
 
 We are proposing that we use email messages to notify the community of the following:
 
-- Finalized RFCs
-- New Releases
+- RFCs entering Final Comment Period
+- New releases of lifecycle and pack
 - Changes to the governance structure, core team, maintainers, etc
 
 We may communicate other information over email, but we consider these essential.
