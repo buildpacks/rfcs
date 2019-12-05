@@ -23,7 +23,6 @@ Furthermore, other mediums like Slack lack a history that is both durable, gener
 
 We are proposing that we use email messages to notify the community of the following:
 
-- New RFCs
 - Finalized RFCs
 - New Releases
 - Changes to the governance structure, core team, maintainers, etc
