@@ -22,6 +22,7 @@ A registry will also support a healthy ecosystem of buildpacks because it allows
 [what-it-is]: #what-it-is
 
 * buildpack registry - a list of published buildpacks
+* buildpack registry api - API service that handles access control to writing to the index
 * namespace - the owner of a buildpack. This may need to become an attribute in `buildpack.toml`
 
 This proposal introduces two new components:
@@ -34,7 +35,22 @@ This proposal introduces two new components:
 When a buildpack author would like to publish and share their buildpack on the registry, they will do the following:
 
 1. Push their CNB (as a buildpackage) to a Docker Registry (ex. Docker Hub, GCR, etc). This can be done with either a `docker push` or a `pack push-buildpack` (or similar name).
+1. Log into the buildpack registry using `pack registry-login`.
+1. Use `pack publish-buildpack` command to publish a new buildpack.
 1. Submit a Pull Request to the buildpack/registry Github repo to add the new buildpack to the index (the `pack push-buildpack` command will create this for you).
+
+## Yanking a Buildpack from the Registry
+
+Sometimes a buildpack author may have pushed up a bad version that they wish to not be available in the index. In order to not break builds, it will not be possible to fully remove an entry from the index. Instead, the entry in the index will be marked as "yanked". This information can than be used when resolving which buildpacks to fetch.
+
+1. Log into the buildpack registry using `pack registry-login`.
+1. Use `pack yank-buildpack <id> <version>` command to yank a buildpack.
+
+If a buildpack author wants to undo the yank and make the buildpack version available in the index, they can use the `--undo` flag.
+
+```
+$ pack yank-buildpack --undo <id> <version>
+```
 
 ## Using a Buildpack from the Registry
 
@@ -82,7 +98,63 @@ When no `uri` is provided in the `[[order.group]]`, the `pack create-package` co
 
 The registry index will be stored in a Github repo similar to [crates.io-index](https://github.com/rust-lang/crates.io-index).
 
-However, instead of multiple JSON files, we will use a single `index.json` at the root of the repo. This file will have the following structure:
+The index should be able to be replicated completely locally, so the structure should work across all major Operating Systems.
+
+Folders with be split by two nested folders. The reasoning for this is so the index doesn't run into a files in a folder limit. The first folder will be represent the first two characters and the third and fourth characters will be in the second folder. The filename will be the id, where it matches: `[a-z0-9\-\.]{1,253}`. For ids that are 1-3 characters long, they'll go in special folders.
+
+Here's an example directory structure:
+
+```
+1
+├── a
+└── b
+2
+├── aa
+└── ab
+3
+├── a
+│   ├── abc
+│   └── acd
+└── b
+    ├── bcd
+    └── bed
+fo
+├── ob
+│   ├── fooball
+│   └── foobar
+└── oc
+    └── foocal
+```
+
+The following ids are reserved by Windows, so they aren't allowed as valid ids:
+
+* nul
+* con
+* prn
+* aux
+* com1
+* com2
+* com3
+* com4
+* com5
+* com6
+* com7
+* com8
+* com9
+* lpt1
+* lpt2
+* lpt3
+* lpt4
+* lpt5
+* lpt6
+* lpt7
+* lpt8
+* lpt9
+
+
+The file will contain minified JSON for each buildpack. Multiple entries will exist in a file split by a newline. This strikes a balance between human redable, easy to parse, and minimizing the diffs for new updates.
+
+An entry will have the following structure:
 
 ```
 {
@@ -95,15 +167,10 @@ However, instead of multiple JSON files, we will use a single `index.json` at th
       "uri" : "<uri>",
     }
   ],
-  "indices": [
-    {
-      "uri": "<uri>"
-    }
-  ]
 }
 ```
 
-*Note:* We may want to split the `id` into two fields, including a `namespace`, which would alter this dir structure
+*Note:* We may want to split the `id` into two fields, including a `namespace`, which would alter this dir structure. If there is a namespace, then the `/` will be replaced by a `-` in the filename.
 
 The `buildpacks` fields are defined as follows:
 
@@ -113,11 +180,37 @@ The `buildpacks` fields are defined as follows:
 * `yanked` - whether or not the buildpack has been removed from the registry
 * `uri` - the address of the image stored in a Docker Registry (ex. `"docker.io/jkutner/lua"`)
 
-The `indices` array contains a list of locations of other index files. This will be used in the future to decompose the `index.json` into separate files to improve performance of searching and updating. Its fields are defined as:
+An example of what this may look like for a single buildpack file:
+```
+{"id":"ruby","version":"0.1.0","cksum":"a9d9038c0cdbb9f3b024aaf4b8ae4f894ea8288ad0c3bf057d1157c74601b906","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.1.0"}
+{"id":"ruby","version":"0.2.0","cksum":"2560f05307e8de9d830f144d09556e19dd1eb7d928aee900ed02208ae9727e7a","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.2.0"}
+{"id":"ruby","version":"0.2.1","cksum":"74eb48882e835d8767f62940d453eb96ed2737de3a16573881dcea7dea769df7","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.2.1"}
+{"id":"ruby","version":"0.3.0","cksum":"8c27fe111c11b722081701dfed3bd55e039b9ce92865473cf4cdfa918071c566","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.3.0"}
+```
 
-* `uri` - The location of an index file with the same structure as this file (note: We will want to support relative paths too, which may mean `uri` is too specific)
+### Manipulating the Index
 
-New entries will be added with a Pull Request, which can be crafted by the `pack` command.
+In general, the file will be append only for add. This will add new entries through `pack publish-buildpack`.
+
+When performing a `pack yank-buildpack`, it will rewrite the corresponding line by adjusting the `yanked` field to `true`.
+
+When performing a `pack yank-buildpack --undo`, it will rewrite the corresponding line by adjusting the `yanked` field to `false`.
+
+### Squashing the Index
+
+For performance reasons, the git history will be periodically squashed. This strikes a balance between ensuring fast fresh clone experience and incremental updates. The way squashes are handled should still ensure small deltas. In order to squash the index:
+
+1. create a branch with the current date as the name, i.e. `snapshot-YYYY-MM-DD`.
+1. replace master with a single commit containing the current state
+1. force push to master
+
+## API
+
+The API server will manage the Git repository index and maintain a bot that will commit to the git repository. It will be a pain for individual users to write minified JSON, so the API server will automate this work. It bare minimum it will need to support 3 endpoints beyond auth/login.
+
+* `POST /buildpacks/new` - this will be used for publishing a new version of a buildpack
+* `DELETE /buildpacks/buildpack_id/:version/yank` - this will be used to yank an existing buildpack version from the index
+* `PUT /buildpacks/:buildpack_id/:version/yank` - this will be used to undo a yank of a buildpack version
 
 ## CLI
 
@@ -126,6 +219,8 @@ The `pack` CLI (or any platform that wishes to support buildpacks from a registr
 * `pack create-builder`
 * `pack create-package`
 * `pack build` with the `--buildpack` flag
+
+Since the Git Repository will be squashed at times, the CLI will need to be able to handle this.
 
 ## Docker Registry
 
