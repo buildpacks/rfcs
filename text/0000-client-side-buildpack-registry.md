@@ -44,12 +44,12 @@ When a buildpack author would like to publish and share their buildpack on the r
 Sometimes a buildpack author may have pushed up a bad version that they wish to not be available in the index. In order to not break builds, it will not be possible to fully remove an entry from the index. Instead, the entry in the index will be marked as "yanked". This information can than be used when resolving which buildpacks to fetch.
 
 1. Log into the buildpack registry using `pack registry-login`.
-1. Use `pack yank-buildpack <id> <version>` command to yank a buildpack.
+1. Use `pack yank-buildpack <namespace>/<name> <version>` command to yank a buildpack.
 
 If a buildpack author wants to undo the yank and make the buildpack version available in the index, they can use the `--undo` flag.
 
 ```
-$ pack yank-buildpack --undo <id> <version>
+$ pack yank-buildpack --undo <namespace>/<name> <version>
 ```
 
 ## Using a Buildpack from the Registry
@@ -160,32 +160,34 @@ An entry will have the following structure:
 {
   "buildpacks" : [
     {
-      "id" : "<string>",
+      "namespace" : "<string>",
+      "name": "<string>",
       "version" : "<string",
       "cksum" : "<string>",
       "yanked" : <boolean>,
-      "uri" : "<uri>",
+      "addr" : "<string>",
     }
   ],
 }
 ```
 
-*Note:* We may want to split the `id` into two fields, including a `namespace`, which would alter this dir structure. If there is a namespace, then the `/` will be replaced by a `-` in the filename.
+*Note:* id is the combination of two fields, `namespace` and `name`. The `/` will be replaced by a `-` in the filename.
 
 The `buildpacks` fields are defined as follows:
 
-* `id` - the globally unique identifier of the buildpack, which will be used in commands like `pack pull-buildpack example/lua`
+* `namespace` - can represent a set or organization of buildpacks.
+* `name` - an identifier that must be unique within a namespace.
 * `version` - the version of the buildpack (must match the version in the `buildpack.toml` of the buildpack)
 * `cksum` - the image ID of the OCI image that represents the buildpack (used for validation)
 * `yanked` - whether or not the buildpack has been removed from the registry
-* `uri` - the address of the image stored in a Docker Registry (ex. `"docker.io/jkutner/lua"`)
+* `addr` - the address of the image stored in a Docker Registry (ex. `"docker.io/jkutner/lua"`)
 
 An example of what this may look like for a single buildpack file:
 ```
-{"id":"ruby","version":"0.1.0","cksum":"a9d9038c0cdbb9f3b024aaf4b8ae4f894ea8288ad0c3bf057d1157c74601b906","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.1.0"}
-{"id":"ruby","version":"0.2.0","cksum":"2560f05307e8de9d830f144d09556e19dd1eb7d928aee900ed02208ae9727e7a","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.2.0"}
-{"id":"ruby","version":"0.2.1","cksum":"74eb48882e835d8767f62940d453eb96ed2737de3a16573881dcea7dea769df7","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.2.1"}
-{"id":"ruby","version":"0.3.0","cksum":"8c27fe111c11b722081701dfed3bd55e039b9ce92865473cf4cdfa918071c566","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.3.0"}
+{"namespace":"heroku","name":"ruby","version":"0.1.0","cksum":"a9d9038c0cdbb9f3b024aaf4b8ae4f894ea8288ad0c3bf057d1157c74601b906","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.1.0"}
+{"namespace":"heroku","name":"ruby","version":"0.2.0","cksum":"2560f05307e8de9d830f144d09556e19dd1eb7d928aee900ed02208ae9727e7a","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.2.0"}
+{"namespace":"heroku","name":"ruby","version":"0.2.1","cksum":"74eb48882e835d8767f62940d453eb96ed2737de3a16573881dcea7dea769df7","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.2.1"}
+{"namespace":"heroku","name":"ruby","version":"0.3.0","cksum":"8c27fe111c11b722081701dfed3bd55e039b9ce92865473cf4cdfa918071c566","yanked":false,"uri":"docker.io/hone/ruby-buildpack:0.3.0"}
 ```
 
 ### Manipulating the Index
