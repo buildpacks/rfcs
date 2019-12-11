@@ -279,6 +279,12 @@ An API server would replace some of the logic performed by the CLI/client. The A
 * `DELETE /buildpacks/buildpack_id/:version/yank` - this will be used to yank an existing buildpack version from the index
 * `PUT /buildpacks/:buildpack_id/:version/yank` - this will be used to undo a yank of a buildpack version
 
+## Human Readable Index as Gateway
+
+In addition to the machine readable index described in [How it works](#how-it-works), we may want to support a human readable index that acts as a gateway for PRs. This would not be on the critical path, but would make the experience of publishing easier.
+
+In the future, the Human readable index could be replaced by an API service and web frontend.
+
 ## TOML Files
 
 Instead of JSON we may want to use TOML, which would allow us to append to an index file. This may provide a performance improvement, but the specifics are unclear.
