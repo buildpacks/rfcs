@@ -17,8 +17,9 @@ This is a proposal for a new file, `project.toml`, containing configuration for 
 This proposal is meant to address all of the following issues:
 
 * Build metadata (i.e. information about the code being built)
-* [Application descriptor](https://github.com/buildpack/spec/issues/44)
 * [Ignoring files](https://github.com/buildpack/pack/issues/210)
+
+It also provides a foundation for solving the problems defined in the [Application descriptor issue](https://github.com/buildpack/spec/issues/44).
 
 # What it is
 [what-it-is]: #what-it-is
@@ -28,7 +29,7 @@ Terminology:
 * **project**: a repository containing source code for an app, service, function, buildpack or a monorepo containing any combination of those.
 * **image**: the output of a running a buildpack(s) against a project
 
-The target personas for this proposal is buildpack users who need to enrich or configure buildpack execution. The elements in  `project.toml` support many different use cases including three top level tables:
+The target personas for this proposal is buildpack users who need to enrich or configure buildpack execution. The elements in  `project.toml` support many different use cases including these top level tables:
 
 - `[project]`: (optional) defines configuration for a project
 - `[metadata]`: (optional) metadata about the repository
