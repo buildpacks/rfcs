@@ -159,7 +159,7 @@ An entry will have the following structure:
 {
   "buildpacks" : [
     {
-      "namespace" : "<string>",
+      "ns" : "<string>",
       "name": "<string>",
       "version" : "<string",
       "cksum" : "<string>",
@@ -172,7 +172,7 @@ An entry will have the following structure:
 
 The `buildpacks` fields are defined as follows:
 
-* `namespace` - can represent a set or organization of buildpacks.
+* `ns` - can represent a set or organization of buildpacks.
 * `name` - an identifier that must be unique within a namespace.
 * `version` - the version of the buildpack (must match the version in the `buildpack.toml` of the buildpack)
 * `cksum` - the image ID of the OCI image that represents the buildpack (used for validation)
@@ -187,7 +187,7 @@ An example of what this may look like for a single buildpack file:
 {"namespace":"heroku","name":"ruby","version":"0.3.0","cksum":"8c27fe111c11b722081701dfed3bd55e039b9ce92865473cf4cdfa918071c566","yanked":false,"addr":"docker.io/hone/ruby-buildpack:0.3.0"}
 ```
 
-*Note:* id is the combination of two fields, `namespace` and `name`. The `/` will be replaced by a `_` in the filename. For example:
+*Note:* id is the combination of two fields, `ns` and `name`. The `/` will be replaced by a `_` in the filename. For example:
 
 ```
 he
@@ -227,7 +227,7 @@ Each `namespace` will be owned by an entity. The mapping of this entity, called 
 ]
 ```
 
-* `namespace` - can represent a set or organization of buildpacks. matches `namespace` in the primary index
+* `namespace` - can represent a set or organization of buildpacks. matches `ns` in the primary index
 * `owner.id` - the identifier of the user or group that owns a namespace. this will be specific to `owner.type`
 * `owner.type` - the type of owner (i.e. a Github account, a Google account, etc)
 
