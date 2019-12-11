@@ -44,12 +44,23 @@ version = "<string>"
 authors = ["<string>"]
 documentation-url = "<url>"
 source-url = "<url>"
-include = ["<string>"]
-exclude = ["<string>"]
 
 [[project.licenses]]
 type = "<string>"
 uri = "<uri>"
+
+[build]
+include = ["<string>"]
+exclude = ["<string>"]
+
+[[build.buildpacks]]
+id = "<string>"
+version = "<string>"
+uri = "<string>"
+
+[[build.env]]
+name = "<string>"
+value = "<string>"
 
 [metadata]
 # additional arbitrary keys allowed
@@ -70,12 +81,12 @@ name = "<string>"
 version = "<string>"
 ```
 
-## `[project.include]` and `[project.exclude]`
+## `[build.include]` and `[build.exclude]`
 
 A list of files to include in the build (while excluding everything else):
 
 ```toml
-[project]
+[build]
 include = [
     "cmd/",
     "go.mod",
@@ -87,7 +98,7 @@ include = [
 A list of files to exclude from the build (while including everything else)
 
 ```toml
-[project]
+[build]
 exclude = [
     "spec/"
 ]
@@ -98,6 +109,29 @@ The `.gitignore` pattern is used in both cases. The `exclude` and `include` keys
 Any files that are excluded (either via `include` or `exclude`) will be excluded before the build (i.e. not only exluded from the final image).
 
 If both `exclude` and `include` are defined, the build process will error out.
+
+## `[[build.buildpacks]]`
+
+The build table may contain an array of buildpacks. The schema for this table is:
+
+```toml
+[[build.buildpacks]]
+id = "<buildpack ID (required)>"
+version = "<buildpack version (optional default=latest)>"
+uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
+```
+
+This defines the buildpacks that a platform should use on the repo.
+
+## `[[build.env]]`
+
+Used to set environment variables at build time, for example:
+
+```toml
+[[build.env]]
+name = "JAVA_OPTS"
+value = "-Xmx1g"
+```
 
 ## `[metadata]`
 
@@ -124,6 +158,24 @@ version = "0.1"
 ```
 
 No other configuration is required.
+
+## Example: Codified Buildpacks
+
+Given an app with a `project.toml`, the lifecycle will read the `build.buildpacks` and generate an ephemeral buildpack group in the lifecycle. Only the buildpacks listed in `build.buildpacks` will be run (no other groups will be run). For example, an app might contain:
+
+```toml
+[[build.buildpacks]]
+id = "io.buildpacks/java"
+version = "1.0"
+
+[[build.buildpacks]]
+id = "io.buildpacks/nodejs"
+version = "1.0"
+```
+
+These entries override any defaults in the builder image. If, for example, the project code contains a `Gemfile` and the `heroku/buildpacks` builder image is used, this will override the default buildpack groups, which would normally detect and run the `heroku/ruby` buildpack.
+
+This is similar to running `pack build --buildpack io.buildpacks/java,io.buildpacks/nodejs`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
