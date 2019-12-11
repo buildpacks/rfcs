@@ -230,15 +230,7 @@ The mapping of owners to namespaces will be stored in a seperate database (poten
 
 Each buildpack release will be checked against the ownership database to ensure the user submitting the release has ownership of the namespace (either directly or as part of an organization like a Github org).
 
-Ownership data is neither private, nor sensitive and can't be stored in clear text and be publicly accessible.
-
-## API
-
-The API server will manage the Git repository index and maintain a bot that will commit to the git repository. It will be a pain for individual users to write minified JSON, so the API server will automate this work. It bare minimum it will need to support 3 endpoints beyond auth/login.
-
-* `POST /buildpacks/new` - this will be used for publishing a new version of a buildpack
-* `DELETE /buildpacks/buildpack_id/:version/yank` - this will be used to yank an existing buildpack version from the index
-* `PUT /buildpacks/:buildpack_id/:version/yank` - this will be used to undo a yank of a buildpack version
+Ownership data is neither private, nor sensitive and *can* be stored in clear text and be publicly accessible.
 
 ## CLI
 
@@ -270,6 +262,14 @@ This component will be considered non-critical, and end-users who require a more
 [alternatives]: #alternatives
 
 - All of the options in: https://github.com/buildpack/rfcs/pull/24
+
+## API
+
+An API server would replace some of the logic performed by the CLI/client. The API server will manage the Git repository index and maintain a bot that will commit to the git repository. It will be a pain for individual users to write minified JSON, so the API server will automate this work. It bare minimum it will need to support 3 endpoints beyond auth/login.
+
+* `POST /buildpacks/new` - this will be used for publishing a new version of a buildpack
+* `DELETE /buildpacks/buildpack_id/:version/yank` - this will be used to yank an existing buildpack version from the index
+* `PUT /buildpacks/:buildpack_id/:version/yank` - this will be used to undo a yank of a buildpack version
 
 ## Crates.io Format
 
