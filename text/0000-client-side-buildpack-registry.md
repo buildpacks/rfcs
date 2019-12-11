@@ -162,7 +162,7 @@ An entry will have the following structure:
       "ns" : "<string>",
       "name": "<string>",
       "version" : "<string",
-      "cksum" : "<string>",
+      "digest" : "<string>",
       "yanked" : <boolean>,
       "addr" : "<string>",
     }
@@ -175,16 +175,16 @@ The `buildpacks` fields are defined as follows:
 * `ns` - can represent a set or organization of buildpacks.
 * `name` - an identifier that must be unique within a namespace.
 * `version` - the version of the buildpack (must match the version in the `buildpack.toml` of the buildpack)
-* `cksum` - the image ID of the OCI image that represents the buildpack (used for validation)
+* `digest` - the image ID of the OCI image that represents the buildpack (used for validation)
 * `yanked` - whether or not the buildpack has been removed from the registry
 * `addr` - the address of the image stored in a Docker Registry (ex. `"docker.io/jkutner/lua"`)
 
 An example of what this may look like for a single buildpack file:
 ```
-{"namespace":"heroku","name":"ruby","version":"0.1.0","cksum":"a9d9038c0cdbb9f3b024aaf4b8ae4f894ea8288ad0c3bf057d1157c74601b906","yanked":false,"addr":"docker.io/hone/ruby-buildpack:0.1.0"}
-{"namespace":"heroku","name":"ruby","version":"0.2.0","cksum":"2560f05307e8de9d830f144d09556e19dd1eb7d928aee900ed02208ae9727e7a","yanked":false,"addr":"docker.io/hone/ruby-buildpack:0.2.0"}
-{"namespace":"heroku","name":"ruby","version":"0.2.1","cksum":"74eb48882e835d8767f62940d453eb96ed2737de3a16573881dcea7dea769df7","yanked":false,"addr":"docker.io/hone/ruby-buildpack:0.2.1"}
-{"namespace":"heroku","name":"ruby","version":"0.3.0","cksum":"8c27fe111c11b722081701dfed3bd55e039b9ce92865473cf4cdfa918071c566","yanked":false,"addr":"docker.io/hone/ruby-buildpack:0.3.0"}
+{"ns":"heroku","name":"ruby","version":"0.1.0","digest":"a9d9038c0cdbb9f3b024aaf4b8ae4f894ea8288ad0c3bf057d1157c74601b906","yanked":false,"addr":"docker.io/hone/ruby-buildpack:0.1.0"}
+{"ns":"heroku","name":"ruby","version":"0.2.0","digest":"2560f05307e8de9d830f144d09556e19dd1eb7d928aee900ed02208ae9727e7a","yanked":false,"addr":"docker.io/hone/ruby-buildpack:0.2.0"}
+{"ns":"heroku","name":"ruby","version":"0.2.1","digest":"74eb48882e835d8767f62940d453eb96ed2737de3a16573881dcea7dea769df7","yanked":false,"addr":"docker.io/hone/ruby-buildpack:0.2.1"}
+{"ns":"heroku","name":"ruby","version":"0.3.0","digest":"8c27fe111c11b722081701dfed3bd55e039b9ce92865473cf4cdfa918071c566","yanked":false,"addr":"docker.io/hone/ruby-buildpack:0.3.0"}
 ```
 
 *Note:* id is the combination of two fields, `ns` and `name`. The `/` will be replaced by a `_` in the filename. For example:
