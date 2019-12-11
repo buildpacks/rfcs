@@ -206,6 +206,32 @@ For performance reasons, the git history will be periodically squashed. This str
 1. replace master with a single commit containing the current state
 1. force push to master
 
+### Namespace ownership
+
+Each `namespace` will be owned by a
+
+```
+{
+  "namespace" : "<string>",
+  "owner" : [
+    "id" : "<string>",
+    "type" : "<string>"
+  ]
+}
+```
+
+* `namespace` - can represent a set or organization of buildpacks. matches `namespace` in the primary index
+* `owner.id` - the identifier of the user or group that owns a namespace. this will be specific to `owner.type`
+* `owner.type` - the type of owner (i.e. a Github account, a Google account, etc)
+
+Namespaces are allocated to owners on a first-come-first-serve basis. However, we will retain the right to retroactively change ownership.
+
+The mapping of owners to namespaces will be stored in a seperate database (potentially a JSON file in a different Github repo). In the future, we may decide to merge this mapping into the registry index repo if we decided that it can be done in a vendor-neutral way (i.e. without coupling to Github).
+
+Each buildpack release will be checked against the ownership database to ensure the user submitting the release has ownership of the namespace (either directly or as part of an organization like a Github org).
+
+Ownership data is neither private, nor sensitive and can't be stored in clear text and be publicly accessible.
+
 ## API
 
 The API server will manage the Git repository index and maintain a bot that will commit to the git repository. It will be a pain for individual users to write minified JSON, so the API server will automate this work. It bare minimum it will need to support 3 endpoints beyond auth/login.
