@@ -43,7 +43,6 @@ When a buildpack author would like to publish and share their buildpack on the r
 
 Sometimes a buildpack author may have pushed up a bad version that they wish to not be available in the index. In order to not break builds, it will not be possible to fully remove an entry from the index. Instead, the entry in the index will be marked as "yanked". This information can than be used when resolving which buildpacks to fetch.
 
-1. Log into the buildpack registry using `pack registry-login`.
 1. Use `pack yank-buildpack <namespace>/<name> <version>` command to yank a buildpack.
 
 If a buildpack author wants to undo the yank and make the buildpack version available in the index, they can use the `--undo` flag.
