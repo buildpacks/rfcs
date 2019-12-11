@@ -208,16 +208,18 @@ For performance reasons, the git history will be periodically squashed. This str
 
 ### Namespace ownership
 
-Each `namespace` will be owned by a
+Each `namespace` will be owned by an entity. The mapping of this entity, called owner, to a namespace will have the following structure:
 
 ```
-{
-  "namespace" : "<string>",
-  "owner" : [
-    "id" : "<string>",
-    "type" : "<string>"
-  ]
-}
+[
+  {
+    "namespace" : "<string>",
+    "owner" : [
+      "id" : "<string>",
+      "type" : "<string>"
+    ]
+  }
+]
 ```
 
 * `namespace` - can represent a set or organization of buildpacks. matches `namespace` in the primary index
@@ -270,22 +272,6 @@ An API server would replace some of the logic performed by the CLI/client. The A
 * `POST /buildpacks/new` - this will be used for publishing a new version of a buildpack
 * `DELETE /buildpacks/buildpack_id/:version/yank` - this will be used to yank an existing buildpack version from the index
 * `PUT /buildpacks/:buildpack_id/:version/yank` - this will be used to undo a yank of a buildpack version
-
-## Crates.io Format
-
-The index would consist of multiple JSON files, split into directories based on the `id` of the buildpack.
-
-```
-├── ex
-│   └── am
-│       ├── example_foo.json
-│       └── example_lua.json
-└── he
-    └── ro
-        └── heroku_java.json
-```
-
-The `indices` section of the index file allows us to adopt this format in the future.
 
 ## TOML Files
 
