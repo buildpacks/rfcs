@@ -241,6 +241,7 @@ The `pack` CLI (or any platform that wishes to support buildpacks from a registr
 * `pack create-builder`
 * `pack create-package`
 * `pack build` with the `--buildpack` flag
+* `pack search-buildpacks`
 
 Since the Git Repository will be squashed at times, the CLI will need to be able to handle this.
 
