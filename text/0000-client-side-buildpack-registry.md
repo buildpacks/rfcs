@@ -35,9 +35,9 @@ This proposal introduces two new components:
 When a buildpack author would like to publish and share their buildpack on the registry, they will do the following:
 
 1. Push their CNB (as a buildpackage) to a Docker Registry (ex. Docker Hub, GCR, etc). This can be done with either a `docker push` or a `pack push-buildpack` (or similar name).
-1. Log into the buildpack registry using `pack registry-login`.
-1. Use `pack publish-buildpack` command to publish a new buildpack.
-1. Submit a Pull Request to the buildpack/registry Github repo to add the new buildpack to the index (the `pack push-buildpack` command will create this for you).
+1. Use `pack publish-buildpack` command to publish a new buildpack. This will do the following:
+    1. Push the buildpackage (OCI image) to a docker registry
+    1. Submit a Pull Request to the buildpack/registry Github repo to add the new buildpack to the index.
 
 ## Yanking a Buildpack from the Registry
 
