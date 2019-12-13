@@ -25,7 +25,7 @@ Pack uses its own internal logging code, and does not leverage any of the existi
 # How it Works
 [how-it-works]: #how-it-works
 
-Remove the custom logging code for pack.  All pack functions that take a pointer to the concrete `logging.Logger`  structure will be modified to take a simple logging interface as an argument.  Given the proliferation of logging packages in the Go ecosystem it may be impossible to design an interface that works with all of them. However by supplying a very simple interface the current logging requirement of pack can be met, and most logging libraries could be adapted to work with pack with little or no modification.  
+Remove the custom logging code for pack.  All pack functions that take a pointer to the concrete `logging.Logger`  structure will be modified to take a simple logging interface as an argument.  Given the proliferation of logging packages in the Go ecosystem it may be impossible to design an interface that works with all of them. However by supplying a very simple interface the current logging requirement of pack can be met, and most logging libraries could be adapted to work with pack with little or no modification.
 
 ```
 type Logger interface {

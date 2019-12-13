@@ -115,7 +115,7 @@ In the future we could also provide flags to change the output format (e.g `-o y
 
 `exporter` will add the bill-of-materials and the process types to the `io.buildpacks.lifecycle.metadata` label by adding `bom` and `processes` keys respectively.
 
-`pack` will read all necessary information from the metadata label and display it to the user. 
+`pack` will read all necessary information from the metadata label and display it to the user.
 
 # Drawbacks
 [drawbacks]: #drawbacks

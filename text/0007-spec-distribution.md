@@ -144,7 +144,7 @@ Next, the 2-D ordering of buildpacks is derived as follows:
 
 Where:
 - O and P are buildpacks IDs referencing buildpacks that compose other buildpack IDs.
-- A through H are buildpack IDs referencing executable buildpacks. 
+- A through H are buildpack IDs referencing executable buildpacks.
 
 Given:
 
@@ -169,7 +169,7 @@ We propose:
 <img src="http://tex.s2cms.ru/svg/%0A%5Cbegin%7Bbmatrix%7D%0AE%2C%20%26%20O%2C%20%26%20F%0A%5Cend%7Bbmatrix%7D%20%3D%20%0A%5Cbegin%7Bbmatrix%7D%0AE%2C%20%26%20A%2C%20%26%20B%2C%20%26%20F%20%5C%5C%0AE%2C%20%26%20C%2C%20%26%20D%2C%20%26%20F%20%5C%5C%0A%5Cend%7Bbmatrix%7D%0A" alt="
 \begin{bmatrix}
 E, &amp; O, &amp; F
-\end{bmatrix} = 
+\end{bmatrix} =
 \begin{bmatrix}
 E, &amp; A, &amp; B, &amp; F \\
 E, &amp; C, &amp; D, &amp; F \\
@@ -179,7 +179,7 @@ E, &amp; C, &amp; D, &amp; F \\
 <img src="http://tex.s2cms.ru/svg/%0A%5Cbegin%7Bbmatrix%7D%0AO%2C%20%26%20P%0A%5Cend%7Bbmatrix%7D%20%3D%20%0A%5Cbegin%7Bbmatrix%7D%0AA%2C%20%26%20B%2C%20%26%20E%2C%20%26%20F%20%5C%5C%0AA%2C%20%26%20B%2C%20%26%20G%2C%20%26%20H%20%5C%5C%0AC%2C%20%26%20D%2C%20%26%20E%2C%20%26%20F%20%5C%5C%0AC%2C%20%26%20D%2C%20%26%20G%2C%20%26%20H%20%5C%5C%0A%5Cend%7Bbmatrix%7D%0A" alt="
 \begin{bmatrix}
 O, &amp; P
-\end{bmatrix} = 
+\end{bmatrix} =
 \begin{bmatrix}
 A, &amp; B, &amp; E, &amp; F \\
 A, &amp; B, &amp; G, &amp; H \\
@@ -270,7 +270,7 @@ These properties will be specified in a `builder.toml` file. This file is a conf
 uri = "https://example.com/nodejs.tgz"
 
 [[packages]]
-ref = "registry.example.com/ruby" 
+ref = "registry.example.com/ruby"
 
 [[order]]
 group = [
@@ -300,10 +300,10 @@ If `order` is not specified, the first buildpackage in `packages` becomes the de
 
 3. For simplicity, should builders be restricted to a single buildpackage, no blobs, and no order definition?
    Suggestion: no, the proposed model simplifies the workflow.
-   
+
 4. Should we remove symlinks in a buildpackage to buildpacks that don't match a buildpackage stack?
    Suggestion: no, this makes dynamic builder generation difficult.
-   
+
 5. Is `package.toml` really necessary?
    Suggestion: it's necessary until we develop a buildpack registry that allows you to download a buildpack based on its ID.
    Once there is a registry, we should deprecate `package.toml` so packages can be generated directly from `buildpack.toml`.

@@ -159,4 +159,3 @@ N/A
   towards flags, and away from positional args. There may be some reason
   unknown to the author as to why flag names and positional args were used
   in the first place.
-

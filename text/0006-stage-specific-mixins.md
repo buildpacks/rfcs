@@ -14,7 +14,7 @@ This proposal makes it easier to extend stack images with mixins.
 # What it is
 [what-it-is]: #what-it-is
 
-This RFC proposes a method for annotating mixins that are necessary during build or launch but not for both stages.  
+This RFC proposes a method for annotating mixins that are necessary during build or launch but not for both stages.
 
 # How it Works
 [how-it-works]: #how-it-works
