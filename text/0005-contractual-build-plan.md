@@ -47,7 +47,7 @@ It affects buildpack developers who implement modular, interdependent buildpacks
 - Multiple buildpacks may require or provide the same dependency.
 - `/bin/build` no longer receives a build plan on stdin.
 - `/bin/build`'s build plan argument contains required dependencies that it provides.
-- `/bin/build` may refine its build plan to contain additional dependency metadata. 
+- `/bin/build` may refine its build plan to contain additional dependency metadata.
 - `/bin/build` may remove all entries for a dependency in its build plan to allow a subsequent buildpack to provide that dependency.
 
 ## Examples
