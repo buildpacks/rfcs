@@ -2,8 +2,8 @@
 [meta]: #meta
 - Name: Lifecycle Descriptor
 - Start Date: 08/05/2019
-- CNB Pull Request: [rfcs#20](https://github.com/buildpack/rfcs/pull/20), [lifecycle#167](https://github.com/buildpack/lifecycle/pull/167), [pack#269](https://github.com/buildpack/pack/pull/269), [pack#294](https://github.com/buildpack/pack/pull/294)
-- CNB Issue: [pack#293](https://github.com/buildpack/pack/issues/293)
+- CNB Pull Request: [rfcs#20](https://github.com/buildpacks/rfcs/pull/20), [lifecycle#167](https://github.com/buildpacks/lifecycle/pull/167), [pack#269](https://github.com/buildpacks/pack/pull/269), [pack#294](https://github.com/buildpacks/pack/pull/294)
+- CNB Issue: [pack#293](https://github.com/buildpacks/pack/issues/293)
 - Supersedes: N/A
 
 # Summary

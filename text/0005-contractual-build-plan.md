@@ -1,8 +1,8 @@
-# Meta 
+# Meta
 [meta]: #meta
 - Name: Contractual Build Plan
 - Start Date: 2019-04-12
-- CNB Pull Requests: [rfcs#12](https://github.com/buildpack/rfcs/pull/12), [spec#52](https://github.com/buildpack/spec/pull/52), [lifecycle#149](https://github.com/buildpack/lifecycle/pull/149)
+- CNB Pull Requests: [rfcs#12](https://github.com/buildpacks/rfcs/pull/12), [spec#52](https://github.com/buildpacks/spec/pull/52), [lifecycle#149](https://github.com/buildpacks/lifecycle/pull/149)
 - CNB Issues: (lifecycle issues to follow)
 
 # Motivation
@@ -111,7 +111,7 @@ packages = ["..."]
 
 2. How can a buildpack require either of two different dependencies, but not both?
 
-   With the [distribution spec](https://github.com/buildpack/rfcs/blob/dist-spec/0000-spec-distribution.md), complex logic can be expressed by multiple buildpacks that live in the same repository. These buildpacks may have the same source.
+   With the [distribution spec](https://github.com/buildpacks/rfcs/blob/dist-spec/0000-spec-distribution.md), complex logic can be expressed by multiple buildpacks that live in the same repository. These buildpacks may have the same source.
 
 # Unanswered Questions
 [unanswered-questions]: #unanswered-questions
