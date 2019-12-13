@@ -116,12 +116,14 @@ The build table may contain an array of buildpacks. The schema for this table is
 
 ```toml
 [[build.buildpacks]]
-id = "<buildpack ID (required)>"
+id = "<buildpack ID (optional)>"
 version = "<buildpack version (optional default=latest)>"
 uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
 ```
 
 This defines the buildpacks that a platform should use on the repo.
+
+Either an `id` or a `uri` are required, but not both. If `uri` is provided, `version` is not allowed.
 
 ## `[[build.env]]`
 
