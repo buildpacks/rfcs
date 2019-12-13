@@ -1,8 +1,8 @@
-# Meta 
+# Meta
 [meta]: #meta
 - Name: Auto-load User-provided Environment Variables
 - Start Date: 2019-06-17
-- CNB Pull Requests: [rfcs#14](https://github.com/buildpack/rfcs/pull/14), [spec#55](https://github.com/buildpack/spec/pull/55), [lifecycle#163](https://github.com/buildpack/lifecycle/pull/163)
+- CNB Pull Requests: [rfcs#14](https://github.com/buildpacks/rfcs/pull/14), [spec#55](https://github.com/buildpacks/spec/pull/55), [lifecycle#163](https://github.com/buildpacks/lifecycle/pull/163)
 - CNB Issues: (lifecycle issues to follow)
 
 
@@ -21,7 +21,7 @@ This RFC proposes that user-provided environment variable be loaded by default. 
 
 User-provided build-time environment variables are loaded in the detection and build environment automatically unless `clear-env = true` is specified in the buildpack's entry in `buildpack.toml`. In both cases, the environment variables continue to be available in `<platform>/env/`.
 
-If any [lifecycle-provided env var](https://github.com/buildpack/spec/blob/master/buildpack.md#provided-by-the-lifecycle) is specified by the user, and `clear-env = true` is not set, then the user-provided value is prepended immediately before each `/bin/build` invocation, so that the value precedes any layer-provided values.
+If any [lifecycle-provided env var](https://github.com/buildpacks/spec/blob/master/buildpack.md#provided-by-the-lifecycle) is specified by the user, and `clear-env = true` is not set, then the user-provided value is prepended immediately before each `/bin/build` invocation, so that the value precedes any layer-provided values.
 
 # Questions
 [questions]: #questions

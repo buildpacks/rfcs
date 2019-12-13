@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Manifest - App metadata - add source type, version and metadata
 - Start Date: 2019-06-10
-- CNB Pull Request: [rfcs#9](https://github.com/buildpack/rfcs/pull/9)
+- CNB Pull Request: [rfcs#9](https://github.com/buildpacks/rfcs/pull/9)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
 
@@ -100,7 +100,7 @@ Unencoded, `io.buildpacks.app.source` is:
 The lifecycle may be provided additional metadata values, and this should be marshalled to the image manifest.
 Platforms may or may not use these additional properties.
 
-In terms of the lifecycle implementation, this is likely to require changes to the [exporter](https://github.com/buildpack/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/exporter.go#L50-L54) to add the additional app metadata.
+In terms of the lifecycle implementation, this is likely to require changes to the [exporter](https://github.com/buildpacks/lifecycle/blob/af8b71578ed91303834ef57a7e3568ce3081f153/exporter.go#L50-L54) to add the additional app metadata.
 
 # Drawbacks
 [drawbacks]: #drawbacks

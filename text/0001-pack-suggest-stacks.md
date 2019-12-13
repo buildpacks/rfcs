@@ -2,8 +2,8 @@
 [meta]: #meta
 - Name: Suggest Stacks
 - Start Date: 2019-04-25
-- CNB Pull Request: [rfcs#4](https://github.com/buildpack/rfcs/pull/4), [pack#190](https://github.com/buildpack/pack/pull/190)
-- CNB Issue: [pack#156](https://github.com/buildpack/pack/issues/156)
+- CNB Pull Request: [rfcs#4](https://github.com/buildpacks/rfcs/pull/4), [pack#190](https://github.com/buildpacks/pack/pull/190)
+- CNB Issue: [pack#156](https://github.com/buildpacks/pack/issues/156)
 - Supersedes: N/A
 
 # Summary

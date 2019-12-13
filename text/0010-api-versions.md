@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: API Versions
 - Start Date: 2019-08-05
-- CNB Pull Request: [rfcs#19](https://github.com/buildpack/rfcs/pull/19), [pack#282](https://github.com/buildpack/pack/pull/282)
+- CNB Pull Request: [rfcs#19](https://github.com/buildpacks/rfcs/pull/19), [pack#282](https://github.com/buildpacks/pack/pull/282)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
 
@@ -47,4 +47,4 @@ A **missing or empty** `api` key would indicate `1.0` (the current version of th
 
 # Related RFCs
 [related-rfcs]: #related-rfcs
-[RFC: Lifecycle descriptor](https://github.com/buildpack/rfcs/pull/20)
+[RFC: Lifecycle descriptor](https://github.com/buildpacks/rfcs/pull/20)

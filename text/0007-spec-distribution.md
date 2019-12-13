@@ -1,8 +1,8 @@
-# Meta 
+# Meta
 [meta]: #meta
 - Name: Buildpack Distribution Specification
 - Start Date: 2019-04-12
-- CNB Pull Requests: [rfcs#11](https://github.com/buildpack/rfcs/pull/11), [spec#53](https://github.com/buildpack/spec/pull/53), [lifecycle#149](https://github.com/buildpack/lifecycle/pull/149), [pack#243](https://github.com/buildpack/pack/issues/243)
+- CNB Pull Requests: [rfcs#11](https://github.com/buildpacks/rfcs/pull/11), [spec#53](https://github.com/buildpacks/spec/pull/53), [lifecycle#149](https://github.com/buildpacks/lifecycle/pull/149), [pack#243](https://github.com/buildpacks/pack/issues/243)
 - CNB Issues: (lifecycle issues to follow)
 
 
