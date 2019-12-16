@@ -178,8 +178,78 @@ Upon execution of the release the following will take place:
 - The release branch will be tagged as `v<version>`.
 - The release branch will be merged into `master`.
 
+# Drawbacks
+[drawbacks]: #drawbacks
+
+A number of these processes could be considered quite heavy, especially when compared with the current informal
+approach.
+- Arranging time for a suitably diversely represented Change Control Board to meet on a daily basis for the week of
+releases could be challenging to schedule, and a burden on the time of members of the board.
+- Release branches may be hard for contributors to track, and understand where pull requests should be made to.
+
+# Alternatives
+[alternatives]: #alternatives
+
+As there are a number of sub-processes discussed in this RFC, alternatives can be considered for individual parts of the
+proposed process. In this way we can pick and choose a combination of steps that meet our needs.
+
+### Continuing trunk based development
+
+To avoid the necessity to create a new, short-lived (maybe, see [unresolved-questions](#unresolve-questions)) branches
+for each release cycle, there are a number of approaches we could use that would allow us to release directly from our
+master branch.
+
+#### Advantages to continuing trunk based development
+
+- No changes to existing development workflow - all PRs target master
+- Low overhead visibility to code included in current build
+- Released commit guaranteed to be part of consistent commit history
+
+#### Approach: PR acceptance freeze
+
+During the change control window, we could selectively choose not to accept feature change PRs.
+
+##### Advantages:
+
+- Existing process requires PR approval and maintainer to merge changes, this would be relatively low touch to 
+implement.
+
+##### Disadvantages:
+
+- Slowing down acceptance of contributions unnecessarily could be off-putting to contributors.
+- Certain test suites such as the pack compatibility suite are only ran once the change has been merged to master,
+feedback for any failures introduced would be delayed.
+
+#### Approach: Build time feature flags for all new features
+
+As detailed in the existing [Feature Flags Proposal](https://github.com/buildpacks/pack/issues/368), we could require
+that any new features added to our code can be turned on or off through build time configuration. Our build time
+configuration for each release would be kept in version control which could be used to independently build release
+candidates and the final release. Our test suites should be configured using the same source to ensure we are testing
+only what we expect to be included, and perhaps that we are not including code we don't expect to exist.
+
+##### Advantages:
+
+- Release configuration, and justifications maintained in searchable source code with history.
+- Configuration could apply across deliverables to ensure compatibility in similarly versioned releases.
+
+##### Disadvantages:
+
+- Increases complexity to release a feature.
+- Feature flag configuration could become very cumbersome (perhaps once a feature is accepted and release, the flag
+could be removed?)
+- Feature flags not currently accepted as a proposal, or implemented.
+
+### Lazy Consensus
+
+Rather than convening a specific Change Control Board, a release candidate is published and shared via mailing list
+and/or Slack
+
 # Prior Art
 [prior-art]: #prior-art
+
+- [Helm's release process](https://github.com/helm/community/blob/master/helm-maintainers-onboarding-guide.md#the-release-process)
+- [Harbor's lazy consensus implementation](https://github.com/goharbor/community/blob/master/GOVERNANCE.md#lazy-consensus)
 
 ### References
 
@@ -190,3 +260,7 @@ Upon execution of the release the following will take place:
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
+
+- Who makes up the Change Control Board, and how are meetings scheduled?
+- Will the release branch be maintained after the changes have been merged back in to master? Could, or should, this
+branch be used to create future patches?
