@@ -120,7 +120,7 @@ provided (all named images will have the same layers).
 
 The `exporter` phase will be responsible for the combined activities of the
 previous `exporter` and `cacher` phases
-(see https://github.com/buildpack/spec/blob/master/buildpack.md#phase-4-export).
+(see https://github.com/buildpacks/spec/blob/master/buildpack.md#phase-4-export).
 
 The previous `/lifecycle/cacher` phase will be removed from the spec.
 
@@ -159,4 +159,3 @@ N/A
   towards flags, and away from positional args. There may be some reason
   unknown to the author as to why flag names and positional args were used
   in the first place.
-
