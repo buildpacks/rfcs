@@ -38,8 +38,8 @@ Here is an overview of the complete schema:
 
 ```toml
 [project]
-id = "<string>"
-name = "<string>"
+id = "<string>" # machine readble
+name = "<string>" # human readable
 version = "<string>"
 authors = ["<string>"]
 documentation-url = "<url>"
@@ -80,6 +80,10 @@ id = "<string>"
 name = "<string>"
 version = "<string>"
 ```
+
+* `id` - the machine readable identifier of the project (ex. "com.example.myservice")
+* `name` - the human readable name of the project (ex. "My Example Service")
+* `version` - and arbitrary string representing the version of the project
 
 ## `[project.licenses]`
 
