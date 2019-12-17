@@ -81,6 +81,11 @@ name = "<string>"
 version = "<string>"
 ```
 
+## `[project.licenses]`
+
+* `type` - This uses the [SPDX 2.1 license expression](https://spdx.org/spdx-specification-21-web-version). This matches the identifier and must be included in the [SPDX Lincenes List](https://spdx.org/licenses/). As of this writing, it's on version 3.7.
+* `uri` - If this project is using a nonstandard license, then this key may be specified in lieu of `type` to point to the license.
+
 ## `[build.include]` and `[build.exclude]`
 
 A list of files to include in the build (while excluding everything else):
