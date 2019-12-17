@@ -242,8 +242,36 @@ could be removed?)
 
 ### Lazy Consensus
 
-Rather than convening a specific Change Control Board, a release candidate is published and shared via mailing list
-and/or Slack
+Rather than convening a specific Change Control Board, a release candidate and accompanying release notes is published
+and shared via mailing list and/or Slack with appropriate maintainer groups tagged. The change review process is then
+opened for no less than five working days, during which any maintainer or contributor can raise any issues,
+including requesting an extension to the review period.
+
+##### Advantages
+
+- Scheduling time for individuals to review a release should be simpler than trying to convene a group of people
+frequently over a week long period.
+
+##### Disadvantages
+
+- The absence of blocking comments may not provide confidence that the release candidate has been actively reviewed
+by all (or any) maintainers.
+- Time spent thoroughly reviewing and reaching a decision to approve the release will become the responsibility of
+each individual, rather than the forcing function of regularly scheduled meetings.
+- An individual, or group would still need to take responsibility to actually initiate the publishing of a release.
+
+### Continuous Release Notes
+
+Each feature-adding or -changing PR should be accompanied with a change or addition to a release notes document or
+folder in order to be accepted.
+
+##### Advantages
+
+- Simpler to release, as notes just need compiling
+
+##### Disadvantages
+
+- Note style and quality may be inconsistent amongst contributors
 
 # Prior Art
 [prior-art]: #prior-art
@@ -257,10 +285,12 @@ and/or Slack
 * Change control board: https://en.wikipedia.org/wiki/Change_control_board
 * Feature Complete and CCB: http://www.professionalqa.com/code-freeze
 
-
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
 - Who makes up the Change Control Board, and how are meetings scheduled?
 - Will the release branch be maintained after the changes have been merged back in to master? Could, or should, this
 branch be used to create future patches?
+- Is the proposed release cadence too ambitious given historic feature delivery speed? Is spending roughly 25% of the
+time in a release window too much?
+- How is the person, or group, responsible for actually building and publishing a release determined?
