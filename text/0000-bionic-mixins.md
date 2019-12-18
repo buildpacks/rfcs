@@ -46,12 +46,12 @@ build mixins: ["build:build-essentials", "git"]
 
 And buildpack authors would update their `buildpack.toml` files from:
 ```toml
-[stack]
+[[stacks]]
 id = "org.cloudfoundry.stacks.cfbionicstack"
 ```
 To:
 ```toml
-[stack]
+[[stacks]]
 id = "io.buildpacks.stacks.bionic"
 mixins = ["build:build-essentials", "git"] # NOTE: only need to list mixins they actually require!
 ```
