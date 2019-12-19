@@ -48,12 +48,23 @@ The Orb's major and minor version number will represent the version of `pack` it
 [drawbacks]: #drawbacks
 
 - We must support the Orb, which could create additional release burden.
+- We are encouraging a pattern that is sub-optimal in terms of performance (i.e. running pack instead of lifecycle directly)
 
 # Alternatives
 [alternatives]: #alternatives
 
 - Document how to use buildpacks on CircleCI without an Orb
 - Integrate with a different CI/CD platform like Jenkins
+
+## Run lifecycle instead of pack
+
+Instead of a job that runs `pack build`, we could implement a job that runs all of the lifecycle steps in a single container. This has the advantage of decoupling from pack and not requiring the Docker daemon (like on Tekton). However, there are also some disadvantages:
+
+* Running lifecycle alone would not support download buildpacks as with `--buildpack` option in pack (you'd have to do it manually)
+* Running lifecycle along would not support `project.toml` when it is shipped.
+* There is no mechanism to `create-builder` or `create-package` without pack.
+
+In the future, we should implement an orb/job that runs lifecycle independently from pack. Ideally if we have a `/lifecycle/prepare` or similar phase that handles `project.toml` and setup/download of buildpacks. But in order to support the full feature set of pack we will start with it.
 
 # Prior Art
 [prior-art]: #prior-art
