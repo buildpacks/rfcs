@@ -26,13 +26,13 @@ version: 2.1
 description: Cloud Native Buildpacks sample app
 
 orbs:
-  buildpacks: buildpacks/pack@0.0.3
+  pack: buildpacks/pack@0.6.0
 
 workflows:
   version: 2.1
   main:
     jobs:
-      - buildpacks/build:
+      - pack/build:
           image-name: myimage
           builder: heroku/buildpacks:18
 ```
