@@ -87,7 +87,7 @@ version = "<string>"
 
 ## `[project.licenses]`
 
-* `type` - This may use the [SPDX 2.1 license expression](https://spdx.org/spdx-specification-21-web-version), but is not limited to identifiers in the [SPDX Lincenes List](https://spdx.org/licenses/).
+* `type` - This may use the [SPDX 2.1 license expression](https://spdx.org/spdx-specification-21-web-version), but is not limited to identifiers in the [SPDX Licenses List](https://spdx.org/licenses/).
 * `uri` - If this project is using a nonstandard license, then this key may be specified in lieu of or in addition to `type` to point to the license.
 
 ## `[build.include]` and `[build.exclude]`
