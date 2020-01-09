@@ -2,8 +2,8 @@
 [meta]: #meta
 - Name: Minimal Project Descriptor
 - Start Date: 2019-06-11
-- CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Pull Request: [rfcs#32](https://github.com/buildpack/rfcs/pull/32)
+- CNB Issue: 32
 - Supersedes: https://github.com/buildpack/rfcs/pull/25
 
 # Summary
