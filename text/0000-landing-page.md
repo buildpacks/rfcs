@@ -9,7 +9,7 @@
 # Summary
 [summary]: #summary
 
-Prospective contributors to the project don't have a central place to go for information. This RFC proposes the creation of a community or "landing page" repo at `buildpacks/community` with high level information about the project including key personel, governance, guidelines for contributions, meeting schedules, etc.
+Prospective contributors to the project don't have a central place to go for information. This RFC proposes the creation of a community or "landing page" repo at `buildpacks/community` with high level information about the project including key personnel, governance, guidelines for contributions, meeting schedules, etc.
 
 # Outcomes
 [outcomes]: #outcomes
@@ -28,9 +28,9 @@ A major part of the success of the CNB project will necessitate growing contribu
 This RFC proposes the creation of a project landing page that will be house at `buildpacks/community`.
 It will have a central `README.md` that included the following information and links to documents that provide more details if and when that's necessary:
 
-- Purpose of the project and high level overview including some canonical talk from youtube, etc
-- Technical overview, including guides to the various components of the projects and links to their respective repos
-- Project and community overview, including key personel, governance structures (links to `GOVERNANCE.MD`), link to slack, calendar links, and links to a contribution guide (this document is likely sufficiently detailed as to necessitate a seperate document beloew)
+- Purpose of the project and high level overview including some canonical talk from YouTube, etc
+- Technical overview, including guides to the various components of the projects and links to their respective repositories
+- Project and community overview, including key personnel, governance structures (links to `GOVERNANCE.md`), link to slack, calendar links, and links to a contribution guide (this document is likely sufficiently detailed as to necessitate a separate document below)
 - `CONTRIBUTING.md` which details the RFC process and various other pieces of information about how to get started contributing to the project
 - Ecosystem overview with links to various platforms, builders, adoptions, etc. to give a sense of the scope of the community beyond the immediate CNB project
 - `GOVERNANCE.md` which thoroughly lays out how the project runs from a governance standpoint
