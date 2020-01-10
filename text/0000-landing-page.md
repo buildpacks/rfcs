@@ -9,35 +9,40 @@
 # Summary
 [summary]: #summary
 
-People interested in the project don't have a central place to go for information. This RFC proposes the creation of a community or "landing page" repo at `buildpacks/buildpacks` with high level information about the project including key personel, governance, guidelines for contributions, meeting schedules, etc.
+Prospective contributors to the project don't have a central place to go for information. This RFC proposes the creation of a community or "landing page" repo at `buildpacks/community` with high level information about the project including key personel, governance, guidelines for contributions, meeting schedules, etc.
 
-**Outcomes**
+# Outcomes
 [outcomes]: #outcomes
 
  - New contributors feel welcomed.
- - A new contributor or user of the project can easily find what they want, join the slack, WG meetings, and immediately contribute pull-requests, RFCs, and issues.
+ - A new contributor can easily find information they want about the project, can join the slack and WG meetings, and can quickly contribute pull-requests, RFCs, and issues.
 
 # Motivation
 [motivation]: #motivation
 
-A major part of the success of the CNB project will necessitate growing contributors beyond the current core. As new people learn about the project and want to use it or contribute, we need a friendly central landing place where all the information _about_ the project is housed.
+A major part of the success of the CNB project will necessitate growing contributors beyond the current core. As new people learn about the project and want to contribute, we need a friendly central landing place where all the information _about_ the project is housed.
 
 # What it is
 [what-it-is]: #what-it-is
 
-This RFC proposes the creation of a project landing page that will be house at `buildpacks/buildpacks`.
-It will have a central `readme.md` that included the following information and links to documents that provide more details if and when that's necessary
+This RFC proposes the creation of a project landing page that will be house at `buildpacks/community`.
+It will have a central `README.md` that included the following information and links to documents that provide more details if and when that's necessary:
 
 - Purpose of the project and high level overview including some canonical talk from youtube, etc
 - Technical overview, including guides to the various components of the projects and links to their respective repos
-- Project and community overview, including key personel, governance structures, link to slack, calendar links, and links to a contribution guide (this document is likely sufficiently detailed as to necessitate a seperate document beloew)
-- `contributing.md` which details the RFC process and various other pieces of information about how to get started contributing to the project
+- Project and community overview, including key personel, governance structures (links to `GOVERNANCE.MD`), link to slack, calendar links, and links to a contribution guide (this document is likely sufficiently detailed as to necessitate a seperate document beloew)
+- `CONTRIBUTING.md` which details the RFC process and various other pieces of information about how to get started contributing to the project
 - Ecosystem overview with links to various platforms, builders, adoptions, etc. to give a sense of the scope of the community beyond the immediate CNB project
+- `GOVERNANCE.md` which thoroughly lays out how the project runs from a governance standpoint
+
+
+Any current information from https://github.com/buildpacks/resources will get ported over and that repo will be retired.
 
 # Alternatives
 [alternatives]: #alternatives
 
 - Keep doing what we're doing
+- Add a "contributing" section to `buildpacks.io`
 
 # Prior Art
 [prior-art]: #prior-art
@@ -50,4 +55,4 @@ It will have a central `readme.md` that included the following information and l
 [unresolved-questions]: #unresolved-questions
 
 - Should this include some sort of roadmap? This would ideally give people a sense of where they can start to chip in
-- Should we host our WG meetings out of the CNCF calendar so they're more publicall discoverable? Who moderates the zoom?
+- Should we host our WG meetings out of the CNCF calendar so they're more publicly discoverable? Who moderates the Zoom?
