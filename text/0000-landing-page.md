@@ -20,7 +20,9 @@ Prospective contributors to the project don't have a central place to go for inf
 # Motivation
 [motivation]: #motivation
 
-A major part of the success of the CNB project will necessitate growing contributors beyond the current core. As new people learn about the project and want to contribute, we need a friendly central landing place where all the information _about_ the project is housed.
+A major part of the success of the CNB project will necessitate growing contributors beyond the current core. As new people learn about the project and want to contribute, we need a friendly central landing place where all the information _about_ the project is housed. Ideally this repo serves as a pointer for all the relevant information that somebody would need to answer "How do I get started contributing to the project"? Some overview of the ecosystem that the project is creating and working within seems relevant to these contributors.
+
+There's probably some overlap between information contained on buildpacks.io and this repo. Ideally the former is targeted to the end user getting started, without overburdening them with too much information that would be irrelevant to using project. Ideally buildpacks.io would answer "How do I get started __using__ this project?" The end users would, ideally, become contributors 😸 to the ecosystem and thus buildpacks.io should probably link to this repo somewhere, not on its front page.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -30,8 +32,8 @@ It will have a central `README.md` that included the following information and l
 
 - Purpose of the project and high level overview including some canonical talk from YouTube, etc
 - Technical overview, including guides to the various components of the projects and links to their respective repositories
-- Project and community overview, including key personnel, governance structures (links to `GOVERNANCE.md`), link to slack, calendar links, and links to a contribution guide (this document is likely sufficiently detailed as to necessitate a separate document below)
-- `CONTRIBUTING.md` which details the RFC process and various other pieces of information about how to get started contributing to the project
+- Project and community overview, including key personnel, governance structures (links to `GOVERNANCE.md`), explanations of and links to our various communication channels: slack, WG calendar events, our mailing list, and twitter, a link to our code of conduct, and a link to a contribution guide (this document is likely sufficiently detailed as to necessitate a separate document below).
+- `CONTRIBUTING.md` which will link to our RFC readme and include various other pieces of information about how to get started contributing to the project
 - Ecosystem overview with links to various platforms, builders, adoptions, etc. to give a sense of the scope of the community beyond the immediate CNB project
 - `GOVERNANCE.md` which thoroughly lays out how the project runs from a governance standpoint
 
@@ -49,6 +51,9 @@ Any current information from https://github.com/buildpacks/resources will get po
 
 - https://github.com/ipfs/ipfs (landing page for IPFS project)
 - https://github.com/desktop/desktop (central repo for github desktop but has community information on there)
+- https://github.com/goharbor/community
+- https://github.com/open-telemetry/community
+- https://github.com/helm/community
 
 
 # Unresolved Questions
