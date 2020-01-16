@@ -58,13 +58,57 @@ The Orb's major and minor version number will represent the version of `pack` it
 
 ## Run lifecycle instead of pack
 
-Instead of a job that runs `pack build`, we could implement a job that runs all of the lifecycle steps in a single container. This has the advantage of decoupling from pack and not requiring the Docker daemon (like on Tekton). However, there are also some disadvantages:
+Instead of a job that runs `pack build`, we could implement a job that runs each of the lifecycle steps in a container. This has the advantage of decoupling from pack and not requiring the Docker daemon (like the [Tekton Template](https://github.com/tektoncd/catalog/blob/master/buildpacks/buildpacks-v3.yaml)). However, there are also some disadvantages:
 
 * Running lifecycle alone would not support download buildpacks as with `--buildpack` option in pack (you'd have to do it manually)
 * Running lifecycle along would not support `project.toml` when it is shipped.
 * There is no mechanism to `create-builder` or `create-package` without pack.
+* Some of the CircleCI features that would make this approach advantagous are paid-only like `docker_layer_caching`
+* CircleCI will not cache the stack images
 
-In the future, we should implement an orb/job that runs lifecycle independently from pack. Ideally if we have a `/lifecycle/prepare` or similar phase that handles `project.toml` and setup/download of buildpacks. But in order to support the full feature set of pack we will start with it.
+An example of what this Orb might look like is the following:
+
+```yaml
+jobs:
+  build:
+    working_directory: /workspace
+    docker:
+    - image: << parameters.builder >>
+    parameters:
+      image-name:
+        type: string
+      builder:
+        type: string
+    steps:
+      - checkout
+      - run: mkdir /tmp/cache
+      - restore_cache:
+          key: cnb-cache-<< parameters.image-name >>-<< parameters.builder >>-{{ arch }}
+      - run:
+          command: /cnb/lifecycle/detector
+          name: Detect
+      - run:
+          command: /cnb/lifecycle/restorer -path /tmp/cache
+          name: Restore
+      - run:
+          command: /cnb/lifecycle/analyzer << parameters.image-name >>
+          name: Analyze
+      - run:
+          command: /cnb/lifecycle/builder
+          name: Build
+      - run:
+          command: /cnb/lifecycle/exporter << parameters.image-name >>
+          name: Export
+      - run:
+          command: /cnb/lifecycle/cacher -path /tmp/cache
+          name: Cache
+      - save_cache:
+          key: cnb-cache-<< parameters.image-name >>-<< parameters.builder >>-{{ arch }}-{{ epoch }}
+          paths:
+            - /tmp/cache
+```
+
+In the future, we should implement an orb/job that runs lifecycle independently from pack. Ideally if we have a `/lifecycle/prepare` or similar phase that handles `project.toml` and setup/download of buildpacks. But in order to support the full feature set of pack we will start with the proposal in this RFC.
 
 # Prior Art
 [prior-art]: #prior-art
