@@ -156,7 +156,7 @@ pipeline = "foobar"
 # How it Works
 [how-it-works]: #how-it-works
 
-The `project.toml` contents will be read by the platform and/or the lifecycle. The launch image will contain labels for the data in all fields except `include` and `exclude`.
+The `project.toml` contents will be read by the platform and/or the lifecycle. The launch image will contain labels for the data in all fields except `include`, `exclude`, and all keys under `build`.
 
 ## Example: Basic app
 
