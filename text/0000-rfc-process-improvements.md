@@ -37,7 +37,7 @@ Change:
 ```diff
 -- When deemed "ready", a team member will propose a "motion for final comment period (FCP)" along with a disposition of the outcome (
 +- When deemed "ready", a team member will propose a "motion for final comment period (FCP)" along with a disposition. If the RCF has remained open for longer than the "discussion period" days and a team member has not moved for the proposal to be moved to FCP (deemed "ready"), the RFC will be automatically tagged with `FCP` via (github action, eg.) with a disposition to close the RFC.
-+- The discussion period will initially be set at 60 days, and adjusted up or down based on whether team members feel this period is achieving the dual goals of fomenting healthy discussion and arriving at a timely decision.
++- The discussion period will initially be set at 90 days, and adjusted up or down based on whether team members feel this period is achieving the dual goals of fomenting healthy discussion and arriving at a timely decision.
 ```
 
 # Drawbacks
