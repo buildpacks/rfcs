@@ -2,8 +2,8 @@
 [meta]: #meta
 - Name: Create a community landing page
 - Start Date: 1-6-2020
-- CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Pull Request: [rfcs#42](https://github.com/buildpack/rfcs/pull/42)
+- CNB Issue: 42
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
