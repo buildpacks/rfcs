@@ -120,3 +120,5 @@ In the future, we should implement an orb/job that runs lifecycle independently 
 
 - What versions will the Orb support?
 - Will the Orb be able to run `lifecycle` w/o pack (Tekton style)
+- Should we use this as the start for documentation on "How to move beyond pack"?
+    - Is the process of how this is implemented just as important as the working thing so others can learn how to use CNB in their own prod environment?
