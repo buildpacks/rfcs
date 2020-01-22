@@ -54,7 +54,7 @@ The following flags optional flags can customize behavior:
 | `-cache-dir`    | optional | `CNB_CACHE_DIR`        | -                         | path to cache directory |
 | `-cache-image`  | optional | `CNB_CACHE_IMAGE`      | -                         | cache image tag reference |
 | `-order`        | optional | `CNB_ORDER_PATH`       | `/cnb/order.toml`         | path to order.toml |
-| `-stack`        | optional | `CNB_STACK_PATH`       | -                         | path to stack.toml |
+| `-stack`        | optional | `CNB_STACK_PATH`       | `/cnb/stack.toml`         | path to stack.toml |
 | `-launch-cache` | optional | `CNB_LAUNCH_CACHE_DIR` | -                         | path to launch cache directory |
 | `-launcher`     | optional | `CNB_LAUNCHER_PATH`    | `/cnb/lifecycle/launcher` | path to launcher binary |
 | `-buildpacks`   | optional | `CNB_BUILDPACKS_DIR`   | `/cnb/buildpacks`         | path to buildpacks directory |
