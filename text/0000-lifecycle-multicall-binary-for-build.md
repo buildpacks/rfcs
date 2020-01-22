@@ -9,7 +9,7 @@
 # Summary
 [summary]: #summary
 
-We should compile the lifecycle as a multicall binary for the build phases of detect, analyze, restore, build, export and rebase while retaining the interface to the phases.
+We should compile the lifecycle as a multicall binary for the build phases of detect, analyze, restore, build, export and rebase while retaining the interface to the phases. The binary can also support the phases as subcommands.
 
 
 # Motivation
@@ -24,8 +24,8 @@ We should compile the lifecycle as a multicall binary for the build phases of de
 [what-it-is]: #what-it-is
 
 We are proposing changing the lifecycle release archive to contain the following:
-- `detector` binary: The build phases (detector, analyzer, restorer, builder, exporter, rebaser) of the lifecycle will exist as a multicall binary
-- symlinks linking `analyzer`, `restorer`, `builder`, `exporter` and `rebaser` to the `detector` binary
+- `lifecycle` binary: The build phases (detector, analyzer, restorer, builder, exporter, rebaser) of the lifecycle will exist as a multicall binary
+- symlinks linking `detector`, `analyzer`, `restorer`, `builder`, `exporter` and `rebaser` to the `lifecycle` binary
 - `launcher` binary: The launcher will exist as a separate binary
 
 ```
@@ -33,13 +33,15 @@ tar tfv ./out/lifecycle-v*.*.*+linux.x86-64.tgz
 -rw-r--r--  0 user staff      ** Jan 32 25:98 lifecycle.toml
 drwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/
 -rwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/launcher
-lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/rebaser -> detector
--rwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/detector
-lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/exporter -> detector
-lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/builder -> detector
-lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/analyzer -> detector
-lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/restorer -> detector
+lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/rebaser -> lifecycle
+-rwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/lifecycle
+lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/exporter -> lifecycle
+lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/builder -> lifecycle
+lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/analyzer -> lifecycle
+lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/restorer -> lifecycle
+lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/detector -> lifecycle
 ```
+
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -47,21 +49,28 @@ lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/restorer -> detector
 Symlinking is used to map the zeroth arg passed to the binary to determine which phase will be executed. The flags shall be parsed accordingly and the desired phase will be invoked.
 [Reference Implementation.](https://github.com/buildpacks/lifecycle/pull/232)
 
+Additionally, the multicall binary will support the lifecycle phases as subcommands. `./lifecycle/lifecycle analyzer` will invoke the `analyzer` command.
+
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
 - Confusion around the contents of a lifecycle release, which will now contain 2 binaries and multiple symlinks
 - If additional phases are introduced to the lifecycle, symlinks will have to be updated accordingly.
 
+
 # Alternatives
 [alternatives]: #alternatives
 
 Continue to have a separate binary for each phase of the build process
 
+
 # Prior Art
 [prior-art]: #prior-art
 
 [Busybox](https://busybox.net/downloads/BusyBox.html)
+This is an example of a multicall binary that also has subcommand support.
+
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
