@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Isolate Registry Credentials from Builder Images
 - Start Date: 2020-01-14
-- CNB Pull Request:
+- CNB Pull Request: [rfcs#43](https://github.com/buildpacks/rfcs/pull/43)
 - CNB Issue:
 - Supersedes: N/A
 
@@ -24,15 +24,13 @@ Users may not realize that credentials are given to builder images and experimen
 # What it is
 [what-it-is]: #what-it-is
 
-### Exporter Images
+### Ephemeral Exporter Images
 
-For every release of the lifecycle we will publish an `exporter` image to `docker.io/cnbs/exporter:<version>`,
-where `<version>` is the version of the lifecycle and the image that contains only lifecycle in a scratch image.
+When `pack build` executes and is provided the `--publish` flag, it will generate an ephemeral "exporter image" on the fly, by adding a single layer container the correct lifecycle to a scratch image. `pack` will then use this image to created the `analyze`, `restore`, and `export` containers. `pack` will clean up the image when the build completes.
 
-When `pack build` executes and is provided the `--publish` flag, it will use the `exporter` image to created the `analyze`, `restore`, and `export` containers.
+When generating exporter images `pack` will read the lifecycle version from the builder metadata and fetch the matching lifecycle version from the lifecycle github release assets.
 
-If the lifecycle version specified in a builder image does not match any known `exporter` image `pack build` will fail
-with a helpful message.
+If the lifecycle version specified in a builder image does not match any known lifecycle release, `pack build` will fail with a helpful message.
 
 ### `--trust-builder` Flag
 If `pack build` is run with the `--publish` and `--trust-builder` flag, then all lifecycle steps will be run in a single container.
@@ -48,8 +46,6 @@ Therefore, `pack` will treat every builder as a "trusted builder" to [potentiall
 # Drawbacks
 [drawbacks]: #drawbacks
 
-* Adding another image (the `exporter` image) makes the mechanics of `pack build` harder for users to understand
-* CNB team must maintain & publish exporter images
 * This change prevents us from reducing the number of containers to improve performance in all cases
 (this can still be accomplished in the "trusted builder" case)
 
@@ -61,10 +57,9 @@ Therefore, `pack` will treat every builder as a "trusted builder" to [potentiall
 # Prior Art
 [prior-art]: #prior-art
 
-??
+Creating ephemeral exporter images is similar to work `pack build` already does when it creates ephemeral builder images (e.g when it adds another layer because of the `--buildpack`).
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 - Registry credential isolation in irrelevant when `--publish` is not supplied, should we prioritize performance or consistency in this case?
-- Is there a better name for this concept than `exporter` image
 - Is there is simpler way to acheive the same level of credential isolation?
