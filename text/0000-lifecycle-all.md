@@ -10,7 +10,7 @@
 [summary]: #summary
 
 ### `/cnb/lifecycle/all`
-A new lifecycle binary shall be found at the path `/cnb/lifecycle/all` within a lifecycle archive or builder image. When invoked will run the following phases sequentially:
+A new lifecycle binary with the name `lifecycle/all` will be included in each released lifecycle archive. Within a builder image, it will be found at the path `/cnb/lifecycle/all`. When invoked, it will run the following phases sequentially:
 
 * detector
 * analyzer
@@ -18,12 +18,10 @@ A new lifecycle binary shall be found at the path `/cnb/lifecycle/all` within a 
 * builder
 * exporter
 
-### `/cnb/lifecycle/*` are still available
 Each of these phases will continue to be available individually as provided by the current lifecycle.
-`launcher` will remain a separate binary
 
 ### Platform API 0.3
-The existance of `all` will constitute a non-breaking but substantive change to the Platform API bring the subsequent lifecycle release to Platform API 0.3. Given that we do not have a mechanism for indicating breaking and nonbreaking platform API change pre 1.0, 
+The existence of `all` will constitute a non-breaking but substantive change to the Platform API, bringing us to Platform API 0.3 . Although platform will interpret this as a breaking change, we do not have a mechanism for indicating non-breaking platform API change pre 1.0. Bumping the platform API number is necessary so that platforms like `pack` know whether or no they can use this feature.
 
 # Motivation
 [motivation]: #motivation
@@ -62,38 +60,49 @@ The following flags optional flags can customize behavior:
 | `-launcher`     | optional | `CNB_LAUNCHER_PATH`    | `/cnb/lifecycle/launcher` | path to launcher binary |
 | `-buildpacks`   | optional | `CNB_BUILDPACKS_DIR`   | `/cnb/buildpacks`         | path to buildpacks directory |
 | `-daemon`       | optional | `CNB_USE_DAEMON`       | false                     | export to docker daemon |
-| `-uid`          | optional | `CNB_USER_ID`          | -                         | UID of user in the stack's build and run images |
-| `-gid`          | optional | `CNB_GROUP_ID`         | -                         | GID of user's group in the stack's build and run images |
+| `-uid`          | required | `CNB_USER_ID`          | -                         | UID of user in the stack's build and run images |
+| `-gid`          | required | `CNB_GROUP_ID`         | -                         | GID of user's group in the stack's build and run images |
 | `-version`      | optional | -                      | false                     | show version |
 | `-skip-restore` | optional | -                      | false                     | do not restore metadata from previous image or data from cache
+| `-tag` (multiples allowed) | optional | -           |                           | additional tags to apply to exported image
 
-Most of the these flags are existing lifecycle phase flags. `-skip-restore` is a a new addition that modifies the behavior of `analyzer` similarly to the existing `-skip-layers` flag, and skips the `restorer` phase all together.
+Most of the these flags are existing lifecycle phase flags. `-skip-restore` is a a new addition that modifies the behavior of `analyzer` similarly to the existing `-skip-layers` flag, and, in addition, skips the `restorer` phase all together.
 
+This RFC proposes a `-tag` flag as the interface to provide additional tags, rather than multiple positional arguments (as is currently accepted by `exporter` ) for clarity and it's similarity to `docker build`.
 
 Some existing lifecycle flags (e.g. `-group` on the `detector` `builder` and `exporter` phases) can are not necessary. They refer to files that were previously used to pass information between lifecycle phase processes. When the phases run in the same process, those values can be passed in memory.
 
- ### Credential Management
 
-// TODO
+### User
+
+Right now, when `pack` runs w/o the `--publish` flag `analyzer` and `exporter` are run as root. This is required so that these phases can connect to the mounted docker daemon socket. Historically the `builder` and `detector` binaries are never run as root.
+
+In the daemon case pack will run `all` as `root` but the buildpacks' `/bin/detect` and `/bin/builder` scripts will be invoked as the provided user. This will require a change to build and detect implementations.
+
+### Credential Management
+
+Right now, when `pack` runs w/ the `--publish` flag `analyzer`,and `exporter` are provided with registry credentials via the `CNB_REGISTRY_AUTH` environment variable.
+
+In the registry case pack will set `CNB_REGISTRY_AUTH` when invoking `all`. To prevents buildpacks from having read access to those credentials the build and detect implementations will ensure this variable is not present in the environment of the `/bin/detect` and `/bin/build` processes.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-// TODO
+Making it easy to run all of the lifecycle in a single container will encourage folks to do so. However, this requires consumers to be more thoughtful about security and credential isolation. We will need to harden `builder` and `detector` implementation to ensure buildpacks are not given root access or registry credentials.
+
+If we choose to implement [rfcs#43](https://github.com/buildpacks/rfcs/pull/43) `pack` will only accrue performance improvements from this change when a builder is explicitly trusted. In the untrusted case pack must continue executing each phase in a separate container.
 
 # Alternatives
 [alternatives]: #alternatives
 
-// TODO
+Require platforms/integrations to invoke all lifecycle phases in order in all situations, even when running in a single container.
 
 # Prior Art
 [prior-art]: #prior-art
 
-Discuss prior art, both the good and bad.
+Most in container build tools do not spin up multiple containers.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What parts of the design do you expect to be resolved before this gets merged?
-- What parts of the design do you expect to be resolved through implementation of the feature?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+- Is there a better name than `lifecycle/all`? It doesn't include `launcher` or `rebaser` functionality so it isn't truly `all`.
