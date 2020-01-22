@@ -53,7 +53,7 @@ $ pack yank-buildpack --undo <namespace>/<name> <version>
 
 ## Using a Buildpack from the Registry
 
-A buildpack can be pulled from the regsitry by running `pack pull-package` or `docker pull`. However, most users will not consume the buildpack in such a raw format. The following sections describe how each persona will use the registry.
+A buildpack can be pulled from the regsitry by running `pack pull-buildpack` or `docker pull`. However, most users will not consume the buildpack in such a raw format. The following sections describe how each persona will use the registry.
 
 ### Persona: Buildpack User
 
