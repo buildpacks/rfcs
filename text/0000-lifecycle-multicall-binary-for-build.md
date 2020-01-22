@@ -9,7 +9,7 @@
 # Summary
 [summary]: #summary
 
-We should compile the lifecycle as a multicall binary for the build phases of detect, analyze, restore, build, export and rebase while retaining the interface to the phases. The binary can also support the phases as subcommands.
+We should compile the lifecycle as a multicall binary for the build phases of detect, analyze, restore, build, export and rebase while retaining the interface to the phases. The binary can also support the phases as subcommands with the phases in their verb form.
 
 
 # Motivation
@@ -49,7 +49,7 @@ lrwxr-xr-x  0 user staff      ** Jan 32 25:98 lifecycle/detector -> lifecycle
 Symlinking is used to map the zeroth arg passed to the binary to determine which phase will be executed. The flags shall be parsed accordingly and the desired phase will be invoked.
 [Reference Implementation.](https://github.com/buildpacks/lifecycle/pull/232)
 
-Additionally, the multicall binary will support the lifecycle phases as subcommands. `./lifecycle/lifecycle analyzer` will invoke the `analyzer` command.
+Additionally, the multicall binary will support the lifecycle phases as subcommands. The subcommand will have to be the verb form of the phase, ie `./lifecycle/lifecycle analyze` will invoke the `analyzer`, `./lifecycle/lifecycle export` will invoke the `exporter` command etc.
 
 
 # Drawbacks
