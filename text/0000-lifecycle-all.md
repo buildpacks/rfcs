@@ -28,7 +28,7 @@ The existence of `all` will constitute a non-breaking but substantive change to 
 
 This new binary supports two main goals.
 
-### Goal 1: faster `pack`
+### Goal 1: faster `pack` builds
 By creating a single container and invoking `/cnb/lifecycle/all` instead of creating a container per lifecycle phase, pack can shave approximate `6s` from the execution time of `pack build`.
 
 `pack` may not always want to do this (see https://github.com/buildpacks/rfcs/pull/43 for an explanation of why this is not always ideal). However, it could be very beneficial to users that are wiling to trust their builder images.
@@ -40,7 +40,6 @@ As members of the community experiment with incorporating CNBs into other platfo
 [what-it-is]: #what-it-is
 
 ### Usage
-USAGE:
 
 `/cnb/lifecycle/all <image-name>`
 
@@ -70,7 +69,7 @@ Most of the these flags are existing lifecycle phase flags. `-skip-restore` is a
 
 This RFC proposes a `-tag` flag as the interface to provide additional tags, rather than multiple positional arguments (as is currently accepted by `exporter` ) for clarity and it's similarity to `docker build`.
 
-Some existing lifecycle flags (e.g. `-group` on the `detector` `builder` and `exporter` phases) can are not necessary. They refer to files that were previously used to pass information between lifecycle phase processes. When the phases run in the same process, those values can be passed in memory.
+Some existing lifecycle flags (e.g. `-group` on the `detector` `builder` and `exporter` phases) are not necessary. They refer to files that were previously used to pass information between lifecycle phase processes. When the phases run in the same process, those values can be passed in memory.
 
 
 ### User
@@ -81,7 +80,7 @@ In the daemon case pack will run `all` as `root` but the buildpacks' `/bin/detec
 
 ### Credential Management
 
-Right now, when `pack` runs w/ the `--publish` flag `analyzer`,and `exporter` are provided with registry credentials via the `CNB_REGISTRY_AUTH` environment variable.
+Right now, when `pack` runs w/ the `--publish` flag `analyzer` and `exporter` are provided with registry credentials via the `CNB_REGISTRY_AUTH` environment variable.
 
 In the registry case pack will set `CNB_REGISTRY_AUTH` when invoking `all`. To prevents buildpacks from having read access to those credentials the build and detect implementations will ensure this variable is not present in the environment of the `/bin/detect` and `/bin/build` processes.
 
@@ -101,6 +100,8 @@ Require platforms/integrations to invoke all lifecycle phases in order in all si
 [prior-art]: #prior-art
 
 Most in container build tools do not spin up multiple containers.
+
+Regarding the introduction of the `-tag` flag, `docker build -t` is prior art.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
