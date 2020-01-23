@@ -64,6 +64,7 @@ The following flags optional flags can customize behavior:
 | `-version`      | optional | -                      | false                     | show version |
 | `-skip-restore` | optional | -                      | false                     | do not restore metadata from previous image or data from cache
 | `-tag` (multiples allowed) | optional | -           |                           | additional tags to apply to exported image
+| `-previous-image`| optional | -                     | `<image-name>`              | image to analyze and reuse layers from
 
 Most of the these flags are existing lifecycle phase flags. `-skip-restore` is a a new addition that modifies the behavior of `analyzer` similarly to the existing `-skip-layers` flag, and, in addition, skips the `restorer` phase all together.
 
