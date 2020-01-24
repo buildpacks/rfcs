@@ -11,7 +11,7 @@
 
 Right now `analyzer` and `exporter` have a boolean `-helpers` flag. When supplied the `-helpers` flag, those lifecycle phases modify the docker `config.json`, `credHelpers` entries mapping well known registries to their associated credential helpers.
 
-This RFC proposed entirely **removing** this feature.
+This RFC proposes entirely **removing** this feature.
 
 # Motivation
 [motivation]: #motivation
@@ -40,7 +40,7 @@ It doesn't do anything, which is less confusing than the current state of affair
 # Drawbacks
 [drawbacks]: #drawbacks
 
-**If** there was a stack that stack had credential helpers installed on the build image **and** the build was running in a public cloud, **and** it was running in a platform that didn't have a preferred method of authentication, **then** it could be useful.
+**If** there was a stack that had credential helpers installed on the build image **and** the build was running in a public cloud, **and** it was running in a platform that didn't have a preferred method of authentication, **then** it could be useful.
 
 # Alternatives
 [alternatives]: #alternatives
