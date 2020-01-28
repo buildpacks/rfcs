@@ -33,7 +33,7 @@ If the lifecycle is running a platform that aggregates logs, structured logs all
 
 ## Output Format
 
-Example format is best describe in a series of examples
+The format of 
 
 ### `detector`
 
@@ -61,20 +61,6 @@ Example format is best describe in a series of examples
 #### After
 
 ##Actions
-detecter
--- buildpack detect
--- resolve plan
-analyzer
--- restore metadata
--- don't restore metadata
-builder
--- buildpack build
-exporter
--- export layer
--- cache layer
--- export slices
--- save image
-
 
 ```json
 {"level": "verbose", "phase": "detect", "detail": {"group": 1, "buildpack": {"id": "org.cloudfoundry.openjdk", "version": "v1.0.86", "result":  "pass"}}}
@@ -90,10 +76,96 @@ exporter
 ### `analyzer`
 
 #### Before
+
 ```
+[analyzer] Analyzing image "aca0be5808b3cbb89e7e69e8ccc3c7bf50edfab5679d860cdd20b02d6013b096"
+[analyzer] Restoring metadata for "org.cloudfoundry.node-engine:node" from app image
+[analyzer] Writing layer metadata for "org.cloudfoundry.node-engine:node"
+[analyzer] Restoring metadata for "org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed" from cache
+[analyzer] Writing layer metadata for "org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed"
+[analyzer] Not restoring "org.cloudfoundry.node-engine:node" from cache, marked as launch=true
+[analyzer] Restoring metadata for "org.cloudfoundry.npm:node_modules" from app image
+[analyzer] Writing layer metadata for "org.cloudfoundry.npm:node_modules"
+[analyzer] Restoring metadata for "org.cloudfoundry.npm:cache" from cache
+[analyzer] Writing layer metadata for "org.cloudfoundry.npm:cache"
+[analyzer] Not restoring "org.cloudfoundry.npm:node_modules" from cache, marked as launch=true
 ```
 
 #### After
+
+```json
+{"level": "verbose", "phase": "analyze", "progress": {"message": "Analyzing image \"aca0be5808b3cbb89e7e69e8ccc3c7bf50edfab5679d860cdd20b02d6013b096\""}
+{"level": "info", "phase": "analyze", "progress": {"message": "Restoring metadata for \"org.cloudfoundry.node-engine:node\" from app image"}
+{"level": "verbose", "phase": "analyze", "progress": {"message": "Writing layer metadata for \"org.cloudfoundry.node-engine:node\""}
+{"level": "info", "phase": "analyze", "progress": {"message": "Restoring metadata for \"org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed\" from cache"}
+{"level": "verbose", "phase": "analyze", "progress": {"message": "Writing layer metadata for \"org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed\""}
+{"level": "verbose", "phase": "analyze", "progress": {"message": "Not restoring \"org.cloudfoundry.node-engine:node\" from cache, marked as launch=true"}
+{"level": "info", "phase": "analyze", "progress": {"message": "Restoring metadata for \"org.cloudfoundry.npm:node_modules\" from app image"}
+{"level": "verbose", "phase": "analyze", "progress": {"message": "Writing layer metadata for \"org.cloudfoundry.npm:node_modules\""}
+{"level": "info", "phase": "analyze", "progress": {"message": "Restoring metadata for \"org.cloudfoundry.npm:cache\" from cache"}
+{"level": "verbose", "phase": "analyze", "progress": {"message": "Not restoring \"org.cloudfoundry.npm:node_modules\" from cache, marked as launch=true"}
+{"level": "info", "phase": "analyze", "summary": {"image": "aca0be5808b3cbb89e7e69e8ccc3c7bf50edfab5679d860cdd20b02d6013b096", "metadata": { "fromLaunch": [{"buildpackID": "org.cloudfoundry.node-engine", "name": "node"}, {"buildpackID": "org.cloudfoundry.npm", "name": "node_modules"}], "fromCache": [{"buildpackID": "org.cloudfoundry.node-engine", "name": "52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed"}, {"buildpackID": "org.cloudfoundry.npm", "name": "node_modules"}]}}
+```
+### `restorer`
+
+#### Before
+```
+[restorer] Restoring data for "org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed" from cache
+[restorer] Restoring data for "org.cloudfoundry.node-engine:node" from cache
+[restorer] Restoring data for "org.cloudfoundry.npm:cache" from cache
+[restorer] Restoring data for "org.cloudfoundry.npm:node_modules" from cache
+```
+
+#### After
+```json
+{"level": "info", "phase": "restore", "progress": {"message": "Restoring data for \"org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed\" from cache"}
+{"level": "info", "phase": "restore", "progress": {"message": "Restoring data for \"org.cloudfoundry.node-engine:node\" from cache"}
+{"level": "info", "phase": "restore", "progress": {"message": "Restoring data for \"org.cloudfoundry.npm:node_modules\" from cache"}
+{"level": "info", "phase": "restore", "summary": {"layers": [{"buildpackID": "org.cloudfoundry.node-engine", "name": "52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed"},{"buildpackID": "org.cloudfoundry.node-engine", "name": "node"},{"buildpackID": "org.cloudfoundry.npm", "name": "node_modules"}]}
+```
+
+### `builder`
+
+#### Before
+```
+[builder] -----> Node Engine Buildpack &{[34] <nil>}
+[builder]   Node Engine 12.14.0: Reusing cached layer
+[builder] -----> NPM Buildpack &{[34] <nil>}
+[builder]   Node Modules b5323d7c9de54a883c5b5472b7a1d89aa8f6fc857b3206a5d3fe96f73e14b2c2: Contributing to layer
+[builder] It is recommended to vendor the application's Node.js dependencies
+[builder] running npm install
+[builder] Reusing existing node_modules
+[builder] audited 302 packages in 2.182s
+[builder] found 0 vulnerabilities
+[builder]
+[builder] Cache verified and compressed (/layers/org.cloudfoundry.npm/cache/npm-cache/_cacache):
+[builder] Content verified: 200 (2550658 bytes)
+[builder] Index entries: 340
+...
+```
+
+#### After
+```json
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.node-engine", "version": "0.0.133"}, "stdout":  "-----> Node Engine Buildpack &{[34] <nil>}"}
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.node-engine", "version": "0.0.133"}, "stdout":  "  Node Engine 12.14.0: Reusing cached layer"}
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.npm", "version": "0.0.83"}, "stdout":  "-----> NPM Buildpack &{[34] <nil>}"}
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.npm", "version": "0.0.83"}, "stdout":  "  Node Modules b5323d7c9de54a883c5b5472b7a1d89aa8f6fc857b3206a5d3fe96f73e14b2c2: Contributing to layer"}
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.npm", "version": "0.0.83"}, "stdout":  "It is recommended to vendor the application's Node.js dependencies"}
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.npm", "version": "0.0.83"}, "stdout":  "running npm install"}
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.npm", "version": "0.0.83"}, "stdout":  "Reusing existing node_modules"}
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.npm", "version": "0.0.83"}, "stdout":  "found 0 vulnerabilities"}
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.npm", "version": "0.0.83"}, "stdout":  ""}
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.npm", "version": "0.0.83"}, "stdout":  "Cache verified and compressed (/layers/org.cloudfoundry.npm/cache/npm-cache/_cacache):"}
+{"level": "info", "phase": "build", "buildpack": {"id": "org.cloudfoundry.npm", "version": "0.0.83"}, "stdout":  "Index entries: 340"}
+...
+```
+
+### `exporter`
+
+#### Before
+
+#### After
+
 
 ### logtool
 
