@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Client-Side Buildpack Registry
 - Start Date: 2019-11-21
-- CNB Pull Request: (leave blank)
+- CNB Pull Request: [rfcs#35](https://github.com/buildpacks/rfcs/pull/35)
 - CNB Issue: (leave blank)
 - Supersedes: https://github.com/buildpack/rfcs/pull/24
 
