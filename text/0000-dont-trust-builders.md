@@ -43,7 +43,7 @@ Users can run `pack trust-builder <build-image>` to permanently trust a builder.
 ### The Daemon Image Exception
 
 When `pack build` is run without the `--publish` flag, registry credentials are not necessary.
-Therefore, `pack` will treat every builder as a "trusted builder" to optimize performance.
+Therefore, `pack` will treat every builder as a "trusted builder" to [potentially optimize performance](https://github.com/buildpacks/rfcs/pull/46).
 
 # Drawbacks
 [drawbacks]: #drawbacks
