@@ -35,60 +35,23 @@ If the lifecycle is running a platform that aggregates logs, structured logs all
 
 The format of 
 
-### `detector`
-
-#### Before
-```
-[detector] ======== Results ========
-[detector] pass: org.cloudfoundry.openjdk@v1.0.86
-[detector] skip: org.cloudfoundry.buildsystem@v1.0.205
-[detector] pass: org.cloudfoundry.jvmapplication@v1.0.122
-[detector] pass: org.cloudfoundry.springboot@v1.0.170
-[detector] skip: org.cloudfoundry.procfile@v1.0.65
-[detector] pass: org.cloudfoundry.springautoreconfiguration@v1.0.172
-[detector] Resolving plan... (try #1)
-[detector] fail: org.cloudfoundry.openjdk@v1.0.86 provides unused openjdk-jdk
-[detector] Resolving plan... (try #2)
-[detector] fail: org.cloudfoundry.jvmapplication@v1.0.122 requires openjdk-jre
-[detector] Resolving plan... (try #3)
-[detector] 4 of 6 buildpacks participating
-[detector] org.cloudfoundry.openjdk                   v1.0.86
-[detector] org.cloudfoundry.jvmapplication            v1.0.122
-[detector] org.cloudfoundry.springboot                v1.0.170
-[detector] org.cloudfoundry.springautoreconfiguration v1.0.172
-```
-
-#### After
-
-##Actions
-
-```json
-{"level": "verbose", "phase": "detect", "detail": {"group": 1, "buildpack": {"id": "org.cloudfoundry.openjdk", "version": "v1.0.86", "result":  "pass"}}}
-{"level": "verbose", "phase": "detect", "detail": {"group": 1, "buildpack": {"id": "org.cloudfoundry.buildsystem", "version": "v1.0.205" "result":  "skip"}}}
-{"level": "verbose", "phase": "detect", "detail": {"group": 1, "buildpack": {"id": "org.cloudfoundry.springboot", "version": "v1.0.170", "result":  "pass"}}}
-{"level": "verbose", "phase": "detect", "detail": {"group": 1, "buildpack": {"id": "org.cloudfoundry.procfile", "version": "@v1.0.65", "result":  "skip"}}}
-{"level": "verbose", "phase": "detect", "group": 1, "buildpack": {"id": "org.cloudfoundry.procfile", "version": "@v1.0.65", "result":  "skip"}}
-{"level": "verbose", "phase": "detect", "detail": {"group": 1, "plan": {"attempt": 1, "result": "fail", "message":  "org.cloudfoundry.openjdk@v1.0.86 provides unused openjdk-jdk"}}}
-{"level": "verbose", "phase": "detect", "group": 1, "plan": {"attempt": 2, "result": "fail", "failDetail":  "org.cloudfoundry.jvmapplication@v1.0.122 requires openjdk-jre"}}
-{"level": "info", "phase": "detect", "group": 1, "plan": {"attempt": 3, "result": "pass", "passDetail":  "org.cloudfoundry.jvmapplication@v1.0.122 requires openjdk-jre"}}
-```
 
 ### `analyzer`
 
 #### Before
 
 ```
-[analyzer] Analyzing image "aca0be5808b3cbb89e7e69e8ccc3c7bf50edfab5679d860cdd20b02d6013b096"
-[analyzer] Restoring metadata for "org.cloudfoundry.node-engine:node" from app image
-[analyzer] Writing layer metadata for "org.cloudfoundry.node-engine:node"
-[analyzer] Restoring metadata for "org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed" from cache
-[analyzer] Writing layer metadata for "org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed"
-[analyzer] Not restoring "org.cloudfoundry.node-engine:node" from cache, marked as launch=true
-[analyzer] Restoring metadata for "org.cloudfoundry.npm:node_modules" from app image
-[analyzer] Writing layer metadata for "org.cloudfoundry.npm:node_modules"
-[analyzer] Restoring metadata for "org.cloudfoundry.npm:cache" from cache
-[analyzer] Writing layer metadata for "org.cloudfoundry.npm:cache"
-[analyzer] Not restoring "org.cloudfoundry.npm:node_modules" from cache, marked as launch=true
+Analyzing image "aca0be5808b3cbb89e7e69e8ccc3c7bf50edfab5679d860cdd20b02d6013b096"
+Restoring metadata for "org.cloudfoundry.node-engine:node" from app image
+Writing layer metadata for "org.cloudfoundry.node-engine:node"
+Restoring metadata for "org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed" from cache
+Writing layer metadata for "org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed"
+Not restoring "org.cloudfoundry.node-engine:node" from cache, marked as launch=true
+Restoring metadata for "org.cloudfoundry.npm:node_modules" from app image
+Writing layer metadata for "org.cloudfoundry.npm:node_modules"
+Restoring metadata for "org.cloudfoundry.npm:cache" from cache
+Writing layer metadata for "org.cloudfoundry.npm:cache"
+Not restoring "org.cloudfoundry.npm:node_modules" from cache, marked as launch=true
 ```
 
 #### After
@@ -110,10 +73,10 @@ The format of
 
 #### Before
 ```
-[restorer] Restoring data for "org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed" from cache
-[restorer] Restoring data for "org.cloudfoundry.node-engine:node" from cache
-[restorer] Restoring data for "org.cloudfoundry.npm:cache" from cache
-[restorer] Restoring data for "org.cloudfoundry.npm:node_modules" from cache
+Restoring data for "org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed" from cache
+Restoring data for "org.cloudfoundry.node-engine:node" from cache
+Restoring data for "org.cloudfoundry.npm:cache" from cache
+Restoring data for "org.cloudfoundry.npm:node_modules" from cache
 ```
 
 #### After
@@ -128,19 +91,19 @@ The format of
 
 #### Before
 ```
-[builder] -----> Node Engine Buildpack &{[34] <nil>}
-[builder]   Node Engine 12.14.0: Reusing cached layer
-[builder] -----> NPM Buildpack &{[34] <nil>}
-[builder]   Node Modules b5323d7c9de54a883c5b5472b7a1d89aa8f6fc857b3206a5d3fe96f73e14b2c2: Contributing to layer
-[builder] It is recommended to vendor the application's Node.js dependencies
-[builder] running npm install
-[builder] Reusing existing node_modules
-[builder] audited 302 packages in 2.182s
-[builder] found 0 vulnerabilities
-[builder]
-[builder] Cache verified and compressed (/layers/org.cloudfoundry.npm/cache/npm-cache/_cacache):
-[builder] Content verified: 200 (2550658 bytes)
-[builder] Index entries: 340
+-----> Node Engine Buildpack &{[34] <nil>}
+  Node Engine 12.14.0: Reusing cached layer
+-----> NPM Buildpack &{[34] <nil>}
+  Node Modules b5323d7c9de54a883c5b5472b7a1d89aa8f6fc857b3206a5d3fe96f73e14b2c2: Contributing to layer
+It is recommended to vendor the application's Node.js dependencies
+running npm install
+Reusing existing node_modules
+audited 302 packages in 2.182s
+found 0 vulnerabilities
+
+Cache verified and compressed (/layers/org.cloudfoundry.npm/cache/npm-cache/_cacache):
+Content verified: 200 (2550658 bytes)
+Index entries: 340
 ...
 ```
 
@@ -163,8 +126,46 @@ The format of
 ### `exporter`
 
 #### Before
+```
+Reusing layers from image with id '68c40bbf412bd8ed2a9bb9bac8e6508f6f1be3115c4385e00c13d1efe4e32c38'
+Reusing layer 'launcher'
+Layer 'launcher' SHA: sha256:e19184b1a3252d16afbdc481d16e577afaf55d8095078efc53b9eb8d4e946eae
+Reusing layer 'org.cloudfoundry.node-engine:node'
+Layer 'org.cloudfoundry.node-engine:node' SHA: sha256:189b7d6858101945bbe5ac839b966136b8781dcd40b8473b7b657c4199f4f888
+Adding layer 'org.cloudfoundry.npm:node_modules'
+Layer 'org.cloudfoundry.npm:node_modules' SHA: sha256:869d2fb3a5e27adab1218ee042f99955756fdd08fa2c1585dc2692631c9d7997
+Layer 'app' SHA: sha256:ef425ede8b461a209993ed95efba050c162093331c87cb730df04cbe95e293e3
+Reusing 1/1 app layer(s)
+Reusing layer 'config'
+Layer 'config' SHA: sha256:210aee34f63c10233a0e0ac9230b742de9511197933ca889d661c7f893fcfcab
+*** Images (8f6be2b444ea):
+      index.docker.io/library/node:latest
+
+*** Image ID: 8f6be2b444eaef1b8383964f8bff3690b8b79eaaf959bb12e358ffd14cd0038c
+Reusing cache layer 'org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed'
+Layer 'org.cloudfoundry.node-engine:52207f643ab0fba66d5189a51aac280c4834c81f24a7297446896386ec93a5ed' SHA: sha256:1a496fa202b8c5e4bd94755b388d5be2d64b6b8554d9b45dc801fa974fa01de9
+Reusing tarball for layer "org.cloudfoundry.node-engine:node" with SHA: sha256:189b7d6858101945bbe5ac839b966136b8781dcd40b8473b7b657c4199f4f888
+Reusing cache layer 'org.cloudfoundry.node-engine:node'
+Layer 'org.cloudfoundry.node-engine:node' SHA: sha256:189b7d6858101945bbe5ac839b966136b8781dcd40b8473b7b657c4199f4f888
+Writing tarball for layer "org.cloudfoundry.npm:cache"
+Adding cache layer 'org.cloudfoundry.npm:cache'
+Layer 'org.cloudfoundry.npm:cache' SHA: sha256:e4a3173bbec7ad71f90a4e8a70aba4d21a9661393ef9ef94911b1ddce34caa0d
+Reusing tarball for layer "org.cloudfoundry.npm:node_modules" with SHA: sha256:869d2fb3a5e27adab1218ee042f99955756fdd08fa2c1585dc2692631c9d7997
+Adding cache layer 'org.cloudfoundry.npm:node_modules'
+Layer 'org.cloudfoundry.npm:node_modules' SHA: sha256:869d2fb3a5e27adab1218ee042f99955756fdd08fa2c1585dc2692631c9d7997
+```
 
 #### After
+
+```json
+{"level": "info", "phase": "export", "action": "reuse", "data": {"layer": {"type": "launcher","diffID": "sha256:e19184b1a3252d16afbdc481d16e577afaf55d8095078efc53b9eb8d4e946eae"}}}
+{"level": "info", "phase": "export", "action": "reuse", "data": {"layer": {"type": "buildpack", "buildpack": "org.cloudfoundry.node-engine", "name": "node", "diffID": "sha256:189b7d6858101945bbe5ac839b966136b8781dcd40b8473b7b657c4199f4f888"}}}
+{"level": "info", "phase": "export", "action": "add", "data": {"layer": {"type": "buildpack", "buildpack": "org.cloudfoundry.npm", "name": "node_modules", "diffID": "sha256:869d2fb3a5e27adab1218ee042f99955756fdd08fa2c1585dc2692631c9d7997"}}}
+{"level": "info", "phase": "export", "action": "add", "data": {"layer": {"type": "app", "index": 1, "diffID": "sha256:210aee34f63c10233a0e0ac9230b742de9511197933ca889d661c7f893fcfcab"}}}
+{"level": "info", "phase": "export", "action": "write", "data": {"image": {"ref": "8f6be2b444ea", "tags": ["index.docker.io/library/node:latest"]}}}
+{"level": "info", "phase": "export", "action": "reuseCache", "data": {"image": {"id": "8f6be2b444ea", "tags": ["index.docker.io/library/node:latest"]}}}
+{"level": "info", "phase": "export", "action": "reuseCache", "data": {"image": {"id": "8f6be2b444ea", "tags": ["index.docker.io/library/node:latest"]}}}
+```
 
 
 ### logtool
