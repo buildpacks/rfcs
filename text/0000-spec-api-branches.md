@@ -25,7 +25,7 @@ Given that we have decided that master of the spec repo shall always describe a 
 
 The spec repo shall have protected branches representing the next API version (right now those would be `platform/0.3` and `buildpack/0.3`). PRs to the spec that change an API (all non-cosmetic changes) should be made to those branches.
 
-When they decide it is appropriate, the core team, in concsultation with the implementation team will merge an API branch to master, bump the API versions, in the spec README (https://github.com/buildpacks/spec#api-versions), and apply a [tag](https://github.com/buildpacks/spec/releases) to master. 
+When they decide it is appropriate, the core team, in consultation with the implementation team will merge an API branch to master, bump the API versions, in the spec README (https://github.com/buildpacks/spec#api-versions), and apply a [tag](https://github.com/buildpacks/spec/releases) to master. 
 
 # How it Works
 [how-it-works]: #how-it-works
