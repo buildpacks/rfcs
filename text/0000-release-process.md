@@ -9,7 +9,10 @@
 # Summary
 [summary]: #summary
 
-The release process for the various components maintained by the Cloud Native Buildpacks organization.
+A release process _template_ that may be applied to various components maintained by the Cloud Native Buildpacks
+organization. This template is initially intended to be applied to [pack](https://github.com/buildpacks/pack) and 
+[lifecycle](https://github.com/buildpacks/lifecycle). It does not try to solve for out-of-band releases such as patches,
+or otherwise changes in release dates due to coordination across dependencies or upstream changes.
 
 # Motivation
 [motivation]: #motivation
@@ -50,7 +53,7 @@ Each release would consists of the following 3 phases:
 
 - development - standard development process _(issue -> PR -> merge)_
 - [feature complete](#feature-complete) - branch of code into a [release branch](#release-branches) for ongoing [UAT](#user-acceptance-testing)
-- [release execution](#release-execution) - the step of finalizing and publishing a release
+- [release finalization](#release-finalization) - the step of finalizing and publishing a release
 
 ```text
  release X
@@ -68,7 +71,7 @@ Each release would consists of the following 3 phases:
 
 _The following schedules are suggestive and subject to change based on practicality._
 
-* Release Cadence: **Monthly** on the **1st Tuesday** of the month 
+* Release Cadence: **Every 6 weeks** 
 * Feature Complete: **5 business days** prior to scheduled release
 * CCB Review: **daily**
 
@@ -121,10 +124,12 @@ requested changes.
 
 #### Change Control Board
 
-A change control board would consist of core developers that, on a daily basis, organize changes that might
-be suitable for [release branches](#release-branches) during the feature complete.
+A change control board would consist of the maintainers of the components's sub-team. They would organize
+changes that might be suitable for [release branches](#release-branches) during feature complete. The communication of
+the board could take place in Slack, such as in `#release-planning`, or through meetings organized by the
+[release manager](#release-manager).
 
-The board members typically decide on whether a change should be included on the release based on the following criteria:
+The board members typically decide on whether a change should be included in the release based on the following criteria:
 
 - Impact
 - Effort
@@ -135,7 +140,8 @@ The board members typically decide on whether a change should be included on the
 Release branches are protected branches that will be created at the beginning of feature complete. These branches are
 protected, similar to `master`, if not more so depending on the [change control board](#change-control-board) members. 
 
-The release branch will be merged into `master` upon release.
+The release branch will be tagged and merged into `master` upon release. At this point in time, there is no intention to
+maintain the release branch after it has been merged in. For more details, refer to [release finalization](#release-finalization)
 
 ```text
                  master
@@ -144,7 +150,9 @@ The release branch will be merged into `master` upon release.
                    |
                    |    release/1.2.3
                    |
-                   |          o commit: fix/critical-or-minor
+                   o ---------+     <--+ merge release branch into master
+                   |          |
+                   |          o commit: fix/critical-or-minor (tag:v1.2.3)
                    |          |
                    |          |
 commit: feature/Y  o          |
@@ -152,7 +160,7 @@ commit: feature/Y  o          |
                    |          |
                    |          |
                    |          |
-                   +----------+ <--+ start feature complete
+                   +----------+     <--+ start feature complete
                    |
                    |
                    |
@@ -165,11 +173,24 @@ commit: feature/X  o
 
 #### Migration Guide
 
-A migration guide is a document which details breaking changes for migrating from prior versions.
+A migration guide is a document which details breaking changes and provides actions that may be taken to migrate from
+prior versions.
 
-### Release Execution
+### Release Manager
 
-Upon execution of the release the following will take place:
+A release manager is a role assigned to an individual selected to own the release process. A release manager should be
+part of the component's maintainers sub-team. They may volunteer, or be selected by other members of the component's maintainers
+sub-team. Their role and responsibilities start as soon as a release going into [feature complete](#feature-complete).
+
+The responsibilities of the release manager include, but are not limited to:
+
+- Communicating status during working group meetings.
+- [Scheduling CCB meetings](#change-control-board).
+- [Finalizing the release](#release-finalization).
+
+### Release Finalization
+
+Upon finalization of the release the following will take place:
 
 - A github release will be created containing the following:
     - **Artifacts**
@@ -177,6 +198,10 @@ Upon execution of the release the following will take place:
     - **Migration Guide**, when appropriate.
 - The release branch will be tagged as `v<version>`.
 - The release branch will be merged into `master`.
+- Send out notifications:
+    - Mailing List
+    - Slack #announcements
+    - Twitter
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -195,7 +220,7 @@ proposed process. In this way we can pick and choose a combination of steps that
 
 ### Continuing trunk based development
 
-To avoid the necessity to create a new, short-lived (maybe, see [unresolved-questions](#unresolve-questions)) branches
+To avoid the necessity to create a new, short-lived (maybe, see [unresolved-questions](#unresolved-questions)) branches
 for each release cycle, there are a number of approaches we could use that would allow us to release directly from our
 master branch.
 
@@ -231,7 +256,7 @@ only what we expect to be included, and perhaps that we are not including code w
 ##### Advantages:
 
 - Release configuration, and justifications maintained in searchable source code with history.
-- Configuration could apply across deliverables to ensure compatibility in similarly versioned releases.
+- Configuration could apply across deliverable to ensure compatibility in similarly versioned releases.
 
 ##### Disadvantages:
 
@@ -276,6 +301,7 @@ folder in order to be accepted.
 # Prior Art
 [prior-art]: #prior-art
 
+- [Kubernetes' Release SIG](https://github.com/kubernetes/sig-release/tree/master/releases)
 - [Helm's release process](https://github.com/helm/community/blob/master/helm-maintainers-onboarding-guide.md#the-release-process)
 - [Harbor's lazy consensus implementation](https://github.com/goharbor/community/blob/master/GOVERNANCE.md#lazy-consensus)
 
@@ -288,9 +314,6 @@ folder in order to be accepted.
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Who makes up the Change Control Board, and how are meetings scheduled?
-- Will the release branch be maintained after the changes have been merged back in to master? Could, or should, this
-branch be used to create future patches?
-- Is the proposed release cadence too ambitious given historic feature delivery speed? Is spending roughly 25% of the
-time in a release window too much?
-- How is the person, or group, responsible for actually building and publishing a release determined?
+- Could, or should, the release branch be used to create future patches once it's merged to master?
+    - The release branch _could_ be used to enable patches but not necessary since a new branch for patching can
+    always be created from the tagged commit. 
