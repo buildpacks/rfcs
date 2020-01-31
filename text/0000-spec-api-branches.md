@@ -25,7 +25,9 @@ Given that we have decided that master of the spec repo shall always describe a 
 
 The spec repo shall have protected branches representing the next API version for each spec. At the time of writing, those branches would be the following: `platform/0.3`, `buildpack/0.3`, `distribution/0.2` and `extensions/bindings/0.2`. PRs to the spec that change an API (all non-cosmetic changes) should be made to those branches.
 
-When they decide it is appropriate, the core team, in consultation with the implementation team will merge an API branch to master, bump the API versions, in the spec README (https://github.com/buildpacks/spec#api-versions), and apply a [tag](https://github.com/buildpacks/spec/releases) to master. 
+When they decide it is appropriate, the core team, in consultation with the implementation team will merge an API branch to master, bump the API versions, in the spec README (https://github.com/buildpacks/spec#api-versions), and apply a [tag](https://github.com/buildpacks/spec/releases) to master.
+
+Release tags will be named following the existing convention: `<spec-name>-v<api-version>`
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -33,7 +35,7 @@ When they decide it is appropriate, the core team, in consultation with the impl
 ## Example - Platform API
 For example, if we were following this process right now, [buildpacks/spec#68](https://github.com/buildpacks/spec/pull/68) would be made against the `platform/0.3` branch. [rfcs#46](https://github.com/buildpacks/rfcs/pull/46) is accepted, a corresponded set of spec changes would also be PR'd to the spec repo.
 
-Once the complete set of changes that should represent Platform API 0.3 is fully staged on the branch it will be merged to master. A release of lifecycle that supports Platform API 0.3 can be shipped, and users will be able to easily lookup implemented API.
+Once the complete set of changes that should represent Platform API 0.3 is fully staged on the branch it will be merged to master and a tag with the name `platform-v0.3` will be applied to the merge commit. A release of lifecycle that supports Platform API 0.3 can be shipped, and users will be able to easily lookup the implemented API.
 
 # Drawbacks
 [drawbacks]: #drawbacks
