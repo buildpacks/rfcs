@@ -9,7 +9,7 @@
 # Summary
 [summary]: #summary
 
-The version of the specification is represented by two numbers, the Buildpack API and the Platform API. When there are major changes to these APIs the API number is bumped. Rather than requiring a bump to the API for each change that enters the spec, this RFC proposes adding protected branches for future API version to the spec repo. Breaking changes can be PR'd to these branches and the branches themselves will be merged to master when the core team decided that a group of changes together shall constitute the next API version.
+The Cloud Native Buildpacks Specification is a collection [specifications](https://github.com/buildpacks/spec#sections), independently versioned with [API numbers](https://github.com/buildpacks/spec#api-versions). When there are major changes to these APIs, the API number is bumped. Rather than requiring a bump to the API for each change that enters the spec, this RFC proposes adding protected branches for future API versions to the spec repo. Breaking changes can be PR'd to these branches and the branches themselves will be merged to master when the core team decides that a group of changes together shall constitute the next API version.
 
 # Motivation
 [motivation]: #motivation
@@ -23,7 +23,7 @@ Given that we have decided that master of the spec repo shall always describe a 
 # What it is
 [what-it-is]: #what-it-is
 
-The spec repo shall have protected branches representing the next API version (right now those would be `platform/0.3` and `buildpack/0.3`). PRs to the spec that change an API (all non-cosmetic changes) should be made to those branches.
+The spec repo shall have protected branches representing the next API version for each spec. At the time of writing, those branches would be the following: `platform/0.3`, `buildpack/0.3`, `distribution/0.2` and `extensions/bindings/0.2`. PRs to the spec that change an API (all non-cosmetic changes) should be made to those branches.
 
 When they decide it is appropriate, the core team, in consultation with the implementation team will merge an API branch to master, bump the API versions, in the spec README (https://github.com/buildpacks/spec#api-versions), and apply a [tag](https://github.com/buildpacks/spec/releases) to master. 
 
