@@ -40,7 +40,10 @@ More knobs to turn, more configurability.
 # Prior Art
 [prior-art]: #prior-art
 
-https://reproducible-builds.org/docs/source-date-epoch/
+- Spec: https://reproducible-builds.org/docs/source-date-epoch/
+
+- [`ko`](https://github.com/google/ko/tree/ca1b2a1dedfdb13b4955018631fd6566e5d1a13d#why-are-my-images-all-created-in-1970)
+- [`rules_docker`](https://github.com/bazelbuild/rules_docker/blob/371f328c4357e33b64bbdc4eaaf59b4544efa31e/container/image_test.py#L231-L236) (via https://github.com/bazelbuild/bazel/issues/2240)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
