@@ -32,7 +32,7 @@ Discuss prior art, both the good and bad.
 + # Spec. Changes (OPTIONAL)
 + [spec-changes]: #spec-changes
 +
-+ Does this RFC entail any proposed changes to the specifications (either buildpack or platform)?
++ Does this RFC entail any proposed changes to the specifications (either buildpack or platform) or extensions?
 + This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are necessary, they should be documented here.
 +
 ```
