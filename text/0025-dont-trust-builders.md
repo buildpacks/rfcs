@@ -36,7 +36,7 @@ If the lifecycle version specified in a builder image does not match any known l
 If `pack build` is run with the `--publish` and `--trust-builder` flag, then all lifecycle steps will be run in a single container.
 The registry credentials will be provided only to `analyzer` and `exporter` processes.
 
-Users can run `pack trust-builder <build-image>` to permanently trust a builder. 
+Users can run `pack trust-builder <build-image>` to permanently trust a builder.
 
 ### The Daemon Image Exception
 
