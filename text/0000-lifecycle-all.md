@@ -9,8 +9,8 @@
 # Summary
 [summary]: #summary
 
-### `/cnb/lifecycle/all`
-A new lifecycle binary with the name `lifecycle/all` will be included in each released lifecycle archive. Within a builder image, it will be found at the path `/cnb/lifecycle/all`. When invoked, it will run the following phases sequentially:
+### `/cnb/lifecycle/creator`
+A new lifecycle binary with the name `lifecycle/creator` will be included in each released lifecycle archive. Within a builder image, it will be found at the path `/cnb/lifecycle/creator`. When invoked, it will run the following phases sequentially:
 
 * detector
 * analyzer
@@ -21,7 +21,7 @@ A new lifecycle binary with the name `lifecycle/all` will be included in each re
 Each of these phases will continue to be available individually as provided by the current lifecycle.
 
 ### Platform API 0.3
-The existence of `all` will constitute a non-breaking but substantive change to the Platform API, bringing us to Platform API 0.3 . Although platform will interpret this as a breaking change, we do not have a mechanism for indicating non-breaking platform API change pre 1.0. Bumping the platform API number is necessary so that platforms like `pack` know whether or no they can use this feature.
+The existence of `creator` will constitute a non-breaking but substantive change to the Platform API, bringing us to Platform API 0.3 . Although platform will interpret this as a breaking change, we do not have a mechanism for indicating non-breaking platform API change pre 1.0. Bumping the platform API number is necessary so that platforms like `pack` know whether or no they can use this feature.
 
 # Motivation
 [motivation]: #motivation
@@ -29,19 +29,19 @@ The existence of `all` will constitute a non-breaking but substantive change to 
 This new binary supports two main goals.
 
 ### Goal 1: faster `pack` builds
-By creating a single container and invoking `/cnb/lifecycle/all` instead of creating a container per lifecycle phase, pack can shave approximate `6s` from the execution time of `pack build`.
+By creating a single container and invoking `/cnb/lifecycle/creator` instead of creating a container per lifecycle phase, pack can shave approximate `6s` from the execution time of `pack build`.
 
 `pack` may not always want to do this (see https://github.com/buildpacks/rfcs/pull/43 for an explanation of why this is not always ideal). However, it could be very beneficial to users that are wiling to trust their builder images.
 
 ### Goal 2: Easier integration of the lifecycle into other platforms and CI tools
-As members of the community experiment with incorporating CNBs into other platform and CI tools, the difficulty of invoking each lifecycle phase correctly and sequentially draws many to the easier solution of using `pack` to orchestrate the lifecycle. While `pack` can provide a simple way for these developers to implement these integrations, there may be performance drawbacks when compared with using the lifecycle directly. `/cnb/lifecycle/all` will provide an easier interface, lowering the barrier to using the lifecycle without pack, thus enabling platform developers choose between `pack` and `lifecycle` based solely upon the needs of their integration.
+As members of the community experiment with incorporating CNBs into other platform and CI tools, the difficulty of invoking each lifecycle phase correctly and sequentially draws many to the easier solution of using `pack` to orchestrate the lifecycle. While `pack` can provide a simple way for these developers to implement these integrations, there may be performance drawbacks when compared with using the lifecycle directly. `/cnb/lifecycle/creator` will provide an easier interface, lowering the barrier to using the lifecycle without pack, thus enabling platform developers choose between `pack` and `lifecycle` based solely upon the needs of their integration.
 
 # What it is
 [what-it-is]: #what-it-is
 
 ### Usage
 
-`/cnb/lifecycle/all <image-name>`
+`/cnb/lifecycle/creator <image-name>`
 
 The following flags optional flags can customize behavior:
 
@@ -77,13 +77,13 @@ Some existing lifecycle flags (e.g. `-group` on the `detector` `builder` and `ex
 
 Right now, when `pack` runs w/o the `--publish` flag `analyzer` and `exporter` are run as root. This is required so that these phases can connect to the mounted docker daemon socket. Historically the `builder` and `detector` binaries are never run as root.
 
-In the daemon case pack will run `all` as `root` but the buildpacks' `/bin/detect` and `/bin/builder` scripts will be invoked as the provided user. This will require a change to build and detect implementations.
+In the daemon case pack will run `creator` as `root` but the buildpacks' `/bin/detect` and `/bin/builder` scripts will be invoked as the provided user. This will require a change to build and detect implementations.
 
 ### Credential Management
 
 Right now, when `pack` runs w/ the `--publish` flag `analyzer` and `exporter` are provided with registry credentials via the `CNB_REGISTRY_AUTH` environment variable.
 
-In the registry case pack will set `CNB_REGISTRY_AUTH` when invoking `all`. To prevents buildpacks from having read access to those credentials the build and detect implementations will ensure this variable is not present in the environment of the `/bin/detect` and `/bin/build` processes.
+In the registry case pack will set `CNB_REGISTRY_AUTH` when invoking `creator`. To prevents buildpacks from having read access to those credentials the build and detect implementations will ensure this variable is not present in the environment of the `/bin/detect` and `/bin/build` processes.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -106,5 +106,3 @@ Regarding the introduction of the `-tag` flag, `docker build -t` is prior art.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-
-- Is there a better name than `lifecycle/all`? It doesn't include `launcher` or `rebaser` functionality so it isn't truly `all`.
