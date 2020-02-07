@@ -26,9 +26,10 @@ party.
 # What is it
 [what-is-it]: #what-is-it
 
+All associated resources listed here will be housed under [buildpacks/community](https://github.com/buildpacks/community).
+
 - `labels.toml` file with all labels in the entire org.
     - format:
-    
     ```toml
     [[label]]
     name = ""         # name of label as displayed in GitHub 
@@ -39,7 +40,7 @@ party.
       exclude = []    # applies to all repos except these
     ```
 - A form of automation that keeps the labels in sync. (eg. GitHub Actions)
-
+- A form of automation that prevents manually created labels from existing.
 
 ### Exclusions
 
@@ -118,9 +119,6 @@ Automation will be triggered when changes to this file are made. The automation 
 on all repositories in the org. It would also ensure that any labels specific to a repository exist
 on said repository.
 
-Any labels not listed in this file would get deleted. This is to ensure a single source of truth and enables the
-capability of mass cleanup.
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -143,8 +141,3 @@ the UI.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-
-- Where does this live? [community](https://github.com/buildpacks/community) or new "plumbing" repo?
-- Is there any way to prevent labels being added manually, that would later be cleaned up by the automation?
-    - There is a way to prevent labels from being manually added using a [trigger](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows#label-event-label) 
-    that could then remove the label as soon as it's created.
