@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Buildpack links
+- Name: Buildpack homepage
 - Start Date: 1-23-2020
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -9,7 +9,7 @@
 # Summary
 [summary]: #summary
 
-This RFC suggest a mechanism where buildpacks can provide arbitrary links in their configuration. These links are intended to contain documentation, point to github repos, point users to readmes, etc. but should not prescribe a format.
+This RFC suggest a mechanism where buildpacks can provide arbitrary links in their configuration: point to a homepage. These links are intended to contain documentation, point to github repos, point users to readmes, etc. but should not prescribe a format.
 
 # Motivation
 [motivation]: #motivation
