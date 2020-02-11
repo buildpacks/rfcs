@@ -122,3 +122,7 @@ API v2 but it's direct compatibility would require additional research. Addition
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
+
+- Where would this be documented long-term?
+    - Does it make sense to be added to the distribution spec?
+    - It could solely live in the docs site.
