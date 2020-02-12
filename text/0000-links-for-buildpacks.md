@@ -35,6 +35,20 @@ Buildpacks:
 
  Inclusion of this link would allow buildpack authors to provide a pointer to arbitrary information for their consumers.
 
+ A `buildpack.toml` for the above buildpack would look like:
+
+ ```toml
+api = "0.2"
+
+[buildpack]
+id = "org.cloudfoundry.azureapplicationinsights"
+version = "1.1.9"
+homepage = "https://github.com/cloudfoundry/azure-application-insights-cnb" # <- New optional field
+
+[[stacks]]
+....snip....
+ ```
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
