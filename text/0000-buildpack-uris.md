@@ -41,11 +41,16 @@ directory and image.
 
 | Short Name | Format | Examples |
 |--- |--- |--- |
-| Filesystem | `file://[<host>]/<path>` | `file:///./my/buildpack.tgz`<br>`file:///home/user/my/buildpack.tgz`
+| Relative | `<path>` | `./my/buildpack.tgz`<br>`/home/user/my/buildpack.tgz`
+| Filesystem | `file://[<host>]/<path>` | `file:///my/buildpack.tgz`<br>`file:///home/user/my/buildpack.tgz`
 | URL | `http[s]://<host>/<path>` | `http://example.com/my/buildpack.tgz`<br>`https://example.com/my/buildpack.tgz`  
-| Docker | `docker://[<host>]/<path>[:<tag>]` | `docker:///ubuntu:latest`<br>`docker://gcr.io/distroless/nodejs` 
-| CNB Builder | `cnb:builder://[<id>[@<version>]]` | `cnb:builder://`<br>`cnb:builder://bp.id`<br>`cnb:builder://bp.id@bp.version`
+| Docker | `docker://[<host>]/<path>[:<tag>⏐@<digest>]` | `docker://gcr.io/distroless/nodejs`<br>`docker:///ubuntu:latest`<br>`docker:///ubuntu@sha256:45b23dee08...`
+| CNB Builder | `cnb:builder://[<host>]/[<id>[:<version>]]` | `cnb:builder://`<br>`cnb:builder:///bp.id`<br>`cnb:builder:///bp.id:bp.version`
 
+
+### Relative
+
+A URI without a scheme is treated as a relative reference as per [RFC 3986 section 4.1](https://tools.ietf.org/html/rfc3986#section-4.1).
 
 ### Filesystem
 
@@ -66,14 +71,16 @@ eg. `docker:/ubuntu:latest`
 ### CNB Builder
 
 - `cnb:builder://` - A reference to ALL the buildpacks in the builder.
-- `cnb:builder://bp.id` - A reference to a buildpack with id `bp.id` in the builder. If there is more than one version
+- `cnb:builder:///bp.id` - A reference to a buildpack with id `bp.id` in the builder. If there is more than one version
 available, a error should be thrown.
-- `cnb:builder://bp.id@bp.version` - A reference to a buildpack with id `bp.id` at the specific version `bp.version`.
+- `cnb:builder:///bp.id:bp.version` - A reference to a buildpack with id `bp.id` at the specific version `bp.version`.
+- Similar to the `file` scheme, there is a minimal declaration for omitting host by using a simple slash (`/`). 
+eg. `cnb:builder:/bp.id:bp.version`
 
 # How it Works
 [how-it-works]: #how-it-works
 
-### Usage
+### pack
 
 Certain `pack` CLI arguments would take URIs supported instead of the current inconsistent format.
 
@@ -82,21 +89,58 @@ Some examples:
 ```shell script
 pack build my-app \
   --buildpack cnb:builder://bp.id@bp.version \                # buildpack from builder
-  --buildpack file:///../path/to/buildpack/ \                 # relative file
+  --buildpack file:///home/user/path/to/buildpack/ \          # absolute via file
+  --buildpack /home/user/path/to/buildpack/ \                 # absolute via schemeless
+  --buildpack ../path/to/buildpack/ \                         # relative file
   --buildpack docker:/cnbs/some-package \                     # Docker Hub image
   --buildpack docker://gcr.io/cnbs/sample-package-2:bionic \  # GCR image (with tag)
   --buildpack cnb:builder://                                  # All buildpacks in builder
 ```   
 
-#### Additional considerations
+### Config Files
 
-`pack` could default a certain scheme to provide additional ease-of-use. For example,
-if  `cnb:builder` is the default scheme, users can simply use `pack build ... --buildpack bp.id@bp.version`. We might
-want to wait until the registry is available though to make that the default.
+Config files would replace `image` with `uri`, using the `docker://` scheme, where applicable.
+
+`package.toml`:
+```toml
+[buildpack]
+uri = "."
+
+[[dependencies]]
+uri = "docker:/my/image:latest"
+
+# ...
+``` 
+
+`builder.toml`:
+```toml
+# ...
+
+[[buildpacks]]
+uri = "./my/buildpacks/"
+
+[[buildpacks]]
+uri = "docker:/my/image:latest"
+
+# ...
+```
+
+# Additional considerations
+
+#### `pack` User Expirience
+
+`pack` could provide additional logic in order for users to have a nicer user experience when providing references
+via CLI. For example, `pack` could have an order of precedence to make a best guess at which type of reference
+they are referring to or provide additional feedback if it's ambiguous.
+
+#### Registry vs Daemon
+
+
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- The user would need to type an additional scheme prefix.
+- The user would need to type an additional scheme prefix for any URI which is not a relative reference.
 
 # Alternatives
 [alternatives]: #alternatives
