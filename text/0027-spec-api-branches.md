@@ -2,9 +2,9 @@
 [meta]: #meta
 - Name: Spec API branches
 - Start Date: 2020-01-27
-- CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
-- Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
+- CNB Pull Request: [rfcs#49](https://github.com/buildpacks/rfcs/pull/49)
+- CNB Issue:
+- Supersedes: N/A
 
 # Summary
 [summary]: #summary
@@ -14,7 +14,7 @@ The Cloud Native Buildpacks Specification is a collection [specifications](https
 # Motivation
 [motivation]: #motivation
 
-Changes to the Platform or Buildpack API can be disruptive, especially right now when both are pre-stable (0.x) and every change is treated as breaking. 
+Changes to the Platform or Buildpack API can be disruptive, especially right now when both are pre-stable (0.x) and every change is treated as breaking.
 
 When we want to make several changes to a given API in short succession (i.e. in the time windows between subsequent releases of the reference lifecycle), it would be nice to use a single new API number to represent a set of breaking changes.
 
