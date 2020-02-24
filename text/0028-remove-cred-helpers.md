@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Remove Lifecycle Credential Helpers Integration
 - Start Date: 2020-01-22
-- CNB Pull Request: (leave blank)
+- CNB Pull Request: [rfcs#49](https://github.com/buildpacks/rfcs/pull/49)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
 
@@ -18,12 +18,12 @@ This RFC proposes entirely **removing** this feature.
 
 There are several reasons to consider removing this feature:
 
-* `-helpers` breaks the build if the corresponding helper binaries are not installed. There is no guarantee that the credential helper binaries are installed on the build image. 
+* `-helpers` breaks the build if the corresponding helper binaries are not installed. There is no guarantee that the credential helper binaries are installed on the build image.
 * The `-helpers` flag gives the false impression that credential helper binaries will be provided.
-* None of the most popular build images ( `heroku/pack:18-build`, `cloudfoundry/build:base-cnb`, `cloudfoundry/build:full-cnb`) have the credential helper binaries installed 
+* None of the most popular build images ( `heroku/pack:18-build`, `cloudfoundry/build:base-cnb`, `cloudfoundry/build:full-cnb`) have the credential helper binaries installed
 * None of following platforms require it
   - pack - resolves registry config on the host and then injects it into the container
-  - tekton - configures your docker config from annotated k8s secrets 
+  - tekton - configures your docker config from annotated k8s secrets
   - kpack - configures your docker config from annotated k8s secrets
 * Stack authors can still provide credential helper integration without requiring lifecycle integration. In addition to installing credential helper binaries on the build image, stack authors can add a docker config file with the corresponding entries, if they wish.
 
