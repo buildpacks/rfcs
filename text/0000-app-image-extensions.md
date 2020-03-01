@@ -31,8 +31,8 @@ Given that app authors and platform maintainers experience increased build time 
 Stack image creators may add the following executables to their run and/or build images:
 
 ```
-/cnb/image/build/extend (pkg-cache-dir) (build-metadata-toml-file) | cwd: /
-/cnb/image/run/extend (pkg-cache-dir) (run-metadata-toml-file) | cwd: /
+/cnb/image/build/extend (build-metadata-toml-file) (pkg-cache-dir) | cwd: /
+/cnb/image/run/extend (run-metadata-toml-file) (pkg-cache-dir) | cwd: /
 ```
 * executes on base run or build images
 * writes metadata to `/cnb/image/build/metadata.toml` or `/cnb/image/run/metadata.toml`
@@ -41,8 +41,8 @@ Stack image creators may add the following executables to their run and/or build
   * if the digest is the same, proceed to status
 
 ```
-/cnb/image/build/status (pkg-cache-dir) (build-metadata-toml-file) | cwd: /
-/cnb/image/run/status (pkg-cache-dir) (run-metadata-toml-file) | cwd: /
+/cnb/image/build/status (build-metadata-toml-file) (pkg-cache-dir) | cwd: /
+/cnb/image/run/status (run-metadata-toml-file) (pkg-cache-dir) | cwd: /
 ```
 * executes on run or build base images
 * metadata arg is `/cnb/image/build/metadata.toml` or `/cnb/image/run/metadata.toml`
@@ -81,9 +81,9 @@ If `extend.run-image` is not specified, `extend.run` is stored on the builder me
 
 ### Extended an Existing Builder
 
-`pack extend-builder sclevine/builder -e extend.toml`
+`pack create-builder sclevine/builder -b builder.toml`
 
-extend.toml:
+builder.toml:
 ```toml
 [builder]
 image = "example.com/builder"
@@ -101,6 +101,8 @@ Behavior: creates a new version of an existing builder with additional packages 
 
 If `extend.run-image` is not specified, `extend.run` is stored on the new builder metadata and used to dynamically extend the run image on `pack build`.
 
+Note that the `[builder]` section is mutually exclusive with `[stack]`.
+
 ### Building an App with Additional Packages
 
 `pack build sclevine/myapp`
@@ -108,9 +110,9 @@ If `extend.run-image` is not specified, `extend.run` is stored on the new builde
 project.toml:
 ```toml
 ...
-[extend.run] # run-metadata-toml-file (stored on new run image metadata)
+[run.extend] # run-metadata-toml-file (stored on new run image metadata)
 packages = ["git"]
-[extend.build] # build-metadata-toml-file (stored on new builder image metadata)
+[build.extend] # build-metadata-toml-file (stored on new builder image metadata)
 packages = ["git"]
 ...
 ```
