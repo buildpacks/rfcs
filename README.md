@@ -3,7 +3,7 @@
 Want to suggest a change to the Cloud Native Buildpacks project? Awesome!
 
 We follow an RFC (Request for Comments) process for substantial changes to the project.
-This process was originally described in the [RFC RFC](./text/0004-rfc-process.md) and is copied below:
+This process was originally described in the [RFC#4](./text/0004-rfc-process.md) and is copied below:
 
 ## RFC Process
 
