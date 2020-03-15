@@ -157,18 +157,16 @@ An entry will have the following structure:
 
 ```
 {
-  "buildpacks" : [
-    {
-      "ns" : "<string>",
-      "name": "<string>",
-      "version" : "<string",
-      "digest" : "<string>",
-      "yanked" : <boolean>,
-      "addr" : "<string>",
-    }
-  ],
+  "ns" : "<string>",
+  "name": "<string>",
+  "version" : "<string",
+  "digest" : "<string>",
+  "yanked" : <boolean>,
+  "addr" : "<string>",
 }
 ```
+
+However, each entry will be minimized (stored on a single line), and multiple entries in the same file will not have a comma at the end (i.e. there will be no list/array using `[]`). Thus, each index file will contain invalid JSON. But this allows for smaller diffs and simpler appends. This follows the precedent set by [crates.io-index](https://github.com/rust-lang/crates.io-index).
 
 The `buildpacks` fields are defined as follows:
 
