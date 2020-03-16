@@ -7,7 +7,7 @@ This process was originally described in the [RFC#4](./text/0004-rfc-process.md)
 
 ## RFC Process
 
-To get an RFC into Cloud Native Buildpacks, first the RFC needs to be merged into the RFC repo. Once an RFC is merged, it's considered 'active' and may be implemented to be included in the project. These steps will get an RFC to be considered:
+To get a proposal into Cloud Native Buildpacks, first, an RFC needs to be merged into the RFC repo. Once an RFC is merged, it's considered 'active' and may be implemented to be included in the project. These steps will get an RFC to be considered:
 
 - Fork the RFC repo: <https://github.com/buildpacks/rfcs>
 - Copy `0000-template.md` to `text/0000-my-feature.md` (where 'my-feature' is descriptive. don't assign an RFC number yet).
