@@ -20,8 +20,8 @@ Stack images can still be provided by platforms/vendors, but they should use the
 [proposal]: #proposal
 
 This RFC proposes that apply the following set of restrictions to base images marked with stack ID `io.buildpacks.stacks.bionic`:
-1. The base set of packages is the set of packages distributed in `ubuntu:bionic` with `ca-certificates`, `libssl1.1`, and `openssl` added. The base image does not have to be based on `ubuntu:bionic`, but must contain packages that provide exactly the same functionality to processes running as the CNB-specified non-root user.
-2. When invoked as root, `apt-get` must be configured to use at least the set of package repositories as `ubuntu:bionic`.  `apt-get update` may be needed to download the package repository indices before `apt-get install` is functional.
+1. The base set of packages is the set of packages distributed in `ubuntu:bionic` with `ca-certificates`, `libssl1.1`, and `openssl` added. The base image does not have to be derived from the `ubuntu:bionic` image, but must contain packages that provide exactly the same functionality to processes running as the CNB-specified, non-root user.
+2. When invoked as root, `apt-get` must be configured to use at minimum the set of package repositories that `ubuntu:bionic` is configured to use. `apt-get update` may be needed to download the package repository indices before `apt-get install` is functional.
 3. Mixins without an `=` are Ubuntu 18.04 LTS package names without version or architecture info from official package mirrors.
 4. Mixins that begin with `set=` are defined by the project as such:
   a. `build:set=shell-utils` represents the change set: `build:curl`, `build:jq`, and yj CLI at build-time.
