@@ -78,6 +78,7 @@ mixins = ["build:build-essential", "git"] # NOTE: only need to list mixins they 
 - Neither the spec nor this RFC suggest whether or not stack authors or app developers are allowed to make additional changes to stack images without using mixin metadata.
 - When package groups (like `build-essential`) or dependent packages are installed, must stack images always specify all the packages added? Or is it only necessary when stack image authors want buildpacks to be able to depend on the dependent packages?
 - For usability, should we create a single-mixin "shortcut" notation for the stack ID (e.g., `io.buildpacks.stacks.bionic#shell-utils`)? This would require a spec change and updates to pack, the lifecycle, and other CNB tools, so I'd like to leave it for a different RFC. 
+- Where should we list all of the package sets for `io.buildpacks.stacks.bionic`? On buildpacks.io? In a new section of the spec?
 
 # Alternatives
 [alternatives]: #alternatives
