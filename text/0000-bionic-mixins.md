@@ -13,7 +13,7 @@ The Platform API specification allows stack maintainers to define stack mixins f
 The Cloud Native Buildpacks project informally defines stack build and run images with ID `io.buildpacks.stacks.bionic` as containing exactly the set of Ubuntu packages in the `ubuntu:bionic` image on Docker Hub.
 This RFC proposes that we formalize the existing definition of `io.buildpacks.stacks.bionic` and define mixins on that stack to be Ubuntu 18.04 LTS packages. 
 
-In general, a stack is a contract that should be more like "Ubuntu Bionic" and less like "Platform XYZ's Re-distribution of Ubuntu Binoic."
+In general, a stack is a contract that should be more like "Ubuntu Bionic" and less like "Platform XYZ's Re-distribution of Ubuntu Bionic."
 Stack images can still be provided by platforms/vendors, but they should use the standard CNB stack contracts where applicable.
 
 # Proposal
