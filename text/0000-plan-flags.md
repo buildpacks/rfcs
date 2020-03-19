@@ -21,7 +21,7 @@ To do so we should add `build` and `launch` fields to the Build Plan (TOML). We 
 2) Clarify how buildpacks communicate their dependencies to other buildpacks.
 
 - Current state of the world.
-    The current way that buildpacks indicate that they rely on an earlier buildpack's dependencies at either build or 
+    The current way that the Cloudfoundry Buildpacks indicate that they rely on an earlier buildpack's dependencies at either build or 
     launch time is to set a string `build` and/or `launch` field in the Build Plan (TOML) metadata section. An example 
     of this being necessary is say the the `node-engine-cnb` and the `npm-cnb`. The `node-engine-cnb` on its own only 
     has the `launch` metadata set for its layer because that is all that is required to run a node app that has no 
@@ -95,28 +95,30 @@ We propose adding `build` and `launch` fields to dependencies in the Build Plan 
   
   ```
   
-##Buildpack Plan (TOML) changes
+## Buildpack Plan (TOML) changes
   
   For the same reasons, we would like to add `build` and `launch` flags to the Buildpack Plan, along with
   some additional format changes: 
-  
+
   ```toml
-  [<dependency name>]
+  [[entries]]
+  name = "<dependency name>"
   build = false
   launch = false
   
-  [[<dependency name>.entries]]
+  [[entries.requires]]
   version = "<dependency version>"
   
-  [<dependency name>.entries.metadata]
+  [entries.requires.metadata]
   # buildpack-specific data
   ```
+We will also guarantee that for each entry the `name` field is unique.
 
   We arrived at this format for several reasons:
   - It allows us to offload some common flag merging operations to the lifecycle. We suggest letting all build/launch flags
-  under a single key be merged together (recommending using an `or` operator). 
+  under a single key be merged together (recommending the `or` operator). 
   
-  - A buildpack only needs to handle logic based on `dependency name` keys it is responsible for. 
+  - A buildpack only needs to handle logic based on `name` keys it is responsible for. 
  
 # How it Works
 [how-it-works]: #how-it-works
@@ -125,14 +127,14 @@ The overarching goal of this RFC is to formalize the flow of the `build` and `la
 phases. 
 
 The additional fields to the Build Plan (TOML) should be self explanitory and are strictly additive.
-But will move these values out the `Metadata` field and make them first class values.
+But will move these values out the `metadata` field.
 
 The proposed changes in this solution to the Buildpack Plan (TOML) would require the following changes to the lifecycle to 
 generate data in the format defined above:
 
 - Detection Succeeds
 - Build Plan entries are aggregated based on dependency-names.
-- Each dependency has an array for all the versions & metadata that appeared under that dependency name in the Build Plan
+- Each dependency has an array for all the versions & map for metadata that appeared under that dependency name in the Build Plan
 - build & launch flags of each entry are reduced using some boolean operator (likely `or`) 
 
 The result of processing the example Build Plan above would be the following: 
@@ -198,7 +200,7 @@ launch = bool
 - Here `<dependency name>` elements in the `merge-layer-flags` array should have unique `name` fields
 
 - Why is this proposal the best?
-The above is non breaking, but it does have semantics that are not enforced by data-type (the uniquness of `name`)
+The above is non breaking, but it divides data for a single entity among multiple structures, this feels bad.
 
 # Prior Art
 [prior-art]: #prior-art
