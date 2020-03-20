@@ -1,10 +1,10 @@
 # Meta
 [meta]: #meta
-- Name: (fill in the feature name: My Feature)
-- Start Date: (fill in today's date: YYYY-MM-DD)
+- Name: Update JSON Structure of CNB Registry
+- Start Date: 2020-03-19
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
-- Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
+- Supersedes: [RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)
 
 # Summary
 [summary]: #summary
