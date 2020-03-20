@@ -56,7 +56,7 @@ An example of what this may look like for a single buildpack file:
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- The faux-JSON will not be parseable. Instead, it is required that a consume parse each line individually.
+- The faux-JSON will not be parseable. Instead, it is required that consumers parse each line individually.
 
 # Alternatives
 [alternatives]: #alternatives
