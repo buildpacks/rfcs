@@ -10,38 +10,38 @@
 [summary]: #summary
 
 We would like to add the ability for buildpacks to be able to specify `build` and `launch` requirements for a dependency.
-To do so we should add `build` and `launch` fields to the Build Plan (TOML). We would also like these flags
- to be available in Buildpack Plan (TOML) files.
+To do so we should add `build` and `launch` fields to both the Build Plan (TOML) and Buildpack Plan (TOML) files.
 
 # Motivation
 [motivation]: #motivation
+The overarching goal of this RFC is to 
 
 1) Simplifies buildpack implementation.
 
 2) Clarify how buildpacks communicate their dependencies to other buildpacks.
 
-- Current state of the world.
-    The current way that the Cloudfoundry Buildpacks indicate that they rely on an earlier buildpack's dependencies at either build or 
-    launch time is to set a string `build` and/or `launch` field in the Build Plan (TOML) metadata section. An example 
-    of this being necessary is say the the `node-engine-cnb` and the `npm-cnb`. The `node-engine-cnb` on its own only 
-    has the `launch` metadata set for its layer because that is all that is required to run a node app that has no 
-    external dependencies. This is a problem when the `npm-cnb` get involved. The `npm-cnb` needs dependencies from the 
-    `node-engine-cnb` during both build and launch times. In order for this to happen the `npm-cnb` adds the ad hoc 
-    keys to the Build Plan (TOML) metadata field and then those fields have to be parsed inside of `node-engine-cnb`.
+State of Cloudfoundry Buildpacks:
+
+- The current method that the Cloudfoundry Buildpacks use to indicate they rely on an earlier buildpack's dependencies is to set a string `build` and/or `launch` field in the Build Plan (TOML) `requires.metadata` section.
+- the throwing this information in the `requires.metadata` obfuscates the flow of `build` and `launch` flags from dependencies to the Layer Metadata.  
+- This implicit contract between dependent buildpacks should be formalized.
+
+####Example:
+ We consider the interactions between the Cloudfoundry `node-engine-cnb` and `npm-cnb`
+ 
+ - The `node-engine-cnb` provides the `npm` dependency to an image, but only for the `launch` phase.
+ - The `npm-cnb` requires `npm` during the `build` phase, and so it adds an entry in `requires.metadata` to reflect this need.
+ - As a result during the `node-engine-cnb`'s build phase all `entries.metadata` must be parsed for `build` and `launch` to determine the correct flags to attach to the `npm` dependency Layer Metadata.
   
 # What it is
 [what-it-is]: #what-it-is
 
 This provides a high level overview of the feature.
 
-- Define the target persona:
+- Define the target persona: Buildpack Author
   
-  The target persona for this change: buildpack authors
-
-- Explaining the feature largely in terms of examples.
+Currently, we have the following fields in the Layer Content Metadata (TOML) file: 
   
-  (this is the final result )
-  Currently: We have the following fields in the Layer Content Metadata (TOML) file: 
   ```toml
   launch = false
   build = false
@@ -51,7 +51,7 @@ This provides a high level overview of the feature.
   # buildpack-specific data
   ```
   
-  `build`, `launch` and `cache` are all well defined in this file. And represent properties on the layer.
+  `build`, `launch` and `cache` are all well defined in this file and represent properties on the layer.
   
   The BuildPlan & Buildpack Plan files that are consumed during detection & build to produce the Layer Content Metadata file
    do not include any of these flags.
@@ -112,21 +112,18 @@ We propose adding `build` and `launch` fields to dependencies in the Build Plan 
   [entries.requires.metadata]
   # buildpack-specific data
   ```
-We will also guarantee that for each entry the `name` field is unique.
+In each entry the `name` field is **unique**.
 
   We arrived at this format for several reasons:
+  
   - It allows us to offload some common flag merging operations to the lifecycle. We suggest letting all build/launch flags
   under a single key be merged together (recommending the `or` operator). 
-  
   - A buildpack only needs to handle logic based on `name` keys it is responsible for. 
  
 # How it Works
 [how-it-works]: #how-it-works
 
-The overarching goal of this RFC is to formalize the flow of the `build` and `launch` flags through the `detect` and `build`
-phases. 
-
-The additional fields to the Build Plan (TOML) should be self explanitory and are strictly additive.
+The additional fields to the Build Plan (TOML) should be self explanatory and are strictly additive.
 But will move these values out the `metadata` field.
 
 The proposed changes in this solution to the Buildpack Plan (TOML) would require the following changes to the lifecycle to 
@@ -134,7 +131,7 @@ generate data in the format defined above:
 
 - Detection Succeeds
 - Build Plan entries are aggregated based on dependency-names.
-- Each dependency has an array for all the versions & map for metadata that appeared under that dependency name in the Build Plan
+- Each dependency has an array for all versions and map for metadata that appeared under that dependency name in the Build Plan
 - build & launch flags of each entry are reduced using some boolean operator (likely `or`) 
 
 The result of processing the example Build Plan above would be the following: 
@@ -157,6 +154,13 @@ The result of processing the example Build Plan above would be the following:
   some_other_metadata_key = some_other_metadata_value
   # buildpack-specific data
   ```
+  
+#### Example:
+ We consider interactions between the Cloudfoundry `node-engine-cnb` and `npm-cnb` using this new format
+ 
+ - The `node-engine-cnb` provides the `npm` dependency to an image, but only for the `launch` phase.
+ - The `npm-cnb` requires `npm` during the `build` phase, and so it sets the `requires.build`  values to `true`.
+ - During the `node-engine-cnb`'s build phase we examine the Buildpack Plan `entries` for one named `npm` and retrieve the `build` & `launch` flags.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -200,16 +204,11 @@ launch = bool
 - Here `<dependency name>` elements in the `merge-layer-flags` array should have unique `name` fields
 
 - Why is this proposal the best?
-The above is non breaking, but it divides data for a single entity among multiple structures, this feels bad.
+The above is non breaking, but it divides data for a single entity among multiple structures & leaves matching up to the buildpack author, this feels bad.
 
-# Prior Art
-[prior-art]: #prior-art
-
-Discuss prior art, both the good and bad.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What parts of the design do you expect to be resolved before this gets merged?
-- What parts of the design do you expect to be resolved through implementation of the feature?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+- Is there a better data format for the Buildpack Plan?
+
