@@ -26,7 +26,7 @@ State of Cloudfoundry Buildpacks:
 - the throwing this information in the `requires.metadata` obfuscates the flow of `build` and `launch` flags from dependencies to the Layer Metadata.  
 - This implicit contract between dependent buildpacks should be formalized.
 
-####Example:
+#### Example:
  We consider the interactions between the Cloudfoundry `node-engine-cnb` and `npm-cnb`
  
  - The `node-engine-cnb` provides the `npm` dependency to an image, but only for the `launch` phase.
