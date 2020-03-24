@@ -75,7 +75,7 @@ We propose adding `build` and `launch` fields to dependencies in the Build Plan 
   launch = true
   
   [requires.metadata]
-  some_metadata_key = some_metadata_value
+  some_metadata_key = "some_metadata_value"
   # buildpack-specific data
   
   [[or]]
@@ -90,7 +90,7 @@ We propose adding `build` and `launch` fields to dependencies in the Build Plan 
   launch = false
   
   [or.requires.metadata]
-  some_other_metadata_key = some_other_metadata_value
+  some_other_metadata_key = "some_other_metadata_value"
   # buildpack-specific data
   
   ```
@@ -145,13 +145,13 @@ The result of processing the example Build Plan above would be the following:
   version = "<dependency version>"
 
   [<dependency name>.entries.metadata]
-    some_metadata_key = some_metadata_value
+    some_metadata_key = "some_metadata_value"
 
   [[<dependency name>.entries]]
   version = "<other dependency version>"
   
   [<dependency name>.entries.metadata]
-  some_other_metadata_key = some_other_metadata_value
+  some_other_metadata_key = "some_other_metadata_value"
   # buildpack-specific data
   ```
   
@@ -192,13 +192,13 @@ version = "<dependency version>"
 
 [[merged-layer-flags]]
 name = "<dependency name>"
-build = bool
-launch = bool
+build = false
+launch = true
 
 [[merged-layer-flags]]
 name = "<dependency name2>"
-build = bool
-launch = bool
+build = true
+launch = false
 ```
 
 - Here `<dependency name>` elements in the `merge-layer-flags` array should have unique `name` fields
