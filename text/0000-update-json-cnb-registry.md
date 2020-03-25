@@ -53,6 +53,16 @@ An example of what this may look like for a single buildpack file:
 {"ns":"heroku","name":"ruby","version":"0.3.0","yanked":false,"addr":"docker.io/hone/ruby-buildpack@sha256:8c27fe111c11b722081701dfed3bd55e039b9ce92865473cf4cdfa918071c566"}
 ```
 
+*Note:* id is the combination of two fields, `ns` and `name`. The `/` will be replaced by a `_` in the filename. The directories will use the first four characaters of the buildpacks `name`, split into two two character dirs. For example:
+
+```
+ja
+└── va
+    └── heroku_java
+```
+
+This ensures an even distribution of files, as opposed to use the first two characters of the `ns`, which would result in only a few directories, with some having a large number of files, and most having only a few.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
