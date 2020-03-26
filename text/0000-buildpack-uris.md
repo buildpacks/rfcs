@@ -69,6 +69,14 @@ The docker scheme denotes the use of the [Docker HTTP API v2 protocol](https://d
 - Similar to the `file` scheme, there is a minimal declaration for omitting host by using a simple slash (`/`). 
 eg. `docker:/ubuntu:latest`
 
+### CNB
+
+The cnb scheme resolves buildpacks using the buildpacks registry described in [RFC #22](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md).
+
+- `<host>` is optional and would default to a host predefined (or configured) in the platform.
+- Similar to the `file` scheme, there is a minimal declaration for omitting host by using a simple slash (`/`).
+eg. `cnb:/my-org/bp.id:bp.version`
+
 ### Resources
 
 The defined URNs are resource names to buildpacks where they reside is predetermined. For example, in `urn:cnb:builder`,
