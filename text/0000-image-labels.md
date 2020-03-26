@@ -16,6 +16,8 @@ Buildpacks should be able to expose arbitrary label metadata on images.  This co
 
 While buildpacks create OCI images, the standard does not expose all elements that OCI images can support to buildpack authors.  One of these elements, [image labels][l], is regularly requested by users in order to contribute both [standard][s] and arbitrary metadata to their generated images.  Once delivered, this functionality would let buildpack authors contribute labels to the images their buildpacks create.
 
+As an example, the Spring Boot team would like to expose the properties an application can be configured with as an `org.springframework.boot.spring-configuration-metadata.json` label on an image.  The contents of this label are the contents of a file within the application.  By allowing a buildpack to automate the addition of the label to the image, it removes the need for a user to do it manually for each application and each build.
+
 [l]: https://docs.docker.com/engine/reference/builder/#label
 [s]: https://github.com/opencontainers/image-spec/blob/master/annotations.md#pre-defined-annotation-keys
 
