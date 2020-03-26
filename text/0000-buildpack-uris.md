@@ -39,14 +39,15 @@ directory and image.
 
 ### Scheme
 
-| Short Name | Format | Examples |
+| Name | Format | Examples |
 |--- |--- |--- |
 | Relative | `<path>` | `./my/buildpack.tgz`<br>`/home/user/my/buildpack.tgz`
 | Filesystem | `file://[<host>]/<path>` | `file:///my/buildpack.tgz`<br>`file:///home/user/my/buildpack.tgz`
 | URL | `http[s]://<host>/<path>` | `http://example.com/my/buildpack.tgz`<br>`https://example.com/my/buildpack.tgz`  
 | Docker | `docker://[<host>]/<path>[:<tag>⏐@<digest>]` | `docker://gcr.io/distroless/nodejs`<br>`docker:///ubuntu:latest`<br>`docker:///ubuntu@sha256:45b23dee08...`
-| CNB Builder | `cnb:builder://[<host>]/[<id>[:<version>]]` | `cnb:builder://`<br>`cnb:builder:///bp.id`<br>`cnb:builder:///bp.id:bp.version`
-
+| CNB Registry | `cnb://[<host>]/[<id>[:<version>]]` |  `cnb:///my-org/my-bp`<br>`cnb://index.buildpack.io/my-org/my-bp`
+| CNB Builder Resource | `urn:cnb:builder[:<id>[:<version>]]` | `urn:cnb:builder`<br>`urn:cnb:builder:bp.id`<br>`urn:cnb:builder:bp.id:bp.version`
+| CNB Registry Resource | `urn:cnb:registry[:<id>[:<version>]]` | `urn:cnb:registry:bp.id`<br>`urn:cnb:registry:bp.id:bp.version`
 
 ### Relative
 
@@ -68,14 +69,22 @@ The docker scheme denotes the use of the [Docker HTTP API v2 protocol](https://d
 - Similar to the `file` scheme, there is a minimal declaration for omitting host by using a simple slash (`/`). 
 eg. `docker:/ubuntu:latest`
 
-### CNB Builder
+### Resources
 
-- `cnb:builder://` - A reference to ALL the buildpacks in the builder.
-- `cnb:builder:///bp.id` - A reference to a buildpack with id `bp.id` in the builder. If there is more than one version
-available, a error should be thrown.
-- `cnb:builder:///bp.id:bp.version` - A reference to a buildpack with id `bp.id` at the specific version `bp.version`.
-- Similar to the `file` scheme, there is a minimal declaration for omitting host by using a simple slash (`/`). 
-eg. `cnb:builder:/bp.id:bp.version`
+The defined URNs are resource names to buildpacks where they reside is predetermined. For example, in `urn:cnb:builder`,
+there is only a single builder in the build context. In `urn:cnb:registry`, the registry is similarly provided as a
+default to the platform.
+
+#### CNB Builder
+
+- `urn:cnb:builder` - A reference to ALL the buildpacks in the builder.
+- `urn:cnb:builder:bp.id` - A reference to a buildpack with id `bp.id` in the builder.
+- `urn:cnb:builder:bp.id:bp.version` - A reference to a buildpack with id `bp.id` at the specific version `bp.version`.
+
+#### CNB Registry
+
+- `urn:cnb:registry:bp.id` - A reference to a buildpack by id `bp.id` in the registry.
+- `urn:cnb:registry:bp.id:bp.version` - A reference to a buildpack with id `bp.id` at the specific version `bp.version`.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -88,13 +97,14 @@ Some examples:
 
 ```shell script
 pack build my-app \
-  --buildpack cnb:builder://bp.id@bp.version \                # buildpack from builder
+  --buildpack urn:cnb:builder:bp.id:bp.version \              # buildpack from builder
   --buildpack file:///home/user/path/to/buildpack/ \          # absolute via file
   --buildpack /home/user/path/to/buildpack/ \                 # absolute via schemeless
   --buildpack ../path/to/buildpack/ \                         # relative file
   --buildpack docker:/cnbs/some-package \                     # Docker Hub image
   --buildpack docker://gcr.io/cnbs/sample-package-2:bionic \  # GCR image (with tag)
-  --buildpack cnb:builder://                                  # All buildpacks in builder
+  --buildpack cnb://index.buildpack.io/my-org/bp.id \         # buildpack from registry
+  --buildpack urn:cnb:builder                                 # All buildpacks in builder
 ```   
 
 ### Config Files
@@ -127,15 +137,11 @@ uri = "docker:/my/image:latest"
 
 # Additional considerations
 
-#### `pack` User Expirience
+#### `pack` User Experience
 
 `pack` could provide additional logic in order for users to have a nicer user experience when providing references
 via CLI. For example, `pack` could have an order of precedence to make a best guess at which type of reference
 they are referring to or provide additional feedback if it's ambiguous.
-
-#### Registry vs Daemon
-
-
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -157,16 +163,17 @@ An alternative to `docker` is to use a more generic term such as `oci`. There is
 API v2 but it's direct compatibility would require additional research. Additionally, `oci` scheme has an overlap with
 [Oracle Cloud Infrastructure Object Storage Service](https://docs.cloud.oracle.com/en-us/iaas/tools/hdfs/2.9.2.1/). 
 
-
 # Prior Art
 [prior-art]: #prior-art
 
 - Predefined set of URI schemes for OCI images created by [Skopeo](https://github.com/containers/skopeo).
-- [from=builder](https://github.com/buildpacks/pack/pull/450#issue-361762357) syntax.
+- [from=builder][from-builder] syntax.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
 - Where would this be documented long-term?
-    - Does it make sense to be added to the distribution spec?
-    - It could solely live in the docs site.
+    - Answer: Would solely live in the docs site.
+- How does `urn:cnb:registry:bp.id:bp.version` translate to a `namespace` + `name` as detailed in [RFC #22](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)?
+
+[from-builder]: (https://github.com/buildpacks/pack/pull/450#issue-361762357)
