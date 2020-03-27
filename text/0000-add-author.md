@@ -28,6 +28,8 @@ You're not going to believe this, but you add an `Author(s):` field to the Meta 
 
 We will also rename the `CNB Pull Request` to `RFC Pull Request`.
 
+Because `CNB Issue` is rarely used, we will also renamed it to `Related Issues`.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
