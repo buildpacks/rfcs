@@ -30,7 +30,7 @@ An entry will have the following structure:
 {
   "ns" : "<string>",
   "name": "<string>",
-  "version" : "<string",
+  "version" : "<string>",
   "yanked" : <boolean>,
   "addr" : "<string>",
 }
