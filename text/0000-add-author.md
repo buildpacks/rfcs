@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Add Author to RFC Metadata
 - Start Date: 2020-03-14
-- CNB Pull Request: (leave blank)
+- CNB Pull Request: https://github.com/buildpacks/rfcs/pull/64
 - CNB Issue: (leave blank)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
@@ -14,7 +14,7 @@ This is a proposal to add an `Author(s):` field to the `Meta` section of the RFC
 # Motivation
 [motivation]: #motivation
 
-When an RFC is merged, and then renamed, the commit history is lost. This makes it difficult to remember who wrote the RFC.
+When an RFC is merged, and then renamed, the commit history is lost. This makes it difficult to remember who wrote the RFC. Sometimes, an RFC is written by more than one person, but the linked PR will not always show this.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -26,6 +26,8 @@ A new `Author(s):` field in the Meta section of the RFC template.
 
 You're not going to believe this, but you add an `Author(s):` field to the Meta section of the RFC template.
 
+We will also rename the `CNB Pull Request` to `RFC Pull Request`.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -36,7 +38,7 @@ Even though the author will be know, the commit history is still hard to find.
 
 ## RFC PR Link
 
-Instead of an author field, we could enforce that a link to the original RFC PR be added to the RFC after it's merged. This would make it easier to find the author and the history.
+Instead of an author field, we could only enforce that a link to the original RFC PR be added to the RFC after it's merged. This would make it easier to find the author and the history, but we would need to ensure that all authors are represented in the PR.
 
 # Prior Art
 [prior-art]: #prior-art
