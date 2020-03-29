@@ -1,8 +1,8 @@
-# Meta 
+# Meta
 [meta]: #meta
-- Name: Stage-specific Mixins 
+- Name: Stage-specific Mixins
 - Start Date: 2019-06-13
-- CNB Pull Requests: [rfcs#13](https://github.com/buildpack/rfcs/pull/13), [spec#54](https://github.com/buildpack/spec/pull/54)
+- CNB Pull Requests: [rfcs#13](https://github.com/buildpacks/rfcs/pull/13), [spec#54](https://github.com/buildpacks/spec/pull/54)
 - CNB Issues: (lifecycle issues to follow)
 
 
@@ -14,7 +14,7 @@ This proposal makes it easier to extend stack images with mixins.
 # What it is
 [what-it-is]: #what-it-is
 
-This RFC proposes a method for annotating mixins that are necessary during build or launch but not for both stages.  
+This RFC proposes a method for annotating mixins that are necessary during build or launch but not for both stages.
 
 # How it Works
 [how-it-works]: #how-it-works

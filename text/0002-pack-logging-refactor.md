@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Pack Logging Interface
 - Start Date: 2019-05-06
-- CNB Pull Request: [rfcs#6](https://github.com/buildpack/rfcs/pull/6), [pack#182](https://github.com/buildpack/pack/pull/182)
+- CNB Pull Request: [rfcs#6](https://github.com/buildpacks/rfcs/pull/6), [pack#182](https://github.com/buildpacks/pack/pull/182)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
 
@@ -25,7 +25,7 @@ Pack uses its own internal logging code, and does not leverage any of the existi
 # How it Works
 [how-it-works]: #how-it-works
 
-Remove the custom logging code for pack.  All pack functions that take a pointer to the concrete `logging.Logger`  structure will be modified to take a simple logging interface as an argument.  Given the proliferation of logging packages in the Go ecosystem it may be impossible to design an interface that works with all of them. However by supplying a very simple interface the current logging requirement of pack can be met, and most logging libraries could be adapted to work with pack with little or no modification.  
+Remove the custom logging code for pack.  All pack functions that take a pointer to the concrete `logging.Logger`  structure will be modified to take a simple logging interface as an argument.  Given the proliferation of logging packages in the Go ecosystem it may be impossible to design an interface that works with all of them. However by supplying a very simple interface the current logging requirement of pack can be met, and most logging libraries could be adapted to work with pack with little or no modification.
 
 ```
 type Logger interface {

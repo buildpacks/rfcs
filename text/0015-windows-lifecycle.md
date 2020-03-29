@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Support for Windows in the Lifecycle components
 - Start Date: 2019-10-07
-- CNB Pull Request: [rfcs#27](https://github.com/buildpack/rfcs/pull/27)
+- CNB Pull Request: [rfcs#27](https://github.com/buildpacks/rfcs/pull/27)
 - CNB Issue:
 - Supersedes: N/A
 

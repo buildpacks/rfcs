@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Service Binding
 - Start Date: 2019-08-06
-- CNB Pull Request: [rfcs#22](https://github.com/buildpack/rfcs/pull/22), [spec#57](https://github.com/buildpack/spec/pull/57)
+- CNB Pull Request: [rfcs#22](https://github.com/buildpacks/rfcs/pull/22), [spec#57](https://github.com/buildpacks/spec/pull/57)
 - CNB Issue:
 - Supersedes: N/A
 
@@ -95,7 +95,7 @@ However, given the security improvements that secrets on the filesystem provide,
 
 Leading to this RFC, various options were considered and [even implemented][l].  The general consensus when consulting with Kubernetes and security experts is that environment variables, while easy and flexible, have fundamental issues that many organizations are unwilling to accept.  In addition de-specifying service binding was considered, but there's enough upside for cross-compatibility and a large enough percentage of buildpacks would make use of service bindings, that it was decided to create this proposal.  Not specifying service bindings, while leaving the placeholder `CNB_SERVICES` in place doesn't seem to be a real option, so if this main thrust of this proposal is not accepted `CNB_SERVICES` should be removed from the specification.
 
-[l]: https://github.com/buildpack/libbuildpack/tree/master/services
+[l]: https://github.com/buildpacks/libbuildpack/tree/master/services
 
 # Prior Art
 [prior-art]: #prior-art

@@ -59,3 +59,9 @@ Discuss prior art, both the good and bad.
 - What parts of the design do you expect to be resolved before this gets merged?
 - What parts of the design do you expect to be resolved through implementation of the feature?
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+
+# Spec. Changes (OPTIONAL)
+[spec-changes]: #spec-changes
+Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
+Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fields, new fields in the buildpackage label, etc.
+This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are necessary, they should be documented here.

@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: RFC Process
 - Start Date: 2019-04-09
-- CNB Pull Request: [rfcs#1](https://github.com/buildpack/rfcs/pull/1), [rfcs#7](https://github.com/buildpack/rfcs/pull/7)
+- CNB Pull Request: [rfcs#1](https://github.com/buildpacks/rfcs/pull/1), [rfcs#7](https://github.com/buildpacks/rfcs/pull/7)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
 
@@ -57,7 +57,7 @@ If you submit a pull request the team deems warrants an RFC, it will be politely
 
 To get an RFC into Cloud Native Buildpacks, first the RFC needs to be merged into the RFC repo. Once an RFC is merged, it's considered 'active' and may be implemented to be included in the project. These steps will get an RFC to be considered:
 
-- Fork the RFC repo: <https://github.com/buildpack/rfcs>
+- Fork the RFC repo: <https://github.com/buildpacks/rfcs>
 - Copy `0000-template.md` to `text/0000-my-feature.md` (where 'my-feature' is descriptive. don't assign an RFC number yet).
 - Fill in RFC. Any section can be marked as "N/A" if not applicable.
 - Submit a pull request. The pull request is the time to get review of the proposal from the larger community.
