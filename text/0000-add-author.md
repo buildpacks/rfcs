@@ -24,11 +24,12 @@ A new `Author(s):` field in the Meta section of the RFC template.
 # How it Works
 [how-it-works]: #how-it-works
 
-You're not going to believe this, but you add an `Author(s):` field to the Meta section of the RFC template.
+We will add the following to the RFC `Meta` section:
 
-We will also rename the `CNB Pull Request` to `RFC Pull Request`.
-
-Because `CNB Issue` is rarely used, we will also renamed it to `Related Issues`.
+```
+- Author(s): (Github usernames)
+- RFC Pull Request: (leave blank)
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
