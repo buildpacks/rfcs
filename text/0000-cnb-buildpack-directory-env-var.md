@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: CNB\_BUILDPACK\_DIRECTORY environment variable
+- Name: CNB\_BUILDPACK\_DIR environment variable
 - Start Date: 2020-04-02
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -27,13 +27,13 @@ One use-case is sourcing other scripts easily:
 #!/usr/bin/env bash
 set -eo pipefail
 
-source "${CNB_BUILDPACK_DIRECTORY}/lib/tools.sh"
+source "${CNB_BUILDPACK_DIR}/lib/tools.sh"
 ```
 
 # How it Works
 [how-it-works]: #how-it-works
 
-Before calling `bin/detect` and `bin/build`, lifecycle creates an environment variable named `CNB_BUILDPACK_DIRECTORY` that contains the absolute path to the buildpack directory.
+Before calling `bin/detect` and `bin/build`, lifecycle creates an environment variable named `CNB_BUILDPACK_DIR` that contains the absolute path to the buildpack directory.
 
 # Drawbacks
 [drawbacks]: #drawbacks
