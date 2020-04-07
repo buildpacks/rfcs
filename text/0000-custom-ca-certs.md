@@ -13,23 +13,37 @@ In order to allow developers to use custom CA certs during build, this RFC:
 1. Suggests an interface between stacks and the platform to allow adding ca-certs to builds and for creating and extending builders with CA certs
 2. Suggest a `pack` UX for using certs during build and for creating and extending builders with CA certs
 
-This RFC builds on some of the ideas proposed in https://github.com/buildpacks/rfcs/pull/23
+**Note**: This RFC builds on some of the ideas proposed in https://github.com/buildpacks/rfcs/pull/23 to begin producing a generic interface for extending build/run images.
 
 # Motivation
 [motivation]: #motivation
 
 Use of custom CA certs is pervasive, especially for developers in enterprise environments. These developers need to fetch assets during build from corp artifact stores, publish to registries with custom certs, and make certs available during runtime for container images. Furthermore, developers might want to more granularly apply certificates, for example leaving certs out of a runtime container that were available during build. In order to account for the possible diversity of methods for adding CA certs in various stacks, the stack itself must embed this knowledge. But we should avoid the possibility of ad-hoc methods and stack forking, by coming up with a community solution.
 
+This solution should further be extensible for other ways of extending builders, thus should have a relatively generic interface. This RFC proposes using that interface for adding CA certs, but leaves the details of other forms of extension up to subsequent RFCs.
+
 # What it is
 [what-it-is]: #what-it-is
 
 ### Specification
-Stack authors may include an `add-cert` executable to the build and/or run images of their stack:
+Stack authors may include an `extend` executable to the build and/or run images of their stack:
 ```
-/cnb/image/{build,run}/add-cert <cert.pem>
+/cnb/image/{build,run}/extend ({build,run}-extend-toml-file) (pkg-cache-dir) | cwd: /
 ```
 
-The platform will invoke this executable for each cert used during an build. This executable should take a single argument, and serve as a wrapper for adding certs to the particular stack in question. Platforms use the certs available on the build image for publishing to registries. All lifecycle phases that could do egress will have build certs.
+For the purpose of CA certs, extend should examine the `[certs] = []` key of the file supplied (by the platform) in the first argument. The file should follow this schema:
+
+```toml
+# extend.toml
+[certs] = [
+    """-----BEGIN CERTIFICATE-----
+AASDASDASDASD
+ASDASDASDSADASD
+ASDSADSADsda
+etc
+-----END CERTIFICATE-----""",
+]
+```
 
 ### UX
 
@@ -104,7 +118,7 @@ certs = ["./cert3.pem"] # Relative to location of `builder.toml`
 # How it Works
 [how-it-works]: #how-it-works
 
-Platforms may extend app images with custom CA certs using the above interface by running the `add-cert` executable as root in a new container and creating an image from the result. Extending an image in this fashion should generate a single layer. This should happen prior to the normal CNB build or rebase process.
+Platforms may extend app images with custom CA certs using the above interface by running the `extend` executable as root in a new container and creating an image from the result. Prior to this execution, the platform will be responsible for populating the contents of `[certs]` in `*-extend-toml`. Extending an image in this fashion should generate a single layer. This should happen prior to the normal CNB build or rebase process.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -126,6 +140,7 @@ This RFC builds on some of the ideas proposed in https://github.com/buildpacks/r
 
 - Build vs Runtime CA-certs? Do we need to split them or should we just collapse this into one?
 - Dynamically extended run image vs just adding to launch image (comes to the same thing?)
+- How does the platform communicate to buildpacks that certs are available?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
