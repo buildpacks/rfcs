@@ -45,9 +45,9 @@ directory and image.
 | Filesystem | `file://[<host>]/<path>` | `file:///my/buildpack.tgz`<br>`file:///home/user/my/buildpack.tgz`
 | URL | `http[s]://<host>/<path>` | `http://example.com/my/buildpack.tgz`<br>`https://example.com/my/buildpack.tgz`  
 | Docker | `docker://[<host>]/<path>[:<tag>⏐@<digest>]` | `docker://gcr.io/distroless/nodejs`<br>`docker:///ubuntu:latest`<br>`docker:///ubuntu@sha256:45b23dee08...`
-| CNB Registry | `cnb://[<host>]/[<id>[:<version>]]` |  `cnb:///my-org/my-bp`<br>`cnb://index.buildpack.io/my-org/my-bp`
-| CNB Builder Resource | `urn:cnb:builder[:<id>[:<version>]]` | `urn:cnb:builder`<br>`urn:cnb:builder:bp.id`<br>`urn:cnb:builder:bp.id:bp.version`
-| CNB Registry Resource | `urn:cnb:registry[:<id>[:<version>]]` | `urn:cnb:registry:bp.id`<br>`urn:cnb:registry:bp.id:bp.version`
+| CNB Registry | `cnb://[<host>]/[<id>[@<version>]]` |  `cnb:///my-org/my-bp`<br>`cnb://index.buildpack.io/my-org/my-bp`<br>`cnb://index.buildpack.io/my-org/my-bp@bp.version`
+| CNB Builder Resource | `urn:cnb:builder[:<id>[@<version>]]` | `urn:cnb:builder`<br>`urn:cnb:builder:bp.id`<br>`urn:cnb:builder:bp.id@bp.version`
+| CNB Registry Resource | `urn:cnb:registry[:<id>[@<version>]]` | `urn:cnb:registry:bp.id`<br>`urn:cnb:registry:bp.id@bp.version`
 
 ### Relative
 
@@ -75,7 +75,7 @@ The cnb scheme resolves buildpacks using the buildpacks registry described in [R
 
 - `<host>` is optional and would default to a host predefined (or configured) in the platform.
 - Similar to the `file` scheme, there is a minimal declaration for omitting host by using a simple slash (`/`).
-eg. `cnb:/my-org/bp.id:bp.version`
+eg. `cnb:/my-org/bp.id@bp.version`
 
 ### Resources
 
@@ -87,12 +87,12 @@ default to the platform.
 
 - `urn:cnb:builder` - A reference to ALL the buildpacks in the builder.
 - `urn:cnb:builder:bp.id` - A reference to a buildpack with id `bp.id` in the builder.
-- `urn:cnb:builder:bp.id:bp.version` - A reference to a buildpack with id `bp.id` at the specific version `bp.version`.
+- `urn:cnb:builder:bp.id@bp.version` - A reference to a buildpack with id `bp.id` at the specific version `bp.version`.
 
 #### CNB Registry
 
 - `urn:cnb:registry:bp.id` - A reference to a buildpack by id `bp.id` in the registry.
-- `urn:cnb:registry:bp.id:bp.version` - A reference to a buildpack with id `bp.id` at the specific version `bp.version`.
+- `urn:cnb:registry:bp.id@bp.version` - A reference to a buildpack with id `bp.id` at the specific version `bp.version`.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -105,14 +105,14 @@ Some examples:
 
 ```shell script
 pack build my-app \
-  --buildpack urn:cnb:builder:bp.id:bp.version \              # buildpack from builder
-  --buildpack file:///home/user/path/to/buildpack/ \          # absolute via file
-  --buildpack /home/user/path/to/buildpack/ \                 # absolute via schemeless
-  --buildpack ../path/to/buildpack/ \                         # relative file
-  --buildpack docker:/cnbs/some-package \                     # Docker Hub image
-  --buildpack docker://gcr.io/cnbs/sample-package-2:bionic \  # GCR image (with tag)
-  --buildpack cnb://index.buildpack.io/my-org/bp.id \         # buildpack from registry
-  --buildpack urn:cnb:builder                                 # All buildpacks in builder
+  --buildpack urn:cnb:builder:bp.id@bp.version \                  # buildpack from builder
+  --buildpack file:///home/user/path/to/buildpack/ \              # absolute via file
+  --buildpack /home/user/path/to/buildpack/ \                     # absolute via schemeless
+  --buildpack ../path/to/buildpack/ \                             # relative file
+  --buildpack docker:/cnbs/some-package \                         # Docker Hub image
+  --buildpack docker://gcr.io/cnbs/sample-package-2:bionic \      # GCR image (with tag)
+  --buildpack cnb://index.buildpack.io/my-org/bp.id@bp.version \  # buildpack from registry
+  --buildpack urn:cnb:builder                                     # All buildpacks in builder
 ```   
 
 ### Config Files
@@ -182,6 +182,8 @@ API v2 but it's direct compatibility would require additional research. Addition
 
 - Where would this be documented long-term?
     - Answer: Would solely live in the docs site.
-- How does `urn:cnb:registry:bp.id:bp.version` translate to a `namespace` + `name` as detailed in [RFC #22](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)?
+- How does `urn:cnb:registry:bp.id@bp.version` translate to a `namespace` + `name` as detailed in [RFC #22](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)?
+    - Answer:
+        > As of now, a namespace/name is an acceptable form of buildpack ID (like ID is a superset). So think defining the URN as `urn:cnb:registry:<id>@<version>` is sufficient for this proposal. In a future proposal we might define more strict rule about ID, but this definition would stay the same.
 
 [from-builder]: (https://github.com/buildpacks/pack/pull/450#issue-361762357)
