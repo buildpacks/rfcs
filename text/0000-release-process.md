@@ -10,9 +10,7 @@
 [summary]: #summary
 
 A release process _template_ that may be applied to various components maintained by the Cloud Native Buildpacks
-organization. This template is initially intended to be applied to [pack](https://github.com/buildpacks/pack) and 
-[lifecycle](https://github.com/buildpacks/lifecycle). It does not try to solve for out-of-band releases such as patches,
-or otherwise changes in release dates due to coordination across dependencies or upstream changes.
+organization. This template is initially intended to be applied to [pack](https://github.com/buildpacks/pack). It does not try to solve for out-of-band releases such as patches, or otherwise changes in release dates due to coordination across dependencies or upstream changes.
 
 # Motivation
 [motivation]: #motivation
