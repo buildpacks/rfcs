@@ -1,4 +1,4 @@
-# Cloud Native Buildpacks RFCs - [Active RFCs](https://github.com/pulls?q=is%3Aopen+is%3Apr+archived%3Afalse+-label%3Ahold+repo%3Abuildpacks%2Frfcs+draft%3Afalse), [Finalizing RFCs](https://github.com/pulls?q=is%3Aopen+is%3Apr+archived%3Afalse+label%3A%22Final+Comment+Period%22+repo%3Abuildpacks%2Frfcs+draft%3Afalse+)
+# Cloud Native Buildpacks RFCs - [Active RFCs](https://github.com/buildpacks/rfcs/pulls?q=is%3Apr+is%3Aopen+archived%3Afalse+-label%3Ahold+draft%3Afalse), [Finalizing RFCs](https://github.com/buildpacks/rfcs/pulls?q=is%3Apr+is%3Aopen+archived%3Afalse+label%3A%22Final+Comment+Period%22+draft%3Afalse+)
 
 Want to suggest a change to the Cloud Native Buildpacks project? Awesome!
 
