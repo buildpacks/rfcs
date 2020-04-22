@@ -22,26 +22,34 @@ Without this information, a platform will need to resort to suboptimal mechanism
 # What it is
 [what-it-is]: #what-it-is
 
-The lifecycle exporter/creator binary will accept an optional flag `exported` which will provides a path to `exported.toml`. When the flag is supplied the export stage will write a toml representation of the built image for platform consumption. When the flag is not provided it will default to writing exported.toml in the working directory which by convention is `/layers`.
+The lifecycle exporter/creator binary will accept an optional flag `report` which will provides a path to `report.toml`. When the flag is supplied the export stage will write a toml representation of the built image for platform consumption. When the flag is not provided it will default to writing report.toml in the working directory which by convention is `/layers`.
 
-Here is an overview of the suggested schema for exported.toml:
+Here is an overview of the suggested schema for report.toml:
 
+On a build published to a registry:
 ```
 [image]
 tags = ["index.docker.io/image/name:latest", "index.docker.io/image/name:other-tag"]
-identifier = "sha256:c8be1b8f4d60d99c281fc2db75e0f56df42a83ad2f0b091621ce19357e19d853"
+digest = "sha256:c8be1b8f4d60d99c281fc2db75e0f56df42a83ad2f0b091621ce19357e19d853"
 ```
 
-By representing this in toml, we can extend this information with additional metadata when needed. 
+On a build exported to the docker daemon:
+```
+[image]
+tags = ["index.docker.io/image/name:latest", "index.docker.io/image/name:other-tag"]
+image_id = "9c0e1895b90f"
+```
+
+By representing this in toml, we can extend this information with additional metadata when needed. A general philosophy for report.toml is that it should contain information that is not accessible elsewhere. For example, the bill of materials should not be included as it is available as an image label and would be unnecessarily duplicated in report.toml. 
 
 # How it Works
 [how-it-works]: #how-it-works
 
-The export stage will write exported.toml after exporting and caching is complete. If the export steps fails to complete no exported.toml is expected to be written.
+The export stage will write report.toml after exporting and caching is complete. If the export steps fails to complete no report.toml is expected to be written.
 
 This addition will require a bump in the platform api.
 
-Docker daemon based platforms such as `pack` can read the exported.toml by utilizing [docker cp](https://docs.docker.com/engine/reference/commandline/cp/).
+Docker daemon based platforms such as `pack` can read the report.toml by utilizing [docker cp](https://docs.docker.com/engine/reference/commandline/cp/).
 
 Kubernetes based platforms can utilize the [pod termination message](https://kubernetes.io/docs/tasks/debug-application-cluster/determine-reason-pod-failure/#customizing-the-termination-message) to retrieve the reports on build completion.
 
@@ -66,9 +74,7 @@ This will require an additional flag which might complicate the lifecycle interf
 [unresolved-questions]: #unresolved-questions
 
 - How/if `pack` should expose this information to users in a programmatic way?
-- Is there any additional metadata that should be provided in exported.toml?
-- Is exported.toml the best name for this file and should it be marshaled into toml?
-
+- Is there any additional metadata that should be provided in report.toml?
 
 # Spec. Changes
 [spec-changes]: #spec-changes
