@@ -181,9 +181,13 @@ API v2 but it's direct compatibility would require additional research. Addition
 [unresolved-questions]: #unresolved-questions
 
 - Where would this be documented long-term?
-    - Answer: Would solely live in the docs site.
+    - Answer: As an extension spec. See [spec changes](#spec-changes).
 - How does `urn:cnb:registry:bp.id@bp.version` translate to a `namespace` + `name` as detailed in [RFC #22](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)?
     - Answer:
         > As of now, a namespace/name is an acceptable form of buildpack ID (like ID is a superset). So think defining the URN as `urn:cnb:registry:<id>@<version>` is sufficient for this proposal. In a future proposal we might define more strict rule about ID, but this definition would stay the same.
+
+# Spec. Changes
+[spec-changes]: #spec-changes
+This RFC would yield a new **extension** spec.
 
 [from-builder]: (https://github.com/buildpacks/pack/pull/450#issue-361762357)
