@@ -2,14 +2,14 @@
 [meta]: #meta
 - Name: Buildpack URIs
 - Start Date: 02/07/2020
-- CNB Pull Request: (leave blank)
+- CNB Pull Request: [rfcs#56](https://github.com/buildpacks/rfcs/pull/56)
 - CNB Issue: (leave blank)
 - Supersedes: "N/A"
 
 # Summary
 [summary]: #summary
 
-A set of predefined URIs for referring to buildpacks from various sources (protocols). 
+A set of predefined URIs for referring to buildpacks from various sources (protocols).
 
 _Please note that the scheme denotes protocol and not type._
 
@@ -28,12 +28,12 @@ A few references to further express the problem:
 
 - [A poll](https://buildpacks.slack.com/archives/C94UJCNV6/p1580920669081100) to understand what users expect when
 providing buildpacks and there is overlap of sources.
-- [Issue](https://github.com/buildpacks/pack/issues/489) to provide additional clarity in logs due to ambiguity. 
+- [Issue](https://github.com/buildpacks/pack/issues/489) to provide additional clarity in logs due to ambiguity.
 - [A conversation](https://buildpacks.slack.com/archives/CJ6B92ZSB/p1578502454017000) when trying to determine how to
 provide reference to all buildpacks in builder.
 - [Issue](https://github.com/buildpacks/pack/issues/376) where an `image` key was added to differentiate between
-directory and image. 
- 
+directory and image.
+
 # What it is
 [what-it-is]: #what-it-is
 
@@ -43,7 +43,7 @@ directory and image.
 |--- |--- |--- |
 | Relative | `<path>` | `./my/buildpack.tgz`<br>`/home/user/my/buildpack.tgz`
 | Filesystem | `file://[<host>]/<path>` | `file:///my/buildpack.tgz`<br>`file:///home/user/my/buildpack.tgz`
-| URL | `http[s]://<host>/<path>` | `http://example.com/my/buildpack.tgz`<br>`https://example.com/my/buildpack.tgz`  
+| URL | `http[s]://<host>/<path>` | `http://example.com/my/buildpack.tgz`<br>`https://example.com/my/buildpack.tgz`
 | Docker | `docker://[<host>]/<path>[:<tag>⏐@<digest>]` | `docker://gcr.io/distroless/nodejs`<br>`docker:///ubuntu:latest`<br>`docker:///ubuntu@sha256:45b23dee08...`
 | CNB Registry | `cnb://[<host>]/[<id>[@<version>]]` |  `cnb:///my-org/my-bp`<br>`cnb://index.buildpack.io/my-org/my-bp`<br>`cnb://index.buildpack.io/my-org/my-bp@bp.version`
 | CNB Builder Resource | `urn:cnb:builder[:<id>[@<version>]]` | `urn:cnb:builder`<br>`urn:cnb:builder:bp.id`<br>`urn:cnb:builder:bp.id@bp.version`
@@ -66,7 +66,7 @@ The URL scheme is the implementation of [RFC 7230](https://tools.ietf.org/html/r
 The docker scheme denotes the use of the [Docker HTTP API v2 protocol](https://docs.docker.com/registry/spec/api/).
 
 - `<host>` is optional and defaults to `index.docker.io`.
-- Similar to the `file` scheme, there is a minimal declaration for omitting host by using a simple slash (`/`). 
+- Similar to the `file` scheme, there is a minimal declaration for omitting host by using a simple slash (`/`).
 eg. `docker:/ubuntu:latest`
 
 ### CNB
@@ -113,7 +113,7 @@ pack build my-app \
   --buildpack docker://gcr.io/cnbs/sample-package-2:bionic \      # GCR image (with tag)
   --buildpack cnb://index.buildpack.io/my-org/bp.id@bp.version \  # buildpack from registry
   --buildpack urn:cnb:builder                                     # All buildpacks in builder
-```   
+```
 
 ### Config Files
 
@@ -128,7 +128,7 @@ uri = "."
 uri = "docker:/my/image:latest"
 
 # ...
-``` 
+```
 
 `builder.toml`:
 ```toml
@@ -169,7 +169,7 @@ URI moot.
 An alternative to `docker` is to use a more generic term such as `oci`. There is an official
 [OCI distribution spec](https://github.com/opencontainers/distribution-spec/blob/master/spec.md) based on Docker HTTP
 API v2 but it's direct compatibility would require additional research. Additionally, `oci` scheme has an overlap with
-[Oracle Cloud Infrastructure Object Storage Service](https://docs.cloud.oracle.com/en-us/iaas/tools/hdfs/2.9.2.1/). 
+[Oracle Cloud Infrastructure Object Storage Service](https://docs.cloud.oracle.com/en-us/iaas/tools/hdfs/2.9.2.1/).
 
 # Prior Art
 [prior-art]: #prior-art
