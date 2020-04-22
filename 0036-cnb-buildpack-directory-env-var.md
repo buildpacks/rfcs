@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: CNB\_BUILDPACK\_DIR environment variable
 - Start Date: 2020-04-02
-- CNB Pull Request: (leave blank)
+- CNB Pull Request: [rfcs#49](https://github.com/buildpacks/rfcs/pull/71)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
 
@@ -64,4 +64,4 @@ Here's a sample of buildpacks and libraries that implement buildpack directory d
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
-The spec should be changed to make mention of this environement variable. 
+The spec should be changed to make mention of this environement variable.
