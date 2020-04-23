@@ -30,33 +30,41 @@ Given that app authors and platform maintainers experience increased build time 
 
 Stack image creators may add the following executables to their run and/or build images:
 
+Extension:
 ```
-/cnb/image/build/extend (build-metadata-toml-file) (pkg-cache-dir) | cwd: /
-/cnb/image/run/extend (run-metadata-toml-file) (pkg-cache-dir) | cwd: /
+/cnb/image/build/extend (build-metadata-toml-file) (cache-dir) | cwd: /
+/cnb/image/run/extend (run-metadata-toml-file) (cache-dir) | cwd: /
 ```
-* executes on base run or build images
-* writes metadata to `/cnb/image/build/metadata.toml` or `/cnb/image/run/metadata.toml`
-* on subsequent builds, lookup latest upstream base image digest:
-  * if the digest is different than extended image's base, the new upstream digest is extended
-  * if the digest is the same, proceed to status
+Status:
+```
+/cnb/image/build/status (build-metadata-toml-file) (cache-dir) | cwd: /
+/cnb/image/run/status (run-metadata-toml-file) (cache-dir) | cwd: /
+```
 
-```
-/cnb/image/build/status (build-metadata-toml-file) (pkg-cache-dir) | cwd: /
-/cnb/image/run/status (run-metadata-toml-file) (pkg-cache-dir) | cwd: /
-```
-* executes on run or build base images
-* metadata arg is `/cnb/image/build/metadata.toml` or `/cnb/image/run/metadata.toml`
-* exit status 100 = existing base image digest is extended 
-* exit status 0 = does not need extension
+Extend workflow:
+* `extend` executes on corresponding base run or build image
+* platform writes metadata to `/cnb/image/build/metadata.toml` or `/cnb/image/run/metadata.toml` and passes it to extend
+* `extend` makes changes to the base image, producing a new image
+* any time the extended image is used, lookup latest upstream (non-extended) base image digest:
+  * if the digest is different than extended image's base, the new upstream digest is extended using `extend`
+  * if the digest is the same, use status to determine whether extend is needed
+
+Status workflow:
+* `status` executes on corresponding run or build base image
+* metadata argument is always `/cnb/image/build/metadata.toml` or `/cnb/image/run/metadata.toml`
+* exit status 100 = upstream base image digest needs to be re-extended (as the extension itself is outdated)
+* exit status 0 = no changes are needed
 * exit status other = unknown
 
-The status executable may be invoked to determine whether updates are necessary.
+The status executable may be invoked to determine whether updates to the extension are necessary.
+
+**TODO: `extend` should have a mechanism for outputting mixins that get added to the extended image stack label metadata.**
 
 ## UX
 
 ### Creating an Extended Builder
 
-`pack create-builder sclevine/builder -b builder.toml`
+`pack create-builder sclevine/builder --config builder.toml --run-image sclevine/run --run-image-mirror scl.sh/run`
 
 builder.toml:
 ```toml
@@ -67,41 +75,33 @@ run-image = "example.com/run"
 run-image-mirrors = ["example.org/run"]
 
 [extend]
-run-image = "sclevine/run"
-run-image-mirrors = ["scl.sh/run"]
-[extend.run] # run-metadata-toml-file (stored on new run image metadata)
+[extend.metadata.run] # run-metadata-toml-file (stored on new run image metadata)
 packages = ["git"]
-[extend.build] # build-metadata-toml-file (stored on builder image metadata)
+[extend.metadata.build] # build-metadata-toml-file (stored on builder image metadata)
 packages = ["git"]
 ```
 
 Behavior: creates a new builder with additional packages as well as a new run image (`sclevine/run`) with additional packages.
 
-If `extend.run-image` is not specified, `extend.run` is stored on the builder metadata and used to dynamically extend the run image on `pack build`.
+**Note:** If `--run-image` is not specified, `extend.metadata.run` could stored on the builder metadata and used to dynamically extend the run image on `pack build`. This would make every initial `pack build` slower, so I consider this optimization out-of-scope for this RFC.
 
 ### Extended an Existing Builder
 
-`pack create-builder sclevine/builder -b builder.toml`
+`pack extend-builder sclevine/builder --extension-config extend.toml --run-image sclevine/run --run-image-mirror scl.sh/run`
 
-builder.toml:
+extend.toml:
 ```toml
-[builder]
-image = "example.com/builder"
-
 [extend]
-run-image = "sclevine/run"
-run-image-mirrors = ["scl.sh/run"]
-[extend.run] # run-metadata-toml-file (stored on new run image metadata)
+image = "example.com/builder"
+[extend.metadata.run] # run-metadata-toml-file (stored on new run image metadata)
 packages = ["git"]
-[extend.build] # build-metadata-toml-file (stored on new builder image metadata)
+[extend.metadata.build] # build-metadata-toml-file (stored on new builder image metadata)
 packages = ["git"]
 ```
 
 Behavior: creates a new version of an existing builder with additional packages as well as a new run image (`sclevine/run`) with additional packages.
 
-If `extend.run-image` is not specified, `extend.run` is stored on the new builder metadata and used to dynamically extend the run image on `pack build`.
-
-Note that the `[builder]` section is mutually exclusive with `[stack]`.
+**Note:** If `--run-image` is not specified, `extend.metadata.run` could stored on the builder metadata and used to dynamically extend the run image on `pack build`. This would make every initial `pack build` slower, so I consider this optimization out-of-scope for this RFC.
 
 ### Building an App with Additional Packages
 
@@ -117,7 +117,7 @@ packages = ["git"]
 ...
 ```
 
-Behavior: creates a version of the current builder with additional packages and an ephemeral run image with additional packages, then does a normal `pack build`.
+Behavior: creates a version of the current builder with additional packages and an ephemeral run image with additional packages, then does a normal `pack build`. The run image is persistented as part of the app image, and can be reused on subsequent builds.
 
 Question: should we store the new builder image to make rebuild faster? If so, where? Should we generate a tag for it?
 
@@ -144,7 +144,7 @@ Platforms may extend app images using the above interface by running the `extend
 Extending an image should generate a single layer.
 This should happen prior to the normal CNB build or rebase process.
 The `*-metadata-toml-file` file is used to determine what packages to install.
-The `pkg-cache-dir` directory is used to cache package databases (e.g. to speed up `apt-get update`).
+The `cache-dir` directory is used to cache package databases (e.g. to speed up `apt-get update`).
 
 ## UX
 
@@ -180,3 +180,7 @@ Three options:
    Disadvantages: Consumers of extended builders may upgrade them unintentionally (by upgrading their own nested extensions).
 
 My preference is (3), but (1) would be a good place to start.
+
+# References
+
+Encorporated suggested UX tweaks from Javier Romero's doc: https://hackmd.io/zuzsIAh5QGKcQt_EZAcXaw?view
