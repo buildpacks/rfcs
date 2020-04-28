@@ -28,14 +28,14 @@ This solution should further be extensible for other ways of extending builders,
 ### Specification
 Stack authors may include an `extend` executable to the build and/or run images of their stack:
 ```
-/cnb/image/{build,run}/extend ({build,run}-extend-toml-file) (pkg-cache-dir) | cwd: /
+/cnb/image/{build,run}/extend ({build,run}-extend-toml-file) | cwd: /
 ```
 
-For the purpose of CA certs, extend should examine the `[certs] = []` key of the file supplied (by the platform) in the first argument. The file should follow this schema:
+For the purpose of CA certs, extend should examine the `certs = []` key of the file supplied (by the platform) in the first argument. The file should follow this schema:
 
 ```toml
 # extend.toml
-[certs] = [
+certs = [
     """-----BEGIN CERTIFICATE-----
 AASDASDASDASD
 ASDASDASDSADASD
@@ -138,6 +138,7 @@ This RFC builds on some of the ideas proposed in https://github.com/buildpacks/r
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
+- Given that the utility of runtime cert extension is limited (platforms usually mount and rotate them) does it make sense to restrict discussion in this RFC to build-time extension. If so we can punt on how rebasing will work.
 - Build vs Runtime CA-certs? Do we need to split them or should we just collapse this into one?
 - Dynamically extended run image vs just adding to launch image (comes to the same thing?)
 - How does the platform communicate to buildpacks that certs are available?
