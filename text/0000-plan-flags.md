@@ -1,5 +1,6 @@
 # Meta
 [meta]: #meta
+
 - Name: Buildplan & Buildpack Plan Flags
 - Start Date: 2020-03-06
 - CNB Pull Request: (leave blank)
@@ -20,7 +21,7 @@ The `metadata` field that is part of require should be removed and replaced with
 - This implicit contract between dependent buildpacks should be formalized.
 
 ### Example:
- We consider the interactions between the Paketo `node-engine` and `npm`
+ We consider the interactions between the Paketo `node-engine` and `npm`:
 
  - The `node-engine` provides the `npm` dependency to an image, but only for the `launch` phase.
  - The `npm` requires `npm` during the `build` phase, and so it adds an entry in `requires.metadata` to reflect this need, it may also require a version of `node-engine` so it may `require` a version of `node-engine`.
@@ -36,7 +37,6 @@ The `metadata` field that is part of require should be removed and replaced with
 [what-it-is]: #what-it-is
 
 ## Build Plan (TOML) Changes
-
 We propose a complete restructuring of the `requires` field and an addition to the `provides` field in the Build Plan (TOML) file.
 
 We propose the following Build Plan (TOML):
@@ -75,7 +75,7 @@ name = "<dependency name>"
   some-other-modifer = "other modifier"
 ```
 
-This proposal removes both the `version` and `metadata` fields and replaces them with three new fields each with their own purpose.
+This proposal removes both the `version` and `metadata` fields and replaces them with three new fields each with their own purpose:
 - `requires.version` field holds all of the version requirement information.
   - `constraint` can be any semver constraint used to decide which dependency the providing buildpack will install.
   - `source` is the origin of the constraint (i.e. it came from `package.json`).
@@ -83,7 +83,6 @@ This proposal removes both the `version` and `metadata` fields and replaces them
 - `requires.modifiers` is meant to hold only specific and **unique** buildpack communications.
 
 ## Buildpack Plan (TOML) changes
-
 For the same reasons, we would like to add the `version`, `capabilities`, and `modifiers` fields to the Buildpack Plan, along with a `versions` field and some additional format changes:
 
 ```toml
@@ -103,7 +102,6 @@ name = "<dependency name>"
 In each entry the `name` field is **unique**.
 
 We arrived at this format for several reasons:
-
 - Moves some common buildpack operations into the lifecycle.
   - Collects all  of the data from various `requires` entries into a unique entry for a given dependency.
   - Allows for the implementation of information merging strategies for the `version`, `capabilities`, and `modifiers`.
@@ -125,8 +123,8 @@ The proposed changes in this solution to the Buildpack Plan (TOML) would require
 - If at any point during this merge process there is a failure, then the image build will fail.
 - In the case that the merge failure occurs while merging the version together, the lifecycle will print out the source of the constraint that caused the merge to fail.
 
-## Example:
-The following are examples the Build Plan (TOML) and the Buildpack Plan (TOML) for when the lifecyle merges them together:
+## Merging Example
+The following are examples the Build Plan (TOML) and the Buildpack Plan (TOML) for when the lifecycle merges them together:
 
 ### Build Plan (TOML)
 ```toml
@@ -170,13 +168,14 @@ name = "node"
 	special-edition = false
 ```
 
-The following is an example of the Build Plan (TOML) and the Buildpack Plan (TOML) when the lifecyle does not merge them together as per the `provides.strategy` setting:
+## Non-merging Example
+The following is an example of the Build Plan (TOML) and the Buildpack Plan (TOML) when the lifecycle does not merge them together as per the `provides.strategy` setting:
 
 ### Build Plan (TOML)
 ```toml
 [[provides]]
 name = "node"
-strategy = “unmerged versions”
+strategy = “non-merged versions”
 
 [[requires]]
 name = "node"
@@ -227,16 +226,18 @@ name = "node"
 
 # Alternatives
 [alternatives]: #alternatives
+
 - Stick with current implementation but make it complete generic (i.e. remove top level version flag) this would make the requires a completely blank canvas and the lifecycle perform no new actions.
 
 # Prior Art:
 [prior-art]: #prior-art
+
 - The name for of the `capabilities` field comes from Seleniums `DesiredCapabilities` which can be seen [here](https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities).
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
 - Is there a better data format for the Buildpack Plan?
-- Should we allow for more than the version data to stay unmerged?
-- What should the merged and unmerged strategies be called?
+- Should we allow for more than the version data to stay non-merged?
+- What should the merged and non-merged strategies be called?
 
