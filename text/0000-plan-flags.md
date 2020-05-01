@@ -19,7 +19,7 @@ The `metadata` field that is part of require should be removed and replaced with
 - Putting this information in the `requires.metadata` obfuscates the flow of information between buildpacks.
 - This implicit contract between dependent buildpacks should be formalized.
 
-#### Example:
+### Example:
  We consider the interactions between the Paketo `node-engine` and `npm`
 
  - The `node-engine` provides the `npm` dependency to an image, but only for the `launch` phase.
@@ -27,11 +27,9 @@ The `metadata` field that is part of require should be removed and replaced with
  - As a result during the `node-engine`'s build phase all `entries.metadata` must be parsed for `build`, `launch`, and `version` to determine the correct flags to attach to the `npm` dependency Layer Metadata.
 
 ## Goal
-1) Simplify the Build Plan (TOML) and Buildpack Plan (TOML) formats.
-
-2) Clarify and codify how buildpacks communicate with each other.
-
-3) Leverage the lifecycle to implement task that would simplify the buildpack authoring process.
+1. Simplify the Build Plan (TOML) and Buildpack Plan (TOML) formats.
+2. Clarify and codify how buildpacks communicate with each other.
+3. Leverage the lifecycle to implement task that would simplify the buildpack authoring process.
 
 
 # What it is
@@ -77,7 +75,12 @@ name = "<dependency name>"
   some-other-modifer = "other modifier"
 ```
 
-This proposal removes both the `version` and `metadata` fields and replaces them with three new fields each with their own purpose. The `requires.version` field holds all of the version requirement information, this includes a `constraint` which can be any semver constraint to be used when deciding what dependency the providing buildpack should install and the `source` so that the origin of the constraint can be identified this will be important when discussing the merging done by the lifecycle later. `requires.capabilities` hold the `build` and `launch` keys and indicate when during which phase buildpack specific data and dependencies are available. Finally, there is `requires.modifiers` this is meant to hold only specific and unique buildpack communications.
+This proposal removes both the `version` and `metadata` fields and replaces them with three new fields each with their own purpose.
+- `requires.version` field holds all of the version requirement information.
+  - `constraint` can be any semver constraint used to decide which dependency the providing buildpack will install.
+  - `source` is the origin of the constraint (i.e. it came from `package.json`).
+- `requires.capabilities` holds the `build` and `launch` keys and indicate when during which phase buildpack specific data and dependencies are available.
+- `requires.modifiers` is meant to hold only specific and **unique** buildpack communications.
 
 ## Buildpack Plan (TOML) changes
 
@@ -102,9 +105,11 @@ In each entry the `name` field is **unique**.
 We arrived at this format for several reasons:
 
 - Moves some common buildpack operations into the lifecycle.
-  - Previously, the buildpacks were responsible for iterating all the buildpack plan entries of a given dependency. This no format collects all of those entries into one entry that is unique to that dependency meaning the buildpacks would no longer have to worry about merging this information for themselves.
+  - Collects all  of the data from various `requires` entries into a unique entry for a given dependency.
   - Allows for the implementation of information merging strategies for the `version`, `capabilities`, and `modifiers`.
-    - All version constraints are merged together into the `version` field. If the merge would result in a valid semver constraint the image build will continue. If the merge fails to produce a valid semver constraint (i.e. a constraint the is unreachable such as "1.10.\*, 1.12.\*") it would cause the image build to fail.
+    - All version constraints are merged together into the `version` field.
+      - If the merge would result in a valid semver constraint, then image build will continue.
+      - If the merge fails to produce a valid semver constraint (i.e. a constraint the is unreachable such as "1.10.\*, 1.12.\*"), then it would cause the image build to fail.
     - All `capabilities.build` and `capabilities.launch` for a given dependency will be `or` merged together.
     - All keys in `modifiers` will be merged with a last in wins strategy.
 - The `versions` list will only contain elements if the `provides` strategy was set to a strategy that does not automatically merge the version constraints together. This would mean that the `version` field would be empty.
@@ -114,14 +119,16 @@ We arrived at this format for several reasons:
 
 The proposed changes in this solution to the Buildpack Plan (TOML) would require the following changes to the lifecycle to generate data in the format defined above:
 
-- Detection Succeeds
-- Build Plan entries are aggregated based on dependency-names and the fields are merged together using their respective strategies or are collected is the providers strategy dictates versions should be collected. If at any point during this merge process there is a failure, then the image build will fail.  In the case that the merge failure occurs while merging the version together, the lifecycle will print out that there was a failure merging the versions and then print the source of the constraint that caused the merge to fail.
-- Each dependency has an array for all versions and map for metadata that appeared under that dependency name in the Build Plan
+- Build Plan entries are aggregated based on dependency names
+- The `capabilities` and `modifiers` fields are merged together using their assigned merge strategies.
+- The `version` fields are either merged together or collected based on the **providers** merge strategy.
+- If at any point during this merge process there is a failure, then the image build will fail.
+- In the case that the merge failure occurs while merging the version together, the lifecycle will print out the source of the constraint that caused the merge to fail.
 
-#### Example:
+## Example:
 The following are examples the Build Plan (TOML) and the Buildpack Plan (TOML) for when the lifecyle merges them together:
 
-Build Plan (TOML)
+### Build Plan (TOML)
 ```toml
 [[provides]]
 name = "node"
@@ -150,7 +157,7 @@ name = "node"
 	special-edition = false
 ```
 
-Buildpack Plan (TOML)
+### Buildpack Plan (TOML)
 ```toml
 [[entries]]
 name = "node"
@@ -163,10 +170,9 @@ name = "node"
 	special-edition = false
 ```
 
-The following are examples the Build Plan (TOML) and the Buildpack Plan (TOML) for when the lifecyle does not merge them together as per the `provides.strategy` setting:
+The following is an example of the Build Plan (TOML) and the Buildpack Plan (TOML) when the lifecyle does not merge them together as per the `provides.strategy` setting:
 
-
-Build Plan (TOML)
+### Build Plan (TOML)
 ```toml
 [[provides]]
 name = "node"
@@ -195,7 +201,7 @@ name = "node"
 	special-edition = false
 ```
 
-Buildpack Plan (TOML)
+### Buildpack Plan (TOML)
 ```toml
 [[entries]]
 name = "node"
@@ -225,7 +231,7 @@ name = "node"
 
 # Prior Art:
 [prior-art]: #prior-art
-The name for of the `capabilities` field comes from Seleniums `DesiredCapabilities` which can be seen [here](https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities).
+- The name for of the `capabilities` field comes from Seleniums `DesiredCapabilities` which can be seen [here](https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities).
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
