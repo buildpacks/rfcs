@@ -52,9 +52,11 @@ name = "<dependency name>"
   constraint = "<dependency constraint>"
   source = "<dependency constraint source>"
 [requires.capabilities]
+  # arbitary key to bools
   build = false
   launch = false
 [requires.modifiers]
+  # arbitrary keys and values
   some-modifer = "modifier"
 
 [[or]]
@@ -69,9 +71,11 @@ name = "<dependency name>"
   constraint = "<other dependency constraint>"
   source = "<other dependency constraint source>"
 [requires.capabilities]
+  # arbitary key to bools
   build = false
   launch = false
 [requires.modifiers]
+  # arbitrary keys and values
   some-other-modifer = "other modifier"
 ```
 
@@ -91,10 +95,12 @@ name = "<dependency name>"
 [entries.version]
   constraint = "<dependency constraint>"
 [entries.capabilities]
+  # or merged bool values from arbitray keys
   build = false
   launch = false
 [entries.modifiers]
-  # arbitrary keys and values
+  # last-in-wins merged values from arbitrary keys
+  some-modifer = "modifier"
 [[entries.versions]]
   constraint = “<dependency constraint>”
   source = "<dependency constraint source>"
@@ -130,7 +136,7 @@ The following are examples the Build Plan (TOML) and the Buildpack Plan (TOML) f
 ```toml
 [[provides]]
 name = "node"
-strategy = “merged versions”
+strategy = "merged versions"
 
 [[requires]]
 name = "node"
@@ -141,7 +147,7 @@ name = "node"
 	build = false
 	launch = true
 [requires.modifiers]
-	special-edition = true
+	special-edition = "yes"
 
 [[requires]]
 name = "node"
@@ -152,7 +158,7 @@ name = "node"
 	build = true
 	launch = true
 [requires.modifiers]
-	special-edition = false
+	special-edition = "no"
 ```
 
 ### Buildpack Plan (TOML)
@@ -165,7 +171,7 @@ name = "node"
 	build = true
 	launch = true
 [entries.modifiers]
-	special-edition = false
+	special-edition = "no"
 ```
 
 ## Non-merging Example
@@ -175,7 +181,7 @@ The following is an example of the Build Plan (TOML) and the Buildpack Plan (TOM
 ```toml
 [[provides]]
 name = "node"
-strategy = “non-merged versions”
+strategy = "non-merged versions"
 
 [[requires]]
 name = "node"
@@ -186,7 +192,7 @@ name = "node"
 	build = false
 	launch = true
 [requires.modifiers]
-	special-edition = true
+	special-edition = "yes"
 
 [[requires]]
 name = "node"
@@ -197,7 +203,7 @@ name = "node"
 	build = true
 	launch = true
 [requires.modifiers]
-	special-edition = false
+	special-edition = "no"
 ```
 
 ### Buildpack Plan (TOML)
@@ -214,7 +220,7 @@ name = "node"
 	build = true
 	launch = true
 [entries.modifiers]
-	special-edition = false
+	special-edition = "no"
 ```
 
 # Drawbacks
