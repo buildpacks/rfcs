@@ -242,7 +242,7 @@ name = "node"
 
 - This would be a breaking change for consumers of the Build Plan and Buildpack Plan.
 - Increased functionality of the lifecycle, which increases maintenance costs of the lifecycle as a whole.
-- Removes the functionality to communicate non-unique information across buildpacks as the `modifiers` field is always merged.
+- Removes the functionality to communicate non-unique information across buildpacks as the `modifiers` field is always merged. This could be mitigated by adding non-merge capabilities to the `modifiers` field.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -257,9 +257,4 @@ name = "node"
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Is there a better data format for the Buildpack Plan?
-<<<<<<< HEAD
-- Should we allow for more than the version data to stay non-merged?
-- What should the merged and non-merged strategies be called?
-=======
->>>>>>> Overhaul strategy and versions scheme
+- Should we have collection strategies for all `requires` fields out of the gate or just add to fields when necessary?
