@@ -23,7 +23,7 @@ The `metadata` field that is part of require should be removed and replaced with
 ### Example:
  We consider the interactions between the Paketo `node-engine` and `npm`:
 
- - The `node-engine` provides the `npm` dependency to an image, but only for the `launch` phase.
+ - The `node-engine` provides the `node` dependency to an image, but only for the `launch` phase.
  - The `npm` requires `npm` during the `build` phase, and so it adds an entry in `requires.metadata` to reflect this need, it may also require a version of `node-engine` so it may `require` a version of `node-engine`.
  - As a result during the `node-engine`'s build phase all `entries.metadata` must be parsed for `build`, `launch`, and `version` to determine the correct flags to attach to the `npm` dependency Layer Metadata.
 
@@ -246,4 +246,3 @@ name = "node"
 - Is there a better data format for the Buildpack Plan?
 - Should we allow for more than the version data to stay non-merged?
 - What should the merged and non-merged strategies be called?
-
