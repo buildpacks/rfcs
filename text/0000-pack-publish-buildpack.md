@@ -36,7 +36,15 @@ The user will run the `pack yank-buildpack <namespace>/<name>@<version>` command
 # How it Works
 [how-it-works]: #how-it-works
 
-## `pack publish-buildpack <url>`
+There are four mechanisms for publishing a buildpack:
+* Default, which opens a Github Issue in a browser
+* Headless, which uses an API token to POST the buildpack to a specified endpoint
+* Native, which commits directly to the local Git repository for the index and makes a Git push to the origin
+* Yank, which removes a buildpack from the registry
+
+## Default: `pack publish-buildpack <url>`
+
+This command will ONLY work against the official `buildpacks.io` registry index. If the default registry is set otherwise, the command will prompt with instructions for publishing to a non-official registry.
 
 Arguments:
 
@@ -59,9 +67,34 @@ Steps:
     - Create and merge a PR against the `https://github.com/buildpacks/registry-index` repo using a Gitub token (i.e. all commits in that repo will be made by the same "user"). The PR will add the buildpack version described in the issue.
     - Close the Github issue.
 
-Options:
+## Headless: `pack publish-buildpack --token <token> <url>`
 
-* `--headless` - this option will use the Github API to create the Github Issue. However, it will require a Github API token from the user.
+When the `pack publish-buildpack` command is passed the `--token` option, it will use an API to publish the buildpack. However, it will require an API token from the user.
+
+Steps:
+
+1. Pulls the image manifest for the buildpackage at `url` if it does not already exist locally.
+1. Reads the following information from the image manifest (if any of these are missing, the command fails):
+    - `id` (must include a `namespace` and `name` in the form `<namespace>/<name>`)
+    - `version`
+1. Makes an HTTP POST request to the endpoint `<registry-write-url>/<namespace>/<name>@<version>` with the following:
+    - Header: `Authorization: Bearer <token>`
+    - Body: a JSON payload represeting the buildpack version as defined in [RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)
+
+**NOTE:** This command requires the default Registry URL be split into a read URL (for the Git pull) and a write URL (for the HTTP POST). Alternatively, we could define a specification for resolving a Git URL from a unified registry URL.
+
+## Native: `pack publish-buildpack --native <url>`
+
+When the `pack publish-buildpack` command is passed the `--native` option, it will commit the buildpack directly to the local registry cache, and attempt to push to the origin. This will NOT work against the official registry index, and the CLI will explicitly check for this before pushing so that it can error out with an appropriate message.
+
+Steps:
+
+1. Pulls the image manifest for the buildpackage at `url` if it does not already exist locally.
+1. Reads the following information from the image manifest (if any of these are missing, the command fails):
+    - `id` (must include a `namespace` and `name` in the form `<namespace>/<name>`)
+    - `version`
+1. Makes a Git commit to the local registry index with a JSON payload represeting the buildpack version as defined in [RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)
+1. Uses Git to push the commit to the registry index's `origin`.
 
 ## `pack yank-buildpack <buildpack-id-and-version>`
 
