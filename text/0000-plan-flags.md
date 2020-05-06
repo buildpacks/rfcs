@@ -53,7 +53,7 @@ name = "<dependency name>"
   constraint = "<dependency constraint>"
   source = "<dependency constraint source>"
 [requires.capabilities]
-  # arbitary key to bools
+  # arbitary keys to bools
   build = false
   launch = false
 [requires.modifiers]
@@ -73,7 +73,7 @@ name = "<dependency name>"
   constraint = "<other dependency constraint>"
   source = "<other dependency constraint source>"
 [requires.capabilities]
-  # arbitary key to bools
+  # arbitary keys to bools
   build = false
   launch = false
 [requires.modifiers]
