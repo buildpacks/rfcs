@@ -44,7 +44,8 @@ We propose the following Build Plan (TOML):
 ```toml
 [[provides]]
 name = "<dependency name>"
-strategy = "<merging strategy>"
+[provides.strategy.version]
+  collect = false
 
 [[requires]]
 name = "<dependency name>"
@@ -63,7 +64,8 @@ name = "<dependency name>"
 
 [[or.provides]]
 name = "<dependency name>"
-strategy = "<merging strategy>"
+[provides.strategy.version]
+  collect = false
 
 [[or.requires]]
 name = "<dependency name>"
@@ -79,12 +81,17 @@ name = "<dependency name>"
   some-other-modifer = "other modifier"
 ```
 
-This proposal removes both the `version` and `metadata` fields and replaces them with three new fields each with their own purpose:
+This proposal adds a new field to `provides`:
+- `provides.strategy.version` field holds a `collect` key which indicates if the version fields from all of the requires should be merged together or if they should collected into an array.
+  - This field is structured to be extensible to other fields in `requires`.
+
+This proposal also removes both the `requires.version` and `requires.metadata` fields and replaces them with three new fields each with their own purpose:
 - `requires.version` field holds all of the version requirement information.
   - `constraint` can be any semver constraint used to decide which dependency the providing buildpack will install.
   - `source` is the origin of the constraint (i.e. it came from `package.json`).
 - `requires.capabilities` holds the `build` and `launch` keys and indicate when during which phase buildpack specific data and dependencies are available.
 - `requires.modifiers` is meant to hold only specific and **unique** buildpack communications.
+
 
 ## Buildpack Plan (TOML) changes
 For the same reasons, we would like to add the `version`, `capabilities`, and `modifiers` fields to the Buildpack Plan, along with a `versions` field and some additional format changes:
@@ -101,8 +108,9 @@ name = "<dependency name>"
 [entries.modifiers]
   # last-in-wins merged values from arbitrary keys
   some-modifer = "modifier"
-[[entries.versions]]
-  constraint = “<dependency constraint>”
+[[entries.collection]]
+[entries.collection.version]
+  constraint = "<dependency constraint>"
   source = "<dependency constraint source>"
 ```
 In each entry the `name` field is **unique**.
@@ -116,7 +124,9 @@ We arrived at this format for several reasons:
       - If the merge fails to produce a valid semver constraint (i.e. a constraint the is unreachable such as "1.10.\*, 1.12.\*"), then it would cause the image build to fail.
     - All `capabilities.build` and `capabilities.launch` for a given dependency will be `or` merged together.
     - All keys in `modifiers` will be merged with a last in wins strategy.
-- The `versions` list will only contain elements if the `provides` strategy was set to a strategy that does not automatically merge the version constraints together. This would mean that the `version` field would be empty.
+- The `collection` list will only contain elements if the `provides` strategy was set to a `collect = true`.
+  - If the `collection` field is present the `version` field will be empty.
+  - The `collection` field has been structured to be extensible to other fields in `requires`, this will allow for the extension of `provides.strategy`.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -136,7 +146,8 @@ The following are examples the Build Plan (TOML) and the Buildpack Plan (TOML) f
 ```toml
 [[provides]]
 name = "node"
-strategy = "merged versions"
+[provides.strategy.version]
+  collect = false
 
 [[requires]]
 name = "node"
@@ -166,7 +177,7 @@ name = "node"
 [[entries]]
 name = "node"
 [entries.version]
-	constraint = "10.19.1"
+	constraint = "~10, 10.19.1"
 [entries.capabilities]
 	build = true
 	launch = true
@@ -181,7 +192,8 @@ The following is an example of the Build Plan (TOML) and the Buildpack Plan (TOM
 ```toml
 [[provides]]
 name = "node"
-strategy = "non-merged versions"
+[provides.strategy.version]
+  collect = true
 
 [[requires]]
 name = "node"
@@ -210,17 +222,19 @@ name = "node"
 ```toml
 [[entries]]
 name = "node"
-[[entries.versions]]
-	constraint = "10.19.1"
-	source = "buildpack.yml"
-[[entries.versions]]
-	constraint = "~10"
-	source = "package.json"
 [entries.capabilities]
 	build = true
 	launch = true
 [entries.modifiers]
 	special-edition = "no"
+[[entries.collection]]
+[entries.collection.version]
+	constraint = "10.19.1"
+	source = "buildpack.yml"
+[[entries.collection]]
+[entries.collection.versions]
+	constraint = "~10"
+	source = "package.json"
 ```
 
 # Drawbacks
@@ -244,5 +258,8 @@ name = "node"
 [unresolved-questions]: #unresolved-questions
 
 - Is there a better data format for the Buildpack Plan?
+<<<<<<< HEAD
 - Should we allow for more than the version data to stay non-merged?
 - What should the merged and non-merged strategies be called?
+=======
+>>>>>>> Overhaul strategy and versions scheme
