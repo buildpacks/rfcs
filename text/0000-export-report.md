@@ -70,11 +70,13 @@ This will require an additional flag which might complicate the lifecycle interf
 - [The kbld tool parses the pack output with a regex to find the built image digest](https://github.com/k14s/kbld/blob/5597786d8369e966f2e7217b24fd058f4a910675/pkg/kbld/image/pack.go#L17). 
 - Tekton allows tasks to surface a built image digest with an [OCI image layout index.json](https://github.com/tektoncd/pipeline/blob/master/docs/resources.md#surfacing-the-image-digest-built-in-a-task).
 
-# Unresolved Questions
-[unresolved-questions]: #unresolved-questions
+# Out of Scope
+[out-of-scope]: #out-of-scope
+
+Some decisions regarding `report.toml` are explicitly out of scope for this RFC:  
 
 - How/if `pack` should expose this information to users in a programmatic way?
-- Is there any additional metadata that should be provided in report.toml?
+- Should report.toml include additional metadata regarding layer usage?
 
 # Spec. Changes
 [spec-changes]: #spec-changes
