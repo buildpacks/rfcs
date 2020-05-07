@@ -1,5 +1,6 @@
 # Meta
 [meta]: #meta
+
 - Name: Buildplan & Buildpack Plan Flags
 - Start Date: 2020-03-06
 - CNB Pull Request: (leave blank)
@@ -9,206 +10,251 @@
 # Summary
 [summary]: #summary
 
-We would like to add the ability for buildpacks to be able to specify `build` and `launch` requirements for a dependency.
-To do so we should add `build` and `launch` fields to both the Build Plan (TOML) and Buildpack Plan (TOML) files.
+The `metadata` field that is part of require should be removed and replaced with fields that have defined purpose to standardize inter-buildpack communication.
 
 # Motivation
 [motivation]: #motivation
-The overarching goal of this RFC is to 
 
-1) Simplifies buildpack implementation.
-
-2) Clarify how buildpacks communicate their dependencies to other buildpacks.
-
-State of Cloudfoundry Buildpacks:
-
-- The current method that the Cloudfoundry Buildpacks use to indicate they rely on an earlier buildpack's dependencies is to set a string `build` and/or `launch` field in the Build Plan (TOML) `requires.metadata` section.
-- the throwing this information in the `requires.metadata` obfuscates the flow of `build` and `launch` flags from dependencies to the Layer Metadata.  
+## State of Paketo Buildpacks
+- The current method that the Paketo Buildpacks uses to communicate information to an earlier buildpack is to set an arbitrary string field in the Build Plan (TOML) `requires.metadata` section.
+- Putting this information in the `requires.metadata` obfuscates the flow of information between buildpacks.
 - This implicit contract between dependent buildpacks should be formalized.
 
-#### Example:
- We consider the interactions between the Cloudfoundry `node-engine-cnb` and `npm-cnb`
- 
- - The `node-engine-cnb` provides the `npm` dependency to an image, but only for the `launch` phase.
- - The `npm-cnb` requires `npm` during the `build` phase, and so it adds an entry in `requires.metadata` to reflect this need.
- - As a result during the `node-engine-cnb`'s build phase all `entries.metadata` must be parsed for `build` and `launch` to determine the correct flags to attach to the `npm` dependency Layer Metadata.
-  
+### Example:
+ We consider the interactions between the Paketo `node-engine` and `npm`:
+
+ - The `node-engine` provides the `node` dependency to an image, but only for the `launch` phase.
+ - The `npm` requires `npm` during the `build` phase, and so it adds an entry in `requires.metadata` to reflect this need, it may also require a version of `node-engine` so it may `require` a version of `node-engine`.
+ - As a result during the `node-engine`'s build phase all `entries.metadata` must be parsed for `build`, `launch`, and `version` to determine the correct flags to attach to the `npm` dependency Layer Metadata.
+
+## Goal
+1. Simplify the Build Plan (TOML) and Buildpack Plan (TOML) formats.
+2. Clarify and codify how buildpacks communicate with each other.
+3. Leverage the lifecycle to implement task that would simplify the buildpack authoring process.
+
+
 # What it is
 [what-it-is]: #what-it-is
 
-This provides a high level overview of the feature.
+## Build Plan (TOML) Changes
+We propose a complete restructuring of the `requires` field and an addition to the `provides` field in the Build Plan (TOML) file.
 
-- Define the target persona: Buildpack Author
-  
-Currently, we have the following fields in the Layer Content Metadata (TOML) file: 
-  
-  ```toml
-  launch = false
-  build = false
-  cache = false
-  
-  [metadata]
-  # buildpack-specific data
-  ```
-  
-  `build`, `launch` and `cache` are all well defined in this file and represent properties on the layer.
-  
-  The BuildPlan & Buildpack Plan files that are consumed during detection & build to produce the Layer Content Metadata file
-   do not include any of these flags.
+We propose the following Build Plan (TOML):
 
-## BuildPlan Changes
-  
-We propose adding `build` and `launch` fields to dependencies in the Build Plan (TOML) file. 
-  
-  Note that in this case `cache` does not make sense as this is strictly a property of a layer and is omitted.
-  
-  We propose adding the following to the Build Plan (TOML):
-  
-  ```toml
-  [[provides]]
-  name = "<dependency name>"
-  
-  [[requires]]
-  name = "<dependency name>"
-  version = "<dependency version>"
+```toml
+[[provides]]
+name = "<dependency name>"
+[provides.strategy.version]
+  collect = false
+
+[[requires]]
+name = "<dependency name>"
+[requires.version]
+  constraint = "<dependency constraint>"
+  source = "<dependency constraint source>"
+[requires.capabilities]
+  # arbitary keys to bools
   build = false
-  launch = true
-  
-  [requires.metadata]
-  some_metadata_key = "some_metadata_value"
-  # buildpack-specific data
-  
-  [[or]]
-  
-  [[or.provides]]
-  name = "<dependency name>"
-  
-  [[or.requires]]
-  name = "<dependency name>"
-  version = "<other dependency version>"
-  build = true
   launch = false
-  
-  [or.requires.metadata]
-  some_other_metadata_key = "some_other_metadata_value"
-  # buildpack-specific data
-  
-  ```
-  
+[requires.modifiers]
+  # arbitrary keys and values
+  some-modifer = "modifier"
+
+[[or]]
+
+[[or.provides]]
+name = "<dependency name>"
+[provides.strategy.version]
+  collect = false
+
+[[or.requires]]
+name = "<dependency name>"
+[requires.version]
+  constraint = "<other dependency constraint>"
+  source = "<other dependency constraint source>"
+[requires.capabilities]
+  # arbitary keys to bools
+  build = false
+  launch = false
+[requires.modifiers]
+  # arbitrary keys and values
+  some-other-modifer = "other modifier"
+```
+
+This proposal adds a new field to `provides`:
+- `provides.strategy.version` field holds a `collect` key which indicates if the version fields from all of the requires should be merged together or if they should collected into an array.
+  - This field is structured to be extensible to other fields in `requires`.
+
+This proposal also removes both the `requires.version` and `requires.metadata` fields and replaces them with three new fields each with their own purpose:
+- `requires.version` field holds all of the version requirement information.
+  - `constraint` can be any semver constraint used to decide which dependency the providing buildpack will install.
+  - `source` is the origin of the constraint (i.e. it came from `package.json`).
+- `requires.capabilities` holds the `build` and `launch` keys and indicate when during which phase buildpack specific data and dependencies are available.
+- `requires.modifiers` is meant to hold only specific and **unique** buildpack communications.
+
+
 ## Buildpack Plan (TOML) changes
-  
-  For the same reasons, we would like to add `build` and `launch` flags to the Buildpack Plan, along with
-  some additional format changes: 
-
-  ```toml
-  [[entries]]
-  name = "<dependency name>"
-  build = false
-  launch = false
-  
-  [[entries.requires]]
-  version = "<dependency version>"
-  
-  [entries.requires.metadata]
-  # buildpack-specific data
-  ```
-In each entry the `name` field is **unique**.
-
-  We arrived at this format for several reasons:
-  
-  - It allows us to offload some common flag merging operations to the lifecycle. We suggest letting all build/launch flags
-  under a single key be merged together (recommending the `or` operator). 
-  - A buildpack only needs to handle logic based on `name` keys it is responsible for. 
- 
-# How it Works
-[how-it-works]: #how-it-works
-
-The additional fields to the Build Plan (TOML) should be self explanatory and are strictly additive.
-But will move these values out the `metadata` field.
-
-The proposed changes in this solution to the Buildpack Plan (TOML) would require the following changes to the lifecycle to 
-generate data in the format defined above:
-
-- Detection Succeeds
-- Build Plan entries are aggregated based on dependency-names.
-- Each dependency has an array for all versions and map for metadata that appeared under that dependency name in the Build Plan
-- build & launch flags of each entry are reduced using some boolean operator (likely `or`) 
-
-The result of processing the example Build Plan above would be the following: 
-
-  ```toml
-  [<dependency name>]
-  build = true
-  launch = true
-  
-  [[<dependency name>.entries]]
-  version = "<dependency version>"
-
-  [<dependency name>.entries.metadata]
-    some_metadata_key = "some_metadata_value"
-
-  [[<dependency name>.entries]]
-  version = "<other dependency version>"
-  
-  [<dependency name>.entries.metadata]
-  some_other_metadata_key = "some_other_metadata_value"
-  # buildpack-specific data
-  ```
-  
-#### Example:
- We consider interactions between the Cloudfoundry `node-engine-cnb` and `npm-cnb` using this new format
- 
- - The `node-engine-cnb` provides the `npm` dependency to an image, but only for the `launch` phase.
- - The `npm-cnb` requires `npm` during the `build` phase, and so it sets the `requires.build`  values to `true`.
- - During the `node-engine-cnb`'s build phase we examine the Buildpack Plan `entries` for one named `npm` and retrieve the `build` & `launch` flags.
-
-# Drawbacks
-[drawbacks]: #drawbacks
-     
-This would be a breaking change for consumers of the Buildpack Plan. Though there are alternative methods to represent
-this data. All have their own discrepancies between the data-formats and their semantics.
-
-
-
-# Alternatives
-[alternatives]: #alternatives
-
-- What other designs have been considered?
-
-This information could also be represented as additional information added to the Buildpack Plan as follows:
+For the same reasons, we would like to add the `version`, `capabilities`, and `modifiers` fields to the Buildpack Plan, along with a `versions` field and some additional format changes:
 
 ```toml
 [[entries]]
 name = "<dependency name>"
-version = "<dependency version>"
+[entries.version]
+  constraint = "<dependency constraint>"
+[entries.capabilities]
+  # or merged bool values from arbitray keys
+  build = false
+  launch = false
+[entries.modifiers]
+  # last-in-wins merged values from arbitrary keys
+  some-modifer = "modifier"
+[[entries.collection]]
+[entries.collection.version]
+  constraint = "<dependency constraint>"
+  source = "<dependency constraint source>"
+```
+In each entry the `name` field is **unique**.
 
-[[entries]]
-name = "<dependency name>"
-version = "<dependency version2>"
+We arrived at this format for several reasons:
+- Moves some common buildpack operations into the lifecycle.
+  - Collects all  of the data from various `requires` entries into a unique entry for a given dependency.
+  - Allows for the implementation of information merging strategies for the `version`, `capabilities`, and `modifiers`.
+    - All version constraints are merged together into the `version` field.
+      - If the merge would result in a valid semver constraint, then image build will continue.
+      - If the merge fails to produce a valid semver constraint (i.e. a constraint the is unreachable such as "1.10.\*, 1.12.\*"), then it would cause the image build to fail.
+    - All `capabilities.build` and `capabilities.launch` for a given dependency will be `or` merged together.
+    - All keys in `modifiers` will be merged with a last in wins strategy.
+- The `collection` list will only contain elements if the `provides` strategy was set to a `collect = true`.
+  - If the `collection` field is present the `version` field will be empty.
+  - The `collection` field has been structured to be extensible to other fields in `requires`, this will allow for the extension of `provides.strategy`.
 
-[[entries]]
-name = "<dependency name2>"
-version = "<dependency version>"
+# How it Works
+[how-it-works]: #how-it-works
 
-[[merged-layer-flags]]
-name = "<dependency name>"
-build = false
-launch = true
+The proposed changes in this solution to the Buildpack Plan (TOML) would require the following changes to the lifecycle to generate data in the format defined above:
 
-[[merged-layer-flags]]
-name = "<dependency name2>"
-build = true
-launch = false
+- Build Plan entries are aggregated based on dependency names
+- The `capabilities` and `modifiers` fields are merged together using their assigned merge strategies.
+- The `version` fields are either merged together or collected based on the **providers** merge strategy.
+- If at any point during this merge process there is a failure, then the image build will fail.
+- In the case that the merge failure occurs while merging the version together, the lifecycle will print out the source of the constraint that caused the merge to fail.
+
+## Merging Example
+The following are examples the Build Plan (TOML) and the Buildpack Plan (TOML) for when the lifecycle merges them together:
+
+### Build Plan (TOML)
+```toml
+[[provides]]
+name = "node"
+[provides.strategy.version]
+  collect = false
+
+[[requires]]
+name = "node"
+[requires.version]
+	constraint = "10.19.1"
+	source = "buildpack.yml"
+[requires.capabilities]
+	build = false
+	launch = true
+[requires.modifiers]
+	special-edition = "yes"
+
+[[requires]]
+name = "node"
+[requires.version]
+	constraint = "~10"
+	source = "package.json"
+[requires.capabilities]
+	build = true
+	launch = true
+[requires.modifiers]
+	special-edition = "no"
 ```
 
-- Here `<dependency name>` elements in the `merge-layer-flags` array should have unique `name` fields
+### Buildpack Plan (TOML)
+```toml
+[[entries]]
+name = "node"
+[entries.version]
+	constraint = "~10, 10.19.1"
+[entries.capabilities]
+	build = true
+	launch = true
+[entries.modifiers]
+	special-edition = "no"
+```
 
-- Why is this proposal the best?
-The above is non breaking, but it divides data for a single entity among multiple structures & leaves matching up to the buildpack author, this feels bad.
+## Non-merging Example
+The following is an example of the Build Plan (TOML) and the Buildpack Plan (TOML) when the lifecycle does not merge them together as per the `provides.strategy` setting:
 
+### Build Plan (TOML)
+```toml
+[[provides]]
+name = "node"
+[provides.strategy.version]
+  collect = true
+
+[[requires]]
+name = "node"
+[requires.version]
+	constraint = "10.19.1"
+	source = "buildpack.yml"
+[requires.capabilities]
+	build = false
+	launch = true
+[requires.modifiers]
+	special-edition = "yes"
+
+[[requires]]
+name = "node"
+[requires.version]
+	constraint = "~10"
+	source = "package.json"
+[requires.capabilities]
+	build = true
+	launch = true
+[requires.modifiers]
+	special-edition = "no"
+```
+
+### Buildpack Plan (TOML)
+```toml
+[[entries]]
+name = "node"
+[entries.capabilities]
+	build = true
+	launch = true
+[entries.modifiers]
+	special-edition = "no"
+[[entries.collection]]
+[entries.collection.version]
+	constraint = "10.19.1"
+	source = "buildpack.yml"
+[[entries.collection]]
+[entries.collection.versions]
+	constraint = "~10"
+	source = "package.json"
+```
+
+# Drawbacks
+[drawbacks]: #drawbacks
+
+- This would be a breaking change for consumers of the Build Plan and Buildpack Plan.
+- Increased functionality of the lifecycle, which increases maintenance costs of the lifecycle as a whole.
+- Removes the functionality to communicate non-unique information across buildpacks as the `modifiers` field is always merged. This could be mitigated by adding non-merge capabilities to the `modifiers` field.
+
+# Alternatives
+[alternatives]: #alternatives
+
+- Stick with current implementation but make it complete generic (i.e. remove top level version flag) this would make the requires a completely blank canvas and the lifecycle perform no new actions.
+
+# Prior Art:
+[prior-art]: #prior-art
+
+- The name for of the `capabilities` field comes from Seleniums `DesiredCapabilities` which can be seen [here](https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities).
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Is there a better data format for the Buildpack Plan?
-
+- Should we have collection strategies for all `requires` fields out of the gate or just add to fields when necessary?
