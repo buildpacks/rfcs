@@ -26,39 +26,60 @@ This solution should further be extensible for other ways of extending builders,
 [what-it-is]: #what-it-is
 
 ### Specification
-Stack authors may include an `extend` executable to the build and/or run images of their stack:
+
+CA-Cert extension configuration should happen as part of the creation of a builder. 
+For known, project reserved, stack IDs, a preamble binary will be maintained by the project with the following interface:
+
 ```
-/cnb/image/{build,run}/extend ({build,run}-extend-toml-file) | cwd: /
+/cnb/image/extender $INPUT | cwd: /
+```
+`$INPUT` will be a cert bundle.
+
+For known stacks, builder creation will attach a builder label which advertises volume mounts mounts to be used for cert extension.
+The label will create an `extend` key within the `io.buildpacks.builder.metadata` label with the following form:
+
+```
+{
+  "description": "",
+  "extend": {
+      "certs": {
+          "bundleHash": "", <-- Hash formula below
+          "volumePaths: [], <-- Stack specific hashes
+      }
+  }
+}
 ```
 
-For the purpose of CA certs, extend should examine the `certs = []` key of the file supplied (by the platform) in the first argument. The file should follow this schema:
+`bundleHash` is calculated using the existing cert bundle of the builder in the following fashion:
+- Locate root certificate file. (This will vary by distro but roughly it should be files located per https://golang.org/src/crypto/x509/root_linux.go)
+- SHA256 sum of the binary contents of the bundle as presented by OS.
 
-```toml
-# extend.toml
-certs = [
-    """-----BEGIN CERTIFICATE-----
-AASDASDASDASD
-ASDASDASDSADASD
-ASDSADSADsda
-etc
------END CERTIFICATE-----""",
-]
-```
+When extending a build with certificates, the `certHash` should be a SHA256 of the certificate bundles.
+
+The `bundleHash` and the `certHash` are used to calculate the volume name of a certificate being added to a build:
+`sha256(string<bundleHash>+string<certHash>)`
+
+`volumePaths` should advertise to the platform where the stacks stores certificates (e.g., `/etc/ssl/certs/` and `/usr/local/share/ca-certificates/`) during the addition of certs so that volumes can be reused in subsequent build containers.
+
+##### Using volume mounts
+If the extension path label is attached to a stack, a preamble phase will be executed whereby the platform will builders extend binary with the certificate bundle, mounting volumes for each path item in the supplied label. 
+
+Subsequent phases of the lifecycle will be executed with these same volumes attached, thereby recycling their contents for the duration of the build.
+
+Platforms may optionally attach these volumes during execution of resulting app image (runtime).
 
 ### UX
 
 ##### pack
 Given the following command:
-`pack build --cert /cert1.pem --cert:build /cert2.pem --cert:run /cert3.pem`
+`pack build --cert /cert1.crt MY-IMAGE`
 
 Certs will go:
-`cert1.pem` will be added to both build* and run images
-`cert2.pem` will be only available during application build* time
-`cert3.pem` will be only available during application run time
+`cert1.crt` will be added to all build containers.
 
 *For the purposes of this RFC build includes publishing. In other words `pack` will be able to use build-time certs to talk to registries. Platform authors should implement adding these certs to whatever registry connection they make as part of implementing this RFC.
 
-##### Creating a new CA cert extended builder
+##### Creating an extensible builder with a project reserved ID
 
 `pack create-builder cnbs/builder:ca-certs-extended -b builder.toml`
 
@@ -69,16 +90,9 @@ id = "io.buildpacks.stacks.bionic"
 build-image = "example.com/build"
 run-image = "example.com/run"
 run-image-mirrors = ["example.org/run"]
-
-[extend]
-certs = ["./cert1.pem"] # Relative to location of `builder.toml`
-[extend.run]
-certs = ["./cert2.pem"] # Relative to location of `builder.toml`
-[extend.build]
-certs = ["./cert3.pem"] # Relative to location of `builder.toml`
 ```
 
-*Behavior*: Creates a new builder with `cert1.pem` on both run and build images, `cert2.pem` on run image, and `cert3.pem` on build image.
+*Behavior*: Creates a new builder with project default extender binary and paths for `"io.buildpacks.stacks.bionic"` stack.
 
 ##### Creating a new CA cert extended builder
 
@@ -86,44 +100,33 @@ certs = ["./cert3.pem"] # Relative to location of `builder.toml`
 
 ```toml
 # builder.toml
-[builder]
-image = "cnbs/builders:bionic" # Base new builder on this key
+[stack]
+id = "org.someorg.stacks.coolest"
+build-image = "example.com/build"
+run-image = "example.com/run"
+run-image-mirrors = ["example.org/run"]
 
 [extend]
-certs = ["./cert1.pem"] # Relative to location of `builder.toml`
-[extend.run]
-certs = ["./cert2.pem"] # Relative to location of `builder.toml`
-[extend.build]
-certs = ["./cert3.pem"] # Relative to location of `builder.toml`
+    [extend.certs]
+    binary = "operator-extender-binary"
+    volume-paths = ["/etc/ssl"]
 ```
 
-*Behavior*: Creates a new builder with `cert1.pem` on both run and build images, `cert2.pem` on run image, and `cert3.pem` on build image.
-
-Note that the [builder] section is mutually exclusive with [stack].
-
-##### Building an app with additional CA certs
-
-`pack build cnbs/myapp`
-
-```toml
-# project.toml
-[extend] # Both build
-certs = ["./cert1.pem"] # Relative to location of `builder.toml`
-[extend.run]
-certs = ["./cert2.pem"] # Relative to location of `builder.toml`
-[extend.build]
-certs = ["./cert3.pem"] # Relative to location of `builder.toml`
-```
+*Behavior*: Creates a new builder that includes the project provided extender binary with `volumePaths=="[\"/etc/ssl\"]"` label.
 
 # How it Works
 [how-it-works]: #how-it-works
 
-Platforms may extend app images with custom CA certs using the above interface by running the `extend` executable as root in a new container and creating an image from the result. Prior to this execution, the platform will be responsible for populating the contents of `[certs]` in `*-extend-toml`. Extending an image in this fashion should generate a single layer. This should happen prior to the normal CNB build or rebase process.
+Platforms may extend app images with custom CA certs using the above interface by running the `extend` executable as root at the beginning of lifecycle phases. 
+
+If volumes are to be used, it will attach volumes corresponding to those supplied in the volume label and mount these volumes in subsequent phases.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 - Some complications of UX.
+- Creating an extended image via layers is slow.
+- Not all stacks support ca-cert extension via filepaths.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -138,10 +141,12 @@ This RFC builds on some of the ideas proposed in https://github.com/buildpacks/r
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Given that the utility of runtime cert extension is limited (platforms usually mount and rotate them) does it make sense to restrict discussion in this RFC to build-time extension. If so we can punt on how rebasing will work.
-- Build vs Runtime CA-certs? Do we need to split them or should we just collapse this into one?
+- Given that the utility of runtime cert extension is limited (platforms usually mount and rotate them) does it make sense to restrict discussion in this RFC to build-time extension? If so we can punt on how rebasing will work.
 - Dynamically extended run image vs just adding to launch image (comes to the same thing?)
 - How does the platform communicate to buildpacks that certs are available?
+- Will paths work on windows?
+- What sort of caching mechanism should be in place for recycling extended volumes?
+- Baking certs into images
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
