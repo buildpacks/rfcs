@@ -112,33 +112,31 @@ An issue would be created with the following content:
 
 - Title: `[<ADD|YANK>] <namespace>/<name>@<version>`
 - Body:
-```markdown
-<user message (optional)>
 
-### Diff
+        <user message (optional)>
 
-` ` `patch
-<patch contents>
-` ` `
-```
+        ### Diff
+
+        ```patch
+        <patch contents>
+        ```
 
 ##### Example
 
 - Title: `[YANK] buildpacks-io-samples/hello-universe@0.0.1`
 - Body:
-```markdown
-Major bug issues found. See https://github.com/buildpacks/samples/issues.
 
-### Diff
+        Major bug issues found. See https://github.com/buildpacks/samples/issues.
 
-` ` `patch
---- a/he/ll/buildpacks-io-samples_hello-universe
-+++ b/he/ll/buildpacks-io-samples_hello-universe
-@@ -1 +1 @@
--{"ns":"buildpacks-io-samples","name":"hello-universe","version":"0.0.1","yanked":false,"addr":"cnbs/sample-package@sha256:a3dc49636f0dabd481906d1ee52c96e7daace1dea8b029c9ac36c27abe4cb1f6"}
-+{"ns":"buildpacks-io-samples","name":"hello-universe","version":"0.0.1","yanked":true,"addr":"cnbs/sample-package@sha256:a3dc49636f0dabd481906d1ee52c96e7daace1dea8b029c9ac36c27abe4cb1f6"}
-` ` `
-```
+        ### Diff
+
+        ```patch
+        --- a/he/ll/buildpacks-io-samples_hello-universe
+        +++ b/he/ll/buildpacks-io-samples_hello-universe
+        @@ -1 +1 @@
+        -{"ns":"buildpacks-io-samples","name":"hello-universe","version":"0.0.1","yanked":false,"addr":"cnbs/sample-package@sha256:a3dc49636f0dabd481906d1ee52c96e7daace1dea8b029c9ac36c27abe4cb1f6"}
+        +{"ns":"buildpacks-io-samples","name":"hello-universe","version":"0.0.1","yanked":true,"addr":"cnbs/sample-package@sha256:a3dc49636f0dabd481906d1ee52c96e7daace1dea8b029c9ac36c27abe4cb1f6"}
+        ```
 
 ## Default: `pack publish-buildpack <url>`
 
