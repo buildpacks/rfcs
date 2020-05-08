@@ -42,6 +42,104 @@ There are four mechanisms for publishing a buildpack:
 * Direct, which commits directly to the local Git repository for the index and makes a Git push to the origin
 * Yank, which removes a buildpack from the registry
 
+## Configuration
+
+##### Base Schema
+```toml
+[registries]
+default="<name>"
+
+[registries.<name>]
+type="<registry type>"
+# <additional per "type" config entries>
+```
+
+##### Type: GitHub Schema
+```toml
+[registries.<name>]
+type="github"
+url="<url to git repo>"
+issues-url="<url to issues for publishing>" # optional, default: "<url>/issues"
+```
+
+##### Type: GitHub Schema
+```toml
+[registries.<name>]
+type="git"
+url="<path to git repo>"
+```
+
+
+#### Default
+
+The following could be an implied default when no registries are present
+
+```
+[registries]
+default="official"
+
+[registries.official]
+type="github"
+url="https://github.com/buildpack/registry"
+
+[registries.official.github]
+issues-url="https://github.com/buildpack/registry/issues"
+```
+
+## Format
+
+### Type: Git
+
+A commit would be created with the following message:
+
+```
+[<ADD|YANK>] <namespace>/<name>@<version>
+
+<user message (optional)>
+```
+
+##### Example
+
+```
+[YANK] buildpacks-io-samples/hello-universe@0.0.1
+
+Major bug issues found. See https://github.com/buildpacks/samples/issues.
+```
+
+### Type: GitHub issue
+
+An issue would be created with the following content:
+
+- Title: `[<ADD|YANK>] <namespace>/<name>@<version>`
+- Body:
+```markdown
+<user message (optional)>
+
+### Diff
+
+` ` `patch
+<patch contents>
+` ` `
+```
+
+##### Example
+
+- Title: `[YANK] buildpacks-io-samples/hello-universe@0.0.1`
+- Body:
+```markdown
+Major bug issues found. See https://github.com/buildpacks/samples/issues.
+
+### Diff
+
+` ` `patch
+--- a/he/ll/buildpacks-io-samples_hello-universe
++++ b/he/ll/buildpacks-io-samples_hello-universe
+@@ -1 +1 @@
+-{"ns":"buildpacks-io-samples","name":"hello-universe","version":"0.0.1","yanked":false,"addr":"cnbs/sample-package@sha256:a3dc49636f0dabd481906d1ee52c96e7daace1dea8b029c9ac36c27abe4cb1f6"}
++{"ns":"buildpacks-io-samples","name":"hello-universe","version":"0.0.1","yanked":true,"addr":"cnbs/sample-package@sha256:a3dc49636f0dabd481906d1ee52c96e7daace1dea8b029c9ac36c27abe4cb1f6"}
+` ` `
+```
+
 ## Default: `pack publish-buildpack <url>`
 
 This command will ONLY work against the official `buildpacks.io` registry index. If the default registry is set otherwise, the command will prompt with instructions for publishing to a non-official registry. If the `--force` option is passed, it will attempt to open an issue anyways.
