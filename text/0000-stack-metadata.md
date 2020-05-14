@@ -30,10 +30,10 @@ This provides a high level overview of the feature.
 - Explaining the feature largely in terms of examples.  
 The following labels will be added to stack images:  
 `io.buildpacks.stack.maintainer`: Name of Stack Maintainer  
-`io.buildpacks.stack.url`: URL for the stack (i.e repo link)  
+`io.buildpacks.stack.homepage`: URL for the stack (i.e repo link)  
 `io.buildpacks.stack.distro.name`: Name of OS Distribution  
 `io.buildpacks.stack.distro.version`: Version of OS Distribution  
-`io.buildpacks.stack.release`: Release Number
+`io.buildpacks.stack.version`: Release Number
 `io.buildpacks.stack.release_date`: Release date of image
 `io.buildpacks.stack.description`: Description  
 
@@ -56,10 +56,10 @@ USER ${cnb_uid}:${cnb_gid}
 LABEL io.buildpacks.stack.id=${stack_id}
 LABEL io.buildpacks.stack.mixins="[\"ca-certificates\"............]"
 LABEL io.buildpacks.stack.maintainer="Paketo Buildpacks"
-LABEL io.buildpacks.stack.url="https://github.com/paketo-buildpacks/stacks/"
+LABEL io.buildpacks.stack.homepage="https://github.com/paketo-buildpacks/stacks/"
 LABEL io.buildpacks.stack.distro.name="ubuntu"
 LABEL io.buildpacks.stack.distro.version="18.04"
-LABEL io.buildpacks.stack.release="25"
+LABEL io.buildpacks.stack.version="25"
 LABEL io.buildpacks.stack.release_date="2020-05-12T05:17:02.390472"
 LABEL io.buildpacks.stack.description="Paketo Buildpacks base stack build image"
 ```
