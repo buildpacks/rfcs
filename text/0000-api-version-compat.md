@@ -1,7 +1,7 @@
 # Meta
 [meta]: #meta
 - Name: Lifecycle API version support changes
-- Start Date: 2020-04-14
+- Start Date: 2020-05-14
 - Author(s): [Emily Casey](https://github.com/ekcasey)
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
@@ -10,11 +10,11 @@
 # Summary
 [summary]: #summary
 
-In order enable smoother migrations and upgrades this RFC proposes the following changes to the API version compatibility rules:
+To enable smoother migrations and upgrades this RFC proposes the following changes to the API version compatibility rules:
 
 1. When the lifecycle increments an API versions in the `0.x` version line, this shall interpreted as non-breaking
 1. The spec may make certain types of "breaking" changes in a `0.x` API version, so long as those changes do not preclude simultaneous lifecycle support for the previous minor or require collaborating buildpacks to implement the same API version.
-1. When the lifecycle implments a new `0.x` API minor version, it will treat the usage of features removed between minor spec versions as a deprecated.
+1. When the lifecycle implments a new `0.x` API minor version, it will treat the usage of features removed between minor spec versions as deprecated.
 
 # Motivation
 [motivation]: #motivation
@@ -28,9 +28,9 @@ As the community of platform and buildpack authors grows and matures, this pain 
 Now that the APIs have stabilized we can realistically guarantee that we will not make breaking lifecycle changes before the implementation of the 1.0 APIs are released.
 
 ## Deprecations
-We will allow the spec to remove features in a minor API and interperet this as a deprecated feature in the lifecycle.
-Previous we never formalized rules around deprecations. This made sense because all API changes have been breaking.
-However, deprecations can aid platform and buldpack as they prepare to perform a major API upgrade.
+We will allow the spec to remove features in a minor API and interpret this as a deprecated feature in the lifecycle.
+Previously, we never formalized rules around deprecations. This made sense because all API changes have been breaking.
+However, deprecations can aid platforms and buildpacks as they prepare to perform a major API upgrade.
 
 The lifecycle will support deprecation modes to allow platform/buildpack authors to curate the experience for users
 and/or filter for deprecations relevant to their use case.
@@ -45,7 +45,7 @@ The spec will use future `0.x` API release to indicate changes that can be imple
 - removal of features (these will be interpreted as deprecated by the lifecycle)
 
 ## Lifecycle
-The lifecycle will continue use the [lifecycle descriptor](https://github.com/buildpacks/rfcs/blob/pack-publish-buildpack/text/0011-lifecycle-descriptor.md) 
+The lifecycle will continue to use the [lifecycle descriptor](https://github.com/buildpacks/rfcs/blob/pack-publish-buildpack/text/0011-lifecycle-descriptor.md)
 to indicate the implemented API versions as before. But the assumptions we make about compatibility will change.
 
 ## Deprecations
@@ -56,15 +56,18 @@ lifecycle features, the lifecycle will provide the following options to configur
 All lifecycle binaries will have a deprecation mode, configurable in the following way:
 | Flag              | Environment Variable | Default
 |-------------------|----------------------|--------
-| -deprecation-mode | CNB_DEPRECATION_MODE | all
+| -deprecation-mode | CNB_DEPRECATION_MODE | warn
 
 The allowed values of deprecation mode are as follows:
-| Mode      | Behavior
-|-----------|---------
-| all       | prints all deprecation warnings
-| buildpack | prints only buildpack API deprecation warnings
-| platform  | prints only platform API deprecation warnings
-| none      | silences all deprecation warnings
+| Mode                | Behavior
+|---------------------|---------
+| all                 | prints all deprecation warnings
+| buildpack           | prints only buildpack API deprecation warnings
+| platform            | prints only platform API deprecation warnings
+| none                | silences all deprecation warnings
+| fail                | prints an error message and fail when any deprecated feature is used
+| fail-buildpack      | fail for buildpack deprecations
+| fail-platform       | fail for platform deprecations
 
 # How it Works
 [how-it-works]: #how-it-works
