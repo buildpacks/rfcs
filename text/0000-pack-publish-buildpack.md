@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Pack Publish Buildpack
 - Start Date: 2020-04-27
-- Author(s): [Joe Kutner](https://github.com/jkutner)
+- Author(s): [Joe Kutner](https://github.com/jkutner), [Javier Romero](https://github.com/jromero)
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -36,13 +36,11 @@ The user will run the `pack yank-buildpack <namespace>/<name>@<version>` command
 # How it Works
 [how-it-works]: #how-it-works
 
-There are four mechanisms for publishing a buildpack:
-* Default, which opens a Github Issue in a browser
-* Headless, which uses an API token to POST the buildpack to a specified endpoint
-* Direct, which commits directly to the local Git repository for the index and makes a Git push to the origin
-* Yank, which removes a buildpack from the registry
+The implementation of adding and yanking buildpacks will require new configuration elements in Pack's config file, and two new commands in Pack.
 
 ## Configuration
+
+A default registry will be configured in `.pack/config.toml` with the following schema.
 
 ##### Base Schema
 ```toml
@@ -54,6 +52,8 @@ type="<registry type>"
 # <additional per "type" config entries>
 ```
 
+The `type` key can be set to one of two values, described below:
+
 ##### Type: GitHub Schema
 ```toml
 [registries.<name>]
@@ -62,19 +62,18 @@ url="<url to git repo>"
 issues-url="<url to issues for publishing>" # optional, default: "<url>/issues"
 ```
 
-##### Type: GitHub Schema
+##### Type: Git Schema
 ```toml
 [registries.<name>]
 type="git"
 url="<path to git repo>"
 ```
 
-
 #### Default
 
-The following could be an implied default when no registries are present
+The following could be an implied default when no registries are present, or pre-seeded by Pack when the file is initalized.
 
-```
+```toml
 [registries]
 default="official"
 
@@ -115,38 +114,38 @@ An issue would be created with the following content:
 
         <user message (optional)>
 
-        ### Diff
+        ### Data
 
-        ```patch
-        <patch contents>
+        ```toml
+        id = <ns/name (required)>
+        version = <version (required)>
+        addr = <address-to-image (only required for ADD)>
+        digest = <digest-of-image (only required for ADD)>
         ```
 
 ##### Example
 
-- Title: `[YANK] buildpacks-io-samples/hello-universe@0.0.1`
+- Title: `[YANK] samples/hello-universe@0.0.1`
 - Body:
 
         Major bug issues found. See https://github.com/buildpacks/samples/issues.
 
-        ### Diff
+        ### Data
 
-        ```patch
-        --- a/he/ll/buildpacks-io-samples_hello-universe
-        +++ b/he/ll/buildpacks-io-samples_hello-universe
-        @@ -1 +1 @@
-        -{"ns":"buildpacks-io-samples","name":"hello-universe","version":"0.0.1","yanked":false,"addr":"cnbs/sample-package@sha256:a3dc49636f0dabd481906d1ee52c96e7daace1dea8b029c9ac36c27abe4cb1f6"}
-        +{"ns":"buildpacks-io-samples","name":"hello-universe","version":"0.0.1","yanked":true,"addr":"cnbs/sample-package@sha256:a3dc49636f0dabd481906d1ee52c96e7daace1dea8b029c9ac36c27abe4cb1f6"}
+        ```toml
+        id = samples/hello-universe
+        version = 0.0.1
         ```
 
-## Default: `pack publish-buildpack <url>`
-
-This command will ONLY work against the official `buildpacks.io` registry index. If the default registry is set otherwise, the command will prompt with instructions for publishing to a non-official registry. If the `--force` option is passed, it will attempt to open an issue anyways.
+## `pack publish-buildpack <url>`
 
 Arguments:
 
-* `url` - the location of a buildpackage _in an Docker registry_ to be released in the buildpack registry
+* `url` - the location of a buildpackage _in a Docker registry_ to be released in the buildpack registry
 
 Steps:
+
+The following behavior will execute when the configured registry is of type `github`.
 
 1. Pulls the image manifest for the buildpackage at `url` if it does not already exist locally.
 1. Reads the following information from the image manifest (if any of these are missing, the command fails):
@@ -163,25 +162,7 @@ Steps:
     - Create a commit against the master branch of the `https://github.com/buildpacks/registry-index` repo using a Gitub token (i.e. all commits in that repo will be made by the same "user"). The commit will add the buildpack version described in the issue.
     - Close the Github issue.
 
-Options:
-
-* `--force` - if the registry URL is a Github URL, but is not the official registry, Pack will open the browser with the Github Issue anyways.
-
-**NOTE:** Github Issues that are not recognized as a request to add/yank a buildpack version will be automatically closed. All PRs will also be automatically closed.
-
-## Headless: `pack publish-buildpack --headless <url>`
-
-We are reserving the `--headless` flag for future work. It will enable a method of publishing where Pack makes an HTTP POST request to an API, which adds the buildpack at `<url>` to the registry.
-
-## Direct: `pack publish-buildpack --direct <url>`
-
-When the `pack publish-buildpack` command is passed the `--direct` option, it will commit the buildpack directly to the local registry cache, and attempt to push to the origin. This will NOT work against the official registry index, and the CLI will explicitly check for this before pushing so that it can error out with an appropriate message.
-
-Arguments:
-
-* `url` - the location of a buildpackage _in an Docker registry_ to be released in the buildpack registry
-
-Steps:
+The following behavior will execute when the configured registry is of type `git`.
 
 1. Pulls the image manifest for the buildpackage at `url` if it does not already exist locally.
 1. Reads the following information from the image manifest (if any of these are missing, the command fails):
@@ -194,7 +175,15 @@ Steps:
 
 Options:
 
-* `--native` - indicates that the native Git mechanism should be used
+* `--buildpack-registry, -R` - the id of a registry configured in `.pack/config.toml`
+
+**NOTE:** Github Issues that are not recognized as a request to add/yank a buildpack version will be automatically closed. All PRs will also be automatically closed.
+
+Example:
+
+```
+$ pack publish-buildpack docker://docker.io/buildpacks/sample:latest
+```
 
 ## `pack yank-buildpack <buildpack-id-and-version>`
 
@@ -203,6 +192,8 @@ Arguments:
 * `buildpack-id-and-version` - a buildpack ID and version in the form `<id>@<version>`
 
 Steps:
+
+The following behavior will execute when the configured registry is of type `github`.
 
 1. Opens a link to a new Github Issue in the user's browser
     - The user must be logged into Github
@@ -214,24 +205,44 @@ Steps:
     - Create and merge a PR against the `https://github.com/buildpacks/registry-index` repo using a Gitub token (i.e. all commits in that repo will be made by the same "user"). The PR will set `yanked=true` for the buildpack version described in the issue.
     - Close the Github issue.
 
+The following behavior will execute when the configured registry is of type `git`.
+
+1. Creates a `local` branch on the local registry index cache
+1. Makes a Git commit to the local registry index with an update setting `yank=true` in the JSON payload representing the buildpack version as defined in [RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)
+1. Uses Git to push the commit to the registry index's `origin`.
+1. Updates the `master` branch of the local registry cache from `origin`.
+
 Options:
 
 * `--undo` - this option will execute the same flow, but set `yanked=false`
 
+```
+$ pack yank-buildpack buildpacks/sample@0.0.1
+```
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
-* Github is a single-point-of-failure
-* The user must have a Github account
-* The user must publish via a browser or provide a Github API token to the CLI
+* `type` of registry isn't accounted for in the [Buildpack URI](https://github.com/buildpacks/rfcs/blob/master/text/0037-buildpack-uris.md) definition
+* Github is a single-point-of-failure for the official registry
+* The user must have a Github account to publish to the official registry
+* The user may only publish to the official registry via a browser
 * "publish" is ambigious (we use it in `pack package-buildpack --publish` to mean pushing an OCI image to a Docker registry).
 
 # Alternatives
 [alternatives]: #alternatives
 
-## Direct commits to the index
+## Infer registry type
 
-Instead of handling Github Issues on the `buildpacks/registry` repo, the `publish-buildpack` command could open a PR against the `buildpacks/registry-index`. This has the following drawbacks:
+Instead of configuring the registry `type`, Pack could infer the type from the URL. For example, any URL with the host `github.com` would be interpreted as type `github`. Any local file path would be interpreted as type `git`.
+
+## Direct commits to the remote index
+
+Instead of handling Github Issues on the `buildpacks/registry` repo, the `publish-buildpack` command could open a PR against the `buildpacks/registry-index`. This has the following advantages:
+
+* The operation could be performed headlessly without storing or transporting the user's Github token.
+
+This also has the following drawbacks:
 
 * The user *must* fork the `buildpacks/registry-index`
 * The contents of a PR to the `buildpacks/registry-index` repo are not intended to be human readable, which would make it difficult for users to audit before submitting.
@@ -250,9 +261,10 @@ The command to release a new version could be `pack push-buildpack` to avoid amb
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What is the structure of the data in the Github Issue?
+- What other types of repository should we support?
+    - API?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
- None
+None
