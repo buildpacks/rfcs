@@ -11,9 +11,8 @@
 [summary]: #summary
 
 This RFC proposes:
-1. An interface between a set of stack images and a platform in order to extend the images
-2. A UX for the pack CLI for extending builders with OS packages
-3. A type of buildpack that runs as the root user
+1. A UX for the pack CLI for extending builders with OS packages
+1. A type of buildpack that runs as the root user
 
 # Motivation
 [motivation]: #motivation
@@ -23,7 +22,7 @@ Allowing buildpacks to install OS packages dynamically during build would drasti
 Mixins already allow buildpack authors to create buildpacks that depend on an extended set of OS packages without affecting build time.
 However, it is not uncommon for application code to depend on OS packages.
 
-Given that app authors and platform maintainers experience increased build time directly, extending the stack at the app author's or platform maintainer's request may add flexibility without sacrificing performance. At the same time, we want the CNB interface to be highly orthogonal, which is why we've strived to "make everything a buildpack". Allowing some buildpacks to run with privileges would give users the flexibility they expect based on their experience with other tools like `Dockerfile`.
+Given that app authors and platform maintainers experience increased build time directly, extending the stack at the app author's request may add flexibility without sacrificing performance. At the same time, we want the CNB interface to be highly orthogonal, which is why we've strived to "make everything a buildpack". Allowing some buildpacks to run with privileges would give users the flexibility they expect based on their experience with other tools like `Dockerfile`.
 
 The advantages of using a buildpack for privileged operations are the same as for unprivileged operations: they are composable, fast (caching), modular, reuseable, and safe.
 
@@ -32,11 +31,11 @@ As an example, consider the use case of Acme.com. They have three teams that wan
 # What it is
 [what-it-is]: #what-it-is
 
-Stack image creators and buildpack users can use buildpacks to extend their build and/or run images.
+- *root buildpack* - a special case of buildpack that is run with privileges
 
-## Specification
+Application developers can use root buildpacks to extend their build and/or run images.
 
-Introduce a boolean `privileged` key in the `[buildpack]` table of `buildpack.toml`, which is defined as follows:
+We introduce a boolean `privileged` key in the `[buildpack]` table of `buildpack.toml`, which is defined as follows:
 
 ```
 [buildpack]
@@ -45,24 +44,117 @@ privileged = <boolean (default=false)>
 
 When `privileged` is set to `true`, the lifecycle will run this buildpack as the `root` user.
 
-For each Root Buildpack, the lifecycle will mount an overlay filesystem before the buildpack's build phase executes (excluding `/tmp`, `/cnb`, and `/layers`). The buildpack can then create layers normally by writing to the `<layers>/` directory the same way an unprivileged buildpack would. However, a new `paths` key would be added to the `<layers>/<layer>.toml` schema:
+For each root buildpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the buildpack's build phase (excluding `/tmp`, `/cnb`, and `/layers`). All of the captured changes will be included in a single layer produced as output from the buildpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
 
+The buildpack can then exclude directories from the layer by writing to the `launch.toml` using a new `[[excludes]]` table, for example:
+
+```toml
+[[excludes]]
+paths = [ "/var" ]
+cache = true
 ```
-paths = ["<path glob>"]
-launch = <boolean>
-build = <boolean>
-cache = <boolean>
+
+* `paths` - a list of path globs to exclude from the run image
+* `cache` - if set to `true`, the paths will be stored in the cache
+
+The `[process]` and `[[slices]]` tables can be used as normal.
+
+The following constraints will be enforced:
+* If a root buildpack is included in a `[[build.buildpacks]]` list in an app's `project.toml`, the build will fail.
+* If a user attempts to create a buildpackage including both root buildpacks and non-root buildpacks, the process will fail.
+
+# How it Works
+[how-it-works]: #how-it-works
+
+## Building an App with Additional Packages
+
+Given a root buildpack with ID `example/git`, the following configuration can be used:
+
+`project.toml`:
+```toml
+[[stack.build.buildpacks]]
+id = "example/git"
+version = "1.0"
+
+[[stack.run.buildpacks]]
+id = "example/git"
+version = "1.0"
 ```
 
-The `paths` array defines the directories and files from the overlay filesystem that should be included in the layer. If an unprivileged buildpack uses the `paths` key, it will be ignored.
+When the following command is run, the app source code will be loaded into the image for access by the root buildpack.
 
-The `launch` and `build` keys can be used as normal, but how they are interpreted will differ based on where they are run (i.e. a launch-only layer will be discarded when the buildpack is run on a build-image, and a build-only layer will be discarded when the buildpack is run on a run-image).
+`pack build sclevine/myapp`
 
-If a Root Buildpack (i.e. a buildpack with `privileged = true`) is included in a `[[build.buildpacks]]` list in an app's `buildpack.toml`, the build will fail.
+This creates a version of the current builder with additional layers and an ephemeral run image with additional layers, then does a normal `pack build`.
 
-## UX
+* The run image layers are persistented as part of the app image, and can be reused on subsequent builds.
+* The build image layers will be persisted as part of the cache, and can be reused on subsequent builds.
+* Any paths that are excluded using `launch.toml` and set to be cached will be stored in the cache, and can be reused on subsequent builds.
 
-### Creating an Extended Builder
+## Upgrade an App
+
+`pack upgrade sclevine/myapp`
+
+This will run `pack upgrade sclevine/run`, generate an ephemeral image, and then do the equivalent of `pack rebase sclevine/myapp`.
+
+Attempting to rebase an app directly after it's been upgraded is not permitted and will fail, because the current base is now ephemeral.
+
+When the base image has not changed
+1. If the buildpacks are configure as idempotent (the default) load the previous layers onto the base images.
+1. Run the buildpacks, creating an emphemeral image.
+1. Rebase the app on to the new emphemeral image.
+
+When there is an update to either the build or run base images
+1. Pull the new base image(s)
+1. Run the root buildpacks against the new image(s) without loading previous layers, and create an emphemeral image.
+1. Rebase the app on to the new emphemeral image.
+
+## Example: Apt Buildpack
+
+A buildpack that reads an `apt.toml` file to install an arbitrary list of packages would have a `buildpack.toml` like this:
+
+```toml
+[buildpack]
+id = "example/apt"
+privileged = true
+```
+
+An end-user's `apt.toml` might look like this:
+
+```toml
+[build]
+packages = [
+  "libpq-dev"
+]
+
+[run]
+packages = [
+  "libpq",
+  "ffmpeg"
+]
+```
+
+The `bin/build` would look like:
+
+```bash
+#!/usr/bin/env bash
+
+apt update
+
+for package in $(cat apt.toml | yj -t | jq -r ".$CNB_STACK_TYPE.packages | .[]"); do
+    apt install $package
+done
+
+cat << EOF > launch.toml
+[[excludes]]
+paths = [ "/var" ]
+cache = true
+EOF
+```
+
+# Alternatives
+
+## Creating an Extended Builder
 
 `pack create-builder sclevine/builder --config builder.toml --run-image sclevine/run --run-image-mirror scl.sh/run`
 
@@ -87,7 +179,14 @@ Behavior: creates a new builder with layers applied from the `example/git` build
 
 **Note:** If `--run-image` is not specified, the builder metadata could be used to dynamically extend the run image on `pack build`. This would make every initial `pack build` slower, so I consider this optimization out-of-scope for this RFC.
 
-### Extended an Existing Builder
+Open Questions:
+- What happens if you try to extend an extended builder?
+   - There are three options:
+      1. Fail
+      1. Treat the extended builder as a normal builder, and override the metadata. Advantages: Allows controlled, multi-level distribution model for changes. Easy to implement. Disadvantages: Requires pack upgradeing multiple levels of builders to fully patch the most extended builder.
+      1. Always save the existing metadata and the run image references each time. On pack upgrade, replay each extension. Advantages: Easy to upgrade builders with confidence. Disadvantages: Consumers of extended builders may upgrade them unintentionally (by upgrading their own nested extensions).
+
+## Extended an Existing Builder
 
 `pack extend-builder sclevine/builder --extension-config extend.toml --run-image sclevine/run --run-image-mirror scl.sh/run`
 
@@ -106,127 +205,21 @@ Behavior: creates a new version of an existing builder with layers applied from 
 
 **Note:** If `--run-image` is not specified, the builder metadata could be used to dynamically extend the run image on `pack build`. This would make every initial `pack build` slower, so I consider this optimization out-of-scope for this RFC.
 
-### Building an App with Additional Packages
-
-`pack build sclevine/myapp`
-
-project.toml:
-```toml
-[[stack.build.buildpacks]]
-id = "example/git"
-version = "1.0"
-
-[[stack.run.buildpacks]]
-id = "example/git"
-version = "1.0"
-```
-
-Behavior: creates a version of the current builder with additional layers and an ephemeral run image with additional layers, then does a normal `pack build`. The run image is persistented as part of the app image, and can be reused on subsequent builds.
-
-Questions:
-- should we store the new builder image to make rebuild faster? If so, where? Should we generate a tag for it? Can we use the buildpack cache for this?
-- should the buildpack have access to the app source code?
-
-### Upgrade an Extended Builder
-
-Both build and run images: `pack upgrade sclevine/builder`
-
-Run images (including mirrors): `pack upgrade sclevine/run`
-
-### Upgrade an App
-
-`pack upgrade sclevine/myapp`
-
-This will run `pack upgrade sclevine/run`, generate an ephemeral image, and then do the equivalent of `pack rebase sclevine/myapp`.
-
-Attempting to rebase an app directly after it's been upgraded is not permitted and will fail, because the current base is now ephemeral.
-
-# How it Works
-[how-it-works]: #how-it-works
-
-## Specification
-
-Platforms may extend app images using the above interface by running the root buildpacks and creating an image from the result. This should happen prior to the normal CNB build or rebase process.
-
-## UX
-
-`pack upgrade` (on base image)
-1. See if new base image available, if so pull the new base image(s)
-1. Run the extension buildpack(s) against each base image.
-
-If running `pack upgrade` on a builder, perform operation against both builder and run images and publish both.
-If running `pack upgrade` on an app, perform operation against run image (with ephemeral output into app repo), then `pack rebase`.
-
-## Example: Imagemagick Buildpack
-
-For a buildpack that installs the Imagemagick package, the `buildpack.toml` would look like:
-
-```toml
-[buildpack]
-id = "example/imagemagick"
-privileged = true
-```
-
-The `bin/build` would look like:
-
-```bash
-#!/usr/bin/env bash
-
-apt update
-apt install imagemagick
-
-cat << EOF > ${1}/usr.toml
-paths = [ "/usr" ]
-launch = true
-build = true
-cache = true
-EOF
-
-cat << EOF > ${1}/var.toml
-paths = [ "/var" ]
-launch = false
-build = false
-cache = true
-EOF
-```
-
-# Alternatives
-
-- Instead of adding `paths` to the `<layer>.toml`, the lifecycle could save the entire overlay as a layer. This mimics the behavior of the `RUN` directive of `Dockerfile`.
-- Make the overlay filesystem optional by adding a boolean `overlay` key in the `[buildpack]` table in `buildpack.toml`. When disabled, the Root Buildpack would still have root access, but it's changes to the filesystem would be discarded.
+Open Questions:
+- What happens if you try to extend an extended builder?
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Requires kaniko (or a similar tool) when a docker daemon is unavailable
+- Requires kaniko (or a similar tool) for snapshotting
 - Fully rebasing apps with package dependencies becomes many orders of magnitude slower, due to upgrade needs
 - Reliability of rebasing apps with package dependencies degrades and network and other external factors may break the process.
-- Some buildpack users will not want to give root access to any-and-all buildpacks. Instead they may want to selectively whitelist certain root buildpacks.
-- The overlayfs could get messy
-   - is it portable (windows?)
-   - will there be unexpected edge cases?
-   - requires privileges?
-   - works for docker...
-
+- Some buildpack users will not want to give root access to arbitrary buildpacks. Instead they may want to selectively whitelist certain root buildpacks.
 
 # Questions
 [questions]: #questions
 
-What happens if you try to extend an extended builder?
-
-Three options:
-
-1. Fail
-
-2. Treat the extended builder as a normal builder, and override the metadata.
-   Advantages: Allows controlled, multi-level distribution model for changes. Easy to implement.
-   Disadvantages: Requires `pack upgrade`ing multiple levels of builders to fully patch the most extended builder.
-
-3. Always save the existing metadata and the run image references each time. On `pack upgrade`, replay each extension.
-   Advantages: Easy to upgrade builders with confidence.
-   Disadvantages: Consumers of extended builders may upgrade them unintentionally (by upgrading their own nested extensions).
-
-My preference is (3), but (1) would be a good place to start.
+* Should we allow non-root buildpacks to run in combination with root buildpacks?
 
 # References
 
@@ -244,20 +237,56 @@ This proposal adds a new key to the `[buildpack]` table in `buildpack.toml`:
 ```
 [buildpack]
 privileged = <boolean (default=false)>
+? = <boolean (default=false)>
 ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user
+* `?` - when set to `true`, indicates that the buildpack is not idempotent. The lifecycle will provide a clean filesystem from the base image before each run (i.e. no cache). Non-idempotent buildpacks cannot be combined.
 
-## Layer Content Metadata (TOML)
+## `launch.toml`
 
-This proposal adds a new key to the Layer Content Metadata schema:
+This proposal adds a new top level table in `launch.toml`:
 
-```toml
-launch = false
-build = false
-cache = false
-paths = [ "<path glob>" ]
-
-[metadata]
-# buildpack-specific data
 ```
+[excludes]
+paths = [ "<path glob>" ]
+cache = <boolean (default=false)>
+```
+
+Path globs MUST:
+
+* Follow the pattern syntax defined in the Go standard library.
+* Match zero or more files or directories.
+* Be absolute
+
+Path globs are not restricted to the app dir as with [slices](https://github.com/buildpacks/spec/blob/master/buildpack.md#launchtoml-toml).
+
+## `project.toml`
+
+```
+[[stack.build.buildpacks]]
+id = "<buildpack ID (optional)>"
+version = "<buildpack version (optional default=latest)>"
+uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
+
+[[stack.run.buildpacks]]
+id = "<buildpack ID (optional)>"
+version = "<buildpack version (optional default=latest)>"
+uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
+```
+
+### `[[stack.build.buildpacks]]`
+
+This table MAY include a list of root buildpacks to execute against the builder image.
+
+### `[[stack.run.buildpacks]]`
+
+This table MAY include a list of root buildpacks to execute against the run image.
+
+## Environment
+
+## Provided by the Lifecycle
+
+| Env Variable      | Description         | Detect | Build | Launch
+|-------------------|---------------------|--------|-------|--------
+| `CNB_STACK_TYPE`  | 'build' or 'run'    | [x]    | [x]   |
