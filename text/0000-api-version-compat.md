@@ -25,12 +25,12 @@ The lifecycle will assume the burden of maintaining compatibility, reducing the 
 Because there are far fewer lifecycle implementation than platforms or buildpacks, the lifecycle should assume the burden of maintaining compatibility. This will free platform authors to consume new lifecycles without worry and free buildpack authors to implement new APIs at their own pace. 
 
 ## Non-Breaking 0.x API Versions
-Originally we specified that all minor version increments in the `0.x` line would be interpreted as breaking changes, when applying [compatibility rules](https://github.com/buildpacks/spec/blob/master/buildpack.md#buildpacktoml-toml).
-This was the correct decision initially b/c we needed a way to indicate breaking changes before the APIs reached 1.0.
-However, this has become annoying over time as it adds considerable friction to specification changes. All platforms and buildpacks must explicitly update to support the new APIs before pulling in a new lifecycle.
+Originally we specified that all minor version increments in the `0.x` line would be interpreted as breaking changes when applying [compatibility rules](https://github.com/buildpacks/spec/blob/master/buildpack.md#buildpacktoml-toml).
+However, a breaking change in the spec need not imply a breaking change in the lifecycle.
+The existing compatibility rules have become annoying over time as they add considerable friction to specification changes. All platforms and buildpacks must explicitly update to support the new APIs before pulling in a new lifecycle.
 As the community of platform and buildpack authors grows and matures, this pain is magnified.
 
-Now that the lifecycle has matured and the APIs have stabilized, we can realistically guarantee that we will not make breaking lifecycle changes before the implementation of the 1.0 APIs are released.
+Now that the lifecycle has matured and the APIs have partially stabilized, we can realistically guarantee that we will not make breaking lifecycle changes when adding support for a new 0.x API.
 
 ## Deprecations
 Once the 1.0 API is supported, we may wish to deprecate older APIs. A future RFC should provide a strategy for deprecations and outline the upgrade path from 0.x to 1.0 APIs. This is purposefully omitted from this RFC so that we can make progress on new 0.x APIs while we work out the details.
@@ -40,6 +40,8 @@ Once the 1.0 API is supported, we may wish to deprecate older APIs. A future RFC
 
 ## Spec
 The spec will use future `0.x` API releases to include any desired changes with one exception: the spec may not change in a way that precludes buildpacks implementing different 0.x APIs from running together.
+
+This RFC does not make changes to the API compatibility rules post 1.0. 1.x APIs version are stil assumed to be purely additive.
 
 ## Lifecycle
 The lifecycle will use the [lifecycle descriptor](https://github.com/buildpacks/rfcs/blob/pack-publish-buildpack/text/0011-lifecycle-descriptor.md)
@@ -83,7 +85,7 @@ Buildpacks should continue to declare the minimum required buildpack API in thei
 
 The lifecycle must now deal with the complexity of implementing all 0.2+ APIs.
 
-The spec may not make certain types of changes to the contractual build plan before 1.0, even if those changes are desirable.
+The spec may not make certain types of changes to the contractual build plan before 1.0, even if those changes are desirable, because they make concurrent support for multiple APIs impossible.
 
 Buildpacks and platforms are likely to implement new APIs more slowly without a forcing function.
 
@@ -92,7 +94,7 @@ Buildpacks and platforms are likely to implement new APIs more slowly without a 
 
 - Keep doing what we are doing
     - This will continue to cause pain for platform and buildpack authors
-- Do not allow breaking changes in the spec itself, instead add deprecation to the spec and print feature level deprecation warning (the previous version of this RFC + suggestions from commenters)
+- Do not allow breaking changes in the spec itself. Instead, add deprecations to the spec and print feature level deprecation warnings (the previous version of this RFC)
 
 # Prior Art
 [prior-art]: #prior-art
@@ -105,10 +107,15 @@ Buildpacks and platforms are likely to implement new APIs more slowly without a 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Will we allow breaking changes in a minor API version in the spec itself post `1.0`?
 - How do we navigate the upgrade to 1.0 APIs
 - How do we eventually deprecate older APIs
 
 # Spec. Changes
 [spec-changes]: #spec-changes
-The compatibility rules described in https://github.com/buildpacks/spec/blob/master/buildpack.md#buildpacktoml-toml will change to remove the special consideration for `0.x` API versions.
+
+We will remove the [compatibility rules](https://github.com/buildpacks/spec/blob/master/buildpack.md#buildpacktoml-toml) from the `buildpack.toml` section of the spec and add a new section describing any spec-level guarantees of compatibility between API versions.
+ We will not attempt to define a buildpack's compatibility with a given lifecycle, thereby allowing but not requiring a given lifecycle to implement multiple API versions.
+
+In practice, this means continuing to codify the existing compatible cases, but removing the negative cases.
+
+Example: A lifecycle implementing buildpack API 1.1 is still guaranteed to be compatible with a buildpack implementing 1.0, by nature of the spec. No further assumptions are specified.
