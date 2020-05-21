@@ -44,7 +44,7 @@ privileged = <boolean (default=false)>
 
 When `privileged` is set to `true`, the lifecycle will run this buildpack as the `root` user.
 
-For each root buildpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the buildpack's build phase (excluding `/tmp`, `/cnb`, and `/layers`). All of the captured changes will be included in a single layer produced as output from the buildpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
+For each root buildpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the buildpack's build phase (excluding `/tmp`, `/cnb`, and `/layers`). Alternatively to snapshotting, a platform may store a new stack iamge to cache the changes. All of the captured changes will be included in a single layer produced as output from the buildpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
 
 The buildpack can then exclude directories from the layer by writing to the `launch.toml` using a new `[[excludes]]` table, for example:
 
@@ -68,16 +68,16 @@ The following constraints will be enforced:
 
 ## Building an App with Additional Packages
 
-Given a root buildpack with ID `example/git`, the following configuration can be used:
+Given a root buildpack with ID `example/git`, the following configuration can be used with a Golang app:
 
 `project.toml`:
 ```toml
-[[stack.build.buildpacks]]
+[[build.buildpacks]]
 id = "example/git"
 version = "1.0"
 
-[[stack.run.buildpacks]]
-id = "example/git"
+[[build.buildpacks]]
+id = "example/golang"
 version = "1.0"
 ```
 
@@ -85,7 +85,7 @@ When the following command is run, the app source code will be loaded into the i
 
 `pack build sclevine/myapp`
 
-This creates a version of the current builder with additional layers and an ephemeral run image with additional layers, then does a normal `pack build`.
+All root buildpacks will be sliced out of the list of buildpacks, and run before non-root buildpacks. This creates a version of the current builder with additional layers and an ephemeral run image with additional layers, then does a normal `pack build`.
 
 * The run image layers are persistented as part of the app image, and can be reused on subsequent builds.
 * The build image layers will be persisted as part of the cache, and can be reused on subsequent builds.
@@ -154,59 +154,7 @@ EOF
 
 # Alternatives
 
-## Creating an Extended Builder
-
-`pack create-builder sclevine/builder --config builder.toml --run-image sclevine/run --run-image-mirror scl.sh/run`
-
-builder.toml:
-```toml
-[stack]
-id = "io.buildpacks.stacks.bionic"
-build-image = "example.com/build"
-run-image = "example.com/run"
-run-image-mirrors = ["example.org/run"]
-
-[[stack.build.buildpacks]]
-id = "example/git"
-version = "1.0"
-
-[[stack.run.buildpacks]]
-id = "example/git"
-version = "1.0"
-```
-
-Behavior: creates a new builder with layers applied from the `example/git` buildpack as well as a new run image (`sclevine/run`) with layers applied from the `example/git` buildpack.
-
-**Note:** If `--run-image` is not specified, the builder metadata could be used to dynamically extend the run image on `pack build`. This would make every initial `pack build` slower, so I consider this optimization out-of-scope for this RFC.
-
-Open Questions:
-- What happens if you try to extend an extended builder?
-   - There are three options:
-      1. Fail
-      1. Treat the extended builder as a normal builder, and override the metadata. Advantages: Allows controlled, multi-level distribution model for changes. Easy to implement. Disadvantages: Requires pack upgradeing multiple levels of builders to fully patch the most extended builder.
-      1. Always save the existing metadata and the run image references each time. On pack upgrade, replay each extension. Advantages: Easy to upgrade builders with confidence. Disadvantages: Consumers of extended builders may upgrade them unintentionally (by upgrading their own nested extensions).
-
-## Extended an Existing Builder
-
-`pack extend-builder sclevine/builder --extension-config extend.toml --run-image sclevine/run --run-image-mirror scl.sh/run`
-
-extend.toml:
-```toml
-[[stack.build.buildpacks]]
-id = "example/git"
-version = "1.0"
-
-[[stack.run.buildpacks]]
-id = "example/git"
-version = "1.0"
-```
-
-Behavior: creates a new version of an existing builder with layers applied from the `example/git` buildpack as well as a new run image (`sclevine/run`)  with layers applied from the `example/git` buildpack.
-
-**Note:** If `--run-image` is not specified, the builder metadata could be used to dynamically extend the run image on `pack build`. This would make every initial `pack build` slower, so I consider this optimization out-of-scope for this RFC.
-
-Open Questions:
-- What happens if you try to extend an extended builder?
+* https://github.com/buildpacks/rfcs/pull/23
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -220,6 +168,8 @@ Open Questions:
 [questions]: #questions
 
 * Should we allow non-root buildpacks to run in combination with root buildpacks?
+* How do the packages installed by a root buildpack related (or not related) to mixins
+    * That is, can you use a root buildpack to install a package that satisfies the requirements of a buildpacks' required mixins?
 
 # References
 
