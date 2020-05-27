@@ -101,7 +101,7 @@ cnb
 ```
 ### How will paths to dependencies be exposed to a buildpack?
 
-During the `build` phase of the `paketo-buildpacks/mri` buildpack, the `CNB_DEPS` environment variable will provide a path pointing to a `packaged.toml` file, this will contain information on all all dependencies packaged with a buildpack.
+During the `build` phase of the `paketo-buildpacks/mri` buildpack, the `CNB_DEPS` environment variable will provide a path pointing to a `packaged.toml` file, this will contain information on all dependencies packaged with a buildpack.
 
 More on the contents of this file [here](#What-are-the-contents-of-the-packagedtoml-file-that-CNB_PATH-points-to).
 
@@ -223,8 +223,6 @@ Why should we *not* do this?
 
 - What is the strategy for staying under the 127 Layer limit.
 - Is `CNB_DEPS` a bad buildpack author experience?
-- should we force some dependency api at each `/cnb/deps/some-identifier/v1.2.3`?
-
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
