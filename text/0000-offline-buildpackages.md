@@ -170,7 +170,7 @@ A buildpack packaged with dependencies will have the added `depLayers` field in 
                  "path": "/cnb/deps/path/to/dep1",
                  "id": "org.some-identifier",
                  "version": "v1.2.3", "metadata": {}
-              }
+              },
               "sha256:sha256-to-other-dep-layer": {
                  "path": "/cnb/deps/path/to/dep1",
                  "id": "paketo.node",
