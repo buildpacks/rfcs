@@ -164,7 +164,7 @@ A buildpack packaged with dependencies will have the added `depLayers` field in 
                "id":"io.buildpacks.stacks.bionic"
             }
          ],
-         "layerDiffID":"sha256:9ae53c280ea60b30b8c03978fbd2f761769fe0c15e421a9ece68e2f52926ce77"
+         "layerDiffID":"sha256:9ae53c280ea60b30b8c03978fbd2f761769fe0c15e421a9ece68e2f52926ce77",
          "depLayers":{
               "sha256:sha256-to-dep-layer": {
                  "path": "/cnb/deps/path/to/dep1",
