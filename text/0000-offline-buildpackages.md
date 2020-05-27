@@ -132,7 +132,7 @@ version = "v10.20.0"
 
 the above would give us the following file tree.
 
-```toml
+```
 cnb
 └─ deps
     ├── org.some-identifier
