@@ -14,8 +14,9 @@ To enable smoother migrations and upgrades this RFC proposes the following chang
 
 1. When the lifecycle increments a supported API in its descriptor file to `0.x`, this implies support for `0.2-0.x` versions of that API
 1. The spec may make changes it wishes in a new 0.x API so long as those changes do not preclude buildpacks implementing different 0.x APIs from running together (e.g changes to the contractual build plan that cannot be bridged by the lifecycle)
-1. The platform can configure which version of the API the lifecycle implements
-1. When interacting with a buildpack, the lifecycle will use the API declared in each buildpack's `buildpack.toml`
+1. The platform can configure which version of the platform API the lifecycle adheres to
+1. When interacting with a buildpack, the lifecycle will adhere to the API declared in each buildpack's `buildpack.toml`
+1. The spec may deprecate features or usage in a given API. The lifecycle will print deprecation warnings when it encounters deprecated usage.
 
 The lifecycle will assume the burden of maintaining compatibility, reducing the burden on platform and buildpack authors.  
 
@@ -31,9 +32,6 @@ The existing compatibility rules have become annoying over time as they add cons
 As the community of platform and buildpack authors grows and matures, this pain is magnified.
 
 Now that the lifecycle has matured and the APIs have partially stabilized, we can realistically guarantee that we will not make breaking lifecycle changes when adding support for a new 0.x API.
-
-## Deprecations
-Once the 1.0 API is supported, we may wish to deprecate older APIs. A future RFC should provide a strategy for deprecations and outline the upgrade path from 0.x to 1.0 APIs. This is purposefully omitted from this RFC so that we can make progress on new 0.x APIs while we work out the details.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -51,16 +49,23 @@ It will be assumed that a lifecycle declaring support for the `0.x` version of t
 ### Platform API
 The lifecycle will use the `CNB_PLATFORM_API` environment variable to decide which API to implement. For now, if `CNB_PLATFORM_API` is not supplied, platform API 0.3 (the currently implemented API) will be assumed, to avoid breaking existing platforms that do not currently set this environment variable.
 
-If the API version declared in `CNB_PLATFORM_API` is higher than the newest supported by a given lifecycle, it will fail.
+If the API version declared in `CNB_PLATFORM_API` not supported by a given lifecycle, it will fail.
 
 ### Buildpack API
 When orchestrating buildpacks, the lifecycle will provide inputs to and interpret outputs from each buildpack using the buildpack API indicated in that buildpack's `buildpack.toml` file.
 
-If the buildpack API declared in the buildpack.toml of a non-optional buildpack is higher than the newest supported by a given lifecycle, the lifecycle will fail.
-If the buildpack API declared in the buildpack.toml of an optional buildpack is higher than the newest supported by a given lifecycle, the lifecycle will warn, omit this buildpack from the group, and continue running.
+If the buildpack API declared in the buildpack.toml of a non-optional buildpack is not supported by a given lifecycle, the lifecycle will fail.
+If the buildpack API declared in the buildpack.toml of an optional buildpack is not supported by a given lifecycle, the lifecycle will warn, omit this buildpack from the group, and continue running.
 
 ## Deprecations
-Once the 1.0 API is supported, we may wish to deprecate older APIs. A future RFC should provide a strategy for deprecations and outline the upgrade path from 0.x to 1.0 APIs. This is purposefully omitted from this RFC so that we can make progress on new 0.x APIs while we work out the details.
+If a feature or the usage of a feature (flag names, key names, etc.) is deprecated in a given API in the spec, and a platform or buildpack uses the deprecated feature with that API, the lifecycle will print a deprecation warning.
+
+Example:
+IF in buildpack API 0.3, `launch`, `cache`, and `build` key names change in the `layer.toml` and the previous keys are retained but deprecated in the 0.3 buildpack API spec:
+* IF a buildpack declares API 0.3 in it's `buildpack.toml`, AND uses the deprecated key name, THEN lifecycle will print a deprecation warning
+* IF a buildpack declares API 0.2 in it's `buildpack.toml`, AND uses the deprecated key name, THEN lifecycle will NOT print a deprecation warning, b/c the keys were not deprecated in the 0.2 version of the spec. 
+
+Eventually, we may wish to entirely deprecate older APIs. A future RFC should provide a strategy for deprecations and outline the upgrade path from 0.x to 1.0 APIs. This is purposefully omitted from this RFC so that we can make progress on new 0.x APIs while we work out the details.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -89,20 +94,21 @@ The spec may not make certain types of changes to the contractual build plan bef
 
 Buildpacks and platforms are likely to implement new APIs more slowly without a forcing function.
 
+If a buildpack or platform wishes to upgrade across several API versions, it may be difficult to easily discern the cumulative set of required changes from the spec alone.
+We can mitigate this with an upgrade guide in the docs.
+
 # Alternatives
 [alternatives]: #alternatives
 
 - Keep doing what we are doing
     - This will continue to cause pain for platform and buildpack authors
-- Do not allow breaking changes in the spec itself. Instead, add deprecations to the spec and print feature level deprecation warnings (the previous version of this RFC)
+- Do not allow buildpacks or platforms to select the API version. Instead, the lifecycle will always adhere to the latest version of the spec but allow for direct configuration of deprecation warnings to prevent ugly messages when a new lifecycle lands (the [previous version](https://github.com/buildpacks/rfcs/blob/121d7c56b427e55980617cc6f954b2ab02443708/text/0000-api-version-compat.md) of this RFC)
 
 # Prior Art
 [prior-art]: #prior-art
 
 - k8s [api versioning](https://kubernetes.io/docs/concepts/overview/kubernetes-api/#api-versioning)
 > We chose to version at the API level rather than at the resource or field level to ensure that the API presents a clear, consistent view of system resources and behavior, and to enable controlling access to end-of-life and/or experimental APIs. ... Note that API versioning and Software versioning are only indirectly related
-
-
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
