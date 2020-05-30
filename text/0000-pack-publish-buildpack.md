@@ -147,8 +147,8 @@ Steps:
 
 The following behavior will execute when the configured registry is of type `github`.
 
-1. Pulls the image manifest for the buildpackage at `url` if it does not already exist locally.
-1. Reads the following information from the image manifest (if any of these are missing, the command fails):
+1. Fetches the image config blob for the buildpackage at `url`.
+1. Reads the following information from the image config (if any of these are missing, the command fails):
     - `id` (must include a `namespace` and `name` in the form `<namespace>/<name>`)
     - `version`
 1. Opens a link to a new Github Issue in the user's browser
