@@ -18,7 +18,7 @@ Replace the flag `--no-pull` with `--pull-policy <option>` and default to `if-no
 
 #### Performance
 
-By not having to check for the latest images on every build we improve performance.
+By not having to check for the latest images on every build we improve [performance](https://github.com/buildpacks/pack/issues/632#issuecomment-629458867).
 
 #### Uncommon
 
