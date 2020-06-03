@@ -21,18 +21,12 @@ Currently, every part of the filesystem available during `detect` and every part
 # What it is
 [what-it-is]: #what-it-is
 
-This provides a high level overview of the feature.
-
-- Define any new terminology.
-- Define the target persona: buildpack author, buildpack user, platform operator, platform implementor, and/or project contributor.
-- Explaining the feature largely in terms of examples.
-- If applicable, provide sample error messages, deprecation warnings, or migration guidance.
-- If applicable, describe the differences between teaching this to existing users and new users.
+A folder named `/platform/unsafe` should be reserved by specification.  Within that folder, an arbitrary collection of directories could be mounted (e.g. `/platform/unsafe/{gradle,maven}`).  Each of the mounts at those specified children would be ready/write instead of read only as all other mounts are configured.  Buildpacks have complete access during both `detect` and `build` and no other enforcment is required.
 
 # How it Works
 [how-it-works]: #how-it-works
 
-A folder named `/platform/unsafe` should be reserved by specification.  Within that folder, an arbitrary collection of directories could be mounted (e.g. `/platform/unsafe/{gradle,maven}`).  Each of the mounts at those specified children would be ready/write instead of read only as all other mounts are configured.  Buildpacks have complete access during both `detect` and `build` and no other enforcment is required.
+The technical details are platform implementation dependent as this is a change to the specification.
 
 # Drawbacks
 [drawbacks]: #drawbacks
