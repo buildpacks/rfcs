@@ -50,7 +50,7 @@ A folder named `/platform/unsafe` should be reserved by specification.  Within t
 # Prior Art
 [prior-art]: #prior-art
 
-No relavant priort art.
+Currently, arbitrary read-only volumes can be mounted under `/platform`.  The outcome of this RFC would be similar with looser permissions and more risk.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
