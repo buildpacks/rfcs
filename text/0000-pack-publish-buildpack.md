@@ -44,19 +44,22 @@ A default registry will be configured in `.pack/config.toml` with the following 
 
 ##### Base Schema
 ```toml
-[registries]
-default="<name>"
+default-registry="<string>"
 
-[registries.<name>]
-type="<registry type>"
+[[registries]]
+name="<string>"
+type="<string>"
 # <additional per "type" config entries>
 ```
 
-The `type` key can be set to one of two values, described below:
+The `default-registry` value must match one of the tables in the `[[registries]]` array with the same `name`. The `name` value can be any string.
+
+The `type` key in the `[[registries]]` tabl can be set to one of two values, described below:
 
 ##### Type: GitHub Schema
 ```toml
-[registries.<name>]
+[[registries]]
+name="<string>"
 type="github"
 url="<url to git repo>"
 issues-url="<url to issues for publishing>" # optional, default: "<url>/issues"
@@ -64,24 +67,23 @@ issues-url="<url to issues for publishing>" # optional, default: "<url>/issues"
 
 ##### Type: Git Schema
 ```toml
-[registries.<name>]
+[[registries]]
+name="<string>"
 type="git"
 url="<path to git repo>"
 ```
 
 #### Default
 
-The following could be an implied default when no registries are present, or pre-seeded by Pack when the file is initalized.
+The following will be the implied default when no registries are present, however, it can be overridden by defining a registry with the name "official".
 
 ```toml
-[registries]
-default="official"
+default-registry="official"
 
-[registries.official]
+[[registries]]
+name="official"
 type="github"
 url="https://github.com/buildpack/registry"
-
-[registries.official.github]
 issues-url="https://github.com/buildpack/registry/issues"
 ```
 
