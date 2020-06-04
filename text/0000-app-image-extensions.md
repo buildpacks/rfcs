@@ -85,7 +85,9 @@ When the following command is run, the app source code will be loaded into the i
 
 `pack build sclevine/myapp`
 
-All root buildpacks will be sliced out of the list of buildpacks, and run before non-root buildpacks. This creates a version of the current builder with additional layers and an ephemeral run image with additional layers, then does a normal `pack build`.
+All root buildpacks will be sliced out of the list of buildpacks, and run before non-root buildpacks. This creates a version of the current builder with additional layers and an ephemeral run image with additional layers, then does a normal build phase without running the root buildpacks.
+
+After the build phase, *a new extend phase* will run the root buildpacks against the run-image to create an ephemeral base image that will be used by the export phase instead of the configured run-image.
 
 * The run image layers are persistented as part of the app image, and can be reused on subsequent builds.
 * The build image layers will be persisted as part of the cache, and can be reused on subsequent builds.
