@@ -59,8 +59,7 @@ cache = true
 
 The `[process]` and `[[slices]]` tables can be used as normal.
 
-The following constraints will be enforced:
-* If a root buildpack is included in a `[[build.buildpacks]]` list in an app's `project.toml`, the build will fail.
+The following constraint(s) will be enforced:
 * If a user attempts to create a buildpackage including both root buildpacks and non-root buildpacks, the process will fail.
 
 # How it Works
