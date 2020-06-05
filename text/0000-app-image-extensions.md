@@ -98,7 +98,7 @@ After the build phase, *a new extend phase* will run the root buildpacks against
 
 This will run `pack upgrade sclevine/run`, generate an ephemeral image, and then do the equivalent of `pack rebase sclevine/myapp`.
 
-Attempting to rebase an app directly after it's been upgraded is not permitted and will fail, because the current base is now ephemeral.
+Attempting to rebase an app directly after it's been upgraded is not permitted and will fail, because the current base is now ephemeral. In effect, we are saying that the use of root buildpacks breaks rebase.
 
 When the base image has not changed
 1. If the buildpacks are configure as idempotent (the default) load the previous layers onto the base images.
