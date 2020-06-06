@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Read/Write Platform Volume Mount
+- Name: Read-Write Volume Mount in Pack
 - Start Date: 2020-06-02
 - Author(s): nebhale
 - RFC Pull Request: (leave blank)
@@ -11,27 +11,29 @@
 # Summary
 [summary]: #summary
 
-Buildpacks should have access to a read/write file system location provided by the platform.
+The `pack` CLI should expand its volume mounting functionality to allow arbitrary read-write mounting.
 
 # Motivation
 [motivation]: #motivation
 
-Currently, every part of the filesystem available during `detect` and every part of the filesystem other than layers during `build` are read-only.  This satisifies most use-cases, but specifically does not support the possibility of multiple builds sharing a communal filesystem location.  While this would likely to be a disaster in many situations, especially in production environments, being able to share a filesystem between a development laptop and a build is _very_ useful.  For example, the single longest bit of building a Java application from source is the initial population of a Maven or Gradle cache.  Hundreds and perhaps thousands of artifacts are downlaoded to do the very first build and subsequently never need to be downloaded again.  Caching these artifacts in a `cache = true` layer helps, but doesn't solve the first build speed problem and results in a pretty poor demo experience.  If a user could mount their `~/.m2` or `~/.gradle` folders into a safe location within the build container, accepting the overall risk of such a choice, the experience would be vastly superior.
+Currently, every part of the filesystem available during `detect` and every part of the filesystem other than layers during `build` are read-only.  This satisifies most use-cases, but specifically does not support the possibility of multiple builds sharing a communal filesystem location.  While this would likely to be a disaster in many situations, especially in production environments, being able to share a filesystem between a development laptop and a build is _very_ useful.  For example, the single longest bit of building a Java application from source is the initial population of a Maven or Gradle cache.  Hundreds and perhaps thousands of artifacts are downlaoded to do the very first build and subsequently never need to be downloaded again.  Caching these artifacts in a `cache = true` layer helps, but doesn't solve the first build speed problem and results in a pretty poor demo experience.  If a user could mount their `~/.m2` or `~/.gradle` folders into the build container, accepting the overall risk of such a choice, the experience would be vastly superior.
+
+This benefit is generally useful and extends beyond build caches to nearly every aspect of buildpack usage including development of both buildpacks and the lifecycle.
 
 # What it is
 [what-it-is]: #what-it-is
 
-A folder named `/platform/unsafe` should be reserved by specification.  Within that folder, an arbitrary collection of directories could be mounted (e.g. `/platform/unsafe/{gradle,maven}`).  Each of the mounts at those specified children would be ready/write instead of read only as all other mounts are configured.  Buildpacks have complete access during both `detect` and `build` and no other enforcment is required.
+Currently, the `pack` CLI has a `--volume` flag that allows users to expose a local filesystem location as a read-only volume mount into the `/platform` directory.  This change should generalize that flag and allow it to mount a local filesystem location as a read-write volume mount into any location within the build container.
 
 # How it Works
 [how-it-works]: #how-it-works
 
-The technical details are platform implementation dependent as this is a change to the specification.
+The technical details are opaque and implementation dependent as this is a change to the behavior of a `pack`-specific flag.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-* There is an amazing amount of danger in using a shared filessystem in distributed systems.
+* There is an amazing amount of danger in using a shared filesystem in distributed systems.
 * Performance problems accessing shared filesystems in distributed systems.
 * Performance problems accessing a local filessystem from within the MacOS Docker Daemon.
 
@@ -44,15 +46,15 @@ The technical details are platform implementation dependent as this is a change 
 # Prior Art
 [prior-art]: #prior-art
 
-Currently, arbitrary read-only volumes can be mounted under `/platform`.  The outcome of this RFC would be similar with looser permissions and more risk.
+* Currently, arbitrary read-only volumes can be mounted under `/platform`.  The outcome of this RFC would be similar with looser permissions and more risk.
+* The `docker run` command presents a good model, both in behavior and syntax for the analogous `pack` CLI `--volume` flag.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-* Should the folder actually be called `/platform/danger-zone`?
+* Should certain CNB-reserved folders be mountable?  I believe that preventing mounts at their lcoations restricts the upside to this feature, without adding a significant amount of safety.  The overall feature is quite dangerous and special-casing two folders isn't going to change that signficantly.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-* The buildpack specification will need to describe a reserved folder in `/platform` where read/write filesystems can be mounted.
-* The platform specification will need to describe how to communicate to the `lifecycle` what folders to mount.
+This is a `pack`-specific feature, so no specification will need to be changed.
