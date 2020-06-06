@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Process Type Arguments
 - Start Date: 2020-06-02
-- Author(s): @nebhale ekcasey
+- Author(s): nebhale ekcasey
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -21,12 +21,12 @@ This RFC attempts to solve two distinct but related problems with CNB process ar
 
 Currently the specification provides a way for buildpacks to declare a set of process types that applications can be started with.  The lifecycle has support for specifying the name of any one of these process types and executing it (`docker run -t my-image web`) as well as support for users passing a completely custom command to be executed (`docker run -it my-image /bin/bash`). There is a missing use case of utilizing one of the pre-defined process types, but adding arguments to the end of the command rather than replacing it.
 
-This pattern is commonly used in what might be described as "task" context.  For example, a Spring Boot application utilitzing Spring Batch might always start `java -cp "${CLASSPATH}" ${JAVA_OPTS} org.springframework.boot.loader.JarLauncher`.  However at runtime this needs to be executed as `java -cp "${CLASSPATH}" ${JAVA_OPTS} org.springframework.boot.loader.JarLauncher --active.profile=green --partitions=21-45`.  The user shouldn't have to interrogate the image metadata to find out what the command would have been an synthesize their command from it.  In addition, if they choose to do this, as the command change during the evolution of the contributing buildpack or application, they'd need to make sure their command was kept in sync as well.
+This pattern is commonly used in what might be described as "task" context.  For example, a Spring Boot application utilitzing Spring Batch might always start `java -cp "${CLASSPATH}" ${JAVA_OPTS} org.springframework.boot.loader.JarLauncher`.  However at runtime this needs to be executed as `java -cp "${CLASSPATH}" ${JAVA_OPTS} org.springframework.boot.loader.JarLauncher --active.profile=green --partitions=21-45`.  The user shouldn't have to interrogate the image metadata to find out what the command would have been and synthesize their command from it.  In addition, if they choose to do this, as the command change during the evolution of the contributing buildpack or application, they'd need to make sure their command was kept in sync as well.
 
-Instead, at execution time, the lifecycle should allow a user to specify the commands to append to an existing process type.
+Instead, at execution time, the lifecycle should allow a user to specify the arguments to append to an existing process type.
 
 Feedback from users in buildpacks slack and in issues, indicates that should in fact be the default behavior:
-- buildpacks/lifecycle#280
+- https://github.com/buildpacks/lifecycle/issues/280
 - https://github.com/buildpacks/pack/issues/468#issuecomment-593139689
 
 ## Problem 2: Arguments for Shell Processes
@@ -50,7 +50,7 @@ does not print `hello world`. Instead users must construct a string command that
 command = "echo hello world"
 args = []
 ```
-This already causes confusion for users (buildpacks/lifecycle#281). The problem is compounded if we allow users to supply additional arguments. We cannot append arguments to the command string in a reliable way and constructing a command that accepts args in the way they are provided is confusing and difficult (buildpack authors likely will not do this correctly).
+This already causes confusion for users (https://github.com/buildpacks/lifecycle/issues/281). The problem is compounded if we allow users to supply additional arguments. We cannot append arguments to the command string in a reliable way and constructing a command that accepts args in the way they are provided is confusing and difficult (buildpack authors likely will not do this correctly).
 
 The RFC proposes and changes to the launchers handling of args to make the execution of the following process
 ```
@@ -67,9 +67,9 @@ produce results equivalent to the execution of `"<CMD>" "<ARG1>" "<ARG2>"` in a 
 * shell process - a process with `direct=false`
 
 ## Philosophy
-The goal is to make the runtime usage of a cnb container as similar as possible to the runtime usage on a non-cnb container, w/o removing functionality or violating assumptions that have been firmly established in the buildpack community (e.g. defaulting to `web`).
+The goal is to make the runtime usage of a CNB container as similar as possible to the runtime usage on a non-CNB container, without removing functionality or violating assumptions that have been firmly established in the buildpack community (e.g. defaulting to `web`).
 
-Because the `launcher` must occupy the container entrypoint we will instead use `CNB_PROCESS_TYPE` as a cnb-specific analog to the entrypoint. Users can already set `CNB_PROCESS_TYPE` to toggle between processes. Setting `CNB_PROCESS_TYPE=override` will be analogous to clearing the entrypoint.
+Because the `launcher` must occupy the container entrypoint we will instead use `CNB_PROCESS_TYPE` as a CNB-specific analog to the entrypoint. Users can already set `CNB_PROCESS_TYPE` to toggle between processes. Setting `CNB_PROCESS_TYPE=override` will be analogous to clearing the entrypoint.
 
 ## Behavior
 ### Selecting a process type at runtime
@@ -110,7 +110,7 @@ Launcher args are appended to the `args` array by default for both `direct` and 
 When a shell process has arguments the launcher will execute a command that has behavior identical to that which would result from a user sourcing the profile script and then executing
 `<CMD> <ARG1> <ARG2>...` in a shell inside the container.
 
-### 
+###
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -156,7 +156,7 @@ We can use `CNB_PLATFORM_API` (API "modes") to toggle between the current and ne
 
 process-types positional arguments to the `launcher` is currently unspecified and undocumented, current usage of this feature is hard to measure but anecdotally appears to be uncommon.
 
-Fo the changes proposed in this RFC, changing the default interpretation of `launcher` arguments from a custom command to additional arguments, will likely have the biggest impact on platforms. Platforms will need to make changes to runtime logic and/or documentation before enabling the platform API containing this change.
+For the changes proposed in this RFC, changing the default interpretation of `launcher` arguments from a custom command to additional arguments, will likely have the biggest impact on platforms. Platforms will need to make changes to runtime logic and/or documentation before enabling the platform API containing this change.
 
 # Drawbacks
 [drawbacks]: #drawbacks
