@@ -69,14 +69,14 @@ produce results equivalent to the execution of `"<CMD>" "<ARG1>" "<ARG2>"` in a 
 ## Philosophy
 The goal is to make the runtime usage of a CNB container as similar as possible to the runtime usage on a non-CNB container, without removing functionality or violating assumptions that have been firmly established in the buildpack community (e.g. defaulting to `web`).
 
-Because the `launcher` must occupy the container `entrypoint` we will instead use `CNB_PROCESS_TYPE` as a CNB-specific analog to the `entrypoint`. Users can already set `CNB_PROCESS_TYPE` to toggle between processes. Setting `CNB_PROCESS_TYPE=override` will be analogous to clearing the `entrypoint`.
+Because the `launcher` must occupy the container `entrypoint`, we will instead use `CNB_PROCESS_TYPE` as a CNB-specific analog to the `entrypoint`. Users can already set `CNB_PROCESS_TYPE` to toggle between processes. Setting `CNB_PROCESS_TYPE=override` will be analogous to clearing the `entrypoint`.
 
 ## Behavior
 ### Selecting a process type at runtime
 Users will no longer be able to pass a process-type to the launcher as a positional argument. Instead, they must set `CNB_PROCESS_TYPE` in the running container to select a process type.
 If `CNB_PROCESS_TYPE` is unset, it will continue to default to `web`.
 
-The `CNB_PROCESS_TYPE` functionality has existed for a long time and is the only specified way to select a process-type. We will simply remove the secondary, unspecified way to select a process-type by passing a single argument containing a process-type to the launcher (i.e. `docker run <image> my-process-type` won't work anymore).
+The `CNB_PROCESS_TYPE` functionality has existed for a long time and is the only specified way to select a process-type. We will remove the secondary, unspecified way to select a process-type by passing a single argument containing a process-type to the launcher (i.e. `docker run <image> my-process-type` won't work anymore).
 
 ### Specifying a custom process at runtime
 If users wish to provide a custom command instead of using one of the buildpack provided process types, they must set `CNB_PROCESS_TYPE=override`. `override` is a special keyword indicating that the entire process shall be defined by the user.
@@ -128,7 +128,7 @@ The `launcher` currently has a three step command resolution flow:
 1.  N args if `$1` is `--`: directly execute `$2` as the command with `${@:3}` as the arguments appended to that command
 1.  N args: execute `$1` as the command with `${@:2}` as the arguments appended to that command in a `bash` shell
 
-This proposal change the command resolution flow to:
+This proposal changes the command resolution flow to:
 
 1.  If `CNB_PROCESS_TYPE=override`
     1. 0 args: fail
@@ -145,7 +145,7 @@ Ensuring all arguments are tokenized and parsed correctly requires some `bash` c
 'source <app-dir>/.profile
 source <layers>/<bp.id>/profile.d/<profile-script>
 ...
-exec bash -c '$(eval echo \"$0\") ...$(eval echo \"$n\")' "$@"' /CNB/lifecycle/launcher <cmd> <args>...
+exec bash -c '$(eval echo \"$0\") ...$(eval echo \"$n\")' "$@"' /cnb/lifecycle/launcher <cmd> <args>...
 ```
 This preserves the original tokenization and ensures variable references and other bash expressions (e.g. an arg containing the string `$JAVA_OPTS`) are evaluated by `bash` after the profile scripts have been sourced (given that profile scripts may modify relevant variables).
 
@@ -170,7 +170,7 @@ Of the changes proposed in this RFC, changing the default interpretation of `lau
 [drawbacks]: #drawbacks
 
 * Breaking changes!
-* Some functionality is only accessible by setting environment variables, when, previously, all functionality was available via the command line.
+* Some functionality is only accessible by setting environment variables. Previously, all functionality was available via the command line.
 * Increased complexity of launcher shell logic.
 
 # Alternatives
