@@ -25,7 +25,7 @@ The one place where this flexibility is constrained is that `version` has been p
 
 The `version` key should be removed as a top-level entry in both the build plan and buildpack plan.  Buildpacks that need to coordinate versions from other parties should use an agreed upon metadata key (the conventional, but not required, choice is `version`) to replicate their existing functionality.  The BOM schema will be updated to remove `version` as a top-level key as well, to match its relation to the buildpack plan.
 
-The `lifecycle` is required to implement temporary compatibility with the previous build plan and buildpack plan structure by converting the `version` key in `metadata` into and out of a top-level key at the appropriate locations.
+The `lifecycle` is required to implement temporary compatibility with the previous build plan and buildpack plan structure by converting the `version` key in `metadata` into and out of a top-level key at the appropriate locations.  If both a `version` metadata entry and the top-level `version` key are both set, the lifecycle should fail with a descriptive error.
 
 # How it Works
 [how-it-works]: #how-it-works
