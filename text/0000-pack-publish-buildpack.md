@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-This RFC describes the implementation the following commands:
+This RFC describes the implementation of the following commands:
 * `pack register-buildpack`
 * `pack yank-buildpack`
 
