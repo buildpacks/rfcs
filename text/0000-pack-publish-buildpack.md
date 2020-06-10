@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Pack Publish Buildpack
+- Name: Pack Register Buildpack
 - Start Date: 2020-04-27
 - Author(s): [Joe Kutner](https://github.com/jkutner), [Javier Romero](https://github.com/jromero)
 - RFC Pull Request: (leave blank)
@@ -12,7 +12,7 @@
 [summary]: #summary
 
 This RFC describes the implementation the following commands:
-* `pack publish-buildpack`
+* `pack register-buildpack`
 * `pack yank-buildpack`
 
 # Motivation
@@ -25,7 +25,7 @@ The [Client-Side Registry RFC (0022)](https://github.com/buildpacks/rfcs/blob/ma
 
 ## Adding a Buildpack to the Registry
 
-When a buildpack author would like to publish a version of a buildpack on the registry, they will use the `pack publish-buildpack <url-or-tag>` command. This command will create a Github Issue on the `https://github.com/buildpack/registry-index` (or similarly named) Github repo requesting the addition the new buildpack version to the index.
+When a buildpack author would like to register a version of a buildpack on the registry, they will use the `pack register-buildpack <url-or-tag>` command. This command will create a Github Issue on the `https://github.com/buildpack/registry-index` (or similarly named) Github repo requesting the addition the new buildpack version to the index.
 
 ## Yanking a Buildpack from the Registry
 
@@ -62,7 +62,7 @@ The `type` key in the `[[registries]]` tabl can be set to one of two values, des
 name="<string>"
 type="github"
 url="<url to git repo>"
-issues-url="<url to issues for publishing>" # optional, default: "<url>/issues"
+issues-url="<url to issues for registering>" # optional, default: "<url>/issues"
 ```
 
 ##### Type: Git Schema
@@ -139,7 +139,7 @@ An issue would be created with the following content:
         version = 0.0.1
         ```
 
-## `pack publish-buildpack <url>`
+## `pack register-buildpack <url>`
 
 Arguments:
 
@@ -184,7 +184,7 @@ Options:
 Example:
 
 ```
-$ pack publish-buildpack docker://docker.io/buildpacks/sample:latest
+$ pack register-buildpack docker://docker.io/buildpacks/sample:latest
 ```
 
 ## `pack yank-buildpack <buildpack-id-and-version>`
@@ -229,9 +229,8 @@ $ pack yank-buildpack buildpacks/sample@0.0.1
 
 * `type` of registry isn't accounted for in the [Buildpack URI](https://github.com/buildpacks/rfcs/blob/master/text/0037-buildpack-uris.md) definition
 * Github is a single-point-of-failure for the official registry
-* The user must have a Github account to publish to the official registry
-* The user may only publish to the official registry via a browser
-* "publish" is ambigious (we use it in `pack package-buildpack --publish` to mean pushing an OCI image to a Docker registry).
+* The user must have a Github account to register with the official registry
+* The user may only register with the official registry via a browser
 
 # Alternatives
 [alternatives]: #alternatives
@@ -242,7 +241,7 @@ Instead of configuring the registry `type`, Pack could infer the type from the U
 
 ## Direct commits to the remote index
 
-Instead of handling Github Issues on the `buildpacks/registry` repo, the `publish-buildpack` command could open a PR against the `buildpacks/registry-index`. This has the following advantages:
+Instead of handling Github Issues on the `buildpacks/registry` repo, the `register-buildpack` command could open a PR against the `buildpacks/registry-index`. This has the following advantages:
 
 * The operation could be performed headlessly without storing or transporting the user's Github token.
 
@@ -253,9 +252,9 @@ This also has the following drawbacks:
 * This would result in commits against the index from the actual user, which requires that they DCO sign-off the commit (it's unclear if automating the sign-off is legally acceptable).
 * This differs from [rust-lang/crates.io-index](https://github.com/rust-lang/crates.io-index), which only has commits from a single user.
 
-## Using `push-buildpack` instead of `publish-buildpack`
+## Create a `publish-buildpack` in addition to `register-buildpack`
 
-The command to release a new version could be `pack push-buildpack` to avoid ambiguity with other commands that use a `--publish` flag.
+The command to release a new version could be `pack publish-buildpack`, which would perform both `package-buildpack --publish` and `regsiter-buildpack`.
 
 # Prior Art
 [prior-art]: #prior-art
