@@ -200,7 +200,7 @@ The following behavior will execute when the configured registry is of type `git
 1. Opens a link to a new Github Issue in the user's browser
     - The user must be logged into Github
     - The link will use [Github query parameters](https://help.github.com/en/github/managing-your-work-on-github/about-automation-for-issues-and-pull-requests-with-query-parameters) to pre-populate the title, body, and labels.
-    - The issue will be opened against the `https://github.com/buildpacks/registry` repo.
+    - The issue will be opened against the `https://github.com/buildpacks/registry-index` repo.
     - The issue body will contain structured data that defines the buildpack id and version to yank.
 1. A Github action will detect the new issue and do the following:
     - Confirm that the Github user who opened the issue is an owner of the buildpack.
@@ -241,7 +241,7 @@ Instead of configuring the registry `type`, Pack could infer the type from the U
 
 ## Direct commits to the remote index
 
-Instead of handling Github Issues on the `buildpacks/registry` repo, the `register-buildpack` command could open a PR against the `buildpacks/registry-index`. This has the following advantages:
+Instead of handling Github Issues on the `buildpacks/registry-index` repo, the `register-buildpack` command could open a PR against the `buildpacks/registry-index`. This has the following advantages:
 
 * The operation could be performed headlessly without storing or transporting the user's Github token.
 
