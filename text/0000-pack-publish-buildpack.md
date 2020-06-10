@@ -25,7 +25,7 @@ The [Client-Side Registry RFC (0022)](https://github.com/buildpacks/rfcs/blob/ma
 
 ## Adding a Buildpack to the Registry
 
-When a buildpack author would like to register a version of a buildpack on the registry, they will use the `pack register-buildpack <url-or-tag>` command. This command will create a Github Issue on the `https://github.com/buildpack/registry-index` (or similarly named) Github repo requesting the addition the new buildpack version to the index.
+When a buildpack author would like to register a version of a buildpack on the registry, they will use the `pack register-buildpack <url-or-tag>` command. This command will create a Github Issue on the `https://github.com/buildpacks/registry-index` (or similarly named) Github repo requesting the addition the new buildpack version to the index.
 
 ## Yanking a Buildpack from the Registry
 
@@ -83,8 +83,8 @@ default-registry="official"
 [[registries]]
 name="official"
 type="github"
-url="https://github.com/buildpack/registry"
-issues-url="https://github.com/buildpack/registry/issues"
+url="https://github.com/buildpacks/registry"
+issues-url="https://github.com/buildpacks/registry/issues"
 ```
 
 ## Format
