@@ -178,7 +178,6 @@ The following behavior will execute when the configured registry is of type `git
 Options:
 
 * `--buildpack-registry, -R` - the id of a registry configured in `.pack/config.toml`
-* `--auth <token>` - If the registry type would default to opening a web browser, it will instead perform the action using an API. In the case of Github, it will use the provided token to invoke the [Issues API](https://developer.github.com/v3/issues/)
 
 **NOTE:** Github Issues that are not recognized as a request to add/yank a buildpack version will be automatically closed. All PRs will also be automatically closed.
 
@@ -218,7 +217,6 @@ The following behavior will execute when the configured registry is of type `git
 Options:
 
 * `--undo` - this option will execute the same flow, but set `yanked=false`
-* `--auth <token>` - If the registry type would default to opening a web browser, it will instead perform the action using an API. In the case of Github, it will use the provided token to invoke the [Issues API](https://developer.github.com/v3/issues/)
 
 Example:
 
