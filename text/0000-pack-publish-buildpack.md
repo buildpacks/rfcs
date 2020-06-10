@@ -18,7 +18,7 @@ This RFC describes the implementation of the following commands:
 # Motivation
 [motivation]: #motivation
 
-The [Client-Side Registry RFC (0022)](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md) established that two CLI commands would allow users to add/remove buildpacks in the registry, but the implementation of those commands was vauge. In this document we describe the details of how they will work.
+The [Client-Side Registry RFC (0022)](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md) established that two CLI commands would allow users to add/remove buildpacks to the registry, but the implementation of those commands was vague. In this document, we describe the details of how they will work.
 
 # What it is
 [what-it-is]: #what-it-is
