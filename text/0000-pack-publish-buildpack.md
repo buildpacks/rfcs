@@ -263,7 +263,8 @@ The command to release a new version could be `pack push-buildpack` to avoid amb
 [prior-art]: #prior-art
 
 * [rust-lang/crates.io-index](https://github.com/rust-lang/crates.io-index)
-
+* [CocoaPods Specs](https://github.com/CocoaPods/Specs)
+* [brew taps](https://docs.brew.sh/Taps)
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
