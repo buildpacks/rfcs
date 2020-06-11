@@ -93,6 +93,7 @@ inline = """
 - Can an inline buildpack be published to a registry?
 - Can inline buildpacks be root buildpacks?
 - Can a `project.toml` contain more than one inline buildpack?
+- Should `version` be required or should it default to `0.0.0`?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
