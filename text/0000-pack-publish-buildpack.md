@@ -231,7 +231,8 @@ $ pack yank-buildpack buildpacks/sample@0.0.1
 
 Not included in this proposal, but intended for future RFCs are the following:
 
-* `pack set-default-registry` - a new command that will mutate the `[[registries]]` config in `.pack/config.toml`. (QUESTION: will "registry" be confusing here since it could mean a "Docker Registry"?)
+* `pack add-buildpack-registry` - a new command that will add to the `[[registries]]` config in `.pack/config.toml`.
+* `pack set-buildpack-registry` - a new command that will mutate the `default-registry` config in `.pack/config.toml`.
 * `pack publish-buildpack` - a new command that will perform both `package-buildpack` and `register-buildpack` in one step.
 * *Headless release* - a new option on `register-buildpack` would allow for a non-interactive (i.e. no browser) registration
 * *REST API* - as an alternative to `github` and `git` types of registries, we intend to support an `api` type that will use a registry service to broker registration requests (instead of using Github Issues).
