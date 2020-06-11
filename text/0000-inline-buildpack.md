@@ -97,4 +97,21 @@ inline = """
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
+The [Project Descriptor extension](https://github.com/buildpacks/spec/blob/master/extensions/project-descriptor.md) will be ammended to include:
 
+## [[build.buildpacks]]
+
+The build table MAY contain an array of buildpacks. The schema for this table is:
+
+```toml
+[[build.buildpacks]]
+id = "<buildpack ID (optional)>"
+version = "<buildpack version (optional default=latest)>"
+uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
+shell = "<string (optional default=/bin/sh)"
+inline = "<script (optional)"
+```
+
+This defines the buildpacks that a platform should use on the repo.
+
+Either an `id` or a `uri` MUST be included, but MUST NOT include both. If `uri` is provided the `version`, `inline`, and `shell` MUST NOT be allowed.
