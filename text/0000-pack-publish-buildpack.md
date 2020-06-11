@@ -159,6 +159,7 @@ The following behavior will execute when the configured registry is of type `git
     - The issue will be opened against the `https://github.com/buildpacks/registry-index` repo.
     - The issue body will contain structured data that defines the buildpack id, version, digest, and url.
 1. A Github action will detect the new issue and do the following:
+    - If the issue is in an unexpected format, or if the digest does not match the image located at `url-or-tag`, the bot will add a comment to the issue and close it.
     - If this is the first time the `namespace` is used, it will add the namespace to the `buildpacks/registry-owners` repo with the Github user who opened the issue as the owner. The `buildpacks/registry-owners` repo defines the [namespace ownership as described in RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md#namespace-ownership).
     - If this is *not* the first time the `namespace` is used, it will confirm that the Github user who opened the issue is an owner of the buildpack.
     - Create a commit against the master branch of the `https://github.com/buildpacks/registry-index` repo using a Gitub token (i.e. all commits in that repo will be made by the same "user"). The commit will add the buildpack version described in the issue.
@@ -203,6 +204,7 @@ The following behavior will execute when the configured registry is of type `git
     - The issue will be opened against the `https://github.com/buildpacks/registry-index` repo.
     - The issue body will contain structured data that defines the buildpack id and version to yank.
 1. A Github action will detect the new issue and do the following:
+    - If the issue is in an unexpected format, or if the digest does not match the image located at `url-or-tag`, the bot will add a comment to the issue and close it.
     - Confirm that the Github user who opened the issue is an owner of the buildpack.
     - Create and merge a PR against the `https://github.com/buildpacks/registry-index` repo using a Gitub token (i.e. all commits in that repo will be made by the same "user"). The PR will set `yanked=true` for the buildpack version described in the issue.
     - Close the Github issue.
