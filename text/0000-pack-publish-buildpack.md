@@ -218,6 +218,7 @@ The following behavior will execute when the configured registry is of type `git
 
 Options:
 
+* `--buildpack-registry, -R` - the id of a registry configured in `.pack/config.toml`
 * `--undo` - this option will execute the same flow, but set `yanked=false`
 
 Example:
