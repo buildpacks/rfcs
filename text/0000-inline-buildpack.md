@@ -109,7 +109,7 @@ The build table MAY contain an array of buildpacks. The schema for this table is
 id = "<buildpack ID (optional)>"
 version = "<buildpack version (optional default=latest)>"
 uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
-shell = "<string (optional default=/bin/sh)"
+shell = "<string (optional default=/bin/sh)>"
 inline = "<script (optional)"
 ```
 
