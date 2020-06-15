@@ -37,7 +37,7 @@ We propose two new keys in the `[[build.buildpacks]]` table in `project.toml`:
 # How it Works
 [how-it-works]: #how-it-works
 
-When an entry in the `[[build.buildpacks]]` table contains an `inline` value, the lifecycle WILL NOT attempt to download the buildpack `id@version`. Instead, it will create an ephemeral buildpack, with the following:
+When an entry in the `[[build.buildpacks]]` table contains an `inline` value, the platform WILL NOT attempt to download the buildpack `id@version`. Instead, it will create an ephemeral buildpack, with the following:
 
 - a `bin/detect` that always passes (i.e. `exit 0`)
 - a `bin/build` that contains the value of `inline` script without any changes (i.e. no magic)
@@ -94,6 +94,8 @@ inline = """
 - Can inline buildpacks be root buildpacks?
 - Can a `project.toml` contain more than one inline buildpack?
 - Should `version` be required or should it default to `0.0.0`?
+- How will platforms implement this behavior?
+    - A future `/lifecycle/prepare` could generate the temporary buildpack from the inline script.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
