@@ -54,7 +54,7 @@ type="<string>"
 
 The `default-registry` value must match one of the tables in the `[[registries]]` array with the same `name`. The `name` value can be any string.
 
-The `type` key in the `[[registries]]` tabl can be set to one of two values, described below:
+The `type` key in the `[[registries]]` table can be set to one of two values, described below:
 
 ##### Type: GitHub Schema
 ```toml
