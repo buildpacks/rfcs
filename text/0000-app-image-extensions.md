@@ -88,7 +88,7 @@ All root buildpacks will be sliced out of the list of buildpacks, and run before
 
 After the build phase, *a new extend phase* will run the root buildpacks against the run-image to create an ephemeral base image that will be used by the export phase instead of the configured run-image.
 
-* The run image layers are persistented as part of the app image, and can be reused on subsequent builds.
+* The run image layers are persisted as part of the app image, and can be reused on subsequent builds.
 * The build image layers will be persisted as part of the cache, and can be reused on subsequent builds.
 * Any paths that are excluded using `launch.toml` and set to be cached will be stored in the cache, and can be reused on subsequent builds.
 
