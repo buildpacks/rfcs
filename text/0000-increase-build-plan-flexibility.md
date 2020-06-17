@@ -59,7 +59,7 @@ Uses `version`:
   * [`paketo-buildpacks/go-compiler`](https://github.com/paketo-buildpacks/go-compiler)
   * [`paketo-buildpacks/httpd`](https://github.com/paketo-buildpacks/httpd)
   * [`paketo-buildpacks/nginx`](https://github.com/paketo-buildpacks/nginx)
-  * [`paketo-buildpacks/node-engine`](https://github.com/paketo-buildpacks/procfile)
+  * [`paketo-buildpacks/node-engine`](https://github.com/paketo-buildpacks/node-engine)
   * [`paketo-buildpacks/npm`](https://github.com/paketo-buildpacks/npm)
   * [`paketo-buildpacks/php-composer`](https://github.com/paketo-buildpacks/php-composer)
   * [`paketo-buildpacks/php-dist`](https://github.com/paketo-buildpacks/php-dist)
