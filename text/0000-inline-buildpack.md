@@ -43,7 +43,7 @@ When an entry in the `[[build.buildpacks]]` table contains an `inline` value, th
 - a `bin/build` that contains the value of `inline` script without any changes (i.e. no magic)
 - a `buildpack.toml` using the `id` and `version` from the buildpack entry in `project.toml`
 
-When the emphemeral buildpack is executed, its working directory will contain the artifacts in the app repo. In this way, an `inline` script MAY reference other scripts in the repo. For example, a `lib/utils.sh` may be sourced by an inline Bash script.
+When the ephemeral buildpack is executed, its working directory will contain the artifacts in the app repo. In this way, an `inline` script MAY reference other scripts in the repo. For example, a `lib/utils.sh` may be sourced by an inline Bash script.
 
 ## Example
 
