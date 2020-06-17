@@ -67,7 +67,7 @@ The following constraint(s) will be enforced:
 
 ## Building an App with Additional Packages
 
-Given a root buildpack with ID `example/git`, the following configuration can be used with a Golang app:
+Given a root buildpack with ID `example/git`, the following configuration can be used in combination with a `example/golang` buildpack, for a Go app:
 
 `project.toml`:
 ```toml
