@@ -112,7 +112,7 @@ id = "<buildpack ID (optional)>"
 version = "<buildpack version (optional default=latest)>"
 uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
 shell = "<string (optional default=/bin/sh)>"
-inline = "<script (optional)>"
+inline = "<script contents (optional)>"
 ```
 
 This defines the buildpacks that a platform should use on the repo.
