@@ -19,7 +19,7 @@ This RFC attempts to solve two distinct but related problems with CNB process ar
 
 ## Problem 1: Arguments Supplied at Runtime
 
-Currently the specification provides a way for buildpacks to declare a set of process types that applications can be started with.  The lifecycle has support for specifying the name of any one of these process types and executing it (`docker run -t my-image web`) as well as support for users passing a completely custom command to be executed (`docker run -it my-image /bin/bash`). There is a missing use case of utilizing one of the pre-defined process types, but adding arguments to the end of the command rather than replacing it.
+Currently the specification provides a way for buildpacks to declare a set of process types that applications can be started with.  The lifecycle currently has support for specifying the name of any one of these process types and executing it (`docker run -t my-image web`) as well as support for users passing a completely custom command to be executed (`docker run -it my-image /bin/bash`). There is a missing use case of utilizing one of the pre-defined process types, but adding arguments to the end of the command rather than replacing it.
 
 This pattern is commonly used in what might be described as "task" context.  For example, a Spring Boot application utilitzing Spring Batch might always start `java -cp "${CLASSPATH}" ${JAVA_OPTS} org.springframework.boot.loader.JarLauncher`.  However, at runtime this needs to be executed as `java -cp "${CLASSPATH}" ${JAVA_OPTS} org.springframework.boot.loader.JarLauncher --active.profile=green --partitions=21-45`.  The user shouldn't have to interrogate the image metadata to find out what the command would have been and synthesize their command from it.  In addition, if they choose to do this, as the command changes during the evolution of the contributing buildpack or application, they need to make sure their command is kept in sync.
 
@@ -69,28 +69,42 @@ produce results equivalent to the execution of `"<CMD>" "<ARG1>" "<ARG2>"` in a 
 ## Philosophy
 The goal is to make the runtime usage of a CNB container as similar as possible to the runtime usage on a non-CNB container, without removing functionality or violating assumptions that have been firmly established in the buildpack community (e.g. defaulting to `web`).
 
-Because the `launcher` must occupy the container `entrypoint`, we will instead use `CNB_PROCESS_TYPE` as a CNB-specific analog to the `entrypoint`. Users can already set `CNB_PROCESS_TYPE` to toggle between processes. Setting `CNB_PROCESS_TYPE=override` will be analogous to clearing the `entrypoint`.
+Because the `launcher` must occupy the container `entrypoint`, we will make the `launcher` a multicall binary that derives the intended process-type, or lack there of, from `argv0`. This allows for intuitive use of both `entrypoint` and `cmd`: `entrypoint` will be used to select a process and `cmd` will be used to supply additional argument to that process.
 
 ## Behavior
-### Selecting a process type at runtime
-Users will no longer be able to pass a process-type to the launcher as a positional argument. Instead, they must set `CNB_PROCESS_TYPE` in the running container to select a process type.
-If `CNB_PROCESS_TYPE` is unset, it will continue to default to `web`.
 
-The `CNB_PROCESS_TYPE` functionality has existed for a long time and is the only specified way to select a process-type. We will remove the secondary, unspecified way to select a process-type by passing a single argument containing a process-type to the launcher (i.e. `docker run <image> my-process-type` won't work anymore).
+### Exporter
+When `exporter` creates an app image it will create one symlink per buildpack-contributed process type. The symlink files will be named `/cnb/process/<process-type>` and will point at the launcher.
+
+The `exporter` will prepend `/cnb/process` to the image `PATH`.
+The `exporter` will set the app image `entrypoint` to the symlink matching the default process.
+
+Currently, it is possible to set the default process-type to a non-existent process-type. This will no longer be allowed. If the default process does not exist, the `exporter` will warn and set the entrypoint to `/cnb/lifecycle/launcher`.
+
+### Selecting a process type at runtime
+Users will no longer be able to pass a process-type to the launcher as a positional argument or with the `CNB_PROCESS_TYPE` environment variable. Instead, they must set the `entrypoint` in the running container to select a process type other than the default.
+
+For Example:
+`docker run --entrypoint web <image>`
+`docker run --entrypoint /cnb/process/web <image>`
+Will both launch the process with `type` `web`
+
+Buildpack-contributed processes will be forbidden from having `type` equal to `"launcher"`.
+If the platform configures the default process to `launcher` or `/cnb/lifecycle/launcher` during export the resulting image will not have a default process-type and instead will accept a [custom command](#specifying-a-custom-process-at-runtime) by default.
 
 ### Specifying a custom process at runtime
-If users wish to provide a custom command instead of using one of the buildpack provided process types, they must set `CNB_PROCESS_TYPE=override`. `override` is a special keyword indicating that the entire process shall be defined by the user.
+If a user wishes to provide a custom command instead of using one of the buildpack provided process types, they must set the `entrypoint` to the vanilla `launcher`, rather than to process-type symlink. 
 
-If `CNB_PROCESS_TYPE` is set to `override`, the `launcher` will construct a process from the positional arguments it receives. If the first argument is `--` this will continue to signify a `direct` process. The first (when it is anything other than `--`) or second (if the first is `--`) argument provided to the `launcher`  will become the `command` of the resultant process. Any subsequent arguments to the launcher will become `args` of the resultant process.
+If the final path element of `$0` does not match any buildpack-provided process-type `launcher` will construct a process from the positional arguments it receives. If the first argument is `--` this will continue to signify a `direct` process. The first (when it is anything other than `--`) or second (if the first is `--`) argument provided to the `launcher`  will become the `command` of the resultant process. Any subsequent arguments to the launcher will become `args` of the resultant process.
 
 Example:
 
-Running `docker run --env CNB_PROCESS_TYPE=override <image> echo hello world`, will be equivalent to running a process type where `direct = false`, `command = "echo"` and `args = ["hello", "world"]`
+Running `docker run --entrypoint launcher <image> echo hello world`, will be equivalent to running a process type where `direct = false`, `command = "echo"` and `args = ["hello", "world"]`
 
-Running `docker run --env CNB_PROCESS_TYPE=override <image> -- echo hello world`, will be equivalent to running a process type where `direct = true`, `command = "echo"` and `args = ["hello", "world"]`
+Running `docker run --enntrypoint /cnb/lifecycle/launcher <image> -- echo hello world`, will be equivalent to running a process type where `direct = true`, `command = "echo"` and `args = ["hello", "world"]`
 
 ### Providing additional arguments at runtime
-If `CNB_PROCESS_TYPE` is unset or set to anything other than `override`, a buildpack-provided process will be selected by `type` and any arguments provided to the `launcher` will be appended to the process's predefined `args` array, before execution.
+If `entrypoint` is set to a process-type symlink, a buildpack-provided process will be selected by `type` and any arguments provided to the `launcher` will be appended to the process's predefined `args` array, before execution.
 
 For example, given an image `<image>` containing the following buildpack-defined process
 ```
@@ -101,7 +115,7 @@ args = ["hello"]
 ```
 if a user selects that process and passes an argument `world`
 ```
-docker run --env CNB_PROCESS_TYPE=hi <image> world
+docker run --entrypoint hi <image> world
  ```
 this will be functionally equivalent to running process the following process.
 ```
@@ -130,13 +144,13 @@ The `launcher` currently has a three step command resolution flow:
 
 This proposal changes the command resolution flow to:
 
-1.  If `CNB_PROCESS_TYPE=override`
+1.  If the last path element in `$0` matches a process-type
+    1. 0 args: execute the matching process-type
+    1. N args: Execute the matching process-type after appending `$@` (all positional arguments) to the process arguments
+1.  Else
     1. 0 args: fail
     1.  N args if `$1` is `--`: directly execute `$2` as the command with `${@:3}` as the arguments appended to that command
     1.  N args: execute `$1` as the command with `${@:2}` as the arguments appended to that command in a `bash` shell
-1.  Else
-    1. 0 args: execute the process type `${CNB_PROCESS_TYPE:-web}`
-    1. N args: Execute process type `${CNB_PROCESS_TYPE:-web}`, after appending `$@` (all positional arguments) to the process arguments
 
 ### Executing Shell Processes
 Ensuring all arguments are tokenized and parsed correctly requires some `bash` complexity. When `direct=false` the launcher will do some magic along the lines of:
@@ -170,7 +184,7 @@ Of the changes proposed in this RFC, changing the default interpretation of `lau
 [drawbacks]: #drawbacks
 
 * Breaking changes!
-* Some functionality is only accessible by setting environment variables. Previously, all functionality was available via the command line.
+* Some functionality is only configurable by setting `entrypoint`. Previously, all functionality was available via `cmd`.
 * Increased complexity of launcher shell logic.
 
 # Alternatives
