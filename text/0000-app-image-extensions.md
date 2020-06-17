@@ -174,7 +174,7 @@ EOF
 
 # References
 
-Encorporated suggested UX tweaks from Javier Romero's doc: https://hackmd.io/zuzsIAh5QGKcQt_EZAcXaw?view
+Incorporated suggested UX tweaks from Javier Romero's doc: https://hackmd.io/zuzsIAh5QGKcQt_EZAcXaw?view
 
 # Spec. Changes
 [spec-changes]: #spec-changes
