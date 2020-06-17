@@ -108,7 +108,7 @@ When the base image has not changed
 When there is an update to either the build or run base images
 1. Pull the new base image(s)
 1. Run the root buildpacks against the new image(s) without loading previous layers, and create an ephemeral image.
-1. Rebase the app on to the new emphemeral image.
+1. Rebase the app on to the new ephemeral image.
 
 ## Example: Apt Buildpack
 
