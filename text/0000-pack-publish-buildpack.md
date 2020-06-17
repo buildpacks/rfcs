@@ -25,7 +25,7 @@ The [Client-Side Registry RFC (0022)](https://github.com/buildpacks/rfcs/blob/ma
 
 ## Registering a Buildpack with the Registry
 
-When a buildpack author would like to register a version of a buildpack on the registry, they will use the `pack register-buildpack <url-or-tag>` command. This command will create a Github Issue on the `https://github.com/buildpacks/registry-index` (or similarly named) Github repo requesting the addition the new buildpack version to the index.
+When a buildpack author would like to register a version of a buildpack on the registry, they will use the `pack register-buildpack <image-name>` command. This command will create a Github Issue on the `https://github.com/buildpacks/registry-index` (or similarly named) Github repo requesting the addition the new buildpack version to the index.
 
 ## Yanking a Buildpack from the Registry
 
@@ -143,23 +143,23 @@ An issue would be created with the following content:
 
 Arguments:
 
-* `url-or-tag` - the location of a buildpackage _in a Docker registry_ to be released in the buildpack registry
+* `image-name` - the location of a buildpackage _in a Docker registry_ to be released in the buildpack registry
 
 Steps:
 
 The following behavior will execute when the configured registry is of type `github`.
 
-1. Fetches the image config blob for the buildpackage at `url-or-tag`.
+1. Fetches the image config blob for the buildpackage at `image-name`.
 1. Reads the following information from the image config (if any of these are missing, the command fails):
     - `id` (must include a `namespace` and `name` in the form `<namespace>/<name>`)
     - `version`
 1. Opens a link to a new Github Issue in the user's browser
     - The user must be logged into Github
-    - The link will use [Github query parameters](https://help.github.com/en/github/managing-your-work-on-github/about-automation-for-issues-and-pull-requests-with-query-parameters) to pre-populate the title, body, and labels.
+    - The link will use [Github query parameters](https://help.github.com/en/github/managing-your-work-on-github/about-automation-for-issues-and-pull-requests-with-query-parameters) to pre-populate the title, body, and labels. It will use the `register-buildpack` label.
     - The issue will be opened against the `https://github.com/buildpacks/registry-index` repo.
     - The issue body will contain structured data that defines the buildpack id, version, digest, and url.
 1. A Github action will detect the new issue and do the following:
-    - If the issue is in an unexpected format, or if the digest does not match the image located at `url-or-tag`, the bot will add a comment to the issue and close it.
+    - If the issue is in an unexpected format, or if the digest does not match the image located at `image-name`, the bot will add a comment to the issue and close it.
     - If this is the first time the `namespace` is used, it will add the namespace to the `buildpacks/registry-owners` repo with the Github user who opened the issue as the owner. The `buildpacks/registry-owners` repo defines the [namespace ownership as described in RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md#namespace-ownership).
     - If this is *not* the first time the `namespace` is used, it will confirm that the Github user who opened the issue is an owner of the buildpack.
     - Create a commit against the master branch of the `https://github.com/buildpacks/registry-index` repo using a Gitub token (i.e. all commits in that repo will be made by the same "user"). The commit will add the buildpack version described in the issue.
@@ -167,7 +167,7 @@ The following behavior will execute when the configured registry is of type `git
 
 The following behavior will execute when the configured registry is of type `git`.
 
-1. Pulls the image manifest for the buildpackage at `url-or-tag` if it does not already exist locally.
+1. Pulls the image manifest for the buildpackage at `image-name` if it does not already exist locally.
 1. Reads the following information from the image manifest (if any of these are missing, the command fails):
     - `id` (must include a `namespace` and `name` in the form `<namespace>/<name>`)
     - `version`
@@ -204,7 +204,7 @@ The following behavior will execute when the configured registry is of type `git
     - The issue will be opened against the `https://github.com/buildpacks/registry-index` repo.
     - The issue body will contain structured data that defines the buildpack id and version to yank.
 1. A Github action will detect the new issue and do the following:
-    - If the issue is in an unexpected format, or if the digest does not match the image located at `url-or-tag`, the bot will add a comment to the issue and close it.
+    - If the issue is in an unexpected format, or if the digest does not match the image located at `image-name`, the bot will add a comment to the issue and close it.
     - Confirm that the Github user who opened the issue is an owner of the buildpack.
     - Create and merge a PR against the `https://github.com/buildpacks/registry-index` repo using a Gitub token (i.e. all commits in that repo will be made by the same "user"). The PR will set `yanked=true` for the buildpack version described in the issue.
     - Close the Github issue.
