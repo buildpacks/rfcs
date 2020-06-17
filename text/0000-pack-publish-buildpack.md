@@ -23,7 +23,7 @@ The [Client-Side Registry RFC (0022)](https://github.com/buildpacks/rfcs/blob/ma
 # What it is
 [what-it-is]: #what-it-is
 
-## Adding a Buildpack to the Registry
+## Registering a Buildpack with the Registry
 
 When a buildpack author would like to register a version of a buildpack on the registry, they will use the `pack register-buildpack <url-or-tag>` command. This command will create a Github Issue on the `https://github.com/buildpacks/registry-index` (or similarly named) Github repo requesting the addition the new buildpack version to the index.
 
