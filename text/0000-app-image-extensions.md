@@ -24,7 +24,7 @@ However, it is not uncommon for application code to depend on OS packages.
 
 Given that app authors and platform maintainers experience increased build time directly, extending the stack at the app author's request may add flexibility without sacrificing performance. At the same time, we want the CNB interface to be highly orthogonal, which is why we've strived to "make everything a buildpack". Allowing some buildpacks to run with privileges would give users the flexibility they expect based on their experience with other tools like `Dockerfile`.
 
-The advantages of using a buildpack for privileged operations are the same as for unprivileged operations: they are composable, fast (caching), modular, reuseable, and safe.
+The advantages of using a buildpack for privileged operations are the same as for unprivileged operations: they are composable, fast (caching), modular, reusable, and safe.
 
 As an example, consider the use case of Acme.com. They have three teams that want to contibute privileged layers to every image built at the company. Each of these teams wants to manage their own artifacts and the mechanisms for installing them, but none of these teams are in control of the base image. The teams have special logic for when their layers should be added to an image; in some cases it's the precense of a Node.js app, and in others it's the use of Tomcat, etc. In the past, these teams were trying to contribute their layers by selectively adding them to every `Dockerfile` for every base image in the company, but this doesn't scale well. With Root Buildpacks, each team can manage their own artifacts, release cadence, and add logic to `bin/detect` to ensure the layers are added when needed.
 
