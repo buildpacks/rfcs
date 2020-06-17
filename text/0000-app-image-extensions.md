@@ -103,7 +103,7 @@ Attempting to rebase an app directly after it's been upgraded is not permitted a
 When the base image has not changed
 1. If the buildpacks are configure as idempotent (the default) load the previous layers onto the base images.
 1. Run the buildpacks, creating an ephemeral image.
-1. Rebase the app on to the new emphemeral image.
+1. Rebase the app on to the new ephemeral image.
 
 When there is an update to either the build or run base images
 1. Pull the new base image(s)
