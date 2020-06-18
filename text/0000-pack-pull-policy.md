@@ -11,18 +11,14 @@
 # Summary
 [summary]: #summary
 
-Replace the flag `--no-pull` with `--pull-policy <option>` and default to `if-not-present`.
+Replace the flag `--no-pull` with `--pull-policy <option>` and introduce `if-not-present`.
 
 # Motivation
 [motivation]: #motivation
 
-#### Performance
-
-By not having to check for the latest images on every build we improve [performance](https://github.com/buildpacks/pack/issues/632#issuecomment-629458867).
-
-#### Uncommon
-
-The docker CLI, docker compose, and k8s default to similar functionality as described by `if-not-present`.
+1. Enable the use case where the user may locally create an alternative to an image that would otherwise be pulled without having to manually pull all other images if using `--no-pull`.
+1. Provide support for an [expected](#prior-art) pull policy without [polluting the number of flags](#alternatives) available to commands.
+1. Allow for additional, potentially more complex pull policies such as [`periodic=1d`](https://github.com/buildpacks/rfcs/pull/80#issuecomment-644120544) or [`lifecycle=never,buildpack=always`](https://github.com/buildpacks/rfcs/pull/80#discussion_r434711922)
 
 # What it is
 [what-it-is]: #what-it-is
@@ -54,7 +50,9 @@ In the following commands, the images listed will adhere to the mentioned Pull P
 
 ### `pack package-buildpack`
 - Buildpacks - When refered to in `package.toml`
+# Backwards Compatibility
 
+For a period of time, `--no-pull` flag will map to `--pull-policy never` and print a deprecation warning.
 # Drawbacks
 [drawbacks]: #drawbacks
 
