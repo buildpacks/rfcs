@@ -21,6 +21,44 @@ Exposing additional metadata in stack images will make it easier for end users t
 - What is the expected outcome?  
 We converge on metadata we want to expose in stack images via labels, and all stack authors eventually support these.
 
+Here's the current output of the `pack inspect-image` command on a sample app:
+```
+Inspecting image: go-mod-simple-app
+...................
+LOCAL:
+
+Stack: io.buildpacks.stacks.bionic
+
+Base Image:
+  Reference: 610caf01e85e5da52c6a99b42fed80858c153de6d25b120940266846bec0872a
+  Top Layer: sha256:b6aadae5b30af0345f0ab82add7ed5b951d78230e86693c08f5c1ae8470a0ffb
+
+Run Images:
+  gcr.io/paketo-buildpacks/run:base-cnb
+...................
+```
+
+By adding the proposed metadata, `pack inspect-image` output of this app could eventually look like:
+```
+Inspecting image: go-mod-simple-app
+...................
+LOCAL:
+
+Stack: io.buildpacks.stacks.bionic
+Stack Metadata: 
+  Maintainer: "Paketo Buildpacks"
+  Homepage: "https://github.com/paketo-buildpacks/stacks"
+  OS Distro: "unbuntu 18.04"
+
+Base Image:
+  Reference: 610caf01e85e5da52c6a99b42fed80858c153de6d25b120940266846bec0872a
+  Top Layer: sha256:b6aadae5b30af0345f0ab82add7ed5b951d78230e86693c08f5c1ae8470a0ffb
+
+Run Images:
+  gcr.io/paketo-buildpacks/run:base-cnb
+...................
+```
+
 # What it is
 [what-it-is]: #what-it-is
 
@@ -28,14 +66,15 @@ This provides a high level overview of the feature.
 
 - Define the target persona: stack author  
 - Explaining the feature largely in terms of examples.  
-The following labels will be added to stack images:  
+The following labels can **optionally** be added by stack maintainers to stack images:  
 `io.buildpacks.stack.maintainer`: Name of Stack Maintainer  
 `io.buildpacks.stack.homepage`: URL for the stack (i.e repo link)  
 `io.buildpacks.stack.distro.name`: Name of OS Distribution  
 `io.buildpacks.stack.distro.version`: Version of OS Distribution  
-`io.buildpacks.stack.version`: Release Number
-`io.buildpacks.stack.release_date`: Release date of image
+`io.buildpacks.stack.version`: Release Number  
+`io.buildpacks.stack.release_date`: Release date of image  
 `io.buildpacks.stack.description`: Description  
+`io.buildpacks.stack.metadata`: Generic stack metadata
 
 
 # How it Works  
@@ -62,6 +101,7 @@ LABEL io.buildpacks.stack.distro.version="18.04"
 LABEL io.buildpacks.stack.version="25"
 LABEL io.buildpacks.stack.release_date="2020-05-12T05:17:02.390472"
 LABEL io.buildpacks.stack.description="Paketo Buildpacks base stack build image"
+LABEL io.buildpacks.stack.metadata="Some optionally defined metadata"
 ```
 
 # Drawbacks
@@ -92,4 +132,7 @@ Stack authors will define their own custom labels to surface the metadata above.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
-None.
+
+The platform spec should be updated to indicate that these keys can **optionally** be added on the build/run stack image.
+
+PR - https://github.com/buildpacks/spec/pull/89
