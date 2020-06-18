@@ -77,11 +77,15 @@ Because the `launcher` must occupy the container `entrypoint`, we will make the 
 When `exporter` creates an app image it will create one symlink per buildpack-contributed process type. The symlink files will be named `/cnb/process/<process-type>` and will point at the launcher.
 
 The `exporter` will prepend `/cnb/process` to the image `PATH`.
+The `exporter` will prepend `/cnb/lifecycle` to the image `PATH`.
 The `exporter` will set the app image `entrypoint` to the symlink matching the default process.
 
 Currently, it is possible to set the default process-type to a non-existent process-type. This will no longer be allowed. If the default process does not exist, the `exporter` will warn and set the entrypoint to `/cnb/lifecycle/launcher`.
 
-### Selecting a process type at runtime
+### Launcher
+The `launcher` will remove `/cnb/process` and `/cnb/lifecycle` from the PATH before launching a process in order to preclude any conflicts between process types and normal executables.
+
+#### Selecting a process type at runtime
 Users will no longer be able to pass a process-type to the launcher as a positional argument or with the `CNB_PROCESS_TYPE` environment variable. Instead, they must set the `entrypoint` in the running container to select a process type other than the default.
 
 For Example:
@@ -92,7 +96,7 @@ Will both launch the process with `type` `web`
 Buildpack-contributed processes will be forbidden from having `type` equal to `"launcher"`.
 If the platform configures the default process to `launcher` or `/cnb/lifecycle/launcher` during export the resulting image will not have a default process-type and instead will accept a [custom command](#specifying-a-custom-process-at-runtime) by default.
 
-### Specifying a custom process at runtime
+#### Specifying a custom process at runtime
 If a user wishes to provide a custom command instead of using one of the buildpack provided process types, they must set the `entrypoint` to the vanilla `launcher`, rather than to process-type symlink. 
 
 If the final path element of `$0` does not match any buildpack-provided process-type `launcher` will construct a process from the positional arguments it receives. If the first argument is `--` this will continue to signify a `direct` process. The first (when it is anything other than `--`) or second (if the first is `--`) argument provided to the `launcher`  will become the `command` of the resultant process. Any subsequent arguments to the launcher will become `args` of the resultant process.
@@ -101,9 +105,9 @@ Example:
 
 Running `docker run --entrypoint launcher <image> echo hello world`, will be equivalent to running a process type where `direct = false`, `command = "echo"` and `args = ["hello", "world"]`
 
-Running `docker run --enntrypoint /cnb/lifecycle/launcher <image> -- echo hello world`, will be equivalent to running a process type where `direct = true`, `command = "echo"` and `args = ["hello", "world"]`
+Running `docker run --entrypoint /cnb/lifecycle/launcher <image> -- echo hello world`, will be equivalent to running a process type where `direct = true`, `command = "echo"` and `args = ["hello", "world"]`
 
-### Providing additional arguments at runtime
+#### Providing additional arguments at runtime
 If `entrypoint` is set to a process-type symlink, a buildpack-provided process will be selected by `type` and any arguments provided to the `launcher` will be appended to the process's predefined `args` array, before execution.
 
 For example, given an image `<image>` containing the following buildpack-defined process
@@ -127,9 +131,52 @@ args = ["hello", "world"]
 
 Launcher args are appended to the `args` array by default for both `direct` and shell processes.
 
-### Executing Shell Processes
+#### Executing Shell Processes
 When a shell process has arguments the launcher will produce behavior identical to that which would result from a user sourcing the profile scripts and then executing
 `<CMD> <ARG1> <ARG2>...` in a shell inside the container.
+
+#### Examples
+
+> Aside: The following examples reference an image built to provide a proof of concept of the new launcher behavior. The POC is a work in progress and `ekcasey/petclinic:launcher-poc` may be updated over time as this RFC evolves or may be removed entirely. This document is the source of truth, rather than the image.
+
+Case 1: Default process-type
+```bash
+docker run ekcasey/petclinic:launcher-poc
+```
+Case 2: Default process-type with additional args
+```bash
+docker run ekcasey/petclinic:launcher-poc --spring.profiles.active=mysql
+```
+Case 3: Non-default process-type
+```bash
+docker run --entrypoint executable-jar ekcasey/petclinic:launcher-poc
+```
+Case 4: Non-default process-type with additional args
+```bash
+docker run --entrypoint executable-jar ekcasey/petclinic:launcher-poc --spring.profiles.active=mysql
+docker run --entrypoint executable-jar ekcasey/petclinic:launcher-poc --spring.profiles.active=$PROFILE # $PROFILE is evaluated on the host machine
+docker run --entrypoint executable-jar ekcasey/petclinic:launcher-poc '--spring.profiles.active=$PROFILE' # $PROFILE is evaluated in the container after profile scripts are sourced
+```
+Case 5: User-provided shell process
+```bash
+docker run --entrypoint launcher -it ekcasey/petclinic:launcher-poc bash # profile scripts have been sourced and buildpack-provided env vars are set in this shell
+docker run --entrypoint launcher ekcasey/petclinic:launcher-poc echo hello "$WORLD" # $WORLD is evaluated on the host machine
+docker run --entrypoint launcher ekcasey/petclinic:launcher-poc echo hello '$WORLD' # $WORLD is evaluated in the container after profile scripts are sourced
+```
+Case 6: User-provided shell process with bash **script**
+```bash
+docker run --entrypoint launcher ekcasey/petclinic:launcher-poc 'for opt in $JAVA_OPTS; do echo $opt; done' # An entire script may be provided as a single argument
+```
+Case 7: User-provided **direct** process
+```bash
+docker run --entrypoint launcher ekcasey/petclinic:launcher-poc -- env # output will include buildpack-provided env vars
+docker run --entrypoint launcher ekcasey/petclinic:launcher-poc -- echo hello "$WORLD" # $WORLD is evaluated on the host machine
+docker run --entrypoint launcher ekcasey/petclinic:launcher-poc -- echo hello '$WORLD' # $WORLD is not evaluated, output will include string literal `$WORLD`
+```
+Case 8: No `launcher`
+```bash
+docker run --entrypoint bash -it ekcasey/petclinic:launcher-poc # profile scripts have NOT been sourced and buildpack-provided env vars are NOT set in this shell
+```
 
 # How it Works
 [how-it-works]: #how-it-works
