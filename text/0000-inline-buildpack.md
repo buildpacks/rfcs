@@ -118,3 +118,5 @@ inline = "<script contents (optional)>"
 This defines the buildpacks that a platform should use on the repo.
 
 Either an `id` or a `uri` MUST be included, but MUST NOT include both. If `uri` is provided the `version`, `inline`, and `shell` MUST NOT be allowed.
+
+When an `inline` script is provided, the script will be executed using the app directory as the buildpack root directory.
