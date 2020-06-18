@@ -29,7 +29,7 @@ The target personas for this RFC are the buildpack author and buildpack user who
 
 We propose two new keys in the `[[build.buildpacks]]` table in `project.toml`:
 
-- `inline` - a script that will be run as the `bin/build` of the inline buildpack
+- `inline` - the contents of a script that will be run as the `bin/build` of the inline buildpack
 - `shell` - defines the shebang line of the script in `inline`
 
 (Note: there is no need to implement `bin/detect`. The detect phase will always pass because there's no foreseeable reason that a user would create an inline buildpack that they don't want to use)
