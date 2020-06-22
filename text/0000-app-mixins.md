@@ -65,13 +65,32 @@ The stackpack interface is identical to the buildpack interface (i.e. the same `
 
 For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase (excluding `/tmp`, `/cnb`, and `/layers`). Alternatively, a platform may store a new stack image to cache the changes. All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
 
-A stackpack is included in a builder by defining it in the `builder.toml` like any other buildpack:
+A stackpack is included in a builder by defining it in the `builder.toml` in the `[[stack.buildpacks]]` array of tables:
 
 ```
-[[buildpacks]]
+[[stack.buildpacks]]
 id = "<stackpack id>"
 uri = "<uri to stackpack>"
 ```
+
+Each stackpack included in the builder will execute until all of a project's mixins have been provided.
+
+The stackpack's snapshot layer may be modified by writing a `launch.toml` file. The `[[processes]]` and `[[slices]]` tables may be used as normal, and a new `[[excludes]]` table will be introduced with the following schema:
+
+```
+[[excludes]]
+paths = ["<sub-path glob>"]
+cache = false
+```
+
+Where:
+
+* `paths` = a list of paths to exclude from the layer
+* `cache` = if true, the paths will be excluded from the launch image layer, but will be included in the cache layer.
+
+## Rebasing an App
+
+App that uses stackpacks can be rebased as normal. Stackpacks are expected to retain ABI compatibility.
 
 ## Example: Apt Buildpack
 
@@ -81,6 +100,9 @@ uri = "<uri to stackpack>"
 [buildpack]
 id = "example/apt"
 privileged = true
+
+[[stacks]]
+id = "io.buildpacks.stacks.bionic"
 ```
 
 Its `bin/detect` would have the following contents:
@@ -90,8 +112,7 @@ Its `bin/detect` would have the following contents:
 
 cat <<TOML >"$2"
 [[mixins]]
-type = "package"
-name = "*"
+name = "[^=]+"
 TOML
 ```
 
@@ -106,24 +127,12 @@ for package in $(cat $3 | yj -t | jq -r ".entries | .[] | .name"); do
   apt install $package
 done
 
-rm -rf /var/cache/apt/archives
+cat << EOF > launch.toml
+[[excludes]]
+paths = [ "/var/cache" ]
+cache = true
+EOF
 ```
-
-## Upgrading an App
-
-When attempting to rebase an image that used a stackpack to provide a mixin, the platform will attempt to re-run the stackpack(s) during rebase.
-
-When the base image has not changed
-1. If the buildpacks are configure as idempotent (the default) load the previous layers onto the base images.
-1. Run the buildpacks, creating an ephemeral image.
-1. Rebase the app on to the new ephemeral image.
-
-When there is an update to either the build or run base images
-1. Pull the new base image(s)
-1. Run the root buildpacks against the new image(s) without loading previous layers, and create an ephemeral image.
-1. Rebase the app on to the new ephemeral image.
-
-**Question**: should some buildpacks be able to opt-out of this rebase behavior (i.e. they are able to guarantee ABI compatibility)?
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -144,8 +153,12 @@ When there is an update to either the build or run base images
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Can users explicitly specify that they want a particular stackpack to run, or are mixins the only interface?
+- How should a buildpack be identified as a stackpack?
+    - a special `key` in the `buildpack.toml`?
+    - a `stackpack.toml`?
 - What is a word that means "not-idempotent"?
+- How do we exclude/include from the cache?
+- Should the stackpack's detect have read-only access to the app?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
@@ -160,20 +173,33 @@ Stackpacks are identical to other buildpacks, with the following exceptions:
 1. All changes made to the filesystem (with the exception of `/tmp`) during the execution of the stackpack's `bin/build` will be snaphotted and stored as a single layer.
 1. A `launch.toml` WILL NOT be honored.
 
-## Build Plan (TOML)
+## launch.toml (TOML)
 
 ```
-[[mixins]]
-type = "<package|set>"
-name = "<mixin name pattern>"
+[[excludes]]
+paths = ["<sub-path glob>"]
+cache = false
 ```
 
 Where:
 
-* `type` - the type of mixin: either `package` or `set`
-* `name` - a pattern used to match mixin names
+* `paths` = a list of paths to exclude from the layer
+* `cache` = if true, the paths will be excluded from the launch image layer, but will be included in the cache layer.
 
-## `buildpack.toml`
+## Build Plan (TOML)
+
+```
+[[mixins]]
+name = "<mixin name pattern>"
+type = "<provides | requires (default=provides)>"
+```
+
+Where:
+
+* `type` - (default=`provides`) whether or not the mixin will be provided or required.
+* `name` - a pattern used to match mixin names. adheres to [re2 syntax](https://github.com/google/re2/wiki/Syntax).
+
+## buildpack.toml  (TOML)
 
  This proposal adds a new key to the `[buildpack]` table in `buildpack.toml`:
 
