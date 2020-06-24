@@ -23,7 +23,7 @@ This benefit is generally useful and extends beyond build caches to nearly every
 # What it is
 [what-it-is]: #what-it-is
 
-Currently, the `pack` CLI has a `--volume` flag that allows users to expose a local filesystem location as a read-only volume mount into the `/platform` directory.  This change should generalize that flag and allow it to mount a local filesystem location as a read-write volume mount into any location within the build container.
+Currently, the `pack` CLI has a `--volume` flag that allows users to expose a local filesystem location as a read-only volume mount into the `/platform` directory.  This change should generalize that flag and allow it to mount a local filesystem location as a read-write volume mount into any location within the build container.  If a user chooses to mount at any specification-reserved files system location (e.g. `/cnb` or `/layers`), a warning should be displayed.
 
 # How it Works
 [how-it-works]: #how-it-works
