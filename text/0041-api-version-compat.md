@@ -18,15 +18,15 @@ To enable smoother migrations and upgrades this RFC proposes the following chang
 1. When interacting with a buildpack, the lifecycle will adhere to the API declared in each buildpack's `buildpack.toml`
 1. The spec may deprecate features or usage in a given API. The lifecycle will print deprecation warnings when it encounters deprecated usage.
 
-The lifecycle will assume the burden of maintaining compatibility, reducing the burden on platform and buildpack authors.  
+The lifecycle will assume the burden of maintaining compatibility, reducing the burden on platform and buildpack authors.
 
 # Motivation
 [motivation]: #motivation
 
-Because there are far fewer lifecycle implementation than platforms or buildpacks, the lifecycle should assume the burden of maintaining compatibility. This will free platform authors to consume new lifecycles without worry and free buildpack authors to implement new APIs at their own pace. 
+Because there are far fewer lifecycle implementation than platforms or buildpacks, the lifecycle should assume the burden of maintaining compatibility. This will free platform authors to consume new lifecycles without worry and free buildpack authors to implement new APIs at their own pace.
 
 ## Non-Breaking 0.x API Versions
-Originally we specified that all minor version increments in the `0.x` line would be interpreted as breaking changes when applying [compatibility rules](https://github.com/buildpacks/spec/blob/master/buildpack.md#buildpacktoml-toml).
+Originally we specified that all minor version increments in the `0.x` line would be interpreted as breaking changes when applying [compatibility rules](https://github.com/buildpacks/spec/blob/main/buildpack.md#buildpacktoml-toml).
 However, a breaking change in the spec need not imply a breaking change in the lifecycle.
 The existing compatibility rules have become annoying over time as they add considerable friction to specification changes. All platforms and buildpacks must explicitly update to support the new APIs before pulling in a new lifecycle.
 As the community of platform and buildpack authors grows and matures, this pain is magnified.
@@ -63,7 +63,7 @@ If a feature or the usage of a feature (flag names, key names, etc.) is deprecat
 Example:
 IF in buildpack API 0.3, `launch`, `cache`, and `build` key names change in the `layer.toml` and the previous keys are retained but deprecated in the 0.3 buildpack API spec:
 * IF a buildpack declares API 0.3 in it's `buildpack.toml`, AND uses the deprecated key name, THEN lifecycle will print a deprecation warning
-* IF a buildpack declares API 0.2 in it's `buildpack.toml`, AND uses the deprecated key name, THEN lifecycle will NOT print a deprecation warning, b/c the keys were not deprecated in the 0.2 version of the spec. 
+* IF a buildpack declares API 0.2 in it's `buildpack.toml`, AND uses the deprecated key name, THEN lifecycle will NOT print a deprecation warning, b/c the keys were not deprecated in the 0.2 version of the spec.
 
 Eventually, we may wish to entirely deprecate older APIs. A future RFC should provide a strategy for deprecations and outline the upgrade path from 0.x to 1.0 APIs. This is purposefully omitted from this RFC so that we can make progress on new 0.x APIs while we work out the details.
 
@@ -119,7 +119,7 @@ We can mitigate this with an upgrade guide in the docs.
 # Spec. Changes
 [spec-changes]: #spec-changes
 
-We will remove the [compatibility rules](https://github.com/buildpacks/spec/blob/master/buildpack.md#buildpacktoml-toml) from the `buildpack.toml` section of the spec and add a new section describing any spec-level guarantees of compatibility between API versions.
+We will remove the [compatibility rules](https://github.com/buildpacks/spec/blob/main/buildpack.md#buildpacktoml-toml) from the `buildpack.toml` section of the spec and add a new section describing any spec-level guarantees of compatibility between API versions.
  We will not attempt to define a buildpack's compatibility with a given lifecycle, thereby allowing but not requiring a given lifecycle to implement multiple API versions.
 
 In practice, this means continuing to codify the existing compatible cases, but removing the negative cases.

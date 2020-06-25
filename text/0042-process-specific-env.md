@@ -39,7 +39,7 @@ Each env or profile layer dir can have subdirs like `<layer>/env.launch/web/` an
 # How it Works
 [how-it-works]: #how-it-works
 
-Lifecycle would use the identifier of the intended launch process to bring in additional `env` and `profile.d` files. The launcher would sort these process specific values _after_ less specific values to allow [Environment Variable Modification Rules](https://github.com/buildpacks/spec/blob/master/buildpack.md#environment-variable-modification-rules) to apply as expected. See Spec Changes below.
+Lifecycle would use the identifier of the intended launch process to bring in additional `env` and `profile.d` files. The launcher would sort these process specific values _after_ less specific values to allow [Environment Variable Modification Rules](https://github.com/buildpacks/spec/blob/main/buildpack.md#environment-variable-modification-rules) to apply as expected. See Spec Changes below.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -66,7 +66,7 @@ Lifecycle would use the identifier of the intended launch process to bring in ad
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-[Original](https://github.com/buildpacks/spec/blob/master/buildpack.md#environment-variable-modification-rules)
+[Original](https://github.com/buildpacks/spec/blob/main/buildpack.md#environment-variable-modification-rules)
 
 #### Environment Variable Modification Rules
 

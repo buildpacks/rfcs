@@ -40,7 +40,7 @@ workflows:
 # How it Works
 [how-it-works]: #how-it-works
 
-We move the [jkutner/buildpacks-orb](https://github.com/jkutner/buildpacks-orb) repo into the `github.com/buildpacks` org, and publish it as `buildpacks/pack`. The repository will be maintained by the [Platform Team](https://github.com/buildpacks/community/blob/master/GOVERNANCE.md#platform-team).
+We move the [jkutner/buildpacks-orb](https://github.com/jkutner/buildpacks-orb) repo into the `github.com/buildpacks` org, and publish it as `buildpacks/pack`. The repository will be maintained by the [Platform Team](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#platform-team).
 
 The Orb's major and minor version number will represent the version of `pack` it uses. But the patch version will be incremented independently. Thus, `buildpacks/pack@0.5.42` could correspond to version `0.5.0` of `pack`.
 
