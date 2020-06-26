@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Process Type Arguments
+- Name: Launcher Arguments
 - Start Date: 2020-06-02
 - Author(s): nebhale ekcasey
 - RFC Pull Request: (leave blank)
