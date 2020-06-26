@@ -29,8 +29,11 @@ The target personas for this RFC are the buildpack author and buildpack user who
 
 We propose two new keys in the `[[build.buildpacks]]` table in `project.toml`:
 
+- `api` - the API compatibility version of the buildpack. Matches the schema of `buildpack.toml`
 - `inline` - the contents of a script that will be run as the `bin/build` of the inline buildpack
 - `shell` - defines the shebang line of the script in `inline`
+
+When any of these keys are provided the following keys are disallowed: `version`, `uri`.
 
 (Note: there is no need to implement `bin/detect`. The detect phase will always pass because there's no foreseeable reason that a user would create an inline buildpack that they don't want to use)
 
@@ -62,6 +65,7 @@ id = "example/ruby"
 version = "1.0"
 
 [[build.buildpacks]]
+api = "0.3"
 id = "me/rake-tasks"
 inline = """
   rake war
@@ -74,6 +78,7 @@ inline = """
 
 - It discourages buildpack reuse (i.e. if it's really easy to create a one-off buildpack, people are less like to make reuseable buildpacks and share them)
 - It encourages the copy-paste problems created by `Dockerfile`
+- There is no built-in mechanism to provide dependencies in the build plan. However, this can be worked-around with a generic build-plan-buildpack that either statically or dynamically creates entries in the build plan.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -93,7 +98,6 @@ inline = """
 - Can an inline buildpack be published to a registry?
 - Can inline buildpacks be root buildpacks?
 - Can a `project.toml` contain more than one inline buildpack?
-- Should `version` be required or should it default to `0.0.0`?
 - How will platforms implement this behavior?
     - A future `/lifecycle/prepare` could generate the temporary buildpack from the inline script.
 
@@ -108,9 +112,7 @@ The build table MAY contain an array of buildpacks. The schema for this table is
 
 ```toml
 [[build.buildpacks]]
-id = "<buildpack ID (optional)>"
-version = "<buildpack version (optional default=latest)>"
-uri = "<url or path to the buildpack (optional default=urn:buildpack:<id>)"
+api = "<buildpack api>"
 shell = "<string (optional default=/bin/sh)>"
 inline = "<script contents (optional)>"
 ```
@@ -118,5 +120,7 @@ inline = "<script contents (optional)>"
 This defines the buildpacks that a platform should use on the repo.
 
 Either an `id` or a `uri` MUST be included, but MUST NOT include both. If `uri` is provided the `version`, `inline`, and `shell` MUST NOT be allowed.
+
+The `api` and `inline` key MUST be used together (i.e. one is not valid without the other). When any of the keys `api`, `inline`, or `shell` are provide the `version` and `uri` MUST NOT be allowed.
 
 When an `inline` script is provided, the script will be executed using the app directory as the buildpack root directory.
