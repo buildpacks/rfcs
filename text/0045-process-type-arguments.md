@@ -3,7 +3,7 @@
 - Name: Process Type Arguments
 - Start Date: 2020-06-02
 - Author(s): nebhale ekcasey
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#84](https://github.com/buildpacks/rfcs/pull/84)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
