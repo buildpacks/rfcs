@@ -6,7 +6,7 @@
 - RFC Pull Request: [rfcs#75](https://github.com/buildpacks/rfcs/pull/75)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
-- Supersedes: https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md
+- Supersedes: https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md
 
 # Summary
 [summary]: #summary
@@ -18,7 +18,7 @@ This RFC describes the implementation of the following commands:
 # Motivation
 [motivation]: #motivation
 
-The [Client-Side Registry RFC (0022)](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md) established that two CLI commands would allow users to add/remove buildpacks to the registry, but the implementation of those commands was vague. In this document, we describe the details of how they will work.
+The [Client-Side Registry RFC (0022)](https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md) established that two CLI commands would allow users to add/remove buildpacks to the registry, but the implementation of those commands was vague. In this document, we describe the details of how they will work.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -160,7 +160,7 @@ The following behavior will execute when the configured registry is of type `git
     - The issue body will contain structured data that defines the buildpack id, version, digest, and url.
 1. A Github action will detect the new issue and do the following:
     - If the issue is in an unexpected format, or if the digest does not match the image located at `image-name`, the bot will add a comment to the issue and close it.
-    - If this is the first time the `namespace` is used, it will add the namespace to the `buildpacks/registry-owners` repo with the Github user who opened the issue as the owner. The `buildpacks/registry-owners` repo defines the [namespace ownership as described in RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md#namespace-ownership).
+    - If this is the first time the `namespace` is used, it will add the namespace to the `buildpacks/registry-owners` repo with the Github user who opened the issue as the owner. The `buildpacks/registry-owners` repo defines the [namespace ownership as described in RFC-0022](https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md#namespace-ownership).
     - If this is *not* the first time the `namespace` is used, it will confirm that the Github user who opened the issue is an owner of the buildpack.
     - Create a commit against the master branch of the `https://github.com/buildpacks/registry-index` repo using a Gitub token (i.e. all commits in that repo will be made by the same "user"). The commit will add the buildpack version described in the issue.
     - Close the Github issue.
@@ -172,7 +172,7 @@ The following behavior will execute when the configured registry is of type `git
     - `id` (must include a `namespace` and `name` in the form `<namespace>/<name>`)
     - `version`
 1. Creates a `local` branch on the local registry index cache
-1. Makes a Git commit to the local registry index with a JSON payload represeting the buildpack version as defined in [RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)
+1. Makes a Git commit to the local registry index with a JSON payload represeting the buildpack version as defined in [RFC-0022](https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md)
 1. Uses Git to push the commit to the registry index's `origin`.
 1. Updates the `master` branch of the local registry cache from `origin`.
 
@@ -212,7 +212,7 @@ The following behavior will execute when the configured registry is of type `git
 The following behavior will execute when the configured registry is of type `git`.
 
 1. Creates a `local` branch on the local registry index cache
-1. Makes a Git commit to the local registry index with an update setting `yank=true` in the JSON payload representing the buildpack version as defined in [RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)
+1. Makes a Git commit to the local registry index with an update setting `yank=true` in the JSON payload representing the buildpack version as defined in [RFC-0022](https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md)
 1. Uses Git to push the commit to the registry index's `origin`.
 1. Updates the `master` branch of the local registry cache from `origin`.
 
@@ -240,7 +240,7 @@ Not included in this proposal, but intended for future RFCs are the following:
 # Drawbacks
 [drawbacks]: #drawbacks
 
-* `type` of registry isn't accounted for in the [Buildpack URI](https://github.com/buildpacks/rfcs/blob/master/text/0037-buildpack-uris.md) definition
+* `type` of registry isn't accounted for in the [Buildpack URI](https://github.com/buildpacks/rfcs/blob/main/text/0037-buildpack-uris.md) definition
 * Github is a single-point-of-failure for the official registry
 * The user must have a Github account to register with the official registry
 * The user may only register with the official registry via a browser

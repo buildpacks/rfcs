@@ -21,7 +21,7 @@ This RFC proposes that user-provided environment variable be loaded by default. 
 
 User-provided build-time environment variables are loaded in the detection and build environment automatically unless `clear-env = true` is specified in the buildpack's entry in `buildpack.toml`. In both cases, the environment variables continue to be available in `<platform>/env/`.
 
-If any [lifecycle-provided env var](https://github.com/buildpacks/spec/blob/master/buildpack.md#provided-by-the-lifecycle) is specified by the user, and `clear-env = true` is not set, then the user-provided value is prepended immediately before each `/bin/build` invocation, so that the value precedes any layer-provided values.
+If any [lifecycle-provided env var](https://github.com/buildpacks/spec/blob/main/buildpack.md#provided-by-the-lifecycle) is specified by the user, and `clear-env = true` is not set, then the user-provided value is prepended immediately before each `/bin/build` invocation, so that the value precedes any layer-provided values.
 
 # Questions
 [questions]: #questions

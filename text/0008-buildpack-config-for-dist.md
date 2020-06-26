@@ -15,7 +15,7 @@ concerns of defining a buildpack and managing configuration of buildpacks.
 # Motivation
 [motivation]: #motivation
 
-In the approval of the [Distribution Spec](https://github.com/buildpacks/rfcs/blob/master/text/0007-spec-distribution.md),
+In the approval of the [Distribution Spec](https://github.com/buildpacks/rfcs/blob/main/text/0007-spec-distribution.md),
 we landed on a [compromise that no one was really happy with](https://github.com/buildpacks/rfcs/pull/11#issuecomment-510483638).
 We now propose a new `buildpack.toml` schema that will, hopefully, satisfy all parties.
 
@@ -91,7 +91,7 @@ group = [
 The `id` and `version` pair will be resolved to a buildpack by the platform.
 
 ## Optional Build Plan Groups
-To simplify `buildpack.toml`, this RFC will also be extending the [Contractual Build Plan RFC](https://github.com/buildpacks/rfcs/blob/master/text/0005-contractual-build-plan.md) to include the ability to add additional groupings of `provides` and `requires` inside of a `[[or]]` Array.
+To simplify `buildpack.toml`, this RFC will also be extending the [Contractual Build Plan RFC](https://github.com/buildpacks/rfcs/blob/main/text/0005-contractual-build-plan.md) to include the ability to add additional groupings of `provides` and `requires` inside of a `[[or]]` Array.
 
 ```toml
 [[or]]
@@ -219,7 +219,7 @@ In this way, the `buildpack.toml` can be used directly (without specifiying a `-
 # Prior Art
 [prior-art]: #prior-art
 
-- The `buildpack.toml` definition in [Distribution Spec](https://github.com/buildpacks/rfcs/blob/master/text/0007-spec-distribution.md)
+- The `buildpack.toml` definition in [Distribution Spec](https://github.com/buildpacks/rfcs/blob/main/text/0007-spec-distribution.md)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions

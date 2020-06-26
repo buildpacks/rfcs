@@ -4,17 +4,17 @@
 - Start Date: 2020-03-19
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
-- Supersedes: [RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)
+- Supersedes: [RFC-0022](https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md)
 
 # Summary
 [summary]: #summary
 
-This proposal corrects some mistakes and inefficiencies in the JSON structure proposed by [RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md).
+This proposal corrects some mistakes and inefficiencies in the JSON structure proposed by [RFC-0022](https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md).
 
 # Motivation
 [motivation]: #motivation
 
-During implementation, we found that the JSON structure described in [RFC-0022](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md) was both incorrect and redundant.
+During implementation, we found that the JSON structure described in [RFC-0022](https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md) was both incorrect and redundant.
 
 # What it is
 [what-it-is]: #what-it-is

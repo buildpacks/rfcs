@@ -71,7 +71,7 @@ eg. `docker:/ubuntu:latest`
 
 ### CNB
 
-The cnb scheme resolves buildpacks using the buildpacks registry described in [RFC #22](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md).
+The cnb scheme resolves buildpacks using the buildpacks registry described in [RFC #22](https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md).
 
 - `<host>` is optional and would default to a host predefined (or configured) in the platform.
 - Similar to the `file` scheme, there is a minimal declaration for omitting host by using a simple slash (`/`).
@@ -182,7 +182,7 @@ API v2 but it's direct compatibility would require additional research. Addition
 
 - Where would this be documented long-term?
     - Answer: As an extension spec. See [spec changes](#spec-changes).
-- How does `urn:cnb:registry:bp.id@bp.version` translate to a `namespace` + `name` as detailed in [RFC #22](https://github.com/buildpacks/rfcs/blob/master/text/0022-client-side-buildpack-registry.md)?
+- How does `urn:cnb:registry:bp.id@bp.version` translate to a `namespace` + `name` as detailed in [RFC #22](https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md)?
     - Answer:
         > As of now, a namespace/name is an acceptable form of buildpack ID (like ID is a superset). So think defining the URN as `urn:cnb:registry:<id>@<version>` is sufficient for this proposal. In a future proposal we might define more strict rule about ID, but this definition would stay the same.
 
