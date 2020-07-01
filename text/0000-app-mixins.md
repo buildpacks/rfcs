@@ -149,6 +149,7 @@ EOF
 [prior-art]: #prior-art
 
 - [RFC-0006: Stage specific mixins](https://github.com/buildpacks/rfcs/blob/main/text/0006-stage-specific-mixins.md)
+- The term "non-idempotent" is used in section 9.1.2 of [Hypertext Transfer Protocol -- HTTP/1.1 (RFC 2616)](https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
@@ -156,7 +157,6 @@ EOF
 - How should a buildpack be identified as a stackpack?
     - a special `key` in the `buildpack.toml`?
     - a `stackpack.toml`?
-- What is a word that means "not-idempotent"?
 - How do we exclude/include from the cache?
 - Should the stackpack's detect have read-only access to the app?
 
@@ -206,8 +206,8 @@ Where:
  ```
  [buildpack]
  privileged = <boolean (default=false)>
- not-idempotent = <boolean (default=false)>
+ non-idempotent = <boolean (default=false)>
  ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
-* `not-idempotent` - when set to `true`, indicates that the buildpack is not idempotent. The lifecycle will provide a clean filesystem from the stack image(s) before each run (i.e. no cache).
+* `non-idempotent` - when set to `true`, indicates that the buildpack is not idempotent. The lifecycle will provide a clean filesystem from the stack image(s) before each run (i.e. no cache).
