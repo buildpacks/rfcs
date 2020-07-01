@@ -119,7 +119,7 @@ inline = "<script contents (optional)>"
 
 This defines the buildpacks that a platform should use on the repo.
 
-Either an `id` or a `uri` MUST be included, but MUST NOT include both. If `uri` is provided the `version`, `inline`, and `shell` MUST NOT be allowed.
+Either an `id` or a `uri` MUST be included, but MUST NOT include both. If `uri` is provided then `api`, `version`, `inline`, and `shell` MUST NOT be allowed.
 
 The `api` and `inline` key MUST be used together (i.e. one is not valid without the other). When any of the keys `api`, `inline`, or `shell` are provide the `version` and `uri` MUST NOT be allowed.
 
