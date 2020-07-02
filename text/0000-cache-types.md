@@ -79,4 +79,28 @@ None
 # Spec. Changes
 [spec-changes]: #spec-changes
 
-TODO
+### Buildpacks Spec
+
+##### [https://github.com/buildpacks/spec/blob/main/buildpack.md#layer-content-metadata-toml](Layer Content Metadata TOML)
+```toml
+# whether this layer should be available to at launch (run-time)
+launch = false
+
+# whether this layer should be available to subsequent buildpacks
+# type: boolean
+build = false
+
+# whether this layer should be cached
+# boolean
+# type: boolean
+cache = false
+
+# type of cache (if `cache = true`)
+# type: string
+# values: app-specific, buildpack-specific
+# default: app-specific
+cache-type = "app-specific" # <"app-specific" | "buildpack-specific" [default: ]>
+
+[metadata]
+# buildpack-specific data
+```
