@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Cache Types
+- Name: Cache Scope
 - Start Date: 2020-06-26
 - Author(s): [Javier Romero](https://github.com/jromero)
 - RFC Pull Request: (leave blank)
@@ -30,33 +30,36 @@ In order to solve this use case in a safe manner, the platform needs to know wha
 # What it is
 [what-it-is]: #what-it-is
 
-Buildpacks will provide a mechanism to denote a cached layer as something that can be shared by associating a "type" to the cache.
+Buildpacks will provide a mechanism to denote a cached layer as something that can be shared by associating specifing a scope of "shared".
 
 - Target persona: buildpack author
 
-There will be two types: 
+There will be two defined scopes: 
 
-- `app-specific` - This cache is specific to the application and SHOULD NOT be shared with any other applications.
-- `buildpack-specific` - This cache is specific to the buildpack and MAY be shared across multiple applications.
+- `app` - This cached layer is specific to the application and SHOULD NOT be shared with any other applications.
+- `shared` - This cached layer is specific to the buildpack and MAY be shared across multiple applications.
 
 # How it Works
 [how-it-works]: #how-it-works
 
 #### Platform Implementation
 
-Provided that there is something that denotes what type of cached layers are available the platform can choose to which scope, if any, they'd like to share the `buildpack-specific` caches.
+Platforms can deside how to _share_ the "shared" cached layers based on their specific use cases.
 
-In `pack`, this could be implemented to limit cache sharing per builder but across applications.
+In `pack`, it being a local development tool, shared cached layers could be implemented as a single global cache that is shared across all applications. Additional options can be provided to restrict or otherwise configure this sharing.
+
+In a different platform, one can forsee that the cache is shared only within a "project" or an "organization".
 
 #### Lifecycle Implementation
 
-TODO
+1. The lifecycle will provide an additional `-shared-cache-dir` and `-shared-cache-image` options where `-cache-dir` and `-cache-image` could be provided.
+2. Layers marked as `cache = true` and `cache-scope = "shared"` will be stored in either `-shared-cached-dir` or `-shared-cache-image`.
+3. If `-share-cached-dir` or `-share-cached-image` are not provide and a buildpack sets a layer to cache with scope `shared`, then it would be cached to the standart cache location (`-cache-dir`/`-cache-image`).
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Doesn't solve for the possibility of "seeding" a cached layer with data on first run. 
-    - Use case: I have `~/.m2` locally and would like to provide that to the build process so that it doesn't have to download all dependencies on first run. 
+- Requires that the buildpack author be continuous about providing this information for optimization purposes.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -81,7 +84,7 @@ None
 
 ### Buildpacks Spec
 
-##### [https://github.com/buildpacks/spec/blob/main/buildpack.md#layer-content-metadata-toml](Layer Content Metadata TOML)
+##### [Layer Content Metadata TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#layer-content-metadata-toml)
 ```toml
 # whether this layer should be available to at launch (run-time)
 launch = false
@@ -97,9 +100,9 @@ cache = false
 
 # type of cache (if `cache = true`)
 # type: string
-# values: app-specific, buildpack-specific
-# default: app-specific
-cache-type = "app-specific" # <"app-specific" | "buildpack-specific" [default: ]>
+# values: app, shared
+# default: app
+cache-scope = "app"
 
 [metadata]
 # buildpack-specific data
