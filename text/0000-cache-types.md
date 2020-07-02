@@ -44,17 +44,17 @@ There will be two defined scopes:
 
 #### Platform Implementation
 
-Platforms can deside how to _share_ the "shared" cached layers based on their specific use cases.
+Platforms can decide how to _share_ the "shared" cached layers based on their specific use cases.
 
 In `pack`, it being a local development tool, shared cached layers could be implemented as a single global cache that is shared across all applications. Additional options can be provided to restrict or otherwise configure this sharing.
 
-In a different platform, one can forsee that the cache is shared only within a "project" or an "organization".
+In a different platform, one can foresee that the cache is shared only within a "project" or an "organization".
 
 #### Lifecycle Implementation
 
-1. The lifecycle will provide an additional `-shared-cache-dir` and `-shared-cache-image` options where `-cache-dir` and `-cache-image` could be provided.
+1. The lifecycle will provide additional `-shared-cache-dir` and `-shared-cache-image` options where `-cache-dir` and `-cache-image` could be provided.
 2. Layers marked as `cache = true` and `cache-scope = "shared"` will be stored in either `-shared-cached-dir` or `-shared-cache-image`.
-3. If `-share-cached-dir` or `-share-cached-image` are not provide and a buildpack sets a layer to cache with scope `shared`, then it would be cached to the standart cache location (`-cache-dir`/`-cache-image`).
+3. If `-share-cached-dir` or `-share-cached-image` are not provide and a buildpack sets a layer to cache with scope `shared`, then it would be cached to the standard cache location (`-cache-dir`/`-cache-image`).
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -66,8 +66,8 @@ In a different platform, one can forsee that the cache is shared only within a "
 
 - Generic Read/Write volume mounts (RFC PR [#85](https://github.com/buildpacks/rfcs/pull/85))
     - The buildpack user must know what and where to mount things.
-    - Has safety concerns when writting to Linux mounts.
-    - Solution violates the spec dependant on use.
+    - Has safety concerns when writing to Linux mounts.
+    - Solution violates the spec dependent on use.
     - Solution is specific to `pack`.
     
 # Prior Art
