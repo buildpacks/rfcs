@@ -188,14 +188,9 @@ Where:
 [buildpack]
 privileged = <boolean (default=false)>
 non-idempotent = <boolean (default=false)>
-
-[[mixins]]
-name = "<mixin name pattern>"
+mixins = [ "<mixin name pattern>" ]
  ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
 * `non-idempotent` - when set to `true`, indicates that the buildpack is not idempotent. The lifecycle will provide a clean filesystem from the stack image(s) before each run (i.e. no cache).
-
-The `[[mixins]]` array of tables defines the list of mixins provided by this buildpack.
-
-* `name` - a pattern describing the mixins provide by this buildpack
+* `mixins` - a list of patterns that match mixins provided by this buildpack
