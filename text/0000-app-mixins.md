@@ -161,13 +161,12 @@ EOF
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-
 ## Stackpacks
 
 Stackpacks are identical to other buildpacks, with the following exceptions:
 
 1. The `<layers>` directory is NOT writable
-1. The working directory WILL NOT contain application source code.
+1. The working directory WILL NOT contain application source code during the build phase.
 1. All changes made to the filesystem (with the exception of `/tmp`) during the execution of the stackpack's `bin/build` will be snaphotted and stored as a single layer.
 
 ## launch.toml (TOML)
@@ -198,3 +197,7 @@ name = "<mixin name pattern>"
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
 * `non-idempotent` - when set to `true`, indicates that the buildpack is not idempotent. The lifecycle will provide a clean filesystem from the stack image(s) before each run (i.e. no cache).
+
+The `[[mixins]]` array of tables defines the list of mixins provided by this buildpack.
+
+* `name` - a pattern describing the mixins provide by this buildpack
