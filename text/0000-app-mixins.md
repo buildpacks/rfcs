@@ -110,10 +110,7 @@ Its `bin/detect` would have the following contents:
  ```bash
 #!/usr/bin/env bash
 
-cat <<TOML >"$2"
-[[mixins]]
-name = "[^=]+"
-TOML
+exit 0
 ```
 
 Its `bin/build` would have the following contents:
@@ -187,27 +184,17 @@ Where:
 * `paths` = a list of paths to exclude from the layer
 * `cache` = if true, the paths will be excluded from the launch image layer, but will be included in the cache layer.
 
-## Build Plan (TOML)
-
-```
-[[mixins]]
-name = "<mixin name pattern>"
-type = "<provides | requires (default=provides)>"
-```
-
-Where:
-
-* `type` - (default=`provides`) whether or not the mixin will be provided or required.
-* `name` - a pattern used to match mixin names. adheres to [re2 syntax](https://github.com/google/re2/wiki/Syntax).
-
 ## buildpack.toml  (TOML)
 
- This proposal adds a new key to the `[buildpack]` table in `buildpack.toml`:
+ This proposal adds new keys to the `[buildpack]` table in `buildpack.toml`, and a new `[[mixins]]` array of tables:
 
  ```
- [buildpack]
- privileged = <boolean (default=false)>
- non-idempotent = <boolean (default=false)>
+[buildpack]
+privileged = <boolean (default=false)>
+non-idempotent = <boolean (default=false)>
+
+[[mixins]]
+name = "<mixin name pattern>"
  ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
