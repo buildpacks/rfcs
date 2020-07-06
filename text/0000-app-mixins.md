@@ -95,7 +95,7 @@ Before a launch image is rebased, the platform must re-run the any stackpacks th
 
 ## Example: Apt Buildpack
 
- A buildpack that can install an arbitrary list of mixins would have a `buildpack.toml` like this:
+A buildpack that installs a custom certificate would have a `buildpack.toml` like this:
 
  ```toml
 [buildpack]
@@ -133,6 +133,49 @@ cache = true
 EOF
 ```
 
+## Example: CA Certificate Buildpack
+
+A buildpack that works on the `ubuntu-20` stack, which defines a `type=` prefix for mixins, and installs customer CA Certificates would have a `buildpack.toml` that looks like this:
+
+```toml
+[buildpack]
+id = "example/cacerts"
+privileged = true
+mixins = ["type=cacert"]
+
+[[stacks]]
+id = "ubuntu-20"
+```
+
+Its `bin/detect` would have the following contents:
+
+ ```bash
+#!/usr/bin/env bash
+
+exit 0
+```
+
+Its `bin/build` would have the following contents:
+
+ ```bash
+#!/usr/bin/env bash
+
+for cert_path in $(cat $3 | yj -t | jq -r ".entries | .[] | .name"); do
+  cert_file=$(basename $cert_path)
+  cp $cert_path /usr/share/ca-certificates/$cert_file
+  chmod 644 /usr/share/ca-certificates/$cert_file
+done
+
+update-ca-certificates
+```
+
+An application that is using this stackpack would the following `project.toml`:
+
+```toml
+[build]
+mixins = [ "type=cacert:mycerts/database.crt" ]
+```
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -155,7 +198,8 @@ EOF
 [unresolved-questions]: #unresolved-questions
 
 - Should the stackpack's detect have read-only access to the app?
-    - This would likely be driven by a stackpack that does not provide mixins, but instead dynamically contributes to the build plan based on the contents of the app source code. For example, a stackpack that adds custom cacerts.
+    - Does a stackpack even need a detect phase?
+    - This would likely be driven by a stackpack that does not provide mixins, but instead dynamically contributes to the build plan based on the contents of the app source code. I don't know if we have a use case for this, but I can imaging a buildpack that reads environment variables as input to some function.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
