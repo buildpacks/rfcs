@@ -9,7 +9,7 @@
 # Summary
 [summary]: #summary
 
-Compatibility verification logic is added to all lifecycle executables for the purpose of allowing lifecycle consumers 
+Compatibility verification logic is added to all lifecycle executables for the purpose of allowing lifecycle consumers
 to verify the compatibility of the Platform API version.
 
 # Motivation
@@ -71,15 +71,15 @@ passed to the binary.
 
 ##### Additional Environment Variables
 
-| Env Var           | Description 
-|-------            |---          
+| Env Var           | Description
+|-------            |---
 | CNB_PLATFORM_API  | The Platform API version of the integration.
 
 
 ##### Additional Exit Codes
 
-| Exit codes        | Description 
-|-------            |---          
+| Exit codes        | Description
+|-------            |---
 | 11                | Lifecycle's Platform API version is incompatible with the integration.
 
 
@@ -150,7 +150,7 @@ spec:
 # How it Works
 [how-it-works]: #how-it-works
 
-As described in the [Platform API RFC](https://github.com/buildpack/rfcs/blob/master/text/0011-lifecycle-descriptor.md#how-it-works),
+As described in the [Platform API RFC](https://github.com/buildpack/rfcs/blob/main/text/0011-lifecycle-descriptor.md#how-it-works),
 changes to the binaries or arguments that are not backwards compatible effectively break the Platform API and thereby
 would require the Platform API version to be incremented.
 
@@ -160,7 +160,7 @@ We can use this change in Platform API version within each lifecycle binary to v
 [drawbacks]: #drawbacks
 
 * This solution would only allow platforms to _fail-fast_ versus attempt to mediate compatibility.
-* The initially executed binary may be renamed, moved, or removed. 
+* The initially executed binary may be renamed, moved, or removed.
     * This would cause a separate unexpected failure which also _fails-fast_ and would be easy to diagnose.
 
 # Alternatives
