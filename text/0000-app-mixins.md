@@ -24,7 +24,7 @@ Mixins already allow buildpack authors to create buildpacks that depend on an ex
 - *application developer* - a person who is using buildpacks to transform their application code into an OCI image
 - *stackpack* - a new type of buildpack that runs against the stack image(s) instead of an app
 
-A application developer may specify a list of mixins in their application's `project.toml` file like this:
+An application developer may specify a list of mixins in their application's `project.toml` file like this:
 
 ```toml
 [build]
@@ -169,7 +169,6 @@ Stackpacks are identical to other buildpacks, with the following exceptions:
 1. The `<layers>` directory is NOT writable
 1. The working directory WILL NOT contain application source code.
 1. All changes made to the filesystem (with the exception of `/tmp`) during the execution of the stackpack's `bin/build` will be snaphotted and stored as a single layer.
-1. A `launch.toml` WILL NOT be honored.
 
 ## launch.toml (TOML)
 
