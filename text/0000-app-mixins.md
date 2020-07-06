@@ -142,7 +142,7 @@ EOF
 
 - [Add root buildpack as interface for app image extension RFC](https://github.com/buildpacks/rfcs/pull/77)
 - [App Image Extensions (OS packages)](https://github.com/buildpacks/rfcs/pull/23)
-- Allow application developers to use root buildpacks in `project.toml`. This would have significant performance implications, and creates a "foot gun" in qhich end users could build images they are not able to maintain. For this reason, we are holding off on a generic root buildpack feature.
+- [Root Buildpacks](https://github.com/buildpacks/rfcs/blob/root-buildpacks/text/0000-root-buildpacks.md): Allow application developers to use root buildpacks in `project.toml`. This would have significant performance implications, and creates a "foot gun" in qhich end users could build images they are not able to maintain. For this reason, we are holding off on a generic root buildpack feature.
 
 # Prior Art
 [prior-art]: #prior-art
