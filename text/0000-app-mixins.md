@@ -101,6 +101,7 @@ Before a launch image is rebased, the platform must re-run the any stackpacks th
 [buildpack]
 id = "example/apt"
 privileged = true
+mixins = ["[^=]+"]
 
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
