@@ -90,7 +90,7 @@ Where:
 
 ## Rebasing an App
 
-App that uses stackpacks can be rebased as normal. Stackpacks are expected to retain ABI compatibility.
+Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. Then, the rebase operation can be performed as normal, while including the stackpack layers as part of the stack. This will be made possible by including the stackpack in the run-image, but because the stackpack detect phase is not run, the operation does not need access to the application source.
 
 ## Example: Apt Buildpack
 
