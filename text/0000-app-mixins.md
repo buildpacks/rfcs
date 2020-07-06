@@ -151,12 +151,8 @@ EOF
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- How should a buildpack be identified as a stackpack?
-    - Not everyone likes `privileged`
-    - a special `key` in the `buildpack.toml`?
-    - a `stackpack.toml`?
 - Should the stackpack's detect have read-only access to the app?
-    - In this proposal it does, and in the future a more generic "root buildpack" construct would need it too.
+    - This would likely be driven by a stackpack that does not provide mixins, but instead dynamically contributes to the build plan based on the contents of the app source code. For example, a stackpack that adds custom cacerts.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
