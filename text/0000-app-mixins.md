@@ -22,7 +22,8 @@ Mixins already allow buildpack authors to create buildpacks that depend on an ex
 [what-it-is]: #what-it-is
 
 - *application developer* - a person who is using buildpacks to transform their application code into an OCI image
-- *stackpack* - a new type of buildpack that runs against the stack image(s) instead of an app
+- *root buildpack* - a new type of buildpack that runs as the root user
+- *stackpack* - a type of root buildpack that runs against the stack image(s) instead of an app
 
 An application developer may specify a list of mixins in their application's `project.toml` file like this:
 
@@ -141,6 +142,7 @@ EOF
 
 - [Add root buildpack as interface for app image extension RFC](https://github.com/buildpacks/rfcs/pull/77)
 - [App Image Extensions (OS packages)](https://github.com/buildpacks/rfcs/pull/23)
+- Allow application developers to use root buildpacks in `project.toml`. This would have significant performance implications, and creates a "foot gun" in qhich end users could build images they are not able to maintain. For this reason, we are holding off on a generic root buildpack feature.
 
 # Prior Art
 [prior-art]: #prior-art
