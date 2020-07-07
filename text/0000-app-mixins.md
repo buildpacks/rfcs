@@ -208,7 +208,7 @@ mixins = [ "type=cacert:mycerts/database.crt" ]
 
 Stackpacks are identical to other buildpacks, with the following exceptions:
 
-1. The `<layers>` directory is NOT writable
+1. The `<layers>` directory is NOT writable.
 1. The working directory WILL NOT contain application source code during the build phase.
 1. All changes made to the filesystem (with the exception of `/tmp`) during the execution of the stackpack's `bin/build` will be snapshotted and stored as a single layer.
 
