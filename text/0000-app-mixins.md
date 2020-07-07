@@ -179,7 +179,7 @@ mixins = [ "type=cacert:mycerts/database.crt" ]
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Mixins are less flexible that a generic [root buildpack](https://github.com/buildpacks/rfcs/blob/app-image-ext-buildpacks/text/0000-app-image-extensions.md).
+- Mixins are less flexible than a generic [root buildpack](https://github.com/buildpacks/rfcs/blob/app-image-ext-buildpacks/text/0000-app-image-extensions.md).
 
 # Alternatives
 [alternatives]: #alternatives
