@@ -95,7 +95,7 @@ Before a launch image is rebased, the platform must re-run the any stackpacks th
 
 ## Example: Apt Buildpack
 
-A buildpack that installs a custom certificate would have a `buildpack.toml` like this:
+A buildpack that can install an arbitrary list of mixins would have a `buildpack.toml` like this:
 
  ```toml
 [buildpack]
