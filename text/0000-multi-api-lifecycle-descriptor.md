@@ -150,6 +150,7 @@ Understanding buildpack/platform API support will require more documentation and
 # Alternatives
 [alternatives]: #alternatives
 
+- We could have `deprected` and `supported` lists instead of using `min` and `max` to define ranges.
 - We could stick with a single `api.buildpack` and `api.platform` in the lifecycle descriptor and let platforms infer support ranges based on the guidelines outlined in [RFC-0041](https://github.com/buildpacks/rfcs/blob/main/text/0041-api-version-compat.md#non-breaking-0x-api-versions)
 - Instead of introducing deprecated APIs we could commit to never deprecating or removing support for older APIs
 
