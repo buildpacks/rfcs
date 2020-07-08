@@ -103,7 +103,7 @@ LABEL io.buildpacks.stack.release_date="2020-05-12T05:17:02.390472"
 LABEL io.buildpacks.stack.description="Paketo Buildpacks base stack build image"
 LABEL io.buildpacks.stack.metadata="Some optionally defined metadata"
 ```
-
+During rebase, the `rebaser` will copy the `io.buildpacks.stack.*` labels from the new run image to the app image.
 # Drawbacks
 [drawbacks]: #drawbacks
 
