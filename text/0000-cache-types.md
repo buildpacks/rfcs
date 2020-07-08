@@ -30,7 +30,7 @@ In order to solve this use case in a safe manner, the platform needs to know wha
 # What it is
 [what-it-is]: #what-it-is
 
-Buildpacks will provide a mechanism to denote a cached layer as something that can be shared by associating specifing a scope of "shared".
+Buildpacks will provide a mechanism to denote a cached layer as something that can be shared by specifying a scope of "shared".
 
 - Target persona: buildpack author
 
@@ -46,7 +46,7 @@ There will be two defined scopes:
 
 Platforms can decide how to _share_ the "shared" cached layers based on their specific use cases.
 
-In `pack`, it being a local development tool, shared cached layers could be implemented as a single global cache that is shared across all applications. Additional options can be provided to restrict or otherwise configure this sharing.
+In `pack`, being a local development tool, shared cached layers could be implemented as a single global cache that is shared across all applications. Additional options can be provided to restrict or otherwise configure this sharing.
 
 In a different platform, one can foresee that the cache is shared only within a "project" or an "organization".
 
@@ -54,12 +54,12 @@ In a different platform, one can foresee that the cache is shared only within a 
 
 1. The lifecycle will provide additional `-shared-cache-dir` and `-shared-cache-image` options where `-cache-dir` and `-cache-image` could be provided.
 2. Layers marked as `cache = true` and `cache-scope = "shared"` will be stored in either `-shared-cached-dir` or `-shared-cache-image`.
-3. If `-share-cached-dir` or `-share-cached-image` are not provide and a buildpack sets a layer to cache with scope `shared`, then it would be cached to the standard cache location (`-cache-dir`/`-cache-image`).
+3. If `-shared-cache-dir` or `-shared-cache-image` are not provided and a buildpack sets a layer to cache with scope `shared`, then it would be cached to the standard cache location (`-cache-dir`/`-cache-image`).
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Requires that the buildpack author be continuous about providing this information for optimization purposes.
+- Requires that the buildpack author be conscious about providing this information for optimization purposes.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -86,7 +86,7 @@ None
 
 ##### [Layer Content Metadata TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#layer-content-metadata-toml)
 ```toml
-# whether this layer should be available to at launch (run-time)
+# whether this layer should be available at launch (run-time)
 launch = false
 
 # whether this layer should be available to subsequent buildpacks
