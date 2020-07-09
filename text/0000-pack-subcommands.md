@@ -57,7 +57,7 @@ pack
     create
     inspect
     suggest
-  buildpacks
+  buildpack
     package
     register
   completion
@@ -80,7 +80,7 @@ pack
       list
   help
   report
-  stacks
+  stack
     suggest
   version
 ```
