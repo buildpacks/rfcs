@@ -68,7 +68,7 @@ The stackpack interface is identical to the buildpack interface (i.e. the same `
 
 For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase (excluding `/tmp`, `/cnb`, and `/layers`). Alternatively, a platform may store a new stack image to cache the changes. All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
 
-A stackpack is included in a builder by defining it in the `builder.toml` in the `[[stack.buildpacks]]` array of tables:
+A builder can use a stackpack by defining it in the `builder.toml` in the `[[stack.buildpacks]]` array of tables:
 
 ```
 [[stack.buildpacks]]
