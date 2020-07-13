@@ -48,7 +48,7 @@ When a list of mixins are required by buildpacks via the build plan and the buil
 1. The lifecycle will compare the list of mixins to those provided by the stack. If all mixin names are provided by the stack, no further action is required.
 1. If any requested mixin is not provided by the stack, the lifecycle will run the detect phase for all stackpacks defined in the builder.
 1. The lifecycle will compare the mixins added to the build plan to see if they match they required mixins.
-1. If at least one stackpack passes detect and provides the required mixin(s), the lifecycle will execute the stackpack build phase for passing stackpack(s). If no stackpacks pass detect, or no stackpacks provide the required mixin, the build will fail with a message that describes the mixins that could not be provided.
+1. If at least one stackpack passes detect and provides the required mixin(s), the lifecycle will execute the stackpack build phase for all passing stackpack(s). If no stackpacks pass detect, or no stackpacks provide the required mixin, the build will fail with a message that describes the mixins that could not be provided.
 1. During the lifecycle's build phase, the stackpacks that passed detection will run against the build and run images accordingly (see details below). All stackpacks will be run before the user's buildpacks.
 
 ## Stackpacks
