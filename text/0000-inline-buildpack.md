@@ -40,13 +40,13 @@ When any of these keys are provided the following keys are disallowed: `version`
 # How it Works
 [how-it-works]: #how-it-works
 
-When an entry in the `[[build.buildpacks]]` table contains an `inline` value, the platform WILL NOT attempt to download the buildpack `id@version`. Instead, it will create an ephemeral buildpack, with the following:
+When an entry in the `[[build.buildpacks]]` table contains an `inline` value, the following is implied:
 
 - a `bin/detect` that always passes (i.e. `exit 0`)
 - a `bin/build` that contains the value of `inline` script without any changes (i.e. no magic)
 - a `buildpack.toml` using the `id` and `version` from the buildpack entry in `project.toml`
 
-When the ephemeral buildpack is executed, its working directory will contain the artifacts in the app repo. In this way, an `inline` script MAY reference other scripts in the repo. For example, a `lib/utils.sh` may be sourced by an inline Bash script.
+When the inline buildpack is executed, the working directory will the app directory (as normal). In this way, an `inline` script MAY reference other scripts in the repo. For example, a `lib/utils.sh` may be sourced by an inline Bash script.
 
 ## Example
 
