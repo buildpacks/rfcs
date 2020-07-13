@@ -76,7 +76,7 @@ id = "<stackpack id>"
 uri = "<uri to stackpack>"
 ```
 
-Each stackpack included in the builder will execute until all of a project's mixins have been provided.
+Each stackpack used by the builder will execute if it passes detection and it's provided mixins satisfy one of a project's required mixins.
 
 The stackpack's snapshot layer may be modified by writing a `launch.toml` file. The `[[processes]]` and `[[slices]]` tables may be used as normal, and a new `[[excludes]]` table will be introduced with the following schema:
 
