@@ -41,7 +41,7 @@ When a command like `pack build` is run, the list of mixins will be processed be
 # How it Works
 [how-it-works]: #how-it-works
 
-When a list of mixins are defined in a `project.toml` and `pack build` is run against that project, the following will happen:
+When a list of mixins are required by buildpacks via the build plan and the build phase starts:
 
 1. The lifecycle will compare the list of mixins to those provided by the stack. If all mixin names are provided by the stack, no further action is required.
 1. If any requested mixin is not provided by the stack, the lifecycle will run the detect phase for all stackpacks defined in the builder.
