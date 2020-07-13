@@ -59,7 +59,7 @@ When a list of mixins are required by buildpacks via the build plan and the buil
 * Does not have access to the application source code
 * Is run before all regular buildpacks
 * Is run against both the build and run images
-* Is distributed with the builder image
+* Is distributed with the stack run and/or build image
 * May not write to the `/layers` directory
 
 The stackpack interface is identical to the buildpack interface (i.e. the same `bin/detect` and `bin/build` scripts are required). However, some of the context it is run in is different from regular buildpacks.
