@@ -16,7 +16,9 @@ This is a proposal for allowing application developers (buildpack users) to spec
 # Motivation
 [motivation]: #motivation
 
-Mixins already allow buildpack authors to create buildpacks that depend on an extended set of OS packages without affecting build time, but it's common for application code to depend on OS packages too. But allowing buildpacks to arbitrarily install OS packages during build would drastically increase build time, especially when CNB tooling is used to build or rebase many apps with similar package requirements. For that reason, this proposal defines a mechanism to implement mixin support for application developers without significant impact on build performance.
+Mixins already allow buildpack authors to create buildpacks that depend on an extended set of OS packages without affecting build time, but it's common for application code to depend on OS packages too. But allowing buildpacks to arbitrarily install OS packages during build would drastically increase build time, especially when CNB tooling is used to build or rebase many apps with similar package requirements.
+
+For that reason, this proposal defines a mechanism to implement dynamic installation of mixins at build time while minimizing the performance impact. This is accomplished by allowing stack images to satisfy mixin requires statically and/or reject dynamic mixin installation early in the build process.
 
 # What it is
 [what-it-is]: #what-it-is
