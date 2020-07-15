@@ -105,6 +105,8 @@ Experimental API versions may or may not correspond to a spec release.
 
 The behavior of experimental APIs may change between lifecycle versions without notice.
 
+When `CNB_PLATFORM_API` or the `api` field in a `buildpack.toml` file is set to an experimental API the lifecycle will print a warning.
+
 # How it Works
 [how-it-works]: #how-it-works
 
