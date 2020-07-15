@@ -94,7 +94,7 @@ modification-date = "2020-07-09 12:41:35-04:00"
 size = 17813
 previous-layer-digest = "c54bba046158"
 
-cached = true
+cache = true
 launch = false
 build = true
 
