@@ -103,6 +103,9 @@ type = "git"
 
 [[layers.application-source.version]]
 sha = "26e8c05b151f57161d64b7a5f844bb04caed0ba3"
+
+[[layers.metadata]]
+checksum = "96d06478d425bd0411d34e71376fbd93"
 ```
 
 In this case, I can discover everything we need to reproduce the
