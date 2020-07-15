@@ -6,7 +6,7 @@
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
-- Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
+- Supersedes: https://github.com/buildpacks/rfcs/pull/63
 
 # Summary
 [summary]: #summary
