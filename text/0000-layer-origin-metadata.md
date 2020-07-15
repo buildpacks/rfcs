@@ -196,6 +196,7 @@ See [above][expose-all-layer-metadata-recap].
 <!--   gets merged? -->
 
 * Does this affect how `report.toml` should be spec'd?
+* How is layer origin metadata stored for layers that are not cached?
 
 <!-- - What parts of the design do you expect to be resolved through -->
 <!--   implementation of the feature? -->
