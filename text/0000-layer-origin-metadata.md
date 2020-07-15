@@ -109,11 +109,9 @@ In this case, I can discover everything we need to reproduce the
 layer; if I discover later that I need to reproduced the layer
 produced by the first build, I should be able to reference the
 `report.toml` for the image designated by
-`image.previous-image-digest`.
-
-(I'm actually hand-waving around the issue of associating
-`image.previous-image-digest` and that image's `report.toml`. See
-[below][unresolved-questions].)
+`image.previous-image-digest`. Storing `report.toml` files and
+associating them with images will have to be a platform concern, given
+that we want to avoid embedding that information in the image itself.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -202,8 +200,6 @@ See [above][expose-all-layer-metadata-recap].
 <!--   gets merged? -->
 
 * Does this affect how `report.toml` should be spec'd?
-* How can I use `image.previous-image-digest` to find that image's
-  `report.toml`?
 
 <!-- - What parts of the design do you expect to be resolved through -->
 <!--   implementation of the feature? -->
