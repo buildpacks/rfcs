@@ -65,12 +65,14 @@ id = "example/ruby"
 version = "1.0"
 
 [[build.buildpacks]]
-api = "0.3"
 id = "me/rake-tasks"
-inline = """
-  rake war
-  rake db:migrate
-"""
+
+  [build.buildpacks.script]
+  api = "0.3"
+  inline = """
+    rake war
+    rake db:migrate
+  """
 ```
 
 # Drawbacks
@@ -91,6 +93,7 @@ inline = """
 
 - `Dockerfile`
 - [Packfile](https://github.com/sclevine/packfile/)
+- [HTML `<script>` element](https://www.w3.org/html/wiki/Elements/script)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
@@ -112,6 +115,8 @@ The build table MAY contain an array of buildpacks. The schema for this table is
 
 ```toml
 [[build.buildpacks]]
+
+[build.buildpacks.script]
 api = "<buildpack api>"
 shell = "<string (optional default=/bin/sh)>"
 inline = "<script contents (optional)>"
@@ -119,6 +124,6 @@ inline = "<script contents (optional)>"
 
 This defines the buildpacks that a platform should use on the repo.
 
-Either an `id` or a `uri` MUST be included, but MUST NOT include both. If `uri` is provided then `api`, `version`, `inline`, and `shell` MUST NOT be allowed.
+Either an `version`, `uri`, or `script` table MUST be included, but MUST NOT include any combination of these elements.
 
-The `api` and `inline` key MUST be used together (i.e. one is not valid without the other). When any of the keys `api`, `inline`, or `shell` are provided the `version` and `uri` MUST NOT be allowed.
+The `api` and `inline` key MUST be defined in the `script` table.
