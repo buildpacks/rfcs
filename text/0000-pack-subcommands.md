@@ -154,7 +154,7 @@ pack config run-image-mirrors list my-image
 ## Backwards Compatibility
 
 1. There would be a period in which all pre-existing subcommands would work.
-2. [Top-level aliases](#top-level-aliases) will provide continued compatibility for common operations.
+2. Critical operations (`build`, `rebase`) will remain unchanged.
 
 # Drawbacks
 [drawbacks]: #drawbacks
