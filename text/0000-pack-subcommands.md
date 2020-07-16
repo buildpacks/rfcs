@@ -198,7 +198,7 @@ pack config run-image-mirrors list my-image
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Are there better alternatives to the name "app"?
+None
 
 # Spec. Changes
 [spec-changes]: #spec-changes
