@@ -46,13 +46,16 @@ pack
 
 ### Proposed structure
 
+The pack commands will be reorganized in a way where they are grouped by resource type where possible. Additionally, a new
+command `config` will group subcommands that solely operate on mutating the config file.
+
+
+An overview of the (sub)commands:
+
 ```
 pack
 
-  app
-    build
-    inspect
-    rebase
+  build
   builder
     create
     inspect
@@ -79,19 +82,13 @@ pack
       remove
       list
   help
+  inspect
   report
+  rebase
   stack
     suggest
   version
 ```
-
-### Top-Level Aliases
-
-There would also be some alias subcommands for the `app` set of subcommands for easier usage and compatibility.
-
-* `pack build` -> `pack app build`
-* `pack inspect` -> `pack app inspect`
-* `pack rebase` -> `pack app rebase`
 
 ### Config
 
@@ -167,13 +164,36 @@ pack config run-image-mirrors list my-image
 # Alternatives
 [alternatives]: #alternatives
 
-- Keep it as it is.
+### Config alternatives
+
+- Only allow manual edits of config file.
+    - A `config` command would allow providing `help` for possible operations and argument values.
 - Some [Config](#config) subcommands could be more intertwined with their respective resource. For example, `pack builder trust ...` instead of `pack config trust-builder ...`.
+    - Other commands are operations on the resource whereas having `config` subcommands would make it more obvious that
+    `pack` is solely mutating local configuration.
+
+### App / Project / Image images commands
+
+- Instead of having top-level commands `build`, `inspect`, `rebase` they can be associated with an `app`/`project`/`image` resource.
+    - There would also be some alias subcommands for the `app` set of subcommands for easier usage and compatibility.
+        - `pack build` -> `pack app build`
+        - `pack inspect` -> `pack app inspect`
+        - `pack rebase` -> `pack app rebase`
+    - The consensus appears to be NOT to provide a resource name based on the confusion it can impose depending on usage.
+        - A few examples: "Is a function image an _app_?", "A _project_ may be composed of multiple images, am I operating on a single or multiple images?", "What type of _image_ am I building?".
 
 # Prior Art
 [prior-art]: #prior-art
 
-Discuss prior art, both the good and bad.
+* colon (`:`) command delimiters
+    * https://oclif.io/
+* nested subcommands
+    * http://docopt.org/
+    * https://picocli.info/#_nested_sub_subcommands
+    * https://oclif.io/
+* config
+    * https://git-scm.com/docs/git-config
+    * https://cloud.google.com/sdk/gcloud/reference/config
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
