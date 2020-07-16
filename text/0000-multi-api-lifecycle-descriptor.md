@@ -32,29 +32,30 @@ The following is an example `lifecycle.toml` following the proposed schema:
 ```toml
 [apis]
 [apis.buildpack]
-  deprecated = ["1.2"]
-  supported = ["2.4"]
+  deprecated = ["1"]
+  supported = ["1.2", "2.1"]
   experimental = "3.0"
 [apis.platform]
-  deprecated = ["0.3"]
+  deprecated = ["0.4"]
   supported = ["0.4", "0.5", "1.3"]
   experimental = "2.0"
 
 [lifecycle]
   version = "0.9.0"
 ```
-* `supproted` contain an array of support API version
+* `supproted` contain an array of support API versions:
   * for version `1.0+`, version `x.n` implies support for `x.0 - x.n`
-* `deprecated` describes the range of deprecated APIs.
-  * for version `1.0+`, version `x.n` implies `x.0 - x.n` are deprecated
+  * `supported` should contain all deprecated and non-deprecated versions that the lifecycle supports
+* `deprecated` contain an array of deprecated APIs:
+  * `deprecated` apis should only contain `0.x` or major versions
 * `experimental` describes a single experimental API
 
 Given lifecycle a lifecycle with the above descriptor file:
-- buildpack API versions `2.0`, `2.1`, `2.2`, `2.3` and `2.4` are supported
-- buildpack API versions `1.1` and `1.2` are deprecated
+- buildpack API versions `1.0`, `1.1` `1.2`, `2.0`, and `2.1` are supported
+- buildpack API versions `1.0`, `1.1` `1.2` are deprecated
 - buildpack API version `3.0` is experimental
 - platform API versions `0.4`, `0.5`, `1.0`, `1.1`, `1.2` and `1.3` are supported
-- platform API version `0.3` is deprecated
+- platform API version `0.4` is deprecated
 - platform API version `2.0` is experimental
 
 ## Lifecycle Labels 
@@ -64,12 +65,12 @@ A builder or lifecycle image with the above descriptor file should have the foll
 ```json
 {
   "buildpack": {
-    "deprecated": ["1.2"],
-    "supported": ["2.4"],
+    "deprecated": ["1"],
+    "supported": ["1.2", "2.4"],
     "experimental": "3.0"
   },
   "platform": {
-    "deprecated": ["0.3"],
+    "deprecated": ["0.4"],
     "supported": ["0.4", "0.5", "1.3"],
     "experimental": "2.0"
   }
