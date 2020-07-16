@@ -34,21 +34,24 @@ The following is an example `lifecycle.toml` following the proposed schema:
 [apis.buildpack]
   deprecated = ["1"]
   supported = ["1.2", "2.1"]
-  experimental = "3.0"
+  experimental = ["3.0"]
 [apis.platform]
   deprecated = ["0.4"]
   supported = ["0.4", "0.5", "1.3"]
-  experimental = "2.0"
+  experimental = ["1.4", "2.0"]
 
 [lifecycle]
   version = "0.9.0"
 ```
-* `supproted` contain an array of support API versions:
-  * for version `1.0+`, version `x.n` implies support for `x.0 - x.n`
-  * `supported` should contain all deprecated and non-deprecated versions that the lifecycle supports
+* `supproted` contains an array of support API versions:
+  * for version `1.0+`, version `x.n` implies support for [`x.0`,`x.n`]
+  * `supported` should be a superset of `deprecated`
+  * `supported` should not contain experimental apis
 * `deprecated` contain an array of deprecated APIs:
   * `deprecated` apis should only contain `0.x` or major versions
-* `experimental` describes a single experimental API
+* `experimental` contains an array of experimental API versions
+ * for version `1.0+`, version `x.n` implies experimental support for (`x.y`,`x.n`], where `x.y` is the highest supported minor
+ * if no minor of the given major is supported `x.n` implies experimental support for [`x.0`, `x.n`]
 
 Given lifecycle a lifecycle with the above descriptor file:
 - buildpack API versions `1.0`, `1.1` `1.2`, `2.0`, and `2.1` are supported
@@ -56,7 +59,7 @@ Given lifecycle a lifecycle with the above descriptor file:
 - buildpack API version `3.0` is experimental
 - platform API versions `0.4`, `0.5`, `1.0`, `1.1`, `1.2` and `1.3` are supported
 - platform API version `0.4` is deprecated
-- platform API version `2.0` is experimental
+- platform API versions `1.4` and `2.0` are experimental
 
 ## Lifecycle Labels 
 A builder or lifecycle image with the above descriptor file should have the following labels
@@ -67,12 +70,12 @@ A builder or lifecycle image with the above descriptor file should have the foll
   "buildpack": {
     "deprecated": ["1"],
     "supported": ["1.2", "2.4"],
-    "experimental": "3.0"
+    "experimental": ["3.0"]
   },
   "platform": {
     "deprecated": ["0.4"],
     "supported": ["0.4", "0.5", "1.3"],
-    "experimental": "2.0"
+    "experimental": ["1.4", "2.0"]
   }
 }
 ```
@@ -154,7 +157,6 @@ Understanding buildpack/platform API support will require more documentation and
 # Alternatives
 [alternatives]: #alternatives
 
-- We could have `deprected` and `supported` lists instead of using `min` and `max` to define ranges.
 - We could stick with a single `api.buildpack` and `api.platform` in the lifecycle descriptor and let platforms infer support ranges based on the guidelines outlined in [RFC-0041](https://github.com/buildpacks/rfcs/blob/main/text/0041-api-version-compat.md#non-breaking-0x-api-versions)
 - Instead of introducing deprecated APIs we could commit to never deprecating or removing support for older APIs
 
@@ -167,8 +169,6 @@ Understanding buildpack/platform API support will require more documentation and
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Should the lifecycle warn when an experimental API is used?
-- Should we support a range of experimental APIs instead of a single API?
 - Should we require platforms to turn on support for experimental APIs with an environment variable?
 
 # Spec. Changes (OPTIONAL)
