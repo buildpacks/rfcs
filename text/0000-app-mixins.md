@@ -202,6 +202,17 @@ mixins = [ "type=cacert:mycerts/database.crt" ]
 - Should the stackpack's detect have read-only access to the app?
     - Does a stackpack even need a detect phase?
     - This would likely be driven by a stackpack that does not provide mixins, but instead dynamically contributes to the build plan based on the contents of the app source code. I don't know if we have a use case for this, but I can imaging a buildpack that reads environment variables as input to some function.
+- Should stackpacks be able to define per-stack mixins?
+    - We could support a top-level `mixins` array, and allow refinements under `[[stacks]] mixins`. If we do this, we need to distinguish between provided and required mixins (at least under `[[stacks]]`).
+    - If buildpacks can require mixins from `bin/detect`, the stackpack could use this mechanism to require per-stack mixins.
+- Should we use regex to match mixins, or should we double-down on `type=` (or similar)?
+    - regexs make it likely that a stackpack will be unable to distinguish packages from other types of mixins
+    - It will be difficult for the platform to distinguish between regex patterns and explict value to match.
+    - Alternatively, we could define a URN for mixins, like:
+        - `urn:package:libpq`
+        - `urn:package:build:libpq-dev`
+        - `urn:cacert:mycerts/database.crt`
+        - Naked strings, like `libpq`, could be assumed to represent packages.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
