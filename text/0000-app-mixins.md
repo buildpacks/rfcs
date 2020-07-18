@@ -137,13 +137,17 @@ EOF
 
 ## Example: CA Certificate Buildpack
 
+Support for custom CA Certificates can be accomplished with two buildpacks: a stackpack that can install the cert, and a normal buildpack that can provide a cert in the build plan.
+
+### CA Cert Installer Stackpack
+
 A buildpack that works on the `ubuntu-20` stack, which defines a `type=` prefix for mixins, and installs custom CA Certificates would have a `buildpack.toml` that looks like this:
 
 ```toml
 [buildpack]
 id = "example/cacerts"
 privileged = true
-mixins = ["type=cacert"]
+mixins = ["cacert"]
 
 [[stacks]]
 id = "ubuntu-20"
@@ -154,28 +158,76 @@ Its `bin/detect` would have the following contents:
  ```bash
 #!/usr/bin/env bash
 
+cat << EOF > $2
+[[provides]]
+name = "cacert"
+EOF
+
 exit 0
 ```
 
-Its `bin/build` would have the following contents:
+Its `bin/build` would would install each `cacert` in the build plan. It would have the following contents:
 
  ```bash
 #!/usr/bin/env bash
 
-for cert_path in $(cat $3 | yj -t | jq -r ".entries | .[] | .name"); do
-  cert_file=$(basename $cert_path)
-  cp $cert_path /usr/share/ca-certificates/$cert_file
-  chmod 644 /usr/share/ca-certificates/$cert_file
+# filter to the cert
+for file in $(cat $3 | yj -t | jq -r ".entries | .[] | select(.name==\"cacert\") | .metadata | .file"); do
+  cert="$(cat $3 | yj -t | jq -r ".entries | .[] | select(.name==\"cacert\") | .metadata | select(.file==\"$file\") | .content")"
+  echo $cert > /usr/share/ca-certificates/$file
+  chmod 644 /usr/share/ca-certificates/$file
 done
 
 update-ca-certificates
 ```
 
-An application that is using this stackpack would the following `project.toml`:
+### CA Cert Provider Buildpack
+
+The stackpack must be used with a buildpack that provides a certificate(s) for it to install. That buildpack would have the following `buildpack.toml`:
 
 ```toml
-[build]
-mixins = [ "type=cacert:mycerts/database.crt" ]
+[buildpack]
+id = "my/db-cert"
+
+[[stacks]]
+id = "ubuntu-20"
+mixins = ["cacert"]
+```
+
+Its `bin/detect` would require a certificate with the following contents:
+
+ ```bash
+#!/usr/bin/env bash
+
+cat << EOF > $2
+[[requires]]
+name = "cacert"
+
+[requires.metadata]
+file = "database.crt"
+content = """
+$(cat $CNB_BUILDPACK_DIR/database.crt)
+"""
+
+[[requires]]
+name = "cacert"
+
+[requires.metadata]
+file = "server.crt"
+content = """
+$(cat $CNB_BUILDPACK_DIR/server.crt)
+"""
+EOF
+
+exit 0
+```
+
+Its `bin/build` would do nothing, and `have the following contents:
+
+ ```bash
+#!/usr/bin/env bash
+
+exit 0
 ```
 
 # Drawbacks
@@ -205,14 +257,7 @@ mixins = [ "type=cacert:mycerts/database.crt" ]
 - Should stackpacks be able to define per-stack mixins?
     - We could support a top-level `mixins` array, and allow refinements under `[[stacks]] mixins`. If we do this, we need to distinguish between provided and required mixins (at least under `[[stacks]]`).
     - If buildpacks can require mixins from `bin/detect`, the stackpack could use this mechanism to require per-stack mixins.
-- Should we use regex to match mixins, or should we double-down on `type=` (or similar)?
-    - regexs make it likely that a stackpack will be unable to distinguish packages from other types of mixins
-    - It will be difficult for the platform to distinguish between regex patterns and explict value to match.
-    - Alternatively, we could define a URN for mixins, like:
-        - `urn:package:libpq`
-        - `urn:package:build:libpq-dev`
-        - `urn:cacert:mycerts/database.crt`
-        - Naked strings, like `libpq`, could be assumed to represent packages.
+- Should we use regex to match mixins?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
