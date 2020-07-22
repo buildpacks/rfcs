@@ -389,6 +389,7 @@ The `depDiffIDs` could be pulled out to the top level. This would let us assert 
 - What parts of the design do you expect to be resolved through implementation of the feature?
     - The distribution of offline dependencies into layers.
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+    - Lifecycle optimizations for offline builds.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
