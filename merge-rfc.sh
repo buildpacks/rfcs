@@ -18,6 +18,8 @@ git pull origin --rebase
 PR="${1}"
 ID=$(id)
 
+echo "Merging PR ${PR} as rfc-${ID}"
+
 git fetch origin "pull/${PR}/head:rfc-${ID}"
 git merge "rfc-${ID}" --signoff --no-edit --no-ff
 git branch -d "rfc-${ID}"
