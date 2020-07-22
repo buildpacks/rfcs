@@ -361,7 +361,8 @@ This would let us correctly build the `depDiffIDs` field in `Label.json`. This w
 The `depDiffIDs` could be pulled out to the top level. This would let us assert that all entries in `depDiffIds` need to be unique.
 
 ``` json
-"paketo-buildpacks/node-engine":{
+{
+   "paketo-buildpacks/node-engine":{
       "0.0.178":{
          "api":"0.2",
          "stacks":[
@@ -370,8 +371,11 @@ The `depDiffIDs` could be pulled out to the top level. This would let us assert 
             }
          ],
          "layerDiffID":"sha256:<some-sha256>"
-      }
-"depDiffIDs": ["sha256:<some-dep-sha256>"]
+      },
+      "depDiffIDs":[
+         "sha256:<some-dep-sha256>"
+      ]
+   }
 }
 ```
 
