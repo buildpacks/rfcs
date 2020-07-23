@@ -36,6 +36,7 @@ The technical details are opaque and implementation dependent as this is a chang
 * There is an amazing amount of danger in using a shared filesystem in distributed systems.
 * Performance problems accessing shared filesystems in distributed systems.
 * Performance problems accessing a local filesystem from within the MacOS Docker Daemon.
+* There are signficant risks around file ownership on Linux hosts
 
 # Alternatives
 [alternatives]: #alternatives
@@ -53,6 +54,7 @@ The technical details are opaque and implementation dependent as this is a chang
 [unresolved-questions]: #unresolved-questions
 
 * Should certain CNB-reserved folders be mountable?  I believe that preventing mounts at their locations restricts the upside to this feature, without adding a significant amount of safety.  The overall feature is quite dangerous and special-casing two folders isn't going to change that significantly.
+* Should this be included behind experimental support of the `pack` CLI?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
