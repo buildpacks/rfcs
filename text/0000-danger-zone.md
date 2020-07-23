@@ -25,6 +25,13 @@ This benefit is generally useful and extends beyond build caches to nearly every
 
 Currently, the `pack` CLI has a `--volume` flag that allows users to expose a local filesystem location as a read-only volume mount into the `/platform` directory.  This change should generalize that flag and allow it to mount a local filesystem location as a read-write volume mount into any location within the build container.  If a user chooses to mount at any specification-reserved files system location (e.g. `/cnb` or `/layers`), a warning should be displayed.
 
+`--volume` will allow `mode` as an optional third colon separated parameter.
+
+Format: `--volume=<src>:<target>[:mode]`
+
+Mode values:
+* `ro` - Read-only (default)
+* `rw` - Read/Write
 # How it Works
 [how-it-works]: #how-it-works
 
@@ -36,7 +43,8 @@ The technical details are opaque and implementation dependent as this is a chang
 * There is an amazing amount of danger in using a shared filesystem in distributed systems.
 * Performance problems accessing shared filesystems in distributed systems.
 * Performance problems accessing a local filesystem from within the MacOS Docker Daemon.
-* There are signficant risks around file ownership on Linux hosts
+* There are significant risks around file ownership on Linux hosts
+* There would be a small transition period of incompatibility for users that already use `--volume` for mounting platform directories.
 
 # Alternatives
 [alternatives]: #alternatives
