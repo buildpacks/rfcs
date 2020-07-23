@@ -43,7 +43,7 @@ The following is an example `lifecycle.toml` following the proposed schema:
 [lifecycle]
   version = "0.9.0"
 ```
-* `supproted` contains an array of support API versions:
+* `supported` contains an array of support API versions:
   * for version `1.0+`, version `x.n` implies support for [`x.0`,`x.n`]
   * `supported` should be a superset of `deprecated`
   * `supported` should not contain experimental apis
