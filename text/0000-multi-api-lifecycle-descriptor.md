@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-This RFC proposed three levels of API support: `deprecated`, `supported`, and `experimental`. Supported APIs will be expressed as arrays.
+This RFC proposed two levels of API support: `deprecated` and `supported`. APIs will be expressed as arrays.
 
 This RFC introduces a new lifecycle descriptor file format, and an analogous label that should be applied to builder and lifecycle images.
 
@@ -21,8 +21,6 @@ This RFC introduces a new lifecycle descriptor file format, and an analogous lab
 Now that the lifecycle may simultaneously support multiple APIs, the current lifecycle descriptor format, which lists exactly one platform and one buildpack API, is no longer sufficient.
 
 In addition, we should have a mechanism for deprecating an entire API, so that buildpack and platform authors are not caught off guard when their platform or buildpack no longer works with a newer lifecycle. We likely will not choose to deprecate any APIs in the near future but building API deprecation into any new design prepares us well for the future.
-
-Experimental APIs will give platform and buildpack authors an opportunity to try out unreleased APIs and give us feedback. This will be valuable as we prepare for the `1.0` versions of the APIs. We want to get the design of the `1.0` APIs as close to "right" as possible because `1.n` APIs will not permit breaking changes. Feedback will help us improve the design before we finalize it. The quality of feedback we get from user about their real life usage of experimental APIs will help us avoid problems we may miss when approving RFCs.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -34,32 +32,28 @@ The following is an example `lifecycle.toml` following the proposed schema:
 [apis.buildpack]
   deprecated = ["1"]
   supported = ["1.2", "2.1"]
-  experimental = ["3.0"]
 [apis.platform]
   deprecated = ["0.4"]
   supported = ["0.4", "0.5", "1.3"]
-  experimental = ["1.4", "2.0"]
 
 [lifecycle]
   version = "0.9.0"
 ```
-* `supported` contains an array of support API versions:
-  * for version `1.0+`, version `x.n` implies support for [`x.0`,`x.n`]
-  * `supported` should be a superset of `deprecated`
-  * `supported` should not contain experimental apis
-* `deprecated` contain an array of deprecated APIs:
-  * `deprecated` apis should only contain `0.x` or major versions
-* `experimental` contains an array of experimental API versions
- * for version `1.0+`, version `x.n` implies experimental support for (`x.y`,`x.n`], where `x.y` is the highest supported minor
- * if no minor of the given major is supported `x.n` implies experimental support for [`x.0`, `x.n`]
+* `supported`:
+  * contains an array of support API versions:
+  * for versions `1.0+`, version `x.n` implies support for [`x.0`,`x.n`]
+  * should be a superset of `deprecated`
+  * should only contain APIs that correspond to a spec release
+* `deprecated`:
+  * contain an array of deprecated APIs:
+  * should only contain `0.x` or major versions
+  * should only contain APIs that correspond to a spec release
 
 Given lifecycle a lifecycle with the above descriptor file:
 - buildpack API versions `1.0`, `1.1` `1.2`, `2.0`, and `2.1` are supported
 - buildpack API versions `1.0`, `1.1` `1.2` are deprecated
-- buildpack API version `3.0` is experimental
 - platform API versions `0.4`, `0.5`, `1.0`, `1.1`, `1.2` and `1.3` are supported
 - platform API version `0.4` is deprecated
-- platform API versions `1.4` and `2.0` are experimental
 
 ## Lifecycle Labels 
 A builder or lifecycle image with the above descriptor file should have the following labels
@@ -70,12 +64,10 @@ A builder or lifecycle image with the above descriptor file should have the foll
   "buildpack": {
     "deprecated": ["1"],
     "supported": ["1.2", "2.4"],
-    "experimental": ["3.0"]
   },
   "platform": {
     "deprecated": ["0.4"],
     "supported": ["0.4", "0.5", "1.3"],
-    "experimental": ["1.4", "2.0"]
   }
 }
 ```
@@ -105,13 +97,6 @@ Only API versions defined in a spec release can be in the supported range.
 
 Supported APIs will behave as expected. 
 
-### Experimental APIs
-Experimental API versions may or may not correspond to a spec release.
-
-The behavior of experimental APIs may change between lifecycle versions without notice.
-
-When `CNB_PLATFORM_API` or the `api` field in a `buildpack.toml` file is set to an experimental API the lifecycle will print a warning.
-
 # How it Works
 [how-it-works]: #how-it-works
 
@@ -123,7 +108,7 @@ The lifecycle will set `io.buildpacks.lifecycle.version` and `io.buildpacks.life
 Platforms may use the contents of the `io.buildpacks.lifecycle.apis` label when deciding which `CNB_PLATFORM_API` to use, or validating whether a buildpack is compatible with a given builder image.
 
 ### `pack`
-`pack inspect-builder` should display deprecated, supported, and experimental API information when it is available.
+`pack inspect-builder` should display deprecated and supported API information when it is available.
 
 ## Backwards Compatibility
 
@@ -163,13 +148,10 @@ Understanding buildpack/platform API support will require more documentation and
 # Prior Art
 [prior-art]: #prior-art
 
-* Experimental APIs are similar to [alpha level APIs](https://kubernetes.io/docs/concepts/overview/kubernetes-api/#api-versioning) in Kubernetes.
 * https://kubernetes.io/docs/reference/using-api/deprecation-policy/
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-
-- Should we require platforms to turn on support for experimental APIs with an environment variable?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
