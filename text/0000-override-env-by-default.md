@@ -27,7 +27,7 @@ Buildpack authors can create environment variable files as `<layer>/env(.launch|
 
 These environment variable files are applied dynamically, either before subsequent buildpacks or when the app container starts. Their application may be modulated by file extensions such as `.append`, `.prepend`, `.default`, and `.override`. For `.append` and `.prepend`, a special `NAME.delim` file may be used to specify the delimiter.
 
-The current behavior is to assume `.append` and `.delim` (with contents `:`) when no extension is specify. This is confusing (for reasons stated above) and does not match the behavior of `NAME=value` when environment variables are set in other contexts. This RFC proposed we change the behavior to be identical to `.override`, with overrides all previous values (such that the last buildpack "wins").
+The current behavior is to assume `.append` and `.delim` (with contents `:`) when no extension is specified. This is confusing (for reasons stated above) and does not match the behavior of `NAME=value` when environment variables are set in other contexts. This RFC proposes we change the behavior to be identical to `.override`, which overrides all previous values (such that the last buildpack "wins").
 
 # Drawbacks
 [drawbacks]: #drawbacks
