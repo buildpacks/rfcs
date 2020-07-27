@@ -11,6 +11,11 @@
 
 One paragraph explanation of the feature.
 
+# Definitions
+[definitions]: #definitions
+
+Make a list of the definitions that may be useful for those reviewing. Include phrases and words that buildpack authors or other interested parties may not be familiar with.
+
 # Motivation
 [motivation]: #motivation
 
