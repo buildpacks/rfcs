@@ -16,7 +16,7 @@ Restored layers are currently re-cached automatically. This RFC proposes that bu
 # Motivation
 [motivation]: #motivation
 
-- If the latest version of the buildpack is not aware of layers created by **any** earlier version of the buildpack and it doesn't removed all unrecognized layers, those layers may stick around indefinitely. This may lead to unexpected behavior and/or security vulnerabilities.
+- If the latest version of the buildpack is not aware of layers created by **any** earlier version of the buildpack and it doesn't remove all unrecognized layers, those layers may stick around indefinitely. This may lead to unexpected behavior and/or security vulnerabilities.
 - Logic to remove unrecognized layers could be removed from buildpacks and buildpack libraries like `libcnb`.
 
 # What it is
