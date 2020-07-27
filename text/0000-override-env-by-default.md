@@ -18,7 +18,10 @@ This RFC proposes that we change the behavior of `/env/`, `/env.build/`, and `/e
 
 The current behavior is surprising, especially because adding `.append` silently removes the delimiter. Changing to `.override` and requiring a `.delim` file to add a delimiter would be more clear.
 
-Additionally, not all environment variables are paths, so assuming `:` may also surprise users when two unrelated buildpacks set the same env var without an extension.
+Additionally:
+
+- Not all environment variables are paths, so assuming `:` may also surprise users when two unrelated buildpacks set the same env var without an extension.
+- Even when an environment variable contains a path that needs to be joined, there is no guarantee that `.append` is the correct choice over `.prepend`. Making one the default hides the need to think about what is the most appropriate choice, results in asymmetrical syntax for the two use-cases, and means buildpack authors need to remember which of them is actually the default.
 
 # What it is
 [what-it-is]: #what-it-is
