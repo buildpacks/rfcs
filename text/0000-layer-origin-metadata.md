@@ -136,7 +136,14 @@ that action taking place shouldn't be too difficult.
 
 To be explicit, this features does not care about intermediate layer
 states. We can treat buildpacks as black boxes and leave investigation
-of intermeiate layer states to buildpack developers.
+of intermediate layer states to buildpack developers.
+
+Layer origin metadata is required or optional, depending on the
+platform's caching strategy. Our ability to make guarantees about the
+existence of layer origin metadata depennds on the layer caching
+strategy: if layers are cached in the registry, then layer origin
+metadata should always exist; if layers are cached on disk, then layer
+origin metadata may not be available.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -197,6 +204,14 @@ See [above][expose-all-layer-metadata-recap].
 
 * Does this affect how `report.toml` should be spec'd?
 * How is layer origin metadata stored for layers that are not cached?
+* Are there use cases for requiring that layer origin metadata is
+  available, or is it merely a nice-to-have?
+  * Would users like to be able to enforce that image builds are only
+    valid if all relevant layer origin metadata is available?
+  * Would users like to use volume caching AND require that all builds
+    using that cache have layer origin metadata? One implication of
+    this is that if layer origin metadata becomes unavailable, the
+    cache cannot be used.
 
 <!-- - What parts of the design do you expect to be resolved through -->
 <!--   implementation of the feature? -->
