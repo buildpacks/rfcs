@@ -172,7 +172,7 @@ pack config run-image-mirrors list my-image
 
 > Another alternative is to focus "pack" more for specific audiences which would reduce the number of commands that it would have to know.
 
-<code>
+```
 pack
 
   build
@@ -180,11 +180,11 @@ pack
      ...
   inspect
   run
-</code>
+```
 
 The alternative utility CLI would be everything else:
 
-<code>
+```
 bputils
 
   builder
@@ -197,7 +197,7 @@ bputils
     register
   stack
     suggest
-</code>
+```
 
 ### Config alternatives
 
