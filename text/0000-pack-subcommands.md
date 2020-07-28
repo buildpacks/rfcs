@@ -68,7 +68,7 @@ pack
     default-builder
       set
       unset
-      show
+      get
     run-image-mirror
       add
       remove
@@ -100,7 +100,7 @@ Singular resources would have the following subcommands:
 
 * set
 * unset
-* show (aliased to subcommand root)
+* get (aliased to subcommand root)
 
 ###### Example
 
@@ -124,7 +124,7 @@ List resources would have the following subcommands:
 
 * add
 * remove
-* list
+* list (aliased to subcommand root)
 
 The explicit additional parameters would be based on the specific implementation needs.
 
@@ -153,7 +153,7 @@ pack config run-image-mirrors list my-image
 
 ## Backwards Compatibility
 
-1. There would be a period in which all pre-existing subcommands would work.
+1. There would be a period in which all pre-existing subcommands would work (with a deprecation warning).
 2. Critical operations (`build`, `rebase`) will remain unchanged.
 
 # Drawbacks
@@ -163,6 +163,41 @@ pack config run-image-mirrors list my-image
 
 # Alternatives
 [alternatives]: #alternatives
+
+### Colon separated commands
+
+> We could use a `pack <topic>:<command>` pattern instead of space separated.
+
+### Alternative Utility
+
+> Another alternative is to focus "pack" more for specific audiences which would reduce the number of commands that it would have to know.
+
+<code>
+pack
+
+  build
+  config
+     ...
+  inspect
+  run
+</code>
+
+The alternative utility CLI would be everything else:
+
+<code>
+bputils
+
+  builder
+    create
+    inspect
+    suggest
+  buildpack
+    create
+    package
+    register
+  stack
+    suggest
+</code>
 
 ### Config alternatives
 
@@ -191,6 +226,7 @@ pack config run-image-mirrors list my-image
     * http://docopt.org/
     * https://picocli.info/#_nested_sub_subcommands
     * https://oclif.io/
+    * kubectl
 * config
     * https://git-scm.com/docs/git-config
     * https://cloud.google.com/sdk/gcloud/reference/config
