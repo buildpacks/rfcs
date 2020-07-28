@@ -25,29 +25,28 @@ Additionally, it's currently impossible to remove build-time dependency entries 
 
 Currently, there is a single file provided to `/bin/build` that contains the Buildpack Plan entries for the buildpack. Entries may be removed from the Buildpack Plan by the buildpack in order to pass the entries to subsequent buildpacks that offered to provide the same entry. Entries may instead be modified, so that the Bill-of-Materials contains more detailed metadata.
 
-This RFC proposes that we replace the current Buildpack Plan argument with four arguments:
-1. The Buildpack Plan (read-only)
-2. Bill-of-Materials entries for metadata that is added to the image's Bill-of-Materials label. (Would starts empty, be r/w, used for stuff that's actually in the image.)
-3. Bill-of-Materials entries for metadata that is not added to the image labels. (Would start empty, be r/w, used for build-time dependencies.)
-4. Buildpack Plan entries that should be passed to subsequent buildpacks. (Would start empty, be r/w.)
+This RFC proposes that we replace the current Buildpack Plan argument with:
+1. The existing Buildpack Plan argument (read-only).
+2. A new `[[bom]]` section in `<layers>/launch.toml` for runtime Bill-of-Materials entries. This would be used for stuff that's actually in the image, and added to image labels in the same format as the current Bill-of-Materials
+3. A new `[[bom]]` section in a new file called `<layers>/build.toml` for build-time Bill-of-Materials entries. This would be used for build-time dependencies, and would not be added to `report.toml` instead of the image labels.
+4. A new `[[entries]]` section in `<layers>/build.toml` for Buildpack Plan entries that should be passed to subsequent buildpacks that may provide the dependencies. 
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 - Large breaking change. Metadata written by all current buildpacks would immediately disappear.
-- More arguments.
 
 # Alternatives
 [alternatives]: #alternatives
 
 - Keep current behavior as-is.
 - Keep current behavior around removing entries from the build plan, but switch to new files for the Bill-of-Materials.
-- Keep current behavior around removing entries from the build plan, but switch to single files for the Bill-of-Materials (just runtime dependencies).
+- Keep current behavior around removing entries from the build plan, but switch to a single file for the Bill-of-Materials (just runtime dependencies).
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- I highly suggest that we switch to environment variables for `/bin/build` arguments before we implement this RFC.
+- Does `[[entries]]` make sense in `<layers>/build.toml`?
 
 # Spec. Changes
 [spec-changes]: #spec-changes
