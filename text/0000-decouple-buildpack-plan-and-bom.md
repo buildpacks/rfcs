@@ -28,7 +28,7 @@ Currently, there is a single file provided to `/bin/build` that contains the Bui
 This RFC proposes that we replace the current Buildpack Plan argument with:
 1. The existing Buildpack Plan argument (read-only).
 2. A new `[[bom]]` section in `<layers>/launch.toml` for runtime Bill-of-Materials entries. This would be used for stuff that's actually in the image, and added to image labels in the same format as the current Bill-of-Materials
-3. A new `[[bom]]` section in a new file called `<layers>/build.toml` for build-time Bill-of-Materials entries. This would be used for build-time dependencies, and would not be added to `report.toml` instead of the image labels.
+3. A new `[[bom]]` section in a new file called `<layers>/build.toml` for build-time Bill-of-Materials entries. This would be used for build-time dependencies, and would be added to `report.toml` instead of the image labels.
 4. A new `[[entries]]` section in `<layers>/build.toml` for Buildpack Plan entries that should be passed to subsequent buildpacks that may provide the dependencies. 
 
 # Drawbacks
