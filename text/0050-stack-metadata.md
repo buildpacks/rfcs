@@ -3,7 +3,7 @@
 - Name: Additional Stack Metadata
 - Start Date: 2020-05-12
 - Author(s): kvedurmu
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#78](https://github.com/buildpacks/rfcs/pull/78)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
