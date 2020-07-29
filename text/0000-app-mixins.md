@@ -25,7 +25,7 @@ For that reason, this proposal defines a mechanism to implement dynamic installa
 
 - *application developer* - a person who is using buildpacks to transform their application code into an OCI image
 - *root buildpack* - a new type of buildpack that runs as the root user
-- *stackpack* - a type of root buildpack that runs against the stack image(s) instead of an app. It is distinguished by a static list of mixins it can provide.
+- *stack buildpack* - a type of root buildpack that runs against the stack image(s) instead of an app. It is distinguished by a static list of mixins it can provide.
 
 An application developer may specify a list of mixins in their application's `project.toml` file like this:
 
