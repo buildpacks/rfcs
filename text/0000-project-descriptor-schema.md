@@ -76,7 +76,7 @@ to something like
 
 ```
 pack build myimage --descriptor project.toml
-ERROR: toml: cannot load TOML value of type int64 into a Go string
+ERROR: Expected project descriptor's build.buildpacks[0].version to be a string
 ```
 
 # How it Works
