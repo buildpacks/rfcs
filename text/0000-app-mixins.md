@@ -105,9 +105,7 @@ id = "example/apt"
 privileged = true
 
 [buildpack.mixins]
-all = "<boolean (default=false)>"
-names = [ "<mixin name>" ]
-
+any = true
 
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
@@ -145,7 +143,7 @@ Support for custom CA Certificates can be accomplished with two buildpacks: a st
 
 ### CA Cert Installer Stackpack
 
-A buildpack that works on the `ubuntu-20` stack, which defines a `type=` prefix for mixins, and installs custom CA Certificates would have a `buildpack.toml` that looks like this:
+A buildpack that installs custom CA Certificates would have a `buildpack.toml` that looks like this:
 
 ```toml
 [buildpack]
@@ -293,9 +291,16 @@ Where:
 [buildpack]
 privileged = <boolean (default=false)>
 non-idempotent = <boolean (default=false)>
-mixins = [ "<mixin name pattern>" ]
+
+[buildpack.mixins]
+any = "<boolean (default=false)>"
+names = [ "<mixin name>" ]
  ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
 * `non-idempotent` - when set to `true`, indicates that the buildpack is not idempotent. The lifecycle will provide a clean filesystem from the stack image(s) before each run (i.e. no cache).
-* `mixins` - a list of patterns that match mixins provided by this buildpack
+
+Under the `[buildpack.mixins]` table:
+
+* `any` - a boolean that, when true, indicates that the buildpack can provide all mixins
+* `names` - a list of names that match mixins provided by this buildpack
