@@ -68,15 +68,15 @@ The stackpack interface is identical to the buildpack interface (i.e. the same `
 
 For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase (excluding `/tmp`, `/cnb`, and `/layers`). Alternatively, a platform may store a new stack image to cache the changes. All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
 
-A builder can use a stackpack by defining it in the `builder.toml` in the `[[stack.buildpacks]]` array of tables:
+A stack can provide stackpacks by including them in the `/cnb/stackpacks` directory. By default, an implicit order will be created for all stackpacks included in a stack. The order can be overridden in the `builder.toml` with the following configuration:
 
 ```
-[[stack.buildpacks]]
-id = "<stackpack id>"
-uri = "<uri to stackpack>"
+[[stack.order]]
+  [[stack.order.group]]
+    id = "<stackpack id>"
 ```
 
-Each stackpack used by the builder will execute if it passes detection and it's provided mixins satisfy one of a project's required mixins.
+A stackpack will only execute if it passes detection.
 
 The stackpack's snapshot layer may be modified by writing a `launch.toml` file. The `[[processes]]` and `[[slices]]` tables may be used as normal, and a new `[[excludes]]` table will be introduced with the following schema:
 
@@ -103,7 +103,7 @@ A buildpack that can install an arbitrary list of mixins would have a `buildpack
 [buildpack]
 id = "example/apt"
 privileged = true
-mixins = ["[^=]+"]
+provides-mixins = true
 
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
@@ -113,6 +113,14 @@ Its `bin/detect` would have the following contents:
 
  ```bash
 #!/usr/bin/env bash
+
+# TODO read the mixins.toml (which has same schema as build plan)
+for package in $(cat mixins.toml | yj -t | jq -r ".requires | .[] | .name"); do
+  cat << EOF >> $2
+[[provides]]
+name = "${package}"
+EOF
+done
 
 exit 0
 ```
@@ -147,10 +155,9 @@ A buildpack that works on the `ubuntu-20` stack, which defines a `type=` prefix 
 [buildpack]
 id = "example/cacerts"
 privileged = true
-mixins = ["cacert"]
 
 [[stacks]]
-id = "ubuntu-20"
+id = "io.buildpacks.stacks.bionic"
 ```
 
 Its `bin/detect` would have the following contents:
@@ -190,8 +197,7 @@ The stackpack must be used with a buildpack that provides a certificate(s) for i
 id = "my/db-cert"
 
 [[stacks]]
-id = "ubuntu-20"
-mixins = ["cacert"]
+id = "io.buildpacks.stacks.bionic"
 ```
 
 Its `bin/detect` would require a certificate with the following contents:
