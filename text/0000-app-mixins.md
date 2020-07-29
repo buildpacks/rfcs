@@ -103,7 +103,11 @@ A buildpack that can install an arbitrary list of mixins would have a `buildpack
 [buildpack]
 id = "example/apt"
 privileged = true
-provides-mixins = true
+
+[buildpack.mixins]
+all = "<boolean (default=false)>"
+names = [ "<mixin name>" ]
+
 
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
@@ -113,14 +117,6 @@ Its `bin/detect` would have the following contents:
 
  ```bash
 #!/usr/bin/env bash
-
-# TODO read the mixins.toml (which has same schema as build plan)
-for package in $(cat mixins.toml | yj -t | jq -r ".requires | .[] | .name"); do
-  cat << EOF >> $2
-[[provides]]
-name = "${package}"
-EOF
-done
 
 exit 0
 ```
