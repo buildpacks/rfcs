@@ -51,9 +51,9 @@ When a list of mixins are required by buildpacks via the build plan and the buil
 1. If at least one stackpack passes detect and provides the required mixin(s), the lifecycle will execute the stackpack build phase for all passing stackpack(s). If no stackpacks pass detect, or no stackpacks provide the required mixin, the build will fail with a message that describes the mixins that could not be provided.
 1. During the lifecycle's build phase, the stackpacks that passed detection will run against the build and run images accordingly (see details below). All stackpacks will be run before the user's buildpacks.
 
-## Stackpacks
+## Stack Buildpacks
 
- A stackpacks is a special case of buildpack that has the following properties:
+ A stack buildpacks (a.k.a. stackpacks) is a special case of buildpack that has the following properties:
 
 * Is run as the `root` user
 * Configured with `privileged = true` in the `buildpack.toml`
