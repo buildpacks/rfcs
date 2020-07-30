@@ -79,6 +79,9 @@ pack build myimage --descriptor project.toml
 ERROR: Expected project descriptor's build.buildpacks[0].version to be a string
 ```
 
+The schema and corresponding human-readable documentation will be available 
+for public consumption from [buildpacks/spec](https://github.com/buildpacks/spec).
+
 # How it Works
 [how-it-works]: #how-it-works
 
@@ -184,11 +187,11 @@ This schema could be further enhanced to define the exclusivity of
 [unresolved-questions]: #unresolved-questions
 
 - What parts of the design do you expect to be resolved before this gets merged?
-  - Where should this schema live?
-  - Should it provide generated types for consumption in `pack`?
-  - Should it provide a generalized binary for validating a `project.toml`?
-  - Is this an extension point for other CNB `toml` files, or directly targeted
-    only at `project.toml`?
+  - Where should this schema live? **[buildpacks/spec](https://github.com/buildpacks/spec)**
+  - Should it include human-readable documentation? **Yes, perhaps this could be automated from the specification**
+  - Should it provide generated types for consumption in `pack`? **Out of scope for now**
+  - Should it provide a generalized binary for validating a `project.toml`? **Out of scope for now**
+  - Is this an extension point for other CNB `toml` files, or directly targeted only at `project.toml`? **We'd like to use this strategy for any public facing toml files**
 - What parts of the design do you expect to be resolved through implementation of the feature?
   - Which JSON-schema library should be used? Options: gojsonschema, santhosh-tekuri/jsonschema, qri-io/jsonschema
   - How to convert TOML to JSON before attempting to serialize to types?
@@ -197,4 +200,5 @@ This schema could be further enhanced to define the exclusivity of
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-N/A
+This work will introduce a schema file and human-readable documentation of the
+schema.
