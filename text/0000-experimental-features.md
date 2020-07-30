@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-This is a proposal for allowing experimental features to enter Pack and Lifecycle without requiring a specification, core team review, or RFC.
+This is a proposal for allowing experimental features without requiring a specification, core team review, or RFC.
 
 # Motivation
 [motivation]: #motivation
@@ -25,7 +25,7 @@ We need a way to introduce experiments before writing an RFC. Such a mechanism w
 
 - *experimental feature* - any behavior or options that are likely to change before being added to the specification
 
-This proposal affects buildpack users, platform implementors, and project contributors who want to introduce experimental features into Pack or Lifecycle. Today, any significant change that impacts end-users is introduced through an RFC, which requires a successful vote by the core team before being introduced into the specification (or the Pack platform).
+This proposal affects buildpack users, platform implementors, and project contributors who want to introduce experimental features. Today, any significant change that impacts end-users is introduced through an RFC, which requires a successful vote by the core team before being introduced into the specification (or the Pack platform).
 
 We seek to change the current process such that experimental features do not require an RFC or specification. Instead, an experimental feature would only require approval by a simple majority of the relevant sub-teams maintainers.
 
