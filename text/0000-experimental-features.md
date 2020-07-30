@@ -32,7 +32,7 @@ We seek to change the current process such that experimental features do not req
 # How it Works
 [how-it-works]: #how-it-works
 
-Experimental features can be submitted as a PR or discussed in Github Issues on the relevant project. The team that maintains that project can decide whether or not to introduce the feature as long as it is behind an `--experimental` flag.
+Experimental features can be submitted as a PR or discussed in Github Issues on the relevant project. The team that maintains that project can decide whether or not to introduce the feature as long as it is behind a  mechanism that enables or disables these features.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -75,4 +75,3 @@ Such a plugin mechanism would require a well defined plugin-interface, and versi
 [unresolved-questions]: #unresolved-questions
 
 - How does an experimental features become a real feature (does it use the same flag/command minus the `--experimental` flag)?
-
