@@ -66,7 +66,20 @@ When a list of mixins are required by buildpacks via the build plan and the buil
 
 The stackpack interface is identical to the buildpack interface (i.e. the same `bin/detect` and `bin/build` scripts are required). However, some of the context it is run in is different from regular buildpacks.
 
-For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase (excluding `/tmp`, `/proc`, `/cnb`, and `/layers`). Alternatively, a platform may store a new stack image to cache the changes. All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
+For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase excluding the following directories:
+
+* `/tmp`
+* `/cnb`
+* `/layers`
+* `/workspace`
+* `/dev`
+* `/sys`
+* `/proc`
+* `/var/run/secrets`
+* `/etc/hostname`, `/etc/hosts`, `/etc/mtab`, `/etc/resolv.conf`
+* `/.dockerenv`
+
+Alternatively, a platform may store a new stack image to cache the changes. All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
 
 A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` directory. By default, an implicit order will be created for all stackpacks included in a stack. The order can be overridden in the `builder.toml` with the following configuration:
 
@@ -76,17 +89,26 @@ A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` 
     id = "<stackpack id>"
 ```
 
-A stackpack will only execute if it passes detection.
+A stackpack will only execute if it passes detection. When the stackpack is executed, it's detect and build scripts use the same parameters as the regular buildpacks. But the arguments may differ. FOr example, the first positional argument to the `bin/build` (the `<layers>` directory) MUST NOT be a standard layers directory adhering to the [Buildpacks Build specification](https://github.com/buildpacks/spec/blob/main/buildpack.md#build).
 
-The stackpack's snapshot layer may be modified by writing a `launch.toml` file. The `[[processes]]` and `[[slices]]` tables may be used as normal, and a new `[[excludes]]` table will be introduced with the following schema:
+The stackpack's snapshot layer may be modified by writing a `stack.toml` file with the following schema:
 
 ```
-[[excludes]]
+[[build.restores]]
+paths = ["<sub-path glob>"]
+
+[[run.excludes]]
 paths = ["<sub-path glob>"]
 cache = false
 ```
 
 Where:
+
+`[[build.restores]]` defines the directories and files that will be restored at build time even when the base image is modified:
+
+* `paths` = a list of paths to always restore
+
+`[[run.excludes]]` defines the directories and files that will be excluded from the launch image:
 
 * `paths` = a list of paths to exclude from the layer
 * `cache` = if true, the paths will be excluded from the launch image layer, but will be included in the cache layer.
@@ -104,11 +126,12 @@ A buildpack that can install an arbitrary list of mixins would have a `buildpack
 id = "example/apt"
 privileged = true
 
-[buildpack.mixins]
-any = true
-
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
+mixins = [ "set=cnb-essentials" ]
+
+  [stacks.extends]
+  mixins = [ "*" ]
 ```
 
 Its `bin/detect` would have the following contents:
