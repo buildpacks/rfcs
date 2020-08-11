@@ -3,7 +3,7 @@
 - Name: Decouple Buildpack Plan and Bill-of-Materials
 - Start Date: 2020-07-26
 - Author(s): @sclevine
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#100](https://github.com/buildpacks/rfcs/pull/100)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
