@@ -78,7 +78,7 @@ A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` 
     id = "<stackpack id>"
 ```
 
-A stackpack will only execute if it passes detection. When the stackpack is executed, it's detect and build scripts use the same parameters as the regular buildpacks. But the arguments may differ. FOr example, the first positional argument to the `bin/build` (the `<layers>` directory) MUST NOT be a standard layers directory adhering to the [Buildpacks Build specification](https://github.com/buildpacks/spec/blob/main/buildpack.md#build).
+A stackpack will only execute if it passes detection. When the stackpack is executed, it's detect and build scripts use the same parameters as the regular buildpacks. But the arguments may differ. For example, the first positional argument to the `bin/build` (the `<layers>` directory) MUST NOT be a standard layers directory adhering to the [Buildpacks Build specification](https://github.com/buildpacks/spec/blob/main/buildpack.md#build).
 
 The stackpack's snapshot layer may be modified by writing a `stack.toml` file. The `stack.toml` will define paths that will be restored even when the base image changes (ex. package indicies) and paths that will be excluded from the launch image (ex. `/var/cache`).
 
