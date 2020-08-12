@@ -91,27 +91,7 @@ A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` 
 
 A stackpack will only execute if it passes detection. When the stackpack is executed, it's detect and build scripts use the same parameters as the regular buildpacks. But the arguments may differ. FOr example, the first positional argument to the `bin/build` (the `<layers>` directory) MUST NOT be a standard layers directory adhering to the [Buildpacks Build specification](https://github.com/buildpacks/spec/blob/main/buildpack.md#build).
 
-The stackpack's snapshot layer may be modified by writing a `stack.toml` file with the following schema:
-
-```
-[[build.restores]]
-paths = ["<sub-path glob>"]
-
-[[run.excludes]]
-paths = ["<sub-path glob>"]
-cache = false
-```
-
-Where:
-
-`[[build.restores]]` defines the directories and files that will be restored at build time even when the base image is modified:
-
-* `paths` = a list of paths to always restore
-
-`[[run.excludes]]` defines the directories and files that will be excluded from the launch image:
-
-* `paths` = a list of paths to exclude from the layer
-* `cache` = if true, the paths will be excluded from the launch image layer, but will be included in the cache layer.
+The stackpack's snapshot layer may be modified by writing a `stack.toml` file. The `stack.toml` will define paths that will be restored even when the base image changes (ex. package indicies) and paths that will be excluded from the launch image (ex. `/var/cache`).
 
 ## Rebasing an App
 
@@ -327,3 +307,27 @@ Under the `[buildpack.mixins]` table:
 
 * `any` - a boolean that, when true, indicates that the buildpack can provide all mixins
 * `names` - a list of names that match mixins provided by this buildpack
+
+## stack.toml (TOML)
+
+The stackpack's snapshot layer may be modified by writing a `stack.toml` file with the following schema:
+
+```
+[[build.restores]]
+paths = ["<sub-path glob>"]
+
+[[run.excludes]]
+paths = ["<sub-path glob>"]
+cache = false
+```
+
+Where:
+
+`[[build.restores]]` defines the directories and files that will be restored at build time even when the base image is modified:
+
+* `paths` = a list of paths to always restore
+
+`[[run.excludes]]` defines the directories and files that will be excluded from the launch image:
+
+* `paths` = a list of paths to exclude from the layer
+* `cache` = if true, the paths will be excluded from the launch image layer, but will be included in the cache layer.
