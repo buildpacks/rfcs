@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Application Mixins
+- Name: Application Mixins and Stack Buildpacks
 - Start Date: 2020-06-22
 - Author(s): [Joe Kutner](https://github.com/jkutner/)
 - RFC Pull Request: (leave blank)
