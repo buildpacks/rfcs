@@ -66,18 +66,7 @@ When a list of mixins are required by buildpacks via the build plan and the buil
 
 The stackpack interface is identical to the buildpack interface (i.e. the same `bin/detect` and `bin/build` scripts are required). However, some of the context it is run in is different from regular buildpacks.
 
-For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase excluding the following directories:
-
-* `/tmp`
-* `/cnb`
-* `/layers`
-* `/workspace`
-* `/dev`
-* `/sys`
-* `/proc`
-* `/var/run/secrets`
-* `/etc/hostname`, `/etc/hosts`, `/etc/mtab`, `/etc/resolv.conf`
-* `/.dockerenv`
+For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase excluding the a few specific directories and files.
 
 Alternatively, a platform may store a new stack image to cache the changes. All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
 
@@ -265,13 +254,26 @@ exit 0
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-## Stackpacks
+A number of changes to the Platform Specification will be required to execute Stack Buildpacks. Those changes will be defined in a separate RFC.
 
-Stackpacks are identical to other buildpacks, with the following exceptions:
+## Stack buildpacks
+
+Stack buildpacks are identical to other buildpacks, with the following exceptions:
 
 1. The `<layers>` directory is NOT writable.
 1. The working directory WILL NOT contain application source code during the build phase.
-1. All changes made to the filesystem (with the exception of `/tmp`) during the execution of the stackpack's `bin/build` will be snapshotted and stored as a single layer.
+1. All changes made to the filesystem during the execution of the stackpack's `bin/build` will be snapshotted and stored as a single layer, with the exception of the following directories:
+
+* `/tmp`
+* `/cnb`
+* `/layers`
+* `/workspace`
+* `/dev`
+* `/sys`
+* `/proc`
+* `/var/run/secrets`
+* `/etc/hostname`, `/etc/hosts`, `/etc/mtab`, `/etc/resolv.conf`
+* `/.dockerenv`
 
 ## launch.toml (TOML)
 
