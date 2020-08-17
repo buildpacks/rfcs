@@ -1,8 +1,8 @@
 # Meta
 [meta]: #meta
-- Name: (Tag RFCs With Specification Label )
-- Start Date: (2020-08-15)
-- Author(s): (ForestEckhardt)
+- Name: Label RFCs With Specification
+- Start Date: 2020-08-15
+- Author(s): ForestEckhardt
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
