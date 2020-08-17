@@ -44,6 +44,7 @@ Buildpack authors many decide to declare compatibility with any stack without ca
 [unresolved-questions]: #unresolved-questions
 
 - Should we introduce a different parameter to buildpack.toml to differentiate Linux stacks from Windows stacks? If we don't do that, then simple any-stack Linux buildpacks might be usable on Windows. Given that Linux buildpacks are packaged differently from Windows buildpacks, I suggest we introduce this parameter in a separate RFC if needed.
+- Should we allow more flexible wildcard matching on the stack ID? For example, `id = "io.buildpacks.stacks.ubuntu.*"` could match all Ubuntu-based stacks. Given that ABI is not preserved between different LTS versions of Linux distros, it's not clear if this is valuable. I suggest we make this determine in a separate RFC.
 
 # Spec. Changes
 [spec-changes]: #spec-changes
