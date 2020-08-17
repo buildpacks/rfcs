@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-This change alls buildpack authors to explicitly remove the restriction that buildpacks must specify at least one stack in `buildpack.toml`. When buildpacks specify a wildcard stack value, the lifecycle will assume that the buildpack is valid on all stacks.
+This change allows buildpack authors to explicitly remove the restriction that buildpacks must specify at least one stack in `buildpack.toml`. When buildpacks specify a wildcard stack value, the lifecycle will assume that the buildpack is valid on all stacks.
 
 # Motivation
 [motivation]: #motivation
