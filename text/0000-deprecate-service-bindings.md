@@ -33,7 +33,9 @@ N/A
 
 - The Specification should be clearly marked as deprecated with an anticipated removal date six months from its designation as deprecated.
 - A reference to the Kubernetes specification should be added to the [Platform Additional Guidance Section][p].
-- A references to the Kubernetes specification should be added to a new [Buildpack Additional Guidance Secion][b]
+- A reference to the Cloud Native Buildpacks specification with a warning that both should be supported during deprecation, should be added to the [Platform Additional Guidance Section][p].
+- A reference to the Kubernetes specification should be added to a new [Buildpack Additional Guidance Secion][b].
+- A reference to the Cloud Native Buildpacks specification with a warning that both should be supported during deprecation, should be added to a new [Buildpack Additional Guidance Secion][b].
 
 [p]: https://github.com/buildpacks/spec/blob/main/platform.md#additional-guidance
 [b]:
