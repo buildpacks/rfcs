@@ -46,7 +46,7 @@ N/A
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Existing users of bindings will be affected.  The lifecycle and platforms should support both styles until the end of the deprecation period.
+- Existing users of bindings will be affected.  Platforms and buildpacks should support both styles until the end of the deprecation period.
 
 # Alternatives
 [alternatives]: #alternatives
