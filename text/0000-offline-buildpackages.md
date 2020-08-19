@@ -1,4 +1,4 @@
-# Meta 4
+# Meta
 [meta]: #meta
 - Name: Offline Buildpackages
 - Start Date: 2020-04-27
@@ -13,7 +13,7 @@
 
 This change allows buildpacks to access vendored assets during builds to enable offline builds and asset reuse.
 
-To do so we introduce the Asset Image, a distribution artifact that provides vendored assets for buildpacks, and platform mechanisms to provide vendored assets to buildpacks during the `build` and `detect`.
+To do so we introduce the Asset Package, a distribution artifact that provides vendored assets for buildpacks, and platform mechanisms to provide vendored assets to buildpacks during the `build` and `detect`.
 
 # Motivation
 [motivation]: #motivation
@@ -29,94 +29,97 @@ Buildpack user, Platform operator, Buildpack author
 
 ### Explaining the feature largely in terms of examples.
 
-Lets walk through an example `pack build` using Asset Images, and the platform changes proposed below.
+Lets walk through an example `pack build` using Asset Package, and the platform changes proposed below.
 
-We pull an Asset Image, using`docker pull asset-image` (or some equivalent command). The asset image has a `json` label mapping the `sha256` values of all the assets it includes to. a `layer` in the Asset Image.
+This is as simple as specifying any Asset Packages to be used in a build.
 
-We run `pack build --buildpack new-buildpack`
+`pack build --buildpack some-buildpack -asset asset-package`
 
-A `new-buildpack` has label metadata containing the `sha256` of assets it could download during a build. However, `new-buildpack` does not contain any of these assets.
+The `asset-package` will provide a set of asset files all rooted at `/cnb/assets/` to which buildpacks may use.
 
-Before buildpack execution the platform reads the `sha256` values from the label metadata on `new-buildpack`. It then searches through local images to check for:
-  1) Exposed `asset` sha256 values.
-  2) A match between the expose, and the `sha256` value from `new-buildpack`.
-
-If both conditions are met, the platform applies the `layerID` mapped to this `sha256` to the build environment, exposing a vendored asset at `/cnb/assets/<asset-sha256>` to all buildpacks.
-
-
+As with the `--buildpack` flag, multiple `--asset` flags may be passed. These flags may reference an image, local archive filepath, or URL.
 
 # How it Works
 [how-it-works]: #how-it-works
 
-### Asset Image Definition.
+### Asset Package Definition.
 
-An Asset Image is a collection of layers each of which provide one or more assets. These layers are in lexicographic order by `diffID`.
+An Asset Package is a collection of layers each of which provide one or more assets. These layers are in lexicographic order by `diffID`. The distribution of assets into layers is an implementation detail left to the platform.
 
 ```
-<layer1> ━━ /cnb/deps/<java11-asset-sha256>/java11
-<layer2> ━━ /cnb/deps/<java13-asset-sha256>/java13
+<layer1> ┳━ /cnb/deps/<java11-asset-sha256>/java11
+         ┃                                  ┗ (archive contents)
+         ┗━ /cnb/deps/<java13-asset-sha256>/java13.tgz
 
 ...
-<layern> ━━ /cnb/deps/<java15-asset-sha256>/java15
+<layern> ━━ /cnb/deps/<java15-asset-sha256>/java15.tgz
 ```
 
-Each Asset Image will have a `io.buildpacks.buildpack.assets` Label. This label's contents will be a `json` object mapping each `asset` sha256 to a `JSON` object that contains a `layerDiffID`, and other optional keys.
-
+Asset Packages will have a `io.buildpacks.buildpack.assets` Label. This label's contents will be a `json` object mapping each layer to metadata describing the assets it provides.
 #### Example
 
 ``` json
 {
-
-  "<java11-asset-sha256>" : {
-     "layerDiffID": "<layer1-diffID>",
-     "additional_paths": ["other/endpoint1", "other/endpoint2"],
-     "metadata": {}
-  },
-  "<java13-asset-sha256>" : {
-    "layerDiffID": "<layer2-diffID>",
-
-    "additional_paths": [],
-    "metadata": {
-      "name": "java13"
+  "<layer1-diffID>": [
+    {
+      "sha256": "java11-asset-sha256",
+      "uri": "https://path/to/java11.tgz",
+      "additionalPaths": [
+        "other/endpoint1",
+        "other/endpoint2"
+      ],
+      "metadata": {}
+    },
+    {
+      "sha256": "<java13-asset-sha256>",
+      "uri": "/local/path/to/java13.tgz",
+      "additionalPaths": [],
+      "metadata": {
+        "name": "java13"
+      }
     }
-  },
-  "<java15-asset-sha256>" : {
-    "layerDiffID": "<layerk-diffID>",
-    "additional_paths": []
-  }
+  ],
+  "...": [],
+  "<layern-diffID>": [
+    {
+      "sha256": "<java15-asset-sha256>",
+      "uri": "/local/path/to/java15.tgz",
+      "additionalPaths": [],
+      "metadata": {}
+    }
+  ]
 }
-
 ```
 
-#### Schema
-TODO: once above format is validated.
+### Creating Asset Packages.
 
+Asset Image creation will be handled by a new pack command, `pack package-assets --config <packag.toml> <asset-image-name>`.
 
+The `package-assets` command will use a `package.toml` configuration file and produce an `<asset-image-name>` OCI image artifact. `<asset-image-name>` may be a tarball, or a locally available image.
 
-### Creating Asset Images.
+To specify assets included in an Asset Package the `package.toml` file must contain an `assets` array. Each entry in this array may provide:
+  - `uri` (string), (required) local path or URL
+  - `sha256` (string), (required) Must be unique. Used for validation and as an endpoint where an  asset will be provided.
+  - `additional-paths` (array)
+  - `metadata` (arbitrary mapping)
+  - `unzip` (bool), unzip asset when building
 
-Asset Image creating will be performed by a new pack command, `pack packages-assets`. `package-assets` and will use an `assets.toml` configuration file. Each entry in `asset.toml` will provide the following:
-  - `uri` string (required)
-  - `sha256` (required) used for validation
-  - `additional_paths` array
-  - `metadata` arbitrary mapping
+The `additional-paths` array lists endpoints where the platform should provide symlinks to the asset. This is provided for cases where `assets` require absolute paths.
 
-The `additional_paths`array lists additional endpoints where the platform should provide the asset to buildpack during a buildpack run. This is provided for cases where `assets` require absolute paths.
-
-
-Ever assets must be in one of the following archive formats:
+The `unzip` field is used to indicate that an asset should be unarchived then added to the Asset Package. In order to use this flag an asset is  must be in one of the following archive formats:
   - `tar.gz`
-  - ...
+  - (TBD)
 
 
-So the `asset.toml` to produce the asset image [above](#Example) would be:
+The `asset` array that would produce the asset image [above](#Example) would be:
 
 #### Example
 ``` toml
 [[asset]]
 url = "https://path/to/java11.tgz"
 sha256 = "some-sha256"
-additional_paths = ["other/endpoint1", "other/endpoint2"]
+additional-paths = ["other/endpoint1", "other/endpoint2"]
+unzip = true
 
 [[asset]]
 url = "/local/path/to/java13.tgz"
@@ -125,7 +128,7 @@ sha256 = "another-sha256"
     name = "java13"
  
 [[asset]]
-...
+#...
 
 [[asset]]
 url = "/local/path/to/java15.tgz"
@@ -133,71 +136,58 @@ sha256 = "another-nother-sha256"
 ```
 
 The `pack create-asset` command will
-  - download all assets, and validate a sha256 of the artifact.
-  - unarchive the archive, transform it to a [image layer filesystem changeset](https://github.com/opencontainers/image-spec/blob/master/layer.md)
+  - download asset if needed, then validate a sha256 of the artifact
+  - if unzip is true, unzip the asset
+  - transform asset to a [image layer filesystem changeset](https://github.com/opencontainers/image-spec/blob/master/layer.md) where the asset is provided at `/cnb/assets/<artifact-sha256>`
+  - add all `additional-paths` symlinks to the resultant image, in the case of path collisions fail
   - order all assets layers [diffID](`https://github.com/opencontainers/image-spec/blob/e562b04403929d582d449ae5386ff79dd7961a11/config.md#layer-diffid`)
-  - add all `additional_paths` symlinks to the resultant image, in the case of path collisions fail.
-  - add `io.buildpacks.buildpack.assets` label metadata to image.
+  - add `io.buildpacks.buildpack.assets` label metadata to image
 
-### Buildpackage changes
+## Using Asset Packages
 
-In order for buildpackages to be able to reference the `assets` and pull them into a build, we need to add `assetHash` metadata to the `io.buildpacks.buildpack.layers` `buildpackage` label.
+##### Asset packages as arguments
 
-``` json
-{
-   "buildpack-org/java-buildpack":{
-      "0.0.178":{
-         "api":"0.2",
-         "stacks":[
-            {
-               "id":"io.buildpacks.stacks.bionic"
-            }
-         ],
-         "layerDiffID":"sha256:<some-sha256>",
-         "depDiffIDs":[
-            "sha256:<some-dep-sha256>"
-         ],
-         "assetHash": [
-            "<java12-asset-sha256>",
-            "<java13-asset-sha256>",
-            "<java15-asset-sha256>"
-         ]
-      }
-   }
-}
-```
+Asset Images may be passed as arguments to the platform may be in any of the following formats:
+- OCI image archives
+- locally available images
+- remote images
 
-In order for us to have access to this data our `pack package-buildpack` command should require both a `package.toml` and `assets.toml` configuration file.
+Decisions between local or remote images are left to the platform.
 
-### New `build` behavior
+##### `lifecycle` changes
+The platform should now pass an additional `CNB_ASSETS` environment variable to the `build` phase binary. `CNB_ASSETS` will by default be `/cnb/assets`. This provides a standard variable buildpacks may use when searching for assets.
 
+### `create-builder` behavior
 
-##### Lifecycle changes
+The `pack create-builder` command will accept Asset Packages passed with `asset` flags. In the final builder image all layers from Asset Packages will be the final `k` layers in the image. These `k` layers will be ordered by `diffID`.
 
-The platform should now pass an additional `CNB_ASSETS` environment variable, with the default value of `/cnb/assets`, to the `build` binary.
+The `create-builder` command will perform the following steps on the specified Asset Packages:
+  - Validate any two assets do not provide the same `assets` in both 'zipped' and 'unzipped' form.
+  - Validate any two assets do not have a common element in `additionalPaths` that is linked to different `/cnb/assets/<asset-sha256>` locations.
+  - If any asset layer is a superset of another, only the superset layer is included in the builder.
+  - builders inherit a `io.buildpacks.buildpack.assets` Label containing entries for every asset layer included in the builder.
 
-##### Platform behavior changes
+### `build` behavior
 
-To enable buildpacks to access vendored assets, a platform may:
-  - Read buildpackage `assetHash` metadata.
-  - For every `sha256` in this hash we search all locally available images for the `io.buildpacks.buildpack.assets` label, if the label exists check if it contains the `sha256`.
-      - if so add this layer to the builder, this will add an asset at `/cnb/assets`, then and create symlinks for all `additional_paths`.
-  - Error cases:
-      - two different layers modify the same `/cnb/assets/<sha256>`
-      - two different layers attempt to create the same `additional_path` symlink
+To enable buildpacks to access vendored assets during a `pack build`, a platform should:
+  - accept `assets` flags
+  - perform the same asset validation that occurs in `create-builder`
+  - add asset layers from both the builder and flags to the build environment image
 
-During a buildpacks `build` phase, vendored assets will be accessible at below `/cnb/assets` and buildpacks may use them as needed.
+This allows buildpacks to access vendored assets below `/cnb/assets` during the `build` phase.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 Why should we *not* do this?
 
-- Performance concerns around finding `assets` in local images. This search likely does not scale well (lots of file IO)
+- Increases complexity for users. This adds another artifact to manage.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Should `asset.toml` and `package.toml` be collapsed into a single file? This would break lots of existing
-- Should builders have access to local assets? What type of config should users pass to enable or disable this behavior?
+- Other formats to support when 'unzipping'
+- How should we resolve `zipped` vs `unzipped` assets, providing both a better strategy?
+- is `diffID` a good key to order layers by?
+- should we be able to add asset packages to buildpackages?
 
