@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-Today, if a buildpacks user would like to define a default process type for their app, they need to pass `-process-type` to the exporter. This is cumbersome because a user might not know which process types are available until after the build has completed. Additionally, [this spec PR](https://github.com/buildpacks/spec/pull/137) would force some users who are currently relying on the lifecycle to specify the default process type to pass `-process-type` instead. This RFC proposes that buildpacks should be able to define the default process type for an app, while retaining the ability for a user to specify the desired default.
+Today, if a buildpacks user would like to define the default process type for their app, they need to pass `-process-type` to the exporter. This is cumbersome because a user might not know which process types are available until after the build has completed. Additionally, [this spec PR](https://github.com/buildpacks/spec/pull/137) would force some users who are currently relying on the lifecycle to specify the default process type to pass `-process-type` instead. This RFC proposes that buildpacks should be able to define the default process type for an app, while retaining the ability for a user to specify the desired default.
 
 # Definitions
 [definitions]: #definitions
@@ -20,7 +20,7 @@ launcher - a [lifecycle binary](https://github.com/buildpacks/spec/blob/main/pla
 
 process type - a CNB construct representing a process that can be started by the launcher. A process type has the following properties as described [here](https://github.com/buildpacks/spec/blob/main/buildpack.md#launchtoml-toml): type (string), command (string), arguments (array of string), direct (boolean). Buildpacks declare process types during the `build` phase by writing entries into `<layers>/launch.toml`.
 
-default process type - the process that will be started by the launcher when the app image is run. It can be overriden by overriding the image entrypoint.
+default process type - describes the process that will be started by the launcher when the app image is run. It can be overriden by overriding the image entrypoint. Example: an image with default process type of web would have an entrypoint of `/cnb/process/web` which is a symlink that points to `/cnb/lifecycle/launcher`. The launcher uses argv0 to determine which process to start.
 
 # Motivation
 [motivation]: #motivation
@@ -32,38 +32,56 @@ default process type - the process that will be started by the launcher when the
 # What it is
 [what-it-is]: #what-it-is
 
+Example: single process app with a buildpack declaring a `default-process` of type `web` -> the app image will have a default process type of `web`
+
+Example single process app with no buildpacks declaring a `default-process` -> the app image will have no default process. Users must specify the process to run at runtime. (This assumes https://github.com/buildpacks/spec/pull/137)
+
+Example: multi-process app with a buildpack declaring a `default-process` of type `web` -> the app image will have a default process type of `web`
+
+Example: multi-process app with an earlier buildpack declaring a `default-process` of type `web` and a later buildpack declaring a process of type `worker` -> the app image will have a default process type of `worker`
+
+Example: multi-process app with a buildpack declaring a `default-process` of type `web` and the user passes `-process-type worker` -> the app image will have a default process type of `worker`
+
+Example: single process app with no buildpacks declaring a `default-process` and the user passes `-process-type worker` -> the app image will have a default process type of `worker`
+
 - Define the target persona: buildpack author, buildpack user.
 
-Example: single process app
-TODO
+New buildpack users would need to be taught that buildpacks will be responsible for setting a sensible default process type. They should know how to override the buildpacks-provided default if they desire.
 
-Example: multi-process app
-TODO
-
-Example: user override
-TODO
-
-New buildpack users would need to be taught what process types are, and also that buildpacks will be responsible for setting a sensible default. They should know how to override the buildpacks-provided default process type if they desire.
-
-Existing buildpack users would need to be taught about the change so that (1) they no longer have to pass a flag to specify the default process type or (2) they now need to pass a flag to explicitly override the default that buildpacks choose. For (2), it's likely that the impact would be small given that the lifecycle (pre- platform API 0.4) and pack (post- platform API 0.4) both encourage `web` as the default, and it's likely that buildpacks would also encourage this same default.
+Existing buildpack users would need to be taught about the change so that (1) they no longer have to pass a flag to specify the default process type or (2) they now need to pass a flag to explicitly override the default that buildpacks choose. For (2), it's likely that the number of users in this category would be small given that the lifecycle (pre- platform API 0.4) and pack (post- platform API 0.4) both encourage `web` as the default, and it's likely that buildpacks would also encourage this same default.
 
 Buildpack authors would need to be taught how to configure the default process type.
 
 # How it Works
 [how-it-works]: #how-it-works
 
-This should require a bump to the buildpack API.
+The changes from this RFC should require a bump to the buildpack API.
 
-This is the technical portion of the RFC, where you explain the design in sufficient detail.
+Currently, during the `build` phase, buildpacks may declare process types by writing entries to `<layers>/launch.toml`. This RFC proposes a new key in `<layers>/launch.toml`, `[default-process]`, that specifies what each buildpack would like to designate as the default process type for the app image.
 
-The section should return to the examples given in the previous section, and explain more fully how the detailed proposal makes those examples work.
+```toml
+[default-process]
+type = web
+
+[[processes]]
+type = web
+command = bundle exec ruby app.rb
+
+[[processes]]
+type = worker
+command = bundle exec ruby worker.rb
+```
+
+Currently, during the `export` phase, the `<layers>/launch.toml` from each buildpack are aggregated to produce a combined processes list "such that process types from later buildpacks override identical process types from earlier buildpacks" ([spec](https://github.com/buildpacks/spec/blob/main/buildpack.md#process-3)). In line with the existing philosophy, this RFC proposes that the `default-process` type from later buildpacks should override any `default-process` types from earlier buildpacks.
+
+The exporter would continue to use the `-process-type` flag if provided to set the default process type for the app image. If no `-process-type` flag is provided, the exporter would use the `default-process` type provided by buildpacks.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 Why should we *not* do this?
 
-- Buildpacks could stomp on each other, each trying to declare different default process types.
+- Buildpacks could stomp on each other, each trying to declare different default process types. This might be confusing.
 - Changing the way things work now could surprise some people.
 - One more thing for buildpack authors to know and care about.
 
@@ -92,5 +110,4 @@ The lifecycle if not provided any `-process-type` will set the default process t
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
-Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fields, new fields in the buildpackage label, etc.
+Does this RFC entail any proposed changes to the core specifications or extensions? New `default-process` key in `<layers>/launch.toml`, logic to disambiguate multiple buildpacks specifying different default process types, consumption of the disambiguated key by the exporter.
