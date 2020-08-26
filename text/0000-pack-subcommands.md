@@ -99,7 +99,6 @@ The `config` subcommand would work with the notion of two different type of reso
 Singular resources would have the following subcommands:
 
 * set
-* unset
 * (implied get)
 
 ###### Example
