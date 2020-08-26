@@ -96,10 +96,7 @@ The `config` subcommand would work with the notion of two different type of reso
 
 ##### Singular
 
-Singular resources would have the following subcommands:
-
-* set
-* (implied get)
+Singular resources would have no subcommands but accept possitional arguments and flags with an implied `get` operation and a common `--unset` flag.
 
 ###### Example
 
