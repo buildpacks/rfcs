@@ -58,7 +58,6 @@ pack
   build
   builder
     create
-    inspect
     suggest
   buildpack
     package
