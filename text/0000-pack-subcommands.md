@@ -100,21 +100,18 @@ Singular resources would have the following subcommands:
 
 * set
 * unset
-* get (aliased to subcommand root)
+* (implied get)
 
 ###### Example
 
 ```
 # sets the default builder
-pack config default-builder set gcr.io/my-org/my-builder:latest
+pack config default-builder gcr.io/my-org/my-builder:latest
 
 # unset the default builder
-pack config default-builder unset
+pack config default-builder --unset
 
-# show the default builder
-pack config default-builder show
-
-# show the default builder (w/o subcommand)
+# gets the default builder
 pack config default-builder
 ```
 
@@ -124,7 +121,8 @@ List resources would have the following subcommands:
 
 * add
 * remove
-* list (aliased to subcommand root)
+* list
+* (implied list)
 
 The explicit additional parameters would be based on the specific implementation needs.
 
@@ -142,6 +140,9 @@ pack config run-image-mirrors remove my-image
 
 # list all mirrors
 pack config run-image-mirrors list
+
+# list all mirrors (implied list)
+pack config run-image-mirrors
 
 # list all mirrors for `my-image`
 pack config run-image-mirrors list my-image
@@ -167,6 +168,46 @@ pack config run-image-mirrors list my-image
 ### Colon separated commands
 
 > We could use a `pack <topic>:<command>` pattern instead of space separated.
+
+Some examples:
+
+**Single config resource:**
+
+```shell
+# set
+pack config:default-builder gcr.io/my-org/my-builder:latest
+
+# unset
+pack config:default-builder:unset
+
+# get
+pack config:default-builder:get
+
+# get (implied)
+pack config:default-builder
+```
+
+**List config resource:**
+
+```shell
+# adds `gcr.io/my-org/my-image` as a mirror for `my-image`  
+pack config:run-image-mirrors:add my-image gcr.io/my-org/my-image
+
+# removes `gcr.io/my-org/my-image` as a mirror for `my-image`
+pack config:run-image-mirrors:remove my-image gcr.io/my-org/my-image
+
+# removes all mirrors for `my-image`
+pack config:run-image-mirrors:remove my-image
+
+# list all mirrors (implied)
+pack config:run-image-mirrors
+
+# list all mirrors
+pack config:run-image-mirrors:list
+
+# list all mirrors for `my-image`
+pack config:run-image-mirrors:list my-image
+```
 
 ### Alternative Utility
 
