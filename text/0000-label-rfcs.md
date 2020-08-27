@@ -30,6 +30,6 @@ that are concerned with specific parts of the specification.
 # Implementation
 [Implementation]: #implementation
 
-During any Working Group meeting, when a new RFC is brought up it should at
-that time be labeled with what part of the specification it affects as well the
-target audience.
+RFCs should be labeled with what part of the specification it affects as well
+the target audience during Working Group meetings while all RFCs are being
+reviewed.
