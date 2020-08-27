@@ -16,7 +16,7 @@ This is proposal for a new type of buildpack that runs against a stack in order 
 # Motivation
 [motivation]: #motivation
 
-Normal buildpacks do not run as root. This is an intentional design decision that ensures operations like `rebase` will work on day-2.
+Normally, buildpacks do not run as root. This is an intentional design decision that ensures operations like `rebase` will work on day-2.
 
 However, many applications and buildpacks require modifications to the stack they run on, such as adding system packages or custom certificates. For this reason, we need a mechanism that buildpack authors and buildpack users and leverage to extend their stacks.
 
@@ -27,14 +27,16 @@ However, many applications and buildpacks require modifications to the stack the
 - *stack buildpack* - a type of root buildpack that runs against the stack image(s) instead of an app. It is distinguished by a static list of mixins it can provide.
 - *userspace buildpack* - the traditional definition of a buildpack (i.e. does not run as root, and runs against an app)
 
-A new type of buildpack, called a Stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands.
+A new type of buildpack, called a Stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. A stackpack may also define a list of mixins that it provides to the stack. In this way, a stack that is missing a mixin required by a buildpack may have that mixin provided by a stack buildpack.
 
 A stack provider may choose to include stack buildpacks with the stack they distribute. If a stack includes any stack buildpacks, the following will occur when the build phase starts:
 
+1. If any requested mixin is not provided by the stack, the lifecycle will compare the missing mixins to the static list of mixins provided by stack buildpacks. If any mixins are still not provided, the build will fail.
 1. The lifecycle will run the detect phase for all stackpacks defined in the builder.
 1. The lifecycle will execute the stack buildpack build phase for all passing stackpack(s). If no stack buildpacks pass detect, the build will continue the build phase as normal (running userspace buildpacks).
 1. After the lifecycle's build phase, the lifecycle will begin a new phase called _extend_.
 1. During the extend phase, stack buildpacks that passed detection will run against the run images accordingly (see details below).
+
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -74,6 +76,8 @@ Before a launch image is rebased, the platform must re-run the any stackpacks th
 
 ## Example: Apt Buildpack
 
+(**note**: this is only an example. A real Apt Buildpack would probably be more robust).
+
 A buildpack that can install an arbitrary list of mixins would have a `buildpack.toml` like this:
 
  ```toml
@@ -81,12 +85,11 @@ A buildpack that can install an arbitrary list of mixins would have a `buildpack
 id = "example/apt"
 privileged = true
 
+[buildpack.mixins]
+any = true
+
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
-mixins = [ "set=cnb-essentials" ]
-
-  [stacks.extends]
-  mixins = [ "*" ]
 ```
 
 Its `bin/detect` would have the following contents:
@@ -228,12 +231,12 @@ exit 0
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
+- Do we want (or need) a `CNB_STACK_TYPE` env var so that a stack buildpack can behave differently on each part of the stack?
 - Should the stackpack's detect have read-only access to the app?
     - This would likely be driven by a stackpack that does not provide mixins, but instead dynamically contributes to the build plan based on the contents of the app source code. I don't know if we have a use case for this, but I can imaging a buildpack that reads environment variables as input to some function.
 - Should stackpacks be able to define per-stack mixins?
     - We could support a top-level `mixins` array, and allow refinements under `[[stacks]] mixins`. If we do this, we need to distinguish between provided and required mixins (at least under `[[stacks]]`).
-    - If buildpacks can require mixins from `bin/detect`, the stackpack could use this mechanism to require per-stack mixins.
-- Should we use regex to match mixins?
+    - If userspace buildpacks can require mixins from `bin/detect`, the stackpack could use this mechanism to require per-stack mixins.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
