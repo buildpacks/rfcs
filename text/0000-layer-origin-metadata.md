@@ -87,7 +87,12 @@ that the second image's `report.toml` looks something like this:
 [image]
 tags = ["index.docker.io/image/name:latest", "index.docker.io/image/name:other-tag"]
 digest = "26cca5b0c787"
-previous-image-digest = "97e47fb9e0a6"
+image-id = "sha256:a9561eb1b190625c9adb5a9513e72c4dedafc1cb2d4c5236c9a6957ec7dfd5a9"
+
+[restored-image]
+# Same schema as [image] above, but without tags
+digest = "97e47fb9e0a6"
+image-id = "sha256:a8d2b367f43398fbabe25d45291451003e529fdd5d50f27437291fe61d637ba1"
 
 [[layers]]
 buildpack = "yabba"
@@ -115,7 +120,7 @@ checksum = "96d06478d425bd0411d34e71376fbd93"
 Given such a `report.toml`, I can discover all of the inputs to the
 layer. If later I need to reproduced the layer produced by the first
 build, I will be able to reference the `report.toml` for the image
-designated by `previous-image.digest`. Storing `report.toml` files and
+designated by `restored-image.digest`. Storing `report.toml` files and
 associating them with images will have to be a platform concern, given
 that we want to avoid embedding that information in the image itself.
 
