@@ -115,6 +115,19 @@ sha = "26e8c05b151f57161d64b7a5f844bb04caed0ba3"
 
 [[layers.metadata]]
 checksum = "96d06478d425bd0411d34e71376fbd93"
+
+[[lifecycle]]
+version = "0.8.0"
+
+[[lifecycle.build-image]]
+tags = [...]
+digest = ...
+image-id = ...
+
+[[lifecycle.run-image]]
+tags = [...]
+digest = ...
+image-id = ...
 ```
 
 Given such a `report.toml`, I can discover all of the inputs to the
