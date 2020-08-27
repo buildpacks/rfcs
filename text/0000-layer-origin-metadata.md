@@ -14,7 +14,7 @@
 <!-- One paragraph explanation of the feature. -->
 
 Exposing layer origin metadata in `report.toml` will improve layer
-reproducibility and, in turn, build reproducibility.
+traceability and, in turn, build and image traceability.
 
 # Motivation
 [motivation]: #motivation
@@ -22,13 +22,13 @@ reproducibility and, in turn, build reproducibility.
 - Layer generation can be influenced by the state of the file system,
   namely by the state of the application directory, other layers, and
   the stack's build image
-- Layers aren't reproducible, because we can't know enough about the
+- Layers aren't traceable, because we can't know enough about the
   state of the file system at the instant that the buildpack build
   executable is invoked (TODO: figure out if there's a less wordy name
   for this)
-- Builds aren't reproducible, because their constituent layers aren't
-  reproducible
-- Layers and builds should be reproducible
+- Images aren't traceable, because their constituent layers aren't
+  traceable
+- Layers and images should be traceable
 - Exposing layer origin metadata will enable us to know crucial facts
   about the state of the file system at the time that the buildpack
   build executable is invoked
@@ -38,18 +38,21 @@ reproducibility and, in turn, build reproducibility.
 
 ## Terminology
 
-- **Layer origin metadata** is the missing piece of the
-  reproducibility puzzle; it includes the ID of the restored version
-  of the layer (if applicable), modification date, source version
-  info, and a list of the IDs of the layers that were present at layer
-  generation time.
+- **Layer origin metadata** is the missing piece of the traceability
+  puzzle; it includes the ID of the restored version of the layer (if
+  applicable), modification date, source version info, and a list of
+  the IDs of the layers that were present at layer generation time.
 - **Layer ID** is the layer's unique ID, whether on disk or on the
   registry.
+- **Traceability** concerns the problem of identifying the inputs to
+  an image or layer (compare with **reproducibility**, which concerns
+  the problem of producing identical images/layers given identical
+  inputs, setting aside the problem of identifying those inputs.)
 
 ## Target persona
 
-This feature will be useful for **buildpack authors** (for reproducing
-layers) and **platform operators** (for reproducing builds).
+This feature will be useful for **buildpack authors** and **platform
+operators** towards tracing and reproducing images and layers.
 
 ## Example
 
@@ -71,13 +74,14 @@ second build:
 4. the version of the `yabba/build` layer that was restored from the
    cache
 
-I can account for all but the last; I neither know that layer's
+I can account for all but the last - I neither know that layer's
 identity, nor how it was created (the version of the `foo-api`, the
 version of the `yabba` buildpack, whatever layers existed at that
-time). Therefore, I cannot reproduce the second build.
+time). I cannot identify the second image's inputs - in other words, I
+cannot trace the second image.
 
-Now consider that I have access to each build's `report.toml`, and
-that the second build's `report.toml` looks something like this:
+Now consider that I have access to each image's `report.toml`, and
+that the second image's `report.toml` looks something like this:
 
 ```toml
 [image]
@@ -108,11 +112,10 @@ sha = "26e8c05b151f57161d64b7a5f844bb04caed0ba3"
 checksum = "96d06478d425bd0411d34e71376fbd93"
 ```
 
-In this case, I can discover everything we need to reproduce the
-layer; if I discover later that I need to reproduced the layer
-produced by the first build, I should be able to reference the
-`report.toml` for the image designated by
-`image.previous-image-digest`. Storing `report.toml` files and
+Given such a `report.toml`, I can discover all of the inputs to the
+layer. If later I need to reproduced the layer produced by the first
+build, I will be able to reference the `report.toml` for the image
+designated by `previous-image.digest`. Storing `report.toml` files and
 associating them with images will have to be a platform concern, given
 that we want to avoid embedding that information in the image itself.
 
@@ -155,9 +158,10 @@ origin metadata may not be available.
 
 <!-- - What is the impact of not doing this? -->
 
-There's a big problem right now around reproducibiility, and given
-that build reproducibility is a stated goal, something has to be
-done. Until something is done, reproducibilty is not easy.
+There's a big problem right now around traceability, which affects
+reproducibility in practice. Given that build reproducibility is a
+stated goal, something has to be done. Until something is done,
+traceability, and hence reproducibility, is not simple.
 
 <!-- - Why is this proposal the best? -->
 
@@ -187,7 +191,7 @@ layer metadata is important but it's just one piece of the puzzle. I
 think that the ideal solution would involve knowing the identities of
 layers present during a buildpack's execution, as that would enable us
 to discover that layer's metadata, and that ideally we'd solve this
-problem for anyone who ever might have to reproduce a build.
+problem for anyone who ever might have to trace an image.
 
 # Prior Art
 [prior-art]: #prior-art
