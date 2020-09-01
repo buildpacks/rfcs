@@ -34,11 +34,13 @@ default process type - describes the process that will be started by the launche
 
 Example: single process app with a buildpack declaring a `default-process` of type `web` -> the app image will have a default process type of `web`
 
-Example single process app with no buildpacks declaring a `default-process` -> the app image will have no default process. Users must specify the process to run at runtime. (This assumes https://github.com/buildpacks/spec/pull/137)
+Example: single process app with no buildpacks declaring a `default-process` -> the app image will have no default process. Users must specify the process to run at runtime. (This assumes https://github.com/buildpacks/spec/pull/137)
 
 Example: multi-process app with a buildpack declaring a `default-process` of type `web` -> the app image will have a default process type of `web`
 
 Example: multi-process app with an earlier buildpack declaring a `default-process` of type `web` and a later buildpack declaring a process of type `worker` -> the app image will have a default process type of `worker`
+
+Example: multi-process app with an earlier buildpack declaring a `default-process` of type `web` and a later buildpack declaring a process of type `worker` and `override = false` -> the app image will have a default process type of `web`
 
 Example: multi-process app with a buildpack declaring a `default-process` of type `web` and the user passes `-process-type worker` -> the app image will have a default process type of `worker`
 
@@ -57,11 +59,14 @@ Buildpack authors would need to be taught how to configure the default process t
 
 The changes from this RFC should require a bump to the buildpack API.
 
-Currently, during the `build` phase, buildpacks may declare process types by writing entries to `<layers>/launch.toml`. This RFC proposes a new key in `<layers>/launch.toml`, `[default-process]`, that specifies what each buildpack would like to designate as the default process type for the app image.
+Currently, during the `build` phase, buildpacks may declare process types by writing entries to `<layers>/launch.toml`.
+
+This RFC proposes a new section in `<layers>/launch.toml`, `[default-process]`, that specifies the default process type contributed by the buildpack. Buildpacks may set a boolean `override` key to indicate that their default process type should override any default process type contributed by earlier buildpacks. If `override` is not provided, it is assumed to be `true`.
 
 ```toml
 [default-process]
 type = web
+override = true
 
 [[processes]]
 type = web
@@ -72,9 +77,9 @@ type = worker
 command = bundle exec ruby worker.rb
 ```
 
-Currently, during the `export` phase, the `<layers>/launch.toml` from each buildpack are aggregated to produce a combined processes list "such that process types from later buildpacks override identical process types from earlier buildpacks" ([spec](https://github.com/buildpacks/spec/blob/main/buildpack.md#process-3)). In line with the existing philosophy, this RFC proposes that the `default-process` type from later buildpacks should override any `default-process` types from earlier buildpacks.
+Currently, during the `export` phase, the `<layers>/launch.toml` from each buildpack are aggregated to produce a combined processes list "such that process types from later buildpacks override identical process types from earlier buildpacks" ([spec](https://github.com/buildpacks/spec/blob/main/buildpack.md#process-3)).
 
-The exporter would continue to use the `-process-type` flag if provided to set the default process type for the app image. If no `-process-type` flag is provided, the exporter would use the `default-process` type provided by buildpacks.
+In line with the existing philosophy, this RFC proposes that the `default-process` type from later buildpacks should override any `default-process` types from earlier buildpacks UNLESS `override = false`. The user-provided `-process-type` flag would override any default process type contributed by buildpacks.
 
 # Drawbacks
 [drawbacks]: #drawbacks
