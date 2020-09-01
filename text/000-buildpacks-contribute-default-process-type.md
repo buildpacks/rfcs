@@ -115,4 +115,4 @@ The lifecycle if not provided any `-process-type` will set the default process t
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-Does this RFC entail any proposed changes to the core specifications or extensions? New `default-process` key in `<layers>/launch.toml`, logic to disambiguate multiple buildpacks specifying different default process types, consumption of the disambiguated key by the exporter.
+Does this RFC entail any proposed changes to the core specifications or extensions? New `default-process` section in `<layers>/launch.toml`, logic to disambiguate multiple buildpacks specifying different default process types, consumption of the disambiguated default process type by the exporter.
