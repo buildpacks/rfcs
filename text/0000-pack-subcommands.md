@@ -65,18 +65,15 @@ pack
   completion
   config
     default-builder
-      set
-      unset
-      get
-    run-image-mirror
+    run-image-mirrors
       add
       remove
       list
-    registry
+    registries
       add
       remove
       list
-    trusted-builder
+    trusted-builders
       add
       remove
       list
