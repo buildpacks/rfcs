@@ -10,7 +10,7 @@
 
 # Summary
 [summary]: #summary
-Once an RFC has been accepted, prior to it being merged in to the [RFC repo](http://github.com/buildpacks/rfcs), the author of the RFC should create issues in the appropriate Buildpacks repositories, linking them to the RFC pull request (using [Github references](https://docs.github.com/en/github/writing-on-github/autolinked-references-and-urls#issues-and-pull-requests))
+Once an RFC has been accepted, prior to it being merged in to the [RFC repo](http://github.com/buildpacks/rfcs), the appropriate sub-team maintainers should create issues in the relevant Buildpacks repositories, linking them to the RFC pull request (using [Github references](https://docs.github.com/en/github/writing-on-github/autolinked-references-and-urls#issues-and-pull-requests))
 
 # Definitions
 [definitions]: #definitions
@@ -27,19 +27,19 @@ As the number of RFCs increase, it has become increasingly hard to ensure that a
 The current RFC process [defines](https://github.com/buildpacks/rfcs#rfc-process) that:
 > the team member who merges the pull request should do the following ... Create a corresponding issue in the appropriate repo.
 
-In practice, that adds extra work for the team member who merges in the PR, and it may slip through the cracks occasionally. Additionally, the author of the RFC, as the one who proposed the change, is often the best person to create the issue, as the person who is most invested in that change. 
+In practice, that adds extra work for the team member who merges in the PR, and it may slip through the cracks occasionally. Additionally, the sub-team maintainers are often the best people to create the issue, given their insight into how it should be implemented.
 
-As an additional consideration, it is often hard to track work from the RFC proposal to the implementation, and difficult to ensure that it was completed. If we use [Github references](https://docs.github.com/en/github/writing-on-github/autolinked-references-and-urls#issues-and-pull-requests) to link the RFC PR to the issue on the appropriate repository, we can better track the work, and be notified when it is fully implemented. 
+As an additional consideration, it is often hard to track work from the RFC proposal to the implementation, and difficult to ensure that it was completed. If we use [Github references](https://docs.github.com/en/github/writing-on-github/autolinked-references-and-urls#issues-and-pull-requests) to link the RFC PR to the issue on the appropriate repository, we can better track the work, and be notified when it is fully implemented.
 
 # What it is
 [what-it-is]: #what-it-is
-This defines a process for RFC authors to open issues on the relevant repositories, after FCP for the RFC concludes, before it is merged in.  
+This defines a process for sub-team maintainers to open issues on the relevant repositories, after FCP for the RFC concludes, before it is merged in.
 
 # How it Works
 [how-it-works]: #how-it-works
-When a PR has been accepted (after FCP has concluded), the PR author makes issues in the relevant buildpack repos, and tags the RFC PR. At that point, the RFC PR may be merged in. 
+When a PR has been accepted (after FCP has concluded), the sub-team maintainers make issues (tagging the RFC PR) in the relevant buildpack repos, and labels the PR `issues-created`. At that point, the RFC PR may be merged in.
 
-Given an RFC PR #002, which discusses a change relevant to the `pack CLI` to add in a `pack my-bags` command. After discussion in Working Group meetings and votes from the Core Team, the RFC is placed in FCP for 7 days. At the end of those, the author should open an issue in the `pack CLI`, which tags the RFC PR. For example, 
+Given an RFC PR #002, which discusses a change relevant to the `pack CLI` to add in a `pack my-bags` command. After discussion in Working Group meetings and votes from the Core Team, the RFC is placed in FCP for 7 days. At the end of those, the platform maintainers should open an issue in the `pack CLI`, which tags the RFC PR. For example,
 
 ```
 ### Description
@@ -53,7 +53,7 @@ This issue is a request to implement the proposed solution as detailed in #build
 - This feature should be documented as part of standard pack CLI commands documentation.
 ```
 
-Upon seeing that issue created, a member of the core team will merge it in. 
+After creating the issue, the maintainer should add the label `issues-created`  to the PR. Upon seeing that issue created, a member of the core team will merge it in.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -65,7 +65,8 @@ N/A
 [alternatives]: #alternatives
 
 - What other designs have been considered?
-    * Core member makes the issue(s) &rarr; This adds extra responsibility when merging issues, and the best person to create the initial issue is the author
+    * Core member makes the issue(s) &rarr; This adds extra responsibility when merging issues
+    * Author of the RFC &rarr; That was my initial suggestion, but there was a concern that it could make the RFC process less approachable for new contributors, and as a community-driver process, we should take steps to make our process friendly.
     * Anarchy
 
 # Prior Art
@@ -89,9 +90,10 @@ Some of those include:
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
-This RFC would entail a proposed change to the RFC process, as defined in the https://github.com/buildpacks/rfcs/blob/main/README.md. It would now read:
 
-Once an RFC has been accepted, the RFC author should create (an) issue(s) in the relevant repositories to implement the RFC, [referencing](https://docs.github.com/en/github/writing-on-github/autolinked-references-and-urls#issues-and-pull-requests) the RFC PR.
+No. However, this RFC would entail a proposed change to the RFC process, as defined in the https://github.com/buildpacks/rfcs/blob/main/README.md. It would now read:
+
+Once an RFC has been accepted, (a) maintainer(s) from the relevant sub-team(s) should create (an) issue(s) in the relevant repositories to implement the RFC, [referencing](https://docs.github.com/en/github/writing-on-github/autolinked-references-and-urls#issues-and-pull-requests) the RFC PR. At that point, they should add the label `issues-created` to the RFC.
 
 Upon seeing the issue(s) created, the team member who merges the pull request should do the following:
 * Assign an id based off the pull request number.
