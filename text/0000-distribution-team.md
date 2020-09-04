@@ -29,7 +29,6 @@ We have two repositories that are not owned by a specific sub-team.
 
 Create a sub-team in the [project governance]() called the "Distribution Team", which will own the following repos:
 
-* [CircleCI Pack Orb](https://github.com/buildpacks/pack-orb)
 * [Buildpack Registry Index](https://github.com/buildpacks/registry-index)
 * [Buildpack Registry Namespace Owners](https://github.com/buildpacks/registry-namespaces)
 
