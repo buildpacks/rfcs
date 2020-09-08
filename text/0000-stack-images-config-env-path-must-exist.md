@@ -33,6 +33,7 @@ See [spec-changes](#spec-changes-optional) for details.
     - Still allows other env var values to come either `config.Env` or from the Windows registry 
     - Windows stack authors can set this once, with low effort
     - Validation tooling can expose the correct value from the runtime environment
+    - Better bug reports, since Windows registry `PATH` values are hard to access
     - No effort for Linux stack authors, and no backward compatibility concerns as all existing images must have had a `config.Env.PATH` set to function.
 
 - What use cases does it support?
@@ -118,7 +119,7 @@ Stack authors would set `config.Env.PATH` to the complete value they need for th
 
 In practice (not spec'd), the `config.Env.PATH` will typically contain, at minimum, a path to the directory of the shell. Also, if unset, the platform could fail with a helpful error message, perhaps how to set a `config.Env.PATH` and perhaps how to find a recommended value: `docker run <base image> cmd /c echo %PATH%` or something similar.
 
-The result of all this is that once a `config.Env.PATH` is set, Docker Windows (and containerd) will never attempt to load the `PATH` value from the registry, even with `config.Env.PATH=`. This ensures consistent behavior lifecycle and app image containers, for Windows and Linux -- that the runtime value for `PATH` is always `config.Env.PATH`, and if a command is needed, a Stack Author can add it to the `config.Env.PATH`.
+The result of all this is that once a `config.Env.PATH` is set, Docker Windows (and containerd) will never attempt to load the `PATH` value from the registry, even with `config.Env.PATH=`. This ensures consistent behavior in lifecycle and app image containers, for Windows and Linux -- that the runtime value for `PATH` is always `config.Env.PATH`, and if a command is needed, a Stack Author can add it to the `config.Env.PATH`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -129,7 +130,7 @@ The result of all this is that once a `config.Env.PATH` is set, Docker Windows (
   * I feel this is not a major concern, as Docker's workarounds are not documented and are problematic in the first place. Docker itself only documents setting the entire env vars through `ENV PATH=...`.
 * Stack Authors will need to correctly duplicate their Windows registry value of `PATH`, which may lead to accidental mis-matches. 
   * No good option for mitigation but some possibilities considered: 
-      * Change _lifecycle_ or _launcher_ to compare the running container's `PATH` with the Windows registry value. A warning message could be given to the user, but it could not be fatal since only a Stack Author could not fix the issue.
+      * Change _lifecycle_ or _launcher_ to compare the running container's `PATH` with the Windows registry value. A warning message could be given to the user, but it could be fatal since only a Stack Author could not fix the issue.
       * Change platforms to attempt to read an image's `Hives/*_Delta`, though the format is undocumented and potentially unstable and the value would need to be aggregated from every layer and hive delta file.
       * Change platforms to create a one-off container that would return Docker's runtime value of `PATH`.
 
