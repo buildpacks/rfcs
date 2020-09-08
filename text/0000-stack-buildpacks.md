@@ -27,14 +27,14 @@ However, many applications and buildpacks require modifications to the stack the
 - *stack buildpack* - a type of root buildpack that runs against the stack image(s) instead of an app. It is distinguished by a static list of mixins it can provide.
 - *userspace buildpack* - the traditional definition of a buildpack (i.e. does not run as root, and runs against an app)
 
-A new type of buildpack, called a Stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. A stackpack may also define a list of mixins that it provides to the stack. In this way, a stack that is missing a mixin required by a buildpack may have that mixin provided by a stack buildpack.
+A new type of buildpack, called a Stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. A stackpack may also define a list of mixins that it provides to the stack, or indicate that it will provide _any_ mixin. In this way, a stack that is missing a mixin required by a buildpack may have that mixin provided by a stack buildpack.
 
 A stack provider may choose to include stack buildpacks with the stack they distribute. If a stack includes any stack buildpacks, the following will occur when the build phase starts:
 
 1. If any requested mixin is not provided by the stack, the lifecycle will compare the missing mixins to the static list of mixins provided by stack buildpacks. If any mixins are still not provided, the build will fail.
 1. The lifecycle will run the detect phase for all stackpacks defined in the builder.
 1. The lifecycle will execute the stack buildpack build phase for all passing stackpack(s). If no stack buildpacks pass detect, the build will continue the build phase as normal (running userspace buildpacks).
-1. After the lifecycle's build phase, the lifecycle will begin a new phase called _extend_.
+1. After, during, or before the lifecycle's build phase, the lifecycle will begin a new phase called _extend_.
 1. During the extend phase, stack buildpacks that passed detection will run against the run images accordingly (see details below).
 
 
@@ -50,13 +50,13 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 * Is run before all regular buildpacks
 * Is run against both the build and run images
 * Is distributed with the stack run and/or build image
-* May not write to the `/layers` directory
+* May not create layers using the `<layers>` directory
 
 The stackpack interface is identical to the buildpack interface (i.e. the same `bin/detect` and `bin/build` scripts are required). However, some of the context it is run in is different from regular buildpacks.
 
 For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase excluding the a few specific directories and files.
 
-Alternatively, a platform may store a new stack image to cache the changes. All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
+Additionally, a platform may store a new stack image to cache the changes. All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
 
 A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` directory. By default, an implicit order will be created for all stackpacks included in a stack. The order can be overridden in the `builder.toml` with the following configuration:
 
@@ -247,7 +247,7 @@ A number of changes to the Platform Specification will be required to execute St
 
 Stack buildpacks are identical to other buildpacks, with the following exceptions:
 
-1. The `<layers>` directory is NOT writable.
+1. The `<layers>` directory WILL NOT be used to create layers.
 1. The working directory WILL NOT contain application source code during the build phase.
 1. All changes made to the filesystem during the execution of the stackpack's `bin/build` will be snapshotted and stored as a single layer, with the exception of the following directories:
 
