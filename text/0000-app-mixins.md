@@ -91,7 +91,7 @@ mixins = [ "build:libpq-dev", "run:libpq" ]
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Installing a mixin a build-time means that the `rebase` must also update the provided mixin. In this way, `rebase` becomes an operation that _may_ do more than edit JSON on a registry. It must all re-run a stack buildpack.
+- Installing a mixin a build-time means that the `rebase` must also update the provided mixin. In this way, `rebase` becomes an operation that _may_ do more than edit JSON on a registry. It must also re-run a stack buildpack.
 
 # Alternatives
 [alternatives]: #alternatives
