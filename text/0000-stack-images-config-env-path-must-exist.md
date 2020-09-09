@@ -70,14 +70,14 @@ This provides a high level overview of the feature.
     - Sample error message (based on existng `pack` error message):
     > ERROR: failed to create builder: invalid build-image: adding image labels to builder: image cnbs/sample-stack-build:nanoserver-1809 missing required env var PATH
 - If applicable, describe the differences between teaching this to existing users and new users.
-    - This is best taught along-side other required platform env vars.
+    - This is best taught the same way, along-side other required platform env vars.
 
 # How it Works
 [how-it-works]: #how-it-works
 
 The spec changes are minimal: change `platform.md` to always require run images and build images to have a `config.Env` entry for `PATH`. It is also valid to set to empty `PATH=` for stack images that do not want to use a `PATH`. If `config.Env.PATH` were unset, a platform would fail.
 
-This change relies on the current behavior of Docker and containerd for Windows is to set each container runtime env var from only one of two places in the image: preferring `config.Env` variables that are set, then falling back to values set in the Windows registry hive layer data. Docker's behavior is intended to align with Windows conventions of apps setting all environment variables through the Windows registry but still allowing for `config.Env` to override them.
+This change relies on the current behavior of Docker and containerd for Windows which is to set each container runtime env var from only one of two places in the image: preferring `config.Env` variables that are set, then falling back to values set in the Windows registry hive layer data. Docker's behavior is intended to align with Windows conventions of apps setting all environment variables through the Windows registry but still allowing for `config.Env` to override them.
 
 Windows base images de-facto always leave the `config.Env.PATH` unset so that Docker will load the env var `PATH` (an any other unset env vars) from the Windows registry. 
 
@@ -111,9 +111,9 @@ $ docker run cnbs/sample-stack-run:alpine sh -c 'echo $PATH'
 /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ```
 
-The difference in Windows and Linux base image conventions carry-through to the respective run images which results in Windows apps images with incomplete `config.Env.PATH`, containing only lifecycle CNB paths (i.e. `c:\cnb\process`). Docker never attempts to load the Windows registry `PATH` value since it prefers the `config.Env.PATH`. 
+The difference in Windows and Linux base image conventions pass-through to the respective run images which results in Windows apps images with incomplete `config.Env.PATH`, containing only lifecycle CNB paths (i.e. `c:\cnb\process`). Docker never attempts to load the Windows registry `PATH` value since it prefers the `config.Env.PATH`. 
 
-Platforms would ensure that `config.Env.PATH` is set on a build or run image configs, just like they do `config.Labels` and other `config.Env` values (ex `CNB_USER_ID`).
+To fix this, platforms would ensure that `config.Env.PATH` is set on a build or run image configs, just like they ensure `config.Labels` and other `config.Env` values are set(ex `CNB_USER_ID`).
 
 Stack authors would set `config.Env.PATH` to the complete value they need for the image (perhaps just the shell's `PATH`), either by adding `ENV PATH=...` to their stack image Dockerfiles or directly setting in the image config with the equivalent of `config.Env += ["PATH=..."]` for their build and run images to pass validation. They would choose an empty path with `config.Env = ["PATH="]`.
 
@@ -130,7 +130,7 @@ The result of all this is that once a `config.Env.PATH` is set, Docker Windows (
   * I feel this is not a major concern, as Docker's workarounds are not documented and are problematic in the first place. Docker itself only documents setting the entire env vars through `ENV PATH=...`.
 * Stack Authors will need to correctly duplicate their Windows registry value of `PATH`, which may lead to accidental mis-matches. 
   * No good option for mitigation but some possibilities considered: 
-      * Change _lifecycle_ or _launcher_ to compare the running container's `PATH` with the Windows registry value. A warning message could be given to the user, but it could be fatal since only a Stack Author could not fix the issue.
+      * Change _lifecycle_ or _launcher_ to compare the running container's `PATH` with the Windows registry value. A warning message could be given to the user, but it could not be fatal since only a Stack Author could not fix the issue.
       * Change platforms to attempt to read an image's `Hives/*_Delta`, though the format is undocumented and potentially unstable and the value would need to be aggregated from every layer and hive delta file.
       * Change platforms to create a one-off container that would return Docker's runtime value of `PATH`.
 
