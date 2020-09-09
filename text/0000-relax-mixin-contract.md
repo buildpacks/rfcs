@@ -23,13 +23,14 @@ Similarly, if a stack build image shares the mixin `mypkg` with the stack run im
 
 This RFC proposed that we update the buildpack specification to create a new relationship between `mypkg`, `run:mypkg`, and `build:mypkg`.
 
-- While `run:mypkg` may imply a different set of changes to the run image compared to `mypkg`, buildpacks requiring `mypkg` should be satisfied with `run:mypkg` at runtime (and vice versa).
+- `run:mypkg` and `mypkg` imply the same set of changes to the run image, such that buildpacks requiring `mypkg` would be satisfied with `run:mypkg` at runtime (and vice versa).
 
-- While `build:mypkg` may imply a different set of changes to the build image compared to `mypkg`, buildpacks requiring `mypkg` should be satisfied with `build:mypkg` at build-time (and vice versa).
+- `build:mypkg` and `mypkg` imply the same set of changes to the build image, such that buildpacks requiring `mypkg` would be satisfied with `build:mypkg` at build-time (and vice versa).
 
-- A runtime stackpack would still be passed either `run:mypkg` or `mypkg` depending on what the buildpack required, so that the stackpack understands whether or not it can expect the build image to have the corresponding mixin as well.
+- A runtime stackpack that needs to satisfy `run:mypkg` or `mypkg` would only be provided with `mypkg`, regardless of which version is required. The stackpack would have no knowledge of whether it could expect the build image to have the corresponding mixin.
 
-- A build-time stackpack would still be passed either `build:mypkg` or `mypkg` depending on what the buildpack required, so that the stackpack understands whether or not it can expect the run image to have the corresponding mixin as well.
+- A build-time stackpack that needs to satisfy `build:mypkg` or `mypkg` would only be provided with `mypkg`, regardless of which version is required. The stackpack would have no knowledge of whether it could expect the run image to have the corresponding mixin.
+
 
 # Definitions
 [definitions]: #definitions
@@ -45,7 +46,7 @@ This RFC proposed that we update the buildpack specification to create a new rel
 
 2. Stack authors are unable to relax the contract between the build and run image (by only using the stage-specifier version of the mixins) without requiring the buildpacks manually list the mixin twice with the different stage specifiers.
 
-3. Under the pre-RFC mixin definition, stackpacks (specified in #87) will attempt to re-install packages when stage-specifier is mismatched between the buildpack and stack images. For instance, a buildpack requesting `mypkg` would result in the stackpack attempting to install `mypkg` on a run image with `run:mypkg`.
+3. Under the pre-RFC mixin definition, stackpacks (specified in [#87](https://github.com/buildpacks/rfcs/issues/87)) will attempt to re-install packages when stage-specifier is mismatched between the buildpack and stack images. For instance, a buildpack requesting `mypkg` would result in the stackpack attempting to install `mypkg` on a run image with `run:mypkg`.
 
 
 # How it Works
@@ -56,13 +57,12 @@ Pack and lifecycle will relax contractual restrictions when initiating builds, c
 # Drawbacks
 [drawbacks]: #drawbacks
 
-This change reduces the power of the mixin model for stack authors. Previously, stack authors could reliably use `run:mypkg` to indicate that a run image strictly contains the runtime version of mypkg (which may provide different functionality than `mypkg`).
+This change reduces the power of the mixin model for stack authors. Previously, stack authors could reliably use `run:mypkg` to indicate that a run image strictly contains the runtime version of mypkg (which may provide different functionality than `mypkg`). Now `run:mypkg` and `mypkg` imply the exact same thing for the run image.
 
 # Alternatives
 [alternatives]: #alternatives
 
 - Refactor mixins entirely, e.g., enforce stack<->stack and stack<->buildpack mixin interfaces separately.
-
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
