@@ -17,7 +17,7 @@ Mixins are used to imply multiple contracts:
 
 2. A contract between a stack run image and stack build image, where apps built on the build image must have a certain dependency present on the run image to start successfully on the run image.
 
-Currently, if a stack build image has the mixin `build:mypkg` and a stack run image has the mixin `run:mypkg`, a buildpack cannot require the mixin as `mypkg` (either statically in buildpack.toml, or dynamically via the stackpack mechanism described in #87). A stack author may choose to use this configuration because the same dependency is used in different, unrelated ways in both images.
+Currently, if a stack build image has the mixin `build:mypkg` and a stack run image has the mixin `run:mypkg`, a buildpack cannot require the mixin as `mypkg` (either statically in buildpack.toml, or dynamically via the stackpack mechanism described in [#87](https://github.com/buildpacks/rfcs/issues/87)). A stack author may choose to use this configuration because the same dependency is used in different, unrelated ways in both images.
 
 Similarly, if a stack build image shares the mixin `mypkg` with the stack run image, a buildpack cannot require the mixin `build:mypkg` or `run:mypkg`, even though both images contain `mypkg`.
 
