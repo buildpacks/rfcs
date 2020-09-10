@@ -234,6 +234,14 @@ See [above][expose-all-layer-metadata-recap].
     using that cache have layer origin metadata? One implication of
     this is that if layer origin metadata becomes unavailable, the
     cache cannot be used.
+* How does any of this relate to volumes mounted by the platform (for
+  example, `/platform/env/`)? Such a volume may affect the build, so
+  it must be considered an input. However, we have no existing means
+  of identifying that volume mount or its contents. How can we get a
+  handle on arbitrary volume mounts in a way that enables us to trace
+  their participation in builds?
+* Whose job is it to identify SCM information: the lifecycle, or the
+  platform?
 
 <!-- - What parts of the design do you expect to be resolved through -->
 <!--   implementation of the feature? -->
