@@ -37,9 +37,9 @@ This defines a process for sub-team maintainers to open issues on the relevant r
 
 # How it Works
 [how-it-works]: #how-it-works
-When a PR has been accepted (after FCP has concluded), the sub-team maintainers make issues (tagging the RFC PR) in the relevant buildpack repos, and labels the PR `issues-created`. At that point, the RFC PR may be merged in.
+When a PR has been accepted (after FCP has concluded), the sub-team maintainers make issues (tagging the RFC PR) in the relevant buildpack repos, and labels the PR `issues-created`. At that point, the RFC PR may be merged in, with references to the CNB issues added to the RFC [metadata](https://github.com/buildpacks/rfcs/blob/main/text/0044-pack-publish-buildpack.md#meta).
 
-Given an RFC PR #002, which discusses a change relevant to the `pack CLI` to add in a `pack my-bags` command. After discussion in Working Group meetings and votes from the Core Team, the RFC is placed in FCP for 7 days. At the end of those, the platform maintainers should open an issue in the `pack CLI`, which tags the RFC PR. For example,
+Given an RFC PR #002, which discusses a change relevant to the `pack CLI` to add in a `pack my-bags` command. After discussion in Working Group meetings and votes from the Core Team, the RFC is placed in FCP for 7 days. At the end of those, the platform maintainers should open an issue (issue #005) in the `pack CLI`, which tags the RFC PR. For example,
 
 ```
 ### Description
@@ -53,13 +53,18 @@ This issue is a request to implement the proposed solution as detailed in #build
 - This feature should be documented as part of standard pack CLI commands documentation.
 ```
 
-After creating the issue, the maintainer should add the label `issues-created`  to the PR. Upon seeing that issue created, a member of the core team will merge it in.
+After creating the issue, the maintainer should add the label `issues-created`  to the PR. Upon seeing that issue created, a member of the core team will merge it in, adding references to the RFC metadata, like so:
+```
+# Meta
+[meta]: #meta
+- Name: Pack My Bags
+...
+- CNB Issue: [buildpacks/pack#005](https://github.com/buildpacks/pack/pull/5)
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
 N/A
-
-![Sloth GIF](https://giphy.com/gifs/3NtY188QaxDdC)
 
 # Alternatives
 [alternatives]: #alternatives
