@@ -145,7 +145,7 @@ for package in $(cat $3 | yj -t | jq -r ".entries | .[] | .name"); do
   apt install $package
 done
 
-cat << EOF > launch.toml
+cat << EOF > $1/launch.toml
 [[excludes]]
 paths = [ "/var/cache" ]
 cache = true
