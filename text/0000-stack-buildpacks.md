@@ -33,7 +33,8 @@ A stackpack may also define a list of mixins that it provides to the stack, or i
 
 A stack provider may choose to include stack buildpacks with the stack they distribute. If a stack includes any stack buildpacks, the following will occur when the build phase starts:
 
-1. If any requested mixin is not provided by the stack, the lifecycle will compare the missing mixins to the static list of mixins provided by stack buildpacks in accordance with [stage-specific mixin rules](https://github.com/buildpacks/rfcs/pull/109). If any mixins are still not provided, the build will fail.
+1. The platform may compare the list of requested mixins with the static list of mixins provided by the stack buildpacks, and fail the build if it choses to do so.
+1. The lifecycle will compare the list of required mixins to the list of mixins provided by stack and stack buildpacks in accordance with [stage-specific mixin rules](https://github.com/buildpacks/rfcs/pull/109). If any mixins are still not provided, the build will fail.
 1. The lifecycle will run the detect phase for all stackpacks defined in the builder.
 1. The lifecycle will execute the stack buildpack build phase for all passing stackpack(s). If no stack buildpacks pass detect, the build will continue the build phase as normal (running userspace buildpacks).
 1. After, during, or before the lifecycle's build phase, the lifecycle will begin a new phase called _extend_.
