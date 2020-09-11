@@ -24,7 +24,7 @@ However, many applications and buildpacks require modifications to the stack the
 [what-it-is]: #what-it-is
 
 - *root buildpack* - a new type of buildpack that runs as the root user
-- *stack buildpack* - a type of root buildpack that runs against the stack image(s) instead of an app. It is distinguished by a static list of mixins it can provide.
+- *stack buildpack* - a type of root buildpack that runs against the stack image(s) instead of an app. Stack buildpacks must not make changes to the build and run images that either violate stack [compatibility guarantees](https://github.com/buildpacks/spec/blob/main/platform.md#compatibility-guarantees) or violate the contract defined by that stack's author.
 - *userspace buildpack* - the traditional definition of a buildpack (i.e. does not run as root, and runs against an app)
 
 A new type of buildpack, called a Stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. A stackpack may also define a list of mixins that it provides to the stack, or indicate that it will provide _any_ mixin. In this way, a stack that is missing a mixin required by a buildpack may have that mixin provided by a stack buildpack.
@@ -296,4 +296,3 @@ Under the `[buildpack.mixins]` table:
 
 * `any` - a boolean that, when true, indicates that the buildpack can provide all mixins
 * `names` - a list of names that match mixins provided by this buildpack
-
