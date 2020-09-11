@@ -70,6 +70,40 @@ A stackpack will only execute if it passes detection. When the stackpack is exec
 
 The stackpack's snapshot layer may be modified by writing a `stack.toml` file. The `stack.toml` will define paths that will be restored even when the base image changes (ex. package indicies) and paths that will be excluded from the launch image (ex. `/var/cache`).
 
+## Providing Mixins
+
+A stack buildpack MAY define a set of mixins it provides in either of two ways:
+
+1. Statically in the `buildpack.toml`
+1. Dynamically in the Build Plan.
+
+A stack buildpack MAY define a set of stack specific mixins in the `buildpack.toml` with the following schema:
+
+```toml
+[[buildpack.provides.stacks]]
+id = "<stack id or *>"
+any = <boolean (default=false)>
+mixins = [ "mixin name" ]
+```
+
+Additionally, mixins MAY be dyncamically provided in the build plan:
+
+```
+[[provides]]
+name = "<mixin name>"
+mixin = <boolean (default=false, requires privileged=true in buildpack.toml if true)>
+```
+
+A userspace buildpack MAY require mixins in the build plan
+
+```
+[[requires]]
+name = "<mixin name>"
+mixin = <boolean (default=false)>
+```
+
+A userspace buildpack MAY NOT provide mixins in the build plan.
+
 ## Rebasing an App
 
 Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. Then, the rebase operation can be performed as normal, while including the stackpack layers as part of the stack. This will be made possible by including the stackpack in the run-image, but because the stackpack detect phase is not run, the operation does not need access to the application source.
@@ -211,6 +245,19 @@ Its `bin/build` would do nothing, and `have the following contents:
 exit 0
 ```
 
+## Example: jq mixin
+
+A buildpack may that requires the `jq` package may have it provided by either a stack, stack buildpack, or userspace buildpack.
+
+```toml
+[[or.requires]]
+name = "jq"
+mixin = true
+
+[[or.requires]]
+name = "jq"
+```
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -284,9 +331,10 @@ Where:
 privileged = <boolean (default=false)>
 non-idempotent = <boolean (default=false)>
 
-[buildpack.mixins]
-any = "<boolean (default=false)>"
-names = [ "<mixin name>" ]
+[[buildpack.provides.stacks]]
+id = "<stack id>"
+any = <boolean (default=false)>
+mixins = [ "<mixin name>" ]
  ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
@@ -296,3 +344,31 @@ Under the `[buildpack.mixins]` table:
 
 * `any` - a boolean that, when true, indicates that the buildpack can provide all mixins
 * `names` - a list of names that match mixins provided by this buildpack
+
+## Build Plan (TOML)
+
+```
+[[provides]]
+name = "<dependency name>"
+mixin = <boolean (default=false)>
+
+[[requires]]
+name = "<dependency name>"
+mixin = <boolean (default=false)>
+
+[requires.metadata]
+# buildpack-specific data
+
+[[or]]
+
+[[or.provides]]
+name = "<dependency name>"
+mixin = <boolean (default=false)>
+
+[[or.requires]]
+name = "<dependency name>"
+mixin = <boolean (default=false)>
+
+[or.requires.metadata]
+# buildpack-specific data
+```
