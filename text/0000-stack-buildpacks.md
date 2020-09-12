@@ -84,8 +84,10 @@ A stack buildpack MAY define a set of mixins it provides in either of two ways:
 A stack buildpack MAY define a set of stack specific mixins in the `buildpack.toml` with the following schema:
 
 ```toml
-[[buildpack.provides.stacks]]
+[[stacks]]
 id = "<stack id or *>"
+
+[stacks.provides]
 any = <boolean (default=false)>
 mixins = [ "mixin name" ]
 ```
@@ -335,19 +337,24 @@ Where:
 privileged = <boolean (default=false)>
 non-idempotent = <boolean (default=false)>
 
-[[buildpack.provides.stacks]]
-id = "<stack id>"
+[[stacks]]
+id = "<stack id or *>"
+
+[stacks.requires]
+mixins = [ "mixin name" ]
+
+[stacks.provides]
 any = <boolean (default=false)>
-mixins = [ "<mixin name>" ]
+mixins = [ "mixin name" ]
  ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
 * `non-idempotent` - when set to `true`, indicates that the buildpack is not idempotent. The lifecycle will provide a clean filesystem from the stack image(s) before each run (i.e. no cache).
 
-Under the `[buildpack.mixins]` table:
+Under the `[stacks.provides]` table:
 
 * `any` - a boolean that, when true, indicates that the buildpack can provide all mixins
-* `names` - a list of names that match mixins provided by this buildpack
+* `mixins` - a list of names that match mixins provided by this buildpack
 
 ## Build Plan (TOML)
 
