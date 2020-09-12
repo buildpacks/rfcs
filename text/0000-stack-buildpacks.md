@@ -110,6 +110,14 @@ mixin = <boolean (default=false)>
 
 A userspace buildpack MAY NOT provide mixins in the build plan.
 
+## Caching and Restoring
+
+During the export phase, the lifecycle will store any snapshot layers created during the build phase in the cache.
+
+During the restore phase of the next build, the lifecycle will download the snapshot layer with the cache and store it as a tarball in the `<layers>` directory (i.e. it will not extract it). The `restorer` cannot extract the snapshot because it will not run with root privileges. In addition, the `restorer` may run in a different container than the build, which means changes made to the base image are not guaranteed to carry forward.
+
+During the build phase, the lifecycle will extract and apply each snapshot tarball before running stack buildpacks, but after a snapshot-baseline has been captured. This ensures that all changes from the previous snapshot are preserved even if the stack buildpack does not make any additional changes.
+
 ## Rebasing an App
 
 Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. Then, the rebase operation can be performed as normal, while including the stackpack layers as part of the stack. This will be made possible by including the stackpack in the run-image, but because the stackpack detect phase is not run, the operation does not need access to the application source.
