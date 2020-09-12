@@ -383,3 +383,89 @@ mixin = <boolean (default=false)>
 [or.requires.metadata]
 # buildpack-specific data
 ```
+
+## Lifecycle Interface
+
+### Usage
+
+#### `detector`
+The platform MUST execute `detector` in the **build environment**
+
+Usage:
+```
+/cnb/lifecycle/detector \
+  [-app <app>] \
+  [-buildpacks <buildpacks>] \
+  [-group <group>] \
+  [-log-level <log-level>] \
+  [-order <order>] \
+  [-plan <plan>] \
+  [-platform <platform>] \
+  [-stack-buildpacks <stack-buildpacks>] \
+  [-stack-group <group>]
+```
+
+##### Inputs
+| Input                 | Environment Variable        | Default Value           | Description
+|-----------------------|-----------------------------|-------------------------|----------------------
+| `<app>`               | `CNB_APP_DIR`               | `/workspace`            | Path to application directory
+| `<buildpacks>`        | `CNB_BUILDPACKS_DIR`        | `/cnb/buildpacks`       | Path to buildpacks directory (see [Buildpacks Directory Layout](#buildpacks-directory-layout))
+| `<group>`             | `CNB_GROUP_PATH`            | `./group.toml`          | Path to output group definition
+| `<log-level>`         | `CNB_LOG_LEVEL`             | `info`                  | Log Level
+| `<order>`             | `CNB_ORDER_PATH`            | `./order.toml`          | Path to order definition (see [`order.toml`](#ordertoml-toml))
+| `<plan>`              | `CNB_PLAN_PATH`             | `./plan.toml`           | Path to output resolved build plan
+| `<platform>`          | `CNB_PLATFORM_DIR`          | `/platform`             | Path to platform directory
+| `<stack-buildpacks>`  | `CNB_STACK_BUILDPACKS_DIR`  | `/cnb/stack/buildpacks` | Path to stack buildpacks directory (see [Buildpacks Directory Layout]
+| `<group>`             | `CNB_STACK_GROUP_PATH`      | `./stack-group.toml`    | Path to output group definition(#buildpacks-directory-layout))
+
+##### Outputs
+| Output             | Description
+|--------------------|----------------------------------------------
+| [exit status]      | (see Exit Code table below for values)
+| `/dev/stdout`      | Logs (info)
+| `/dev/stderr`      | Logs (warnings, errors)
+| `<group>`          | Detected buildpack group  (see [`group.toml`](#grouptoml-toml))
+| `<plan>`           | Resolved Build Plan (see [`plan.toml`](#plantoml-toml))
+| `<stack-group>`    | Detected stack buildpack group  (see [`group.toml`](#grouptoml-toml))
+
+#### `builder`
+The platform MUST execute `builder` in the **build environment**
+
+Usage:
+```
+/cnb/lifecycle/builder \
+  [-app <app>] \
+  [-buildpacks <buildpacks>] \
+  [-group <group>] \
+  [-layers <layers>] \
+  [-log-level <log-level>] \
+  [-plan <plan>] \
+  [-platform <platform>] \
+  [-stack-buildpacks <stack-buildpacks>] \
+  [-stack-group <stack-group>]
+```
+
+##### Inputs
+| Input                 | Environment Variable        | Default Value           | Description
+|-----------------------|-----------------------------|-------------------------|----------------------
+| `<app>`               | `CNB_APP_DIR`               | `/workspace`            | Path to application directory
+| `<buildpacks>`        | `CNB_BUILDPACKS_DIR`        | `/cnb/buildpacks`       | Path to buildpacks directory (see [Buildpacks Directory Layout](#buildpacks-directory-layout))
+| `<group>`             | `CNB_GROUP_PATH`            | `./group.toml`          | Path to output group definition
+| `<layers>`            | `CNB_LAYERS_DIR`            | `/layers`               | Path to layers directory
+| `<log-level>`         | `CNB_LOG_LEVEL`             | `info`                  | Log Level
+| `<order>`             | `CNB_ORDER_PATH`            | `./order.toml`          | Path to order definition (see [`order.toml`](#ordertoml-toml))
+| `<plan>`              | `CNB_PLAN_PATH`             | `./plan.toml`           | Path to output resolved build plan
+| `<platform>`          | `CNB_PLATFORM_DIR`          | `/platform`             | Path to platform directory
+| `<stack-buildpacks>`  | `CNB_STACK_BUILDPACKS_DIR`  | `/cnb/stack/buildpacks` | Path to stack buildpacks directory (see [Buildpacks Directory Layout]
+| `<group>`             | `CNB_STACK_GROUP_PATH`      | `./stack-group.toml`    | Path to output group definition(#buildpacks-directory-layout))
+
+##### Outputs
+| Output                                     | Description
+|--------------------------------------------|----------------------------------------------
+| [exit status]                              | (see Exit Code table below for values)
+| `/dev/stdout`                              | Logs (info)
+| `/dev/stderr`                              | Logs (warnings, errors)
+| `<layers>/<buildpack ID>/<layer>`          | Layer contents (see [Buildpack Interface Specfication](buildpack.md)
+| `<layers>/<buildpack ID>/<layer>.toml`     | Layer metadata (see [Buildpack Interface Specfication](buildpack.md)
+| `<layers>/<buildpack ID>.tgz`              | Layer snapshot (see [Buildpack Interface Specfication](buildpack.md)
+| `<layers>/config/metadata.toml`            | Build metadata (see [`metadata.toml`](#metadatatoml-toml))
