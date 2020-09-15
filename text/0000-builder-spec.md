@@ -10,10 +10,7 @@
 
 # Summary
 [summary]: #summary
-A Builder is a critical tool in the CNB ecosystem, and yet, is largely [unspecified][spec-issue-builder]. This RFC proposes that we should add an extension spec, defining builders, as well as clarifying the usage/consumption (or at least, the existence) of builders in the:
-* [Buildpack specification][buildpacks-spec]
-* [Platform specification][platform-spec]
-* [Distribution specification][distribution-spec]
+A Builder is a critical tool in the CNB ecosystem, and yet, is largely [unspecified][spec-issue-builder]. This RFC proposes that we should add a rigorous description of builders in the [distribution specification][distribution-spec], and clarify the usage/existence of builders in the [platform specification][platform-spec]
 
 # Definitions
 [definitions]: #definitions
@@ -103,14 +100,147 @@ Detection Order:
           ├ samples/hello-world@0.0.1
           └ samples/hello-moon@0.0.1
 ```
+
 # How it Works
 [how-it-works]: #how-it-works
+## Structure of Builders
+### Files/Directories
+A builder is composed of at least the following directories/files:
+```
+- /cnb/buildpacks/...<buildpack ID>/<buildpack version>/
+- /cnb/lifecycle/<lifecycle binaries>
+- /cnb/order.toml
+- /cnb/stack.toml
+- /layers
+- /platform/env/<env-files>
+- /workspace
+```
 
-This is the technical portion of the RFC, where you explain the design in sufficient detail.
+### Env Vars/Labels
+A builder's environment is the build-time environment of the stack, and as such, requires all of the [build image specifications][build-image-specs], including:
+* The image config's User field is set to a non-root user with a writable home directory.
+* The image config's Env field has the environment variable CNB_STACK_ID set to the stack ID.
+* The image config's Env field has the environment variable CNB_USER_ID set to the user †UID/‡SID of the user specified in the User field.
+* The image config's Env field has the environment variable CNB_GROUP_ID set to the primary group †GID/‡SID of the user specified in the User field.
+* The image config's Label field has the label io.buildpacks.stack.id set to the stack ID. (string)
+* The image config's Label field has the label io.buildpacks.stack.mixins set to a JSON array containing mixin names for each mixin applied to the image.
+
+Additionally, a builder requires:
+* The image config's WorkingDir should be set
+* The image config's Label field has the label io.buildpacks.buildpack.order, set to a JSON object representing an Order
+* The image config's Label field has the label io.buildpacks.builder.metadata, set to a JSON object representing Builder Metadata
+* The image config's Label field has the label io.buildpacks.buildpack.layers, set to a JSON object representing the layers
+
+#### Order
+The `io.buildpacks.buildpack.order` data should look like:
+```json
+[
+	{
+	  "group":
+		[
+		  {
+			"id": "<buildpack id>",
+			"version": "<buildpack version>",
+			"optional": "<bool>"
+		  }
+		]
+	}
+]
+```
+
+#### Metadata
+The `io.buildpacks.builder.metadata` data should look like:
+```json
+{
+  "description": "<Some description>",
+  "stack": {
+    "runImage": {
+      "image": "<some/run-image>",
+      "mirrors": [
+        "<gcr.io/some/default>"
+      ]
+    }
+  },
+  "buildpacks": [
+    {
+      "id": "<buildpack id>",
+	  "version": "<buildpack version>",
+	  "homepage": "http://geocities.com/top-bp"
+	}
+  ],
+  "lifecycle": {
+    "version": "<version of lifecycle in builder>",
+    "apis":  {
+        "buildpack": {
+          "deprecated": ["0.1"],
+          "supported": ["1.2", "1.3"]},
+        "platform": {
+          "deprecated": [],
+          "supported": ["2.3", "2.4"]}
+    }
+  },
+  "createdBy": {
+    "name": "<creator of builder>", 
+    "version": "<builder version>"
+  }
+}
+```
+
+#### Layers
+The `io.buildpacks.buildpack.layers` data should look like:
+```json
+{
+  "<buildpack id>": {
+    "<buildpack version>": {
+      "api": "<buildpack API>",
+      "order": [
+        {
+          "group": [
+            {
+              "id": "<inner buildpack>",
+              "version": "<inner bulidpacks version>"
+            }
+          ]
+        }
+      ],
+      "layerDiffID": "sha256:test.nested.sha256",
+	  "homepage": "http://geocities.com/top-bp"
+    }
+  },
+  "<inner buildpack>": {
+    "<inner buildpacks version>": {
+      "api": "<buildpack API>",
+      "stacks": [
+        {
+          "id": "<stack ID buildpack supports>",
+          "mixins": ["<list of mixins required>"]
+        }
+      ],
+      "layerDiffID": "sha256:test.bp.one.sha256",
+	  "homepage": "http://geocities.com/cool-bp"
+    }
+  }
+}
+```
+
+## Spec Additions
+### [Buildpack specification][buildpacks-spec]
+Builders don't seem immediately relevant to the buildpack specification; as such, I wouldn't add mention of builders here. 
+
+### [Platform specification][platform-spec]
+We can add a note, clarifying that in platforms that use builders, the Stack's build image is the core of the builder. 
+
+### [Distribution specification][distribution-spec]
+We should have a rigorous definition of the builder here, with a description of all the files and metadata necessary and allowed. 
 
 # Drawbacks
 [drawbacks]: #drawbacks
 N/A
+
+# Alternatives
+[alternatives]: #alternatives
+Specifying the builder is something that, to my mind, should definitely done; the question is, how. We could have an entirely separate `extension spec`, defining builders and how they should be used. 
+ > Given that one of the key uses of builders is in distributing buildpacks, I thought it should at least be discussed in some depth in the [distribution spec][distribution-spec], and given that the buildpackage makeup is described there, I thought it appropriate to just describe it fully in the distribution spec. 
 
 # Prior Art
 [prior-art]: #prior-art
@@ -120,19 +250,17 @@ Some similar PRs that led to the development of specifications are:
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-
-- What parts of the design do you expect to be resolved before this gets merged?
-- What parts of the design do you expect to be resolved through implementation of the feature?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+* This RFC doesn't assume the requirement of a PATH variable, or any other open RFCs  
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
-This RFC should lead to the creation of a new specification document - either a core, or extension spec. for Builders.
+This RFC should lead to changes in the distribution spec.
 
 [//]: <> (Links)
 [buildpacks-spec]: https://github.com/buildpacks/spec/blob/main/buildpack.md
 [platform-spec]: https://github.com/buildpacks/spec/blob/main/platform.md
 [distribution-spec]: https://github.com/buildpacks/spec/blob/main/distribution.md
+[build-image-specs]: https://github.com/buildpacks/spec/blob/main/platform.md#build-image
 [spec-issue-builder]: https://github.com/buildpacks/spec/issues/101
 [stack-docs]: https://buildpacks.io/docs/concepts/components/stack/
 [builder-docs]: https://buildpacks.io/docs/concepts/components/builder/
