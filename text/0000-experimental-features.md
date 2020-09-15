@@ -32,7 +32,9 @@ We seek to change the current process such that experimental features do not req
 # How it Works
 [how-it-works]: #how-it-works
 
-Experimental features can be submitted as a PR or discussed in Github Issues on the relevant project. The team that maintains that project can decide whether or not to introduce the feature as long as it is behind a  mechanism that enables or disables these features.
+Experimental Features should have a tracking GitHub issue with an appropriate "experimental" label in the relevant repo. That issue should describe what it is, what it's trying to prove, and a proposed end date of the experiment. The end dates can be extended if needed. When the experiment has ended, it should be removed (if deemed a failure) or a RFC/implementation should be done depending on the feature.
+
+The sub-team that maintains the project can decide with a majority vote whether or not to introduce the feature as long as it is behind a mechanism that enables or disables these features. Where possible when a feature is used it should log a warning after it's used with a message that you used this experimental feature and a link to the tracking issue to collect feedback.
 
 # Drawbacks
 [drawbacks]: #drawbacks
