@@ -126,7 +126,9 @@ During the build phase, the lifecycle will extract and apply each snapshot tarba
 
 ## Rebasing an App
 
-Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. Then, the rebase operation can be performed as normal, while including the stackpack layers as part of the stack. This will be made possible by including the stackpack in the run-image, but because the stackpack detect phase is not run, the operation does not need access to the application source.
+Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. The image containing the stack buildpacks and the builder binary must be provided to the rebaser operation as an argument. A platform may choose to provide the same stack buildpacks and builder binary used during the build that create the launch-image being rebased, or it may provide updates versions (which may increase the risk of something failing in the rebase process).
+
+Then, the rebase operation can be performed as normal, while including the stackpack layers as part of the stack. This will be made possible by including the stackpack in the run-image, but because the stackpack detect phase is not run, the operation does not need access to the application source.
 
 ## Example: Apt Buildpack
 
@@ -468,3 +470,18 @@ Usage:
 |---------------------|-----------------------|---------------------|---------------------------------------
 | ...                 |                             |                           |
 | `<stack-group>`     | `CNB_STACK_GROUP_PATH`      | `./stack-group.toml`      | Path to stack-group file (see [`group.toml`](#grouptoml-toml))
+
+
+#### `rebaser`
+Usage:
+```
+/cnb/lifecycle/exporter \
+  [-build-image <build-image>] \
+  ...
+```
+
+##### Inputs
+| Input               | Environment Variable  | Default Value          | Description
+|---------------------|-----------------------|------------------------|---------------------------------------
+| ...                 |                       |                        |
+| `<stack-group>`     | `CNB_BUILD_IMAGE`     | derived from `<image>` | Image containing `builder` and stack buildpacks
