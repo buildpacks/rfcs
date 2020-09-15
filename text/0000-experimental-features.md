@@ -32,9 +32,15 @@ We seek to change the current process such that experimental features do not req
 # How it Works
 [how-it-works]: #how-it-works
 
-Experimental Features should have a tracking GitHub issue with an appropriate "experimental" label in the relevant repo. That issue should describe what it is, what it's trying to prove, and a proposed end date of the experiment. The end dates can be extended if needed. When the experiment has ended, it should be removed (if deemed a failure) or a RFC/implementation should be done depending on the feature.
+In order to suggest an experimental feature, a tracking GitHub issue is created with the "experimental" label in the relevant repo. The issue should describe what it is, what it's trying to prove, and a proposed end date of the experiment. The end dates can be extended if needed.
 
 The sub-team that maintains the project can decide with a majority vote whether or not to introduce the feature as long as it is behind a mechanism that enables or disables these features. Where possible when a feature is used it should log a warning after it's used with a message that you used this experimental feature and a link to the tracking issue to collect feedback.
+
+When the experiment has ended, there are two possible outcomes:
+- if deemed not successful, the feature should be removed
+- if deemed successful a RFC/implementation should be done depending on the feature
+
+If not much feedback is collected, that will be taken into account but ultimately up to the subteam in how to proceed.
 
 # Drawbacks
 [drawbacks]: #drawbacks
