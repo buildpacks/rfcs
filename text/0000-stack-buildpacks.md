@@ -72,7 +72,13 @@ A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` 
 
 A stackpack will only execute if it passes detection. When the stackpack is executed, its detect and build scripts use the same parameters as the regular buildpacks. But the arguments may differ. For example, the first positional argument to the `bin/build` (the `<layers>` directory) MUST NOT be a standard layers directory adhering to the [Buildpacks Build specification](https://github.com/buildpacks/spec/blob/main/buildpack.md#build).
 
-The stackpack's snapshot layer may be enriched by writing a `launch.toml` file. The `launch.toml` will define paths that will be restored even when the base image changes (ex. package indicies) and paths that will be excluded from the launch image (ex. `/var/cache`).
+The stackpack's snapshot layer may be enriched by writing a `launch.toml` file. The `launch.toml` may define globs of files to be excluded from the image when it is _used_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered when the image is _used_. The term _used_ is defined as:
+
+* *Used for build-time build*: A given path is excluded at normal buildpack build-time, and recovered the next time the build image is extended with the stackpack.
+* *Used for build-time run*: A given path is excluded from the final image, and recovered the next time the run image is extended with the stackpack (either rebase or rebuild).
+* *Used for rebase run*: A given path is excluded from the rebased image, and recovered the next time the run image is extended with the stackpack (either rebase or rebuild).
+
+For example, a stack buildpack may choose to exclude `/var/cache` from the final run image, but may want to mark it as _cached_ to have it restored during build-time and rebase.
 
 ## Providing Mixins
 
@@ -335,6 +341,10 @@ Where:
 
 * `paths` = a list of paths to exclude from the layer
 * `cache` = if true, the paths will be excluded from the launch image layer, but will be included in the cache layer.
+
+1. Paths not referenced by an `[[excludes]]` entry will be included in the cache _and_ run image (default).
+1. Any paths with an `[[excludes]]` entry and `cache = true` will be included in the cache image, but not the run image.
+1. Any paths with an `[[excludes]]` entry and `cache = false` will not be included in the cache image or the run image.
 
 ## buildpack.toml  (TOML)
 
