@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Builder Spec
 - Start Date: 2020-09-11
-- Author(s): @dfreilich
+- Author(s): [@dfreilich](https://github.com/dfreilich)
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -127,9 +127,9 @@ A builder's environment is the build-time environment of the stack, and as such,
 
 Additionally, a builder requires:
 * The image config's WorkingDir should be set
-* The image config's Label field has the label io.buildpacks.buildpack.order, set to a JSON object representing an Order
-* The image config's Label field has the label io.buildpacks.builder.metadata, set to a JSON object representing Builder Metadata
-* The image config's Label field has the label io.buildpacks.buildpack.layers, set to a JSON object representing the layers
+* The image config's Label field has the label io.buildpacks.buildpack.order, set to a JSON object representing an [Order](#order)
+* The image config's Label field has the label io.buildpacks.builder.metadata, set to a JSON object representing [Builder Metadata](#metadata)
+* The image config's Label field has the label io.buildpacks.buildpack.layers, set to a JSON object representing the [layers](#layers)
 
 #### Order
 The `io.buildpacks.buildpack.order` data should look like:
