@@ -89,7 +89,7 @@ A stack buildpack MAY define a set of mixins it provides in either of two ways:
 
 A stack buildpack MAY define a set of stack specific mixins in the `buildpack.toml` with the following schema:
 
-```toml
+```
 [[stacks]]
 id = "<stack id or *>"
 
