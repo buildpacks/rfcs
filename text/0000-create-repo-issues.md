@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Create Repo Issues
 - Start Date: 2020-08-06
-- Author(s): @dfreilich
+- Author(s): [@dfreilich][https://github.com/dfreilich]
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
