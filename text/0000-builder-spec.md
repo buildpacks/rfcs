@@ -14,10 +14,11 @@ A Builder is a critical tool in the CNB ecosystem, and yet, is largely [unspecif
 
 # Definitions
 [definitions]: #definitions
-* **[Builder][builder-docs]** &rarr; A **builder** is an image that bundles all the bits and information on how to build your apps, such as buildpacks and build-time image, as well as executes the buildpacks against your app source code.
+* **[Builder][builder-docs]** &rarr; A **builder** is an image that bundles all the bits and information on how to build your apps, such as buildpacks, an implementation of the lifecycle, and build-time environment that platforms may use when executing the lifecycle.
 * **[Buildpack][buildpacks-docs]** &rarr; A **buildpack** is a unit of work that inspects your app source code and formulates a plan to build and run your application.
 * **[Platform][platform-docs]** &rarr; A **platform** uses a lifecycle, buildpacks (packaged in a builder), and application source code to produce an OCI image.
 * **[Stack][stack-docs]** &rarr; A stack provides the buildpack lifecycle with build-time and run-time environments in the form of images.
+* **[Lifecycle][lifecycle-docs]** &rarr; The lifecycle orchestrates buildpack execution, then assembles the resulting artifacts into a final app image.
 
 # Motivation
 [motivation]: #motivation
@@ -35,7 +36,7 @@ However, at this point, builders are underspecified, and a rigorous technical sp
 A Builder consists of four items:
 * Buildpacks &rarr; A list of buildpack references, and an ordering of buildpacks
 * Lifecycle &rarr; A version of a lifecycle implementation
-* Stack’s build image &rarr; An environment used at build-time
+* Stack’s build image &rarr; An environment used at build-time (the metadata contains a reference to the run image required, and potentially a list of run-image mirrors)
 * Metadata, describing the builder (description, who it was created by, etc)
 
 Users of `pack` interact with builders in the following ways:
@@ -112,24 +113,39 @@ A builder is composed of at least the following directories/files:
 - /cnb/order.toml
 - /cnb/stack.toml
 - /layers
-- /platform/env/<env-files>
 - /workspace
 ```
 
+In addition, builders can build in environment variables by defining env-files in
+```
+- /platform/env/<env-files>
+```
+
 ### Env Vars/Labels
-A builder's environment is the build-time environment of the stack, and as such, requires all of the [build image specifications][build-image-specs], including:
-* The image config's User field is set to a non-root user with a writable home directory.
-* The image config's Env field has the environment variable CNB_STACK_ID set to the stack ID.
-* The image config's Env field has the environment variable CNB_USER_ID set to the user †UID/‡SID of the user specified in the User field.
-* The image config's Env field has the environment variable CNB_GROUP_ID set to the primary group †GID/‡SID of the user specified in the User field.
-* The image config's Label field has the label io.buildpacks.stack.id set to the stack ID. (string)
-* The image config's Label field has the label io.buildpacks.stack.mixins set to a JSON array containing mixin names for each mixin applied to the image.
+A builder's environment is the build-time environment of the stack, and as such, requires all of the [build image specifications][build-image-specs].
 
 Additionally, a builder requires:
 * The image config's WorkingDir should be set
 * The image config's Label field has the label io.buildpacks.buildpack.order, set to a JSON object representing an [Order](#order)
 * The image config's Label field has the label io.buildpacks.builder.metadata, set to a JSON object representing [Builder Metadata](#metadata)
 * The image config's Label field has the label io.buildpacks.buildpack.layers, set to a JSON object representing the [layers](#layers)
+
+If the builder contains an optional [lifecycle descriptor file][lifecycle-descriptor-rfc], it also requires:
+* The image config's Label field has the label io.buildpacks.lifecycle.version, set to the lifecycle version
+* The image config's Label field has the label io.buildpacks.lifecycle.apis, set to:
+```json
+{
+  "buildpack": {
+    "deprecated": ["<list of versions>"],
+    "supported": ["<list of versions>"]
+  },
+  "platform": {
+    "deprecated": ["<list of versions>"],
+    "supported": ["<list of versions>"]
+  }
+}
+```
+
 
 #### Order
 The `io.buildpacks.buildpack.order` data should look like:
@@ -262,9 +278,11 @@ This RFC should lead to changes in the distribution spec.
 [distribution-spec]: https://github.com/buildpacks/spec/blob/main/distribution.md
 [build-image-specs]: https://github.com/buildpacks/spec/blob/main/platform.md#build-image
 [spec-issue-builder]: https://github.com/buildpacks/spec/issues/101
+[lifecycle-docs]: https://buildpacks.io/docs/concepts/components/lifecycle/
 [stack-docs]: https://buildpacks.io/docs/concepts/components/stack/
 [builder-docs]: https://buildpacks.io/docs/concepts/components/builder/
 [buildpacks-docs]: https://buildpacks.io/docs/concepts/components/buildpack/
 [platform-docs]: https://buildpacks.io/docs/concepts/components/platform/
 [distrib-spec-rfc]: https://github.com/buildpacks/rfcs/blob/main/text/0007-spec-distribution.md
 [service-binding-rfc]: https://github.com/buildpacks/rfcs/blob/main/text/0012-service-binding.md
+[lifecycle-descriptor-rfc]: https://github.com/buildpacks/rfcs/blob/main/text/0049-multi-api-lifecycle-descriptor.md#lifecycle-descriptor
