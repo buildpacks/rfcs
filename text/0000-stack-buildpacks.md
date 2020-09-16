@@ -56,7 +56,13 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 * Is distributed with the stack run and/or build image
 * May not create layers using the `<layers>` directory
 
-The stackpack interface is identical to the buildpack interface (i.e. the same `bin/detect` and `bin/build` scripts are required). However, some of the context it is run in is different from regular buildpacks.
+The stackpack interface is similar to the buildpack interface
+* the same `bin/detect` and `bin/build` scripts are required
+* the `bin/detect` will have read-only access to the app
+* The positional arguments for `bin/detect` and `bin/build` are the same (though the values may be different)
+* The environment variables and inputs for `bin/detect` and `bin/build` are the same (though the values may be different)
+
+However, some of the context it is run in is different from regular buildpacks.
 
 For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase excluding the a few specific directories and files.
 
@@ -291,6 +297,12 @@ mixin = true
 name = "jq"
 ```
 
+## Future work
+
+In the future, we plan to enhance the stack buildpack interface with the following:
+
+* A `CNB_STACK_TYPE` env var that a stack buildpack can use to behave differently on each part of the stack
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -311,12 +323,10 @@ name = "jq"
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Do we want (or need) a `CNB_STACK_TYPE` env var so that a stack buildpack can behave differently on each part of the stack?
-- Should the stackpack's detect have read-only access to the app?
-    - This would likely be driven by a stackpack that does not provide mixins, but instead dynamically contributes to the build plan based on the contents of the app source code. I don't know if we have a use case for this, but I can imaging a buildpack that reads environment variables as input to some function.
-- Should stackpacks be able to define per-stack mixins?
-    - We could support a top-level `mixins` array, and allow refinements under `[[stacks]] mixins`. If we do this, we need to distinguish between provided and required mixins (at least under `[[stacks]]`).
-    - If userspace buildpacks can require mixins from `bin/detect`, the stackpack could use this mechanism to require per-stack mixins.
+- what happens if a mixin that already exist on the image is required, how does the lifecycle know?
+- do we need/want distinct upgrade vs rebase operations (where one re-runs stackpacks, and one does not)?
+- what about the bill of materials?
+- what metadata do we need to do an upgrade, which what are the schema of the labels?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
