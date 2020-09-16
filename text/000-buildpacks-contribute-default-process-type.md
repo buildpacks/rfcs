@@ -20,31 +20,44 @@ launcher - a [lifecycle binary](https://github.com/buildpacks/spec/blob/main/pla
 
 process type - a CNB construct representing a process that can be started by the launcher. A process type has the following properties as described [here](https://github.com/buildpacks/spec/blob/main/buildpack.md#launchtoml-toml): type (string), command (string), arguments (array of string), direct (boolean). Buildpacks declare process types during the `build` phase by writing entries into `<layers>/launch.toml`.
 
-default process type - describes the process that will be started by the launcher when the app image is run. It can be overriden by overriding the image entrypoint. Example: an image with default process type of web would have an entrypoint of `/cnb/process/web` which is a symlink that points to `/cnb/lifecycle/launcher`. The launcher uses argv0 to determine which process to start.
+default process type - describes the process type that will be started by the launcher when the app image is run. It can be overriden by overriding the image entrypoint. Example: an image with default process type of web would have an entrypoint of `/cnb/process/web` which is a symlink that points to `/cnb/lifecycle/launcher`. The launcher uses argv0 to determine which process to start.
 
 # Motivation
 [motivation]: #motivation
 
 - Why should we do this? Easier and more intuitive for end users.
 - What use cases does it support? Apps with one or more process type(s).
-- What is the expected outcome? The experience should be seamless for end users. Buildpacks should produce a sensible default process type without the user having to know or care that process types exist. The user should still be able to override the default process type by passing `-process-type` to the lifecycle.
+- What is the expected outcome? The experience should be seamless for end users. Buildpacks should produce a sensible default process type without the user having to know or care that process types exist. The platform should still be able to override the default process type by passing `-process-type` to the lifecycle.
 
 # What it is
 [what-it-is]: #what-it-is
+
+#### Happy path
 
 Example: single process app with a buildpack declaring a `default-process` of type `web` -> the app image will have a default process type of `web`
 
 Example: single process app with no buildpacks declaring a `default-process` -> the app image will have no default process. Users must specify the process to run at runtime. (This assumes https://github.com/buildpacks/spec/pull/137)
 
+Example: single process app with no buildpacks declaring a `default-process` and the user passes `-process-type worker` -> the app image will have a default process type of `worker`
+
 Example: multi-process app with a buildpack declaring a `default-process` of type `web` -> the app image will have a default process type of `web`
 
-Example: multi-process app with an earlier buildpack declaring a `default-process` of type `web` and a later buildpack declaring a process of type `worker` -> the app image will have a default process type of `worker`
+#### Overrides
 
-Example: multi-process app with an earlier buildpack declaring a `default-process` of type `web` and a later buildpack declaring a process of type `worker` and `override = false` -> the app image will have a default process type of `web`
+Example: multi-process app with an earlier buildpack declaring a `default-process` of type `web` and a later buildpack declaring a `default-process` of type `worker` -> the app image will have a default process type of `worker`
+
+Example: multi-process app with an earlier buildpack declaring a `default-process` of type `web` and a later buildpack declaring a `default-process` of type `worker` and `override = false` -> the app image will have a default process type of `web`
 
 Example: multi-process app with a buildpack declaring a `default-process` of type `web` and the user passes `-process-type worker` -> the app image will have a default process type of `worker`
 
-Example: single process app with no buildpacks declaring a `default-process` and the user passes `-process-type worker` -> the app image will have a default process type of `worker`
+#### Overrides - edge cases
+[edge-cases]: #edge-cases
+
+Example: multi-process app with a buildpack declaring a process type `worker` and a `default-process` of type `web` -> the app image will have no default process. Users must specify the process to run at runtime.
+
+Example: multi-process app with an earlier buildpack declaring a `default-process` of type `web` and a later buildpack redefining what `web` means -> the app image will have no default process. Users must specify the process to run at runtime.
+
+Example: multi-process app with an earlier buildpack declaring a `default-process` of type `web` and a later buildpack redefining what `web` means while also declaring `web` as the `default-process` -> the app image will have a default process type of `web`
 
 - Define the target persona: buildpack author, buildpack user.
 
@@ -80,6 +93,8 @@ command = bundle exec ruby worker.rb
 Currently, during the `export` phase, the `<layers>/launch.toml` from each buildpack are aggregated to produce a combined processes list "such that process types from later buildpacks override identical process types from earlier buildpacks" ([spec](https://github.com/buildpacks/spec/blob/main/buildpack.md#process-3)).
 
 In line with the existing philosophy, this RFC proposes that the `default-process` type from later buildpacks should override any `default-process` types from earlier buildpacks UNLESS `override = false`. The user-provided `-process-type` flag would override any default process type contributed by buildpacks.
+
+Buildpacks should not be able to declare a process type as the default if it is not a process type that they define (see [edge cases](#edge-cases)). Additionally, if a buildpack attempts to redefine a process type that is declared as the default by an earlier buildpack, the default designation should be cleared unless explicitly set by the later buildpack.
 
 # Drawbacks
 [drawbacks]: #drawbacks
