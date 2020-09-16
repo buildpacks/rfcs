@@ -128,7 +128,18 @@ During the build phase, the lifecycle will extract and apply each snapshot tarba
 
 Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. The image containing the stack buildpacks and the builder binary must be provided to the rebaser operation as an argument. A platform may choose to provide the same stack buildpacks and builder binary used during the build that create the launch-image being rebased, or it may provide updates versions (which may increase the risk of something failing in the rebase process).
 
+A platform may choose to store the stack buildpacks and builder binary in any of the following images:
+* A companion image of the launch-image
+* A builder image that is available when rebasing
+* The launch-image itself (store the stack buildpacks and builder binary alongside the application itself)
+
 Then, the rebase operation can be performed as normal, while including the stackpack layers as part of the stack. This will be made possible by including the stackpack in the run-image, but because the stackpack detect phase is not run, the operation does not need access to the application source.
+
+## Extending the Run Image
+
+We will introduce a new phase to the lifecycle to support extending the run-image with stack buildpacks. The _extend_ phase will be responsible for running stack buildpacks on the run-image, and creating layers that will be applied to the launch-image.
+
+
 
 ## Example: Apt Buildpack
 
@@ -475,7 +486,7 @@ Usage:
 #### `rebaser`
 Usage:
 ```
-/cnb/lifecycle/exporter \
+/cnb/lifecycle/rebaser \
   [-build-image <build-image>] \
   ...
 ```
@@ -485,3 +496,48 @@ Usage:
 |---------------------|-----------------------|------------------------|---------------------------------------
 | ...                 |                       |                        |
 | `<stack-group>`     | `CNB_BUILD_IMAGE`     | derived from `<image>` | Image containing `builder` and stack buildpacks
+
+
+#### `extender`
+Usage:
+```
+/cnb/lifecycle/extender \
+  [-stack-buildpacks <stack-buildpacks>] \
+  [-stack-group <stack-group>] \
+  [-layers <layers>] \
+  [-log-level <log-level>] \
+  [-plan <plan>] \
+  [-platform <platform>]
+```
+
+##### Inputs
+| Input          | Env                   | Default Value     | Description
+|----------------|-----------------------|-------------------|----------------------
+| `<layers>`     | `CNB_LAYERS_DIR`      | `/layers`         | Path to layers directory
+| `<log-level>`  | `CNB_LOG_LEVEL`       | `info`            | Log Level
+| `<plan>`       | `CNB_PLAN_PATH`       | `./plan.toml`     | Path to resolved build plan (see [`plan.toml`](#plantoml-toml))
+| `<platform>`   | `CNB_PLATFORM_DIR`    | `/platform`       | Path to platform directory
+| `<stack-buildpacks>`  | `CNB_STACK_BUILDPACKS_DIR`  | `/cnb/stack/buildpacks` | Path to stack buildpacks directory (see [Buildpacks Directory Layout]
+| `<stack-group>`       | `CNB_STACK_GROUP_PATH`      | `./stack-group.toml`    | Path to output group definition(#buildpacks-directory-layout))
+
+##### Outputs
+| Output                                     | Description
+|--------------------------------------------|----------------------------------------------
+| [exit status]                              | (see Exit Code table below for values)
+| `/dev/stdout`                              | Logs (info)
+| `/dev/stderr`                              | Logs (warnings, errors)
+| `<layers>/<buildpack ID>.tgz`              | Layer snapshot (see [Buildpack Interface Specfication](buildpack.md)
+| `<layers>/config/metadata.toml`            | Build metadata (see [`metadata.toml`](#metadatatoml-toml))
+
+| Exit Code | Result|
+|-----------|-------|
+| `0`       | Success
+| `11`      | Platform API incompatibility error
+| `12`      | Buildpack API incompatibility error
+| `1-10`, `13-99` | Generic lifecycle errors
+| `401`     | Buildpack build error
+| `400`, `402-499`|  Build-specific lifecycle errors
+
+- The lifecycle SHALL execute all stack buildpacks in the order defined in `<stack-group>` according to the process outlined in the [Buildpack Interface Specification](buildpack.md).
+- The lifecycle SHALL add all invoked stack buildpacks to`<layers>/config/metadata.toml`.
+- The lifecycle SHALL aggregate all `processes` and BOM entries returned by buildpacks in `<layers>/config/metadata.toml`.
