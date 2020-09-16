@@ -53,7 +53,9 @@ This issue is a request to implement the proposed solution as detailed in #build
 - This feature should be documented as part of standard pack CLI commands documentation.
 ```
 
-After creating the issue, the maintainer should add the label `issues-created`  to the PR. Upon seeing that issue created, a member of the core team will merge it in, adding references to the RFC metadata, like so:
+After creating the issue, the maintainers of the sub-team should add the label `issues-created/<sub-team>`  to the PR. Alternatively, if a PR isn't relevant to a specific sub-team (for instance, a lifecycle PR that isn't relevant to the platform sub-team), the maintainers of that sub-team should just trivially add the `issues-created/<sub-team>` label upon concluding FCP.
+
+Upon seeing those labels attached to the PR, a member of the core team will merge it in, adding references to the RFC metadata, like so:
 ```
 # Meta
 [meta]: #meta
