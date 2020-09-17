@@ -10,7 +10,9 @@
 
 # Summary
 [summary]: #summary
-A Builder is a critical tool in the CNB ecosystem, and yet, is largely [unspecified][spec-issue-builder]. This RFC proposes that we should add a rigorous description of builders in the [distribution specification][distribution-spec], and clarify the usage/existence of builders in the [platform specification][platform-spec]
+A Builder is a critical tool in the CNB ecosystem, and yet, is largely [unspecified][spec-issue-builder]. This RFC proposes that we should add a rigorous versioned specification of builders as an extension to the core specification, and clarify the existence of builders in the:
+* [distribution specification][distribution-spec]
+* [platform specification][platform-spec]
 
 # Definitions
 [definitions]: #definitions
@@ -19,6 +21,7 @@ A Builder is a critical tool in the CNB ecosystem, and yet, is largely [unspecif
 * **[Platform][platform-docs]** &rarr; A **platform** uses a lifecycle, buildpacks (packaged in a builder), and application source code to produce an OCI image.
 * **[Stack][stack-docs]** &rarr; A stack provides the buildpack lifecycle with build-time and run-time environments in the form of images.
 * **[Lifecycle][lifecycle-docs]** &rarr; The lifecycle orchestrates buildpack execution, then assembles the resulting artifacts into a final app image.
+* **Extension Spec** &rarr; An extension spec defines soemthing that is an optional add-on for Cloud Native Buildpacks systems, but not required to be considered `spec` compliant.
 
 # Motivation
 [motivation]: #motivation
@@ -49,7 +52,7 @@ Users of `pack` interact with builders in the following ways:
 * `list-trusted-builders` &rarr; List Trusted Builders
 * `create-builder` &rarr; Create builder image
 
-Users of `pack-orb`, `tekton`, and `kpack` interact with Builders through supplying a builder to use for building applications.
+Users of `pack-orb` and `tekton` interact with Builders through supplying a builder to use for building applications. Users of `kpack` can create and use builders.
 
 A sample inspected builder (using `pack inspect-builder`), looks like:
 ```bash
@@ -116,7 +119,7 @@ A builder is composed of at least the following directories/files:
 - /workspace
 ```
 
-In addition, builders can build in environment variables by defining env-files in
+In addition, builders MAY build in environment variables by defining env-files in
 ```
 - /platform/env/<env-files>
 ```
@@ -132,20 +135,7 @@ Additionally, a builder requires:
 
 If the builder contains an optional [lifecycle descriptor file][lifecycle-descriptor-rfc], it also requires:
 * The image config's Label field has the label io.buildpacks.lifecycle.version, set to the lifecycle version
-* The image config's Label field has the label io.buildpacks.lifecycle.apis, set to:
-```json
-{
-  "buildpack": {
-    "deprecated": ["<list of versions>"],
-    "supported": ["<list of versions>"]
-  },
-  "platform": {
-    "deprecated": ["<list of versions>"],
-    "supported": ["<list of versions>"]
-  }
-}
-```
-
+* The image config's Label field has the label io.buildpacks.lifecycle.apis, set to a JSON object representing the [lifecycle apis](#lifecycle-apis)
 
 #### Order
 The `io.buildpacks.buildpack.order` data should look like:
@@ -169,6 +159,7 @@ The `io.buildpacks.builder.metadata` data should look like:
 ```json
 {
   "description": "<Some description>",
+  "api": "<some builder API version | default 0.1 >",
   "stack": {
     "runImage": {
       "image": "<some/run-image>",
@@ -239,15 +230,30 @@ The `io.buildpacks.buildpack.layers` data should look like:
 }
 ```
 
+### Lifecycle APIs
+The `io.buildpacks.lifecycle.apis` data should look like:
+```json
+{
+  "buildpack": {
+    "deprecated": ["<list of versions>"],
+    "supported": ["<list of versions>"]
+  },
+  "platform": {
+    "deprecated": ["<list of versions>"],
+    "supported": ["<list of versions>"]
+  }
+}
+```
+
 ## Spec Additions
-### [Buildpack specification][buildpacks-spec]
-Builders don't seem immediately relevant to the buildpack specification; as such, I wouldn't add mention of builders here. 
+### Extension Spec
+Builders should be specified as an extension spec, and explicitly versioned, using a `<major>.<minor>` pattern, and following the [established spec api release pattern][spec-api-branches]. The version should be persisted in the `io.buildpacks.builder.metadata`, as a top-level `api` field. Versioning will start with 0.1.
 
 ### [Platform specification][platform-spec]
-We can add a note, clarifying that in platforms that use builders, the Stack's build image is the core of the builder. 
+We should add a cross-reference to the extension builder specification, noting that a builder is a fully-functioning Stack build image.
 
 ### [Distribution specification][distribution-spec]
-We should have a rigorous definition of the builder here, with a description of all the files and metadata necessary and allowed. 
+We should add a cross-reference to the extension builder specification, noting that a builder is also a valid artifact, and is specified in the extension spec.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -255,8 +261,7 @@ N/A
 
 # Alternatives
 [alternatives]: #alternatives
-Specifying the builder is something that, to my mind, should definitely done; the question is, how. We could have an entirely separate `extension spec`, defining builders and how they should be used. 
- > Given that one of the key uses of builders is in distributing buildpacks, I thought it should at least be discussed in some depth in the [distribution spec][distribution-spec], and given that the buildpackage makeup is described there, I thought it appropriate to just describe it fully in the distribution spec. 
+* It could be purely in the distribution spec &rarr; There was push-back to this idea, given that platforms don't need to use builders, but can just call the lifecycle directly.
 
 # Prior Art
 [prior-art]: #prior-art
@@ -286,3 +291,4 @@ This RFC should lead to changes in the distribution spec.
 [distrib-spec-rfc]: https://github.com/buildpacks/rfcs/blob/main/text/0007-spec-distribution.md
 [service-binding-rfc]: https://github.com/buildpacks/rfcs/blob/main/text/0012-service-binding.md
 [lifecycle-descriptor-rfc]: https://github.com/buildpacks/rfcs/blob/main/text/0049-multi-api-lifecycle-descriptor.md#lifecycle-descriptor
+[spec-api-branches]: https://github.com/buildpacks/rfcs/blob/main/text/0027-spec-api-branches.md
