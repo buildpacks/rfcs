@@ -145,8 +145,6 @@ Then, the rebase operation can be performed as normal, while including the stack
 
 We will introduce a new phase to the lifecycle to support extending the run-image with stack buildpacks. The _extend_ phase will be responsible for running stack buildpacks on the run-image, and creating layers that will be applied to the launch-image.
 
-
-
 ## Example: Apt Buildpack
 
 (**note**: this is only an example. A real Apt Buildpack would probably be more robust).
@@ -302,6 +300,7 @@ name = "jq"
 In the future, we plan to enhance the stack buildpack interface with the following:
 
 * A `CNB_STACK_TYPE` env var that a stack buildpack can use to behave differently on each part of the stack
+* Support for `creator`. Because of the new extend phase, it is not possible to easily run the entire buildpack process with a single binary.
 
 # Drawbacks
 [drawbacks]: #drawbacks
