@@ -336,9 +336,9 @@ In the future, we plan to enhance the stack buildpack interface with the followi
 
 - what happens if a mixin that already exist on the image is required, how does the lifecycle know?
 - what about the bill of materials?
-- what metadata do we need to do an rebase; what are the schema of the labels?
+- what metadata do we need to do a rebase; what are the schema of the labels?
 - how do we prevent problems on rebase if the mixins provided by the stack change?
-- While the rebase process may get it's stackpacks from any image passed to it, do we need to support official ways of producing well-formed run-builders?
+- while the rebase process may get its stackpacks from any image passed to it, do we need to support official ways of producing well-formed run-builders?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
