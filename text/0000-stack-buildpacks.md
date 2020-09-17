@@ -86,7 +86,9 @@ The stackpack's snapshot layer may be enriched by writing a `launch.toml` file. 
 
 For example, a stack buildpack may choose to exclude `/var/cache` from the final run image, but may want to mark it as _cached_ to have it restored during build-time and rebase.
 
-## Providing Mixins
+## Mixins
+
+### Providing Mixins
 
 A stack buildpack MAY define a set of mixins it provides in either of two ways:
 
@@ -104,12 +106,13 @@ any = <boolean (default=false)>
 mixins = [ "mixin name" ]
 ```
 
-Additionally, mixins MAY be dyncamically provided in the build plan:
+Additionally, mixins MAY be dynamically provided in the build plan:
 
 ```
 [[provides]]
 name = "<mixin name>"
-mixin = <boolean (default=false, requires privileged=true in buildpack.toml if true)>
+any = <boolean (default=false)>
+mixin = <boolean (default=false)>
 ```
 
 A userspace buildpack MAY require mixins in the build plan
@@ -121,6 +124,15 @@ mixin = <boolean (default=false)>
 ```
 
 A userspace buildpack MAY NOT provide mixins in the build plan.
+
+### Resolving Mixins
+
+After the detect phase, the lifecycle will merge the list of provided mixins from the following sources:
+* `stack.toml`
+* `buildpack.toml` of any stack buildpacks
+* The build plan (any `[[provides]]` tables with `mixin = true`)
+
+If any required mixins from the Build Plan (any `[[required]]` tables with `mixin = true`) are not provided, then the build will fail. Otherwise the build will continue.
 
 ## Caching and Restoring
 
