@@ -262,6 +262,7 @@ N/A
 # Alternatives
 [alternatives]: #alternatives
 * It could be purely in the distribution spec &rarr; There was push-back to this idea, given that platforms don't need to use builders, but can just call the lifecycle directly.
+* Versioning could be done through setting a custom OCI mediaType &rarr; That may make the images impossible to manipulate through the docker cli, which would be a big issue.
 
 # Prior Art
 [prior-art]: #prior-art
