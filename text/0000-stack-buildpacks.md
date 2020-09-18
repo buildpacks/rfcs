@@ -168,11 +168,11 @@ A buildpack that can install an arbitrary list of mixins would have a `buildpack
 id = "example/apt"
 privileged = true
 
-[buildpack.mixins]
-any = true
-
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
+
+[stacks.provides]
+any = true
 ```
 
 Its `bin/detect` would have the following contents:
