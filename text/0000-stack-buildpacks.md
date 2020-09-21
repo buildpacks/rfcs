@@ -125,6 +125,10 @@ mixin = <boolean (default=false)>
 
 A userspace buildpack MAY NOT provide mixins in the build plan.
 
+### Requiring Mixins
+
+Stack buildpacks MUST NOT require any entries in the build plan (neither mixins nor non-mixins). This ensures that we do not need to re-run the detect phase.
+
 ### Resolving Mixins
 
 After the detect phase, the lifecycle will merge the list of provided mixins from the following sources:
@@ -133,6 +137,20 @@ After the detect phase, the lifecycle will merge the list of provided mixins fro
 * The build plan (any `[[provides]]` tables with `mixin = true`)
 
 If any required mixins from the Build Plan (any `[[required]]` tables with `mixin = true`) are not provided, then the build will fail. Otherwise the build will continue.
+
+During the build phase, the lifecycle will create a build plan containing only the entries required during that stage (build or run).
+* If a mixin is required for "run" stage only, it will not appear in the build plan entries during build
+* If a mixin is required for "build" stage only, it will not appear in the build plan entries during extend
+
+The entries of the build plan during the build and extend phases will have a new `mixin` key. For example:
+
+```
+[[entries]]
+name = "libpq"
+mixin = true
+```
+
+A Stack Buildpack that needs to install mixins must select them from the build plan.
 
 ## Caching and Restoring
 
@@ -434,6 +452,17 @@ name = "<dependency name>"
 mixin = <boolean (default=false)>
 
 [or.requires.metadata]
+# buildpack-specific data
+```
+
+### Buildpack Plan (TOML)
+
+```toml
+[[entries]]
+name = "<dependency name>"
+mixin = <boolean (default=false)>
+
+[entries.metadata]
 # buildpack-specific data
 ```
 
