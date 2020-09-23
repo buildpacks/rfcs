@@ -27,7 +27,7 @@ We have two repositories that are not owned by a specific sub-team.
 # What it is
 [what-it-is]: #what-it-is
 
-The Distribution team is responsible for maintaining tools and services that support the distribution and discovery of buildpacks. It own the following repos:
+The Distribution team is responsible for maintaining tools and services that support the distribution and discovery of buildpacks. It owns the following repos:
 
 * [Buildpack Registry Index](https://github.com/buildpacks/registry-index)
 * [Buildpack Registry Namespace Owners](https://github.com/buildpacks/registry-namespaces)
