@@ -33,11 +33,11 @@ We define the asset package. Which is a reproducible OCI image. Each layer in th
 
 Asset Package Layers Layout:
 ```
-<layer1> ┳━ /cnb/assets/<java11-asset-sha256>.tgz
-         ┗━ /cnb/assets/<java13-asset-sha256>.tar
+<layer1> ┳━ /cnb/assets/<java11-asset-sha256>
+         ┗━ /cnb/assets/<java13-asset-sha256>
 
 ...
-<layern> ━━ /cnb/assets/<java15-asset-sha256>.zip
+<layern> ━━ /cnb/assets/<java15-asset-sha256>
 ```
 
 Asset packages will have a `io.buildpacks.asset.layers` Label. This label's contents will be a `json` object mapping each layer to metadata describing the assets it provides.
@@ -194,9 +194,9 @@ When performing a build. The platform should apply asset layer changesets to the
 ```
 cnb
  └── assets
-     ├── <java11-asset-sha256>.tgz
-     ├── <java13-asset-sha256>.tar
-     └── <java15-asset-sha256>.zip
+     ├── <java11-asset-sha256>
+     ├── <java13-asset-sha256>
+     └── <java15-asset-sha256>
 ```
 
 Buildpacks should then be able to quickly check for available assets using a `sha256` of the asset they wish to use in tandem with the `CNB_ASSETS` environment variable.
