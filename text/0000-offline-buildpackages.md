@@ -164,7 +164,7 @@ When asset packages are added to a build/builder we need to verify the following
 When creating a builder with asset packages:
   - Asset package layers should be the final k layers in the builder. These should be ordered by `diff-ID`.
   - If any asset layer is a superset of another, only the superset layer is included in the builder.
-  - builders inherit a `io.buildpacks.buildpack.assets` Label containing entries for every asset layer included in the builder.
+  - builders contain a `io.buildpacks.buildpack.assets` label with an `<layer1-diffID>` entry for every asset layer included in the builder.
 
 ### Adding Asset Package references to a buildpackage
 
