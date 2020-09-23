@@ -138,6 +138,8 @@ After the detect phase, the lifecycle will merge the list of provided mixins fro
 
 If any required mixins from the Build Plan (any `[[required]]` tables with `mixin = true`) are not provided, then the build will fail. Otherwise the build will continue.
 
+If a stack buildpack provides a mixin that is not required, the stack buildpack MAY pass detection. This is in contrast to a userspace buildpack providing a dependency that is not required, which fails detection. If a mixin is required for a [single stage only](https://github.com/buildpacks/rfcs/pull/109) with the `build:` or `run:` prefix, a stack buildpack may provide it for both stages without failing detection. However, it will not be included in the Buildpack Build Plan during the stage where it is not required.
+
 During the build phase, the lifecycle will create a build plan containing only the entries required during that stage (build or run).
 * If a mixin is required for "run" stage only, it will not appear in the build plan entries during build
 * If a mixin is required for "build" stage only, it will not appear in the build plan entries during extend
