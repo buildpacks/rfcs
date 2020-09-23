@@ -25,22 +25,22 @@ A Builder is a critical tool in the CNB ecosystem, and yet, is largely [unspecif
 
 # Motivation
 [motivation]: #motivation
-Builders are a vital part of the CNB ecosystem as it currently stands; they are used to distribute the lifecycle and buildpacks to every platform, including:
+Builders are a vital part of the CNB ecosystem as it currently stands; they are used to distribute the lifecycle and buildpacks to many platforms, including:
 * pack
 * Tekton
 * pack-orb
 * kpack
 etc.
 
-However, at this point, builders are underspecified, and a rigorous technical specification would fill a needed hole in the current documentation.
+However, at this point, builders are unspecified, and a rigorous technical specification would guarantee a stable API for platforms to develop against.
 
 # What it is
 [what-it-is]: #what-it-is
 A Builder consists of four items:
 * Buildpacks &rarr; A list of buildpack references, and an ordering of buildpacks
 * Lifecycle &rarr; A version of a lifecycle implementation
-* Stack’s build image &rarr; An environment used at build-time (the metadata contains a reference to the run image required, and potentially a list of run-image mirrors)
-* Metadata, describing the builder (description, who it was created by, etc)
+* Stack’s build image &rarr; An environment used at build-time
+* Metadata, describing the builder (description, who it was created by, etc) and the stack run images (potentially a list of run-image mirrors as well)
 
 Users of `pack` interact with builders in the following ways:
 * `pack build` &rarr; requires a builder to construct an image
@@ -116,6 +116,7 @@ A builder is composed of at least the following directories/files:
 - /cnb/order.toml
 - /cnb/stack.toml
 - /layers
+- /platform
 - /workspace
 ```
 
@@ -129,13 +130,14 @@ A builder's environment is the build-time environment of the stack, and as such,
 
 Additionally, a builder requires:
 * The image config's WorkingDir should be set
-* The image config's Label field has the label io.buildpacks.buildpack.order, set to a JSON object representing an [Order](#order)
-* The image config's Label field has the label io.buildpacks.builder.metadata, set to a JSON object representing [Builder Metadata](#metadata)
-* The image config's Label field has the label io.buildpacks.buildpack.layers, set to a JSON object representing the [layers](#layers)
+* The image config's Labels field has the label io.buildpacks.builder.api, set to a string (defaulting to `0.1`)
+* The image config's Labels field has the label io.buildpacks.builder.metadata, set to a JSON object representing [Builder Metadata](#metadata)
+* The image config's Labels field has the label io.buildpacks.buildpack.order, set to a JSON object representing an [Order](#order)
+* The image config's Labels field has the label io.buildpacks.buildpack.layers, set to a JSON object representing the [buildpack layers](#layers)
 
 If the builder contains an optional [lifecycle descriptor file][lifecycle-descriptor-rfc], it also requires:
-* The image config's Label field has the label io.buildpacks.lifecycle.version, set to the lifecycle version
-* The image config's Label field has the label io.buildpacks.lifecycle.apis, set to a JSON object representing the [lifecycle apis](#lifecycle-apis)
+* The image config's Labels field has the label io.buildpacks.lifecycle.version, set to the lifecycle version
+* The image config's Labels field has the label io.buildpacks.lifecycle.apis, set to a JSON object representing the [lifecycle apis](#lifecycle-apis)
 
 #### Order
 The `io.buildpacks.buildpack.order` data should look like:
@@ -159,7 +161,6 @@ The `io.buildpacks.builder.metadata` data should look like:
 ```json
 {
   "description": "<Some description>",
-  "api": "<some builder API version | default 0.1 >",
   "stack": {
     "runImage": {
       "image": "<some/run-image>",
@@ -175,17 +176,6 @@ The `io.buildpacks.builder.metadata` data should look like:
 	  "homepage": "http://geocities.com/top-bp"
 	}
   ],
-  "lifecycle": {
-    "version": "<version of lifecycle in builder>",
-    "apis":  {
-        "buildpack": {
-          "deprecated": ["0.1"],
-          "supported": ["1.2", "1.3"]},
-        "platform": {
-          "deprecated": [],
-          "supported": ["2.3", "2.4"]}
-    }
-  },
   "createdBy": {
     "name": "<creator of builder>", 
     "version": "<builder version>"
@@ -257,7 +247,7 @@ We should add a cross-reference to the extension builder specification, noting t
 
 # Drawbacks
 [drawbacks]: #drawbacks
-N/A
+Development Speed &rarr; By specifying the builder spec, it will require more ceremony to make changes, like one to builder metadata
 
 # Alternatives
 [alternatives]: #alternatives
@@ -276,7 +266,7 @@ Some similar PRs that led to the development of specifications are:
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
-This RFC should lead to changes in the distribution spec.
+This RFC should lead to a new extension spec, and small changes to the distribution and platform spec.
 
 [//]: <> (Links)
 [buildpacks-spec]: https://github.com/buildpacks/spec/blob/main/buildpack.md
