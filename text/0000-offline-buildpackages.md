@@ -13,50 +13,30 @@
 
 This change allows buildpacks to access vendored assets during builds to enable offline builds and asset reuse.
 
-To do so we introduce the Asset Package, a distribution artifact that provides vendored assets for buildpacks, and platform mechanisms to provide vendored assets to buildpacks during the `build` and `detect`.
+To do so we introduce the Asset Package, a distribution artifact that provides vendored assets for buildpacks, and platform mechanisms to provide vendored assets to buildpacks during `build` and `detect`.
 
 # Motivation
 [motivation]: #motivation
 
 - Simplify artifacts needed to achieve offline builds.
-- Enable registry de-deplication of buildpack assets
+- Enable registry deduplication of buildpack assets
+- Separate buildpacks from vendored assets.
 
 # What it is
 [what-it-is]: #what-it-is
 
-### Define the target persona:
-Buildpack user, Platform operator, Buildpack author
+We define the Asset Package. Which is a reproducible OCI image. Each layer in this image contains one or more `asset` files that a buildpack may want to contribute during a build. Each of these `asset` files will be made available at `/cnb/assets/<asset-sha256>.extension` in the build container.
 
-### Explaining the feature largely in terms of examples.
-
-Lets walk through an example `pack build` using Asset Package, and the platform changes proposed below.
-
-This is as simple as specifying any Asset Packages to be used in a build.
-
-`pack build --buildpack some-buildpack -asset asset-package`
-
-The `asset-package` will provide a set of asset files all rooted at `/cnb/assets/` to which buildpacks may use.
-
-As with the `--buildpack` flag, multiple `--asset` flags may be passed. These flags may reference an image, local archive filepath, or URL.
-
-# How it Works
-[how-it-works]: #how-it-works
-
-### Asset Package Definition.
-
-An Asset Package is a collection of layers each of which provide one or more assets. These layers are in lexicographic order by `diffID`. The distribution of assets into layers is an implementation detail left to the platform.
-
+Asset Package Layers Layout.
 ```
-<layer1> ┳━ /cnb/deps/<java11-asset-sha256>/java11
-         ┃                                  ┗ (archive contents)
-         ┗━ /cnb/deps/<java13-asset-sha256>/java13.tgz
+<layer1> ┳━ /cnb/assets/<java11-asset-sha256>.tgz
+         ┗━ /cnb/assets/<java13-asset-sha256>.tar
 
 ...
-<layern> ━━ /cnb/deps/<java15-asset-sha256>/java15.tgz
+<layern> ━━ /cnb/assets/<java15-asset-sha256>.zip
 ```
 
-Asset Packages will have a `io.buildpacks.buildpack.assets` Label. This label's contents will be a `json` object mapping each layer to metadata describing the assets it provides.
-#### Example
+Asset Packages will have a `io.buildpacks.asset.layers` Label. This label's contents will be a `json` object mapping each layer to metadata describing the assets it provides.
 
 ``` json
 {
@@ -72,7 +52,6 @@ Asset Packages will have a `io.buildpacks.buildpack.assets` Label. This label's 
     },
     {
       "sha256": "<java13-asset-sha256>",
-      "uri": "/local/path/to/java13.tgz",
       "additionalPaths": [],
       "metadata": {
         "name": "java13"
@@ -83,7 +62,7 @@ Asset Packages will have a `io.buildpacks.buildpack.assets` Label. This label's 
   "<layern-diffID>": [
     {
       "sha256": "<java15-asset-sha256>",
-      "uri": "/local/path/to/java15.tgz",
+      "uri": "/local/path/to/java15.zip",
       "additionalPaths": [],
       "metadata": {}
     }
@@ -91,103 +70,115 @@ Asset Packages will have a `io.buildpacks.buildpack.assets` Label. This label's 
 }
 ```
 
-### Creating Asset Packages.
+We also add the `io.builpacks.buildpackage.assets` label to buildpackages. This will let buildpackages reference a set of Asset Packages, and allow the platform to make decisions about pulling in sset packages before a build.
 
-Asset Image creation will be handled by a new pack command, `pack package-assets --config <packag.toml> <asset-image-name>`.
 
-The `package-assets` command will use a `package.toml` configuration file and produce an `<asset-image-name>` OCI image artifact. `<asset-image-name>` may be a tarball, or a locally available image.
+The `io.buildpacks.buildpackage.assets` label will contain a `json` object with an `assets` field listing possible asset packages.
 
-To specify assets included in an Asset Package the `package.toml` file must contain an `assets` array. Each entry in this array may provide:
+``` json
+{
+    "assets": [
+        "gcr.io/buildpacks/java-asset-package",
+        "https://buildpacks.io/asset-package-fallback/java.tgz",
+        "urn:cnb:registry:buildpacks/java-asset-package"
+    ]
+}
+```
+
+Builders that contain asset packages will have an `io.buildpacks.asset.layers` with the same format as the asset package label.
+
+
+# How it Works
+[how-it-works]: #how-it-works
+
+## Asset package creation
+
+Asset Image creation will be handled by the platform. E.g. `pack package-asset <asset-image-name> --config <package.toml>`
+
+It requires a `package.toml` file. This file has two methods to specify assets to be included in an asset package.
+1) an entry in the `[[asset]]` array
+2) including all assets from another asset package via an entry in the `[[include]]` array.
+
+Each entry in the `[[asset]]` array may have the following fields defined:
   - `uri` (string), (required) local path or URL
   - `sha256` (string), (required) Must be unique. Used for validation and as an endpoint where an  asset will be provided.
-  - `additional-paths` (array)
+  - `additional-paths` (array), endpoints where the platform should provide symlinks to the asset. This is provided for cases where `assets` require absolute paths.
   - `metadata` (arbitrary mapping)
-  - `unzip` (bool), unzip asset when building
 
-The `additional-paths` array lists endpoints where the platform should provide symlinks to the asset. This is provided for cases where `assets` require absolute paths.
+Each entry in the `[[include]]` array must have one of the following fields defined
+  - `image` (string), image name of an asset, domain name resolution is left to the platform.
+  - `uri` (string), uri to an asset image archive.
 
-The `unzip` field is used to indicate that an asset should be unarchived then added to the Asset Package. In order to use this flag an asset is  must be in one of the following archive formats:
-  - `tar.gz`
-  - (TBD)
-
-
-The `asset` array that would produce the asset image [above](#Example) would be:
 
 #### Example
 ``` toml
 [[asset]]
-url = "https://path/to/java11.tgz"
+uri = "https://path/to/java11.tgz"
 sha256 = "some-sha256"
 additional-paths = ["other/endpoint1", "other/endpoint2"]
-unzip = true
 
 [[asset]]
-url = "/local/path/to/java13.tgz"
+uri = "/local/path/to/java13.tgz"
 sha256 = "another-sha256"
   [metadata]
     name = "java13"
- 
-[[asset]]
-#...
 
 [[asset]]
-url = "/local/path/to/java15.tgz"
+uri = "/local/path/to/java15.tgz"
 sha256 = "another-nother-sha256"
-```
 
-The `pack create-asset` command will
-  - download asset if needed, then validate a sha256 of the artifact
-  - if unzip is true, unzip the asset
-  - transform asset to a [image layer filesystem changeset](https://github.com/opencontainers/image-spec/blob/master/layer.md) where the asset is provided at `/cnb/assets/<artifact-sha256>`
-  - add all `additional-paths` symlinks to the resultant image, in the case of path collisions fail
-  - order all assets layers [diffID](`https://github.com/opencontainers/image-spec/blob/e562b04403929d582d449ae5386ff79dd7961a11/config.md#layer-diffid`)
-  - add `io.buildpacks.buildpack.assets` label metadata to image
+[[include]]
+image = "gcr.io/ruby/asset-package:0.0.1"
+
+[[include]]
+uri = "https://nodejs/asset-package.tar"
+
+```
 
 ## Using Asset Packages
 
-##### Asset packages as arguments
+Asset packages can be added to a build by three mechanisms
+1) specify an asset package(s) using the `--asset` flag(s).
+2) buildpackages on a builder may have asset package references in the `io.buildpacks.buildpackage.assets` label. If these assets are not in the builder the platform may pull to make them available for a build.
+3) Assets package layers can be added to a builder image during its creation. These assets will then be available to all builds that use this builder.
 
-Asset Images may be passed as arguments to the platform may be in any of the following formats:
-- OCI image archives
-- locally available images
-- remote images
 
-Decisions between local or remote images are left to the platform.
-
-##### `lifecycle` changes
-The platform should now pass an additional `CNB_ASSETS` environment variable to the `build` phase binary. `CNB_ASSETS` will by default be `/cnb/assets`. This provides a standard variable buildpacks may use when searching for assets.
-
-### `create-builder` behavior
-
-The `pack create-builder` command will accept Asset Packages passed with `asset` flags. In the final builder image all layers from Asset Packages will be the final `k` layers in the image. These `k` layers will be ordered by `diffID`.
-
-The `create-builder` command will perform the following steps on the specified Asset Packages:
-  - Validate any two assets do not provide the same `assets` in both 'zipped' and 'unzipped' form.
+When asset packages are added to a build/builder we need to verify the following:
   - Validate any two assets do not have a common element in `additionalPaths` that is linked to different `/cnb/assets/<asset-sha256>` locations.
+  - If two assets provide the same `/cnb/assets/<asset-sha256>` these two files must have identical contents.
+
+When creating a builder with asset packages:
+  - Asset package layers should be the final k layers in the builder. These should be ordered by `diff-ID`.
   - If any asset layer is a superset of another, only the superset layer is included in the builder.
   - builders inherit a `io.buildpacks.buildpack.assets` Label containing entries for every asset layer included in the builder.
 
-### `build` behavior
 
-To enable buildpacks to access vendored assets during a `pack build`, a platform should:
-  - accept `assets` flags
-  - perform the same asset validation that occurs in `create-builder`
-  - add asset layers from both the builder and flags to the build environment image
+### `lifecycle` changes
+The platform should now provide a `CNB_ASSETS` environment variable to the `build` and `detect phases`. This provides a standard variable buildpacks may use when looking up assets.
 
-This allows buildpacks to access vendored assets below `/cnb/assets` during the `build` phase.
+### Platform container setup
+
+When performing a build. The platform should apply asset layer changesets to the build container. As a result there will be a filesystem subtree rooted at `/cnb/assets/` E.g.
+
+```
+cnb
+ └── assets
+     ├── <java11-asset-sha256>.tgz
+     ├── <java13-asset-sha256>.tar
+     └── <java15-asset-sha256>.zip
+```
+
+Buildpacks should then be able to quickly check for available assets using a `sha256` of the asset they wish to use in tandem with the `CNB_ASSETS` environment variable.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 Why should we *not* do this?
 
-- Increases complexity for users. This adds another artifact to manage.
+- Increases complexity for users/buildpack authors. This adds another artifact to manage and new code paths for checking for vendored assets.
+
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-
-- Other formats to support when 'unzipping'
-- How should we resolve `zipped` vs `unzipped` assets, providing both a better strategy?
-- is `diffID` a good key to order layers by?
-- should we be able to add asset packages to buildpackages?
-
+- `io.buildpacks.asset.layers` json keys and `asset.toml` keys are not identically named.
+- Creation time of asset images: `1980-01-01T00:00:01Z` does this date have another names
