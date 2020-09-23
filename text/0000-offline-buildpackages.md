@@ -13,7 +13,7 @@
 
 This change allows buildpacks to access vendored assets during builds to enable offline builds and asset reuse.
 
-To do so we introduce the Asset Package, a distribution artifact that provides vendored assets for buildpacks, and platform mechanisms to provide vendored assets to buildpacks during `build` and `detect`.
+To do so we introduce the asset package, a distribution artifact that provides vendored assets for buildpacks, and platform mechanisms to provide vendored assets to buildpacks during `build` and `detect`.
 
 # Motivation
 [motivation]: #motivation
@@ -25,9 +25,13 @@ To do so we introduce the Asset Package, a distribution artifact that provides v
 # What it is
 [what-it-is]: #what-it-is
 
-We define the Asset Package. Which is a reproducible OCI image. Each layer in this image contains one or more `asset` files that a buildpack may want to contribute during a build. Each of these `asset` files will be made available at `/cnb/assets/<asset-sha256>.extension` in the build container.
+### Define the target persona:
+Buildpack user, Platform operator, Buildpack author
 
-Asset Package Layers Layout.
+### Explaining the feature largely in terms of examples.
+We define the asset package. Which is a reproducible OCI image. Each layer in this image contains one or more `asset` files that a buildpack may want to contribute during a build. Each of these `asset` files will be made available at `/cnb/assets/<asset-sha256>.extension` in the build container.
+
+Asset Package Layers Layout:
 ```
 <layer1> ┳━ /cnb/assets/<java11-asset-sha256>.tgz
          ┗━ /cnb/assets/<java13-asset-sha256>.tar
@@ -36,7 +40,7 @@ Asset Package Layers Layout.
 <layern> ━━ /cnb/assets/<java15-asset-sha256>.zip
 ```
 
-Asset Packages will have a `io.buildpacks.asset.layers` Label. This label's contents will be a `json` object mapping each layer to metadata describing the assets it provides.
+Asset packages will have a `io.buildpacks.asset.layers` Label. This label's contents will be a `json` object mapping each layer to metadata describing the assets it provides.
 
 ``` json
 {
@@ -70,11 +74,13 @@ Asset Packages will have a `io.buildpacks.asset.layers` Label. This label's cont
 }
 ```
 
-We also add the `io.builpacks.buildpackage.assets` label to buildpackages. This will let buildpackages reference a set of Asset Packages, and allow the platform to make decisions about pulling in sset packages before a build.
+We also add the `io.builpacks.buildpackage.assets` label to buildpackages. This will let buildpackages reference a set of asset packages, and allow the platform to make decisions about pulling in asset packages before a build.
 
 
 The `io.buildpacks.buildpackage.assets` label will contain a `json` object with an `assets` field listing possible asset packages.
 
+##### Buildpackage Label
+[buildpackage-label]: #buildpackage-label
 ``` json
 {
     "assets": [
@@ -93,9 +99,9 @@ Builders that contain asset packages will have an `io.buildpacks.asset.layers` w
 
 ## Asset package creation
 
-Asset Image creation will be handled by the platform. E.g. `pack package-asset <asset-image-name> --config <package.toml>`
+Asset Image creation will be handled by the platform. E.g. `pack package-asset <asset-image-name> --config <asset.toml>`
 
-It requires a `package.toml` file. This file has two methods to specify assets to be included in an asset package.
+It requires a `asset.toml` file. This file has two methods to specify assets to be included in an asset package.
 1) an entry in the `[[asset]]` array
 2) including all assets from another asset package via an entry in the `[[include]]` array.
 
@@ -135,6 +141,14 @@ uri = "https://nodejs/asset-package.tar"
 
 ```
 
+Asset package creation should:
+  - Transform all assets a image layer filesystem changeset where the asset is provided at `/cnb/assets/<artifact-sha256>`.
+  - Add all additional-paths symlinks to the resultant image, in the case of path collisions fail.
+  - Order all assets layers diffID.
+  - Add `io.buildpacks.asset.layers` label metadata to the asset image.
+  - set the created time in image config to a constant value.
+  - set the modification time of all files in newly created layers to a constant value
+
 ## Using Asset Packages
 
 Asset packages can be added to a build by three mechanisms
@@ -145,13 +159,30 @@ Asset packages can be added to a build by three mechanisms
 
 When asset packages are added to a build/builder we need to verify the following:
   - Validate any two assets do not have a common element in `additionalPaths` that is linked to different `/cnb/assets/<asset-sha256>` locations.
-  - If two assets provide the same `/cnb/assets/<asset-sha256>` these two files must have identical contents.
+  - If two assets provide the same `/cnb/assets/<asset-sha256>` these two files must have identical contents. Decisions about rewriting these layers to optimize space are left to the platform.
 
 When creating a builder with asset packages:
   - Asset package layers should be the final k layers in the builder. These should be ordered by `diff-ID`.
   - If any asset layer is a superset of another, only the superset layer is included in the builder.
   - builders inherit a `io.buildpacks.buildpack.assets` Label containing entries for every asset layer included in the builder.
 
+### Adding Asset Package references to a buildpackage
+
+A new `[[asset-package]]` array is added to the `package.toml` file used to create buildpackages. The values in this array are used to fill out the `io.buildpacks.buildpackage.assets` label.
+
+The following entries in a `package.toml` file would produce the Buildpackage labels in the above example.
+```toml
+[[asset-package]]
+image = "gcr.io/buildpacks/java-asset-package"
+
+[[asset-package]]
+uri = "https://buildpacks.io/asset-package-fallback/java.tgz"
+
+[[asset-package]]
+image = "urn:cnb:registry:buildpacks/java-asset-package"
+```
+
+The platform may verify each `[[asset-package]]` exists when creating a buildpackage.
 
 ### `lifecycle` changes
 The platform should now provide a `CNB_ASSETS` environment variable to the `build` and `detect phases`. This provides a standard variable buildpacks may use when looking up assets.
@@ -182,3 +213,8 @@ Why should we *not* do this?
 [unresolved-questions]: #unresolved-questions
 - `io.buildpacks.asset.layers` json keys and `asset.toml` keys are not identically named.
 - Creation time of asset images: `1980-01-01T00:00:01Z` does this date have another names
+
+
+
+
+
