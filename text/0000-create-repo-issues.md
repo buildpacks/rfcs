@@ -37,7 +37,7 @@ This defines a process for sub-team maintainers to open issues on the relevant r
 
 # How it Works
 [how-it-works]: #how-it-works
-When a PR has been accepted (after FCP has concluded), the sub-team maintainers make issues (tagging the RFC PR) in the relevant buildpack repos, and labels the PR `issues-created`. At that point, the RFC PR may be merged in, with references to the CNB issues added to the RFC [metadata](https://github.com/buildpacks/rfcs/blob/main/text/0044-pack-publish-buildpack.md#meta).
+When a PR has been accepted (after FCP has concluded), the sub-team maintainers make issues (tagging the RFC PR) in the relevant buildpack repos, and labels the PR `issues-created/<sub-team>` for their respective sub-team. Once all sub-team `issues-created/<sub-team>` labels are set, the RFC PR may be merged in, with references to the CNB issues added to the RFC [metadata](https://github.com/buildpacks/rfcs/blob/main/0000-template.md#meta).
 
 Given an RFC PR #002, which discusses a change relevant to the `pack CLI` to add in a `pack my-bags` command. After discussion in Working Group meetings and votes from the Core Team, the RFC is placed in FCP for 7 days. At the end of those, the platform maintainers should open an issue (issue #005) in the `pack CLI`, which tags the RFC PR. For example,
 
