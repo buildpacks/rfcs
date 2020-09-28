@@ -49,7 +49,7 @@ the API version must be of the format: `<major>.<minor>-<alphanumeric>`, i.e. `1
 Since experimental versions are defined with a different format, they will NOT automatically get upgraded to a `supported` release when the experimental API has finalized.
 
 ## Lifecycle Labels
-This will extend the builder or lifecycle image with the above descriptor file will extend the label `io.buildpacks.lifecycle.apis` with the value:
+This will extend the the `io.buildpacks.lifecycle.apis` label on the builder or lifecycle image with the values contained in the above descriptor file. For example:
 ```json
 {
   "buildpack": {
