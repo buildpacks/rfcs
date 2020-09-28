@@ -22,7 +22,6 @@ experimental - a new API mode that is marked as experimental. Unlike supported a
 [motivation]: #motivation
 
 In order to have a smooth transition to 1.0 of the spec, there needs to be a way for the project to test out these ideas in the wild and gather feedback. Even beyond 1.0, this desire still stands for testing out concepts in an organized fashion where the feedback can be provided. This feedback will help us improve the design before we finalize it. The quality of feedback we get from users about their real life usage of experimental APIs will help us avoid problems we may miss when approving RFCs.
-/AP
 # What it is
 [what-it-is]: #what-it-is
 
