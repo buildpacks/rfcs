@@ -102,6 +102,9 @@ The Experimental API version format could instead follow the same format as depr
 ### Unstable Features
 Similar to [RFC#91](https://github.com/buildpacks/rfcs/pull/91), instead of tying features to a specific release, features can be tied behind flags for testing. There's a potential this could be complicated to do if the features are coupled to other changes going on in the API/spec. The benefit is folks can try out individual features in a more explicit way.
 
+### Experimental Section in the API
+Instead of having Experimental APIs, parts of the API can be marked as "experimental". This will go out into an official API release, but using that part of the API will be experimental and suscetible to change in an upcoming release. This will require a bit more rigor, but will allow us to evolve the experimental sections overtime without as much pressure to "get it right" or "block a release". The downside is that the lifecycle will need to suppert these experimental features since they're part of the API. If the experimental API changes a lot, lifecycle will need to support these differences.
+
 # Prior Art
 [prior-art]: #prior-art
 
