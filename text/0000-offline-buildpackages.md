@@ -31,19 +31,19 @@ Buildpack user, Platform operator, Buildpack author
 ### Explaining the feature largely in terms of examples.
 
 ##### Asset Package Definition
-We define the asset package. Which is a reproducible OCI image. Each layer in this image contains one or more `asset` files a buildpack may contribute during a future build. Each of these `asset` files will be made available at `/cnb/assets/<asset-sha256>` in the build container.
+We define the asset package. Which is a reproducible OCI image. Each layer in this image contains one or more `asset` files a buildpack may contribute during a future build. Each of these `asset` files will be made available at `/cnb/assets/<asset-digest>` in the build container.
 
 Asset Package Layers Layout:
 ```
-<layer1> ┳━ /cnb/assets/<java11-asset-sha256>
-         ┗━ /cnb/assets/<java13-asset-sha256>
+<layer1> ┳━ /cnb/assets/<java11-asset-digest>
+         ┗━ /cnb/assets/<java13-asset-digest>
 
 ...
-<layern> ━━ /cnb/assets/<java15-asset-sha256>
+<layern> ━━ /cnb/assets/<java15-asset-digest>
 ```
 
 ##### Asset Image Labels
-Asset packages will have two labels. A simple `io.buildpacks.asset.metadata` label that contains ID and versioning information. 
+Asset packages will have two labels. A simple `io.buildpacks.asset.metadata` label that contains ID and versioning information.
 ``` json
 {
   "id": "asset-org/asset-name",
@@ -52,7 +52,7 @@ Asset packages will have two labels. A simple `io.buildpacks.asset.metadata` lab
 
 ```
 
-Asset packages will also have a `io.buildpacks.asset.layers` Label. This label's contents will be a `json` object mapping each layer to metadata describing the assets it provides. This metadata is for auditing purposes.
+Asset packages will also have a `io.buildpacks.asset.layers` Label. This label's contents will be a `json` object mapping each layer to metadata describing the assets it provides.
 
 ``` json
 {
@@ -84,11 +84,11 @@ Asset packages will also have a `io.buildpacks.asset.layers` Label. This label's
 
 To enable buildpackages to reference asset packages, we define a new buildpackage label,`io.buildpacks.buildpackage.assets`.
 
-The contents of this label will be a `json` object that contains a list of data describing an asset package. This will allow the platform to make decisions about pulling in asset packages before a build.
+The contents of this label will be a `json` with a list of data describing each asset package. This will allow the platform to make decisions about which assets to pull before a build.
 
 The format of this object will be as follows:
  
-A top level `assets` field listing possible asset packages. Each entry in the `assets` field will list the `name`, the asset image `sha256`, an alternative `id`, as well as `layers` field whos contents will be identical to the `io.buildpacks.asset.layers`  label on the associated asset package.
+A top level `assets` field listing possible asset packages. Each entry in the `assets` field will list the `name`, the asset image `digest`, an alternative `id`, as well as `layersDiffIDs` field with contents identical to the `io.buildpacks.asset.layers`  label on the associated asset package.
 
 ##### Buildpackage Label
 [buildpackage-label]: #buildpackage-label
@@ -100,19 +100,39 @@ A top level `assets` field listing possible asset packages. Each entry in the `a
       "digest": "sha256:<some-java-asset-package-sha256>",
       "id": "buildpacks-assets/java-assets",
       "version": "1.1.1",
-      "layerDiffIDs": [
-        "<layer1-diffID>",
-        "<layer2-diffID>"
-      ]
+      "layerDiffIDs": {
+        "<layer1-diffID>": [
+          {
+            "digest": "sha256:java11-asset-sha256",
+            "uri": "https://path/to/java11.tgz",
+            "metadata": {}
+          },
+          {
+            "digest": "sha256:<java13-asset-sha256>",
+            "metadata": {
+              "name": "java13"
+            }
+          }
+        ],
+        "<layer2-diffID>": [
+          "..."
+        ]
+      }
     },
     {
       "uri": "https://buildpacks.io/asset-package-fallback/java.tgz",
       "digest": "sha256:<some-asset-package-fallback-sha256>",
       "id": "buildpack-assets/asset-package-fallback",
       "version": "1.2.3",
-      "layerDiffIDs": [
-        "<other-layer1-diffID>"
-      ]
+      "layerDiffIDs": {
+        "<other-layer1-diffID>": [
+          {
+            "digest": "sha256:<java15-asset-sha256>",
+            "uri": "/local/path/to/java15.zip",
+            "metadata": {}
+          }
+        ]
+      }
     }
   ]
 }
@@ -137,10 +157,27 @@ Builders will additionally need to retain the asset references for each buildpac
           "digest": "sha256:<some-java-asset-package-sha256>",
           "id": "buildpacks-assets/java-assets",
           "version": "1.1.1",
-          "layerDiffIDs": [
-            "<layer1-diffID>",
-            "<layer2-diffID>"
-          ]
+          "layerDiffIDs": {
+            "<layer1-diffID>": [
+              {
+                "digest": "sha256:java11-asset-sha256",
+                "uri": "https://path/to/java11.tgz",
+                "metadata": {}
+              },
+              {
+                "digest": "sha256:<java13-asset-sha256>",
+                "metadata": {
+                  "name": "java13"
+                }
+              }
+            ],
+            "<layer2-diffID>": [
+              "..."
+            ]
+          }
+        },
+        {
+          "...": "..."
         }
       ]
     }
@@ -158,37 +195,42 @@ Builders will additionally need to retain the asset references for each buildpac
 
 Asset Image creation will be handled by the platform. E.g. `pack package-asset <asset-image-name> --config <asset.toml>`
 
-It requires a `asset.toml` file. This file contains ID and versioning info as well as has two methods to specify assets to be included in an asset package.
-1) an entry in the `[[asset-cache]]` array
-2) including all assets from another asset package via an entry in the `[[include]]` array.
+It requires a `asset.toml` file. This file contains three top level objects: the ID and versioning info as well as two methods to specify assets to be included in an asset package.
+1) ID and version information under a top level `[asset-package]` mapping
+2) An `[[assets]]` array, each entry specifies an individual asset to be included in the asset image
+3) An `[[include]]` array specifying other asset packages. All assets from asset packages in this array will be included in the resultant asset package.
 
-Each entry in the `[[asset-cache]]` array may have the following fields defined:
+The `[asset-package]` mapping must have the following fields defined:
+- `id` (string)
+- `version`(string)
+
+Each entry in the `[[assets]]` array may have the following fields defined:
   - `uri` (string), (required) local path or URL
-  - `digest` (string), (required) Must be unique. Must be of the form `<hash-algorithm>:<hash-value>` Used for validation and as an endpoint where an  asset will be provided.
+  - `digest` (string), (required) Must be unique. Must be of the form `<hashing-algorithm>:<hash-value>`. this is used for validation and as an endpoint where an  asset will be provided.
   - `metadata` (arbitrary mapping)
 
 Each entry in the `[[include]]` array must have one of the following fields defined
-  - `image` (string), image name of an asset, domain name resolution is left to the platform.
+  - `image` (string), image name of an asset, image name resolution is left to the platform.
   - `uri` (string), uri to an asset image archive.
 
 
 #### Example
 ``` toml
-[asset]
+[asset_package]
   id = "my-assets/java-asset"
   version = "1.2.3"
 
-[[asset-cache]]
+[[assets]]
 uri = "https://path/to/java11.tgz"
 digest = "sha256:some-sha256"
 
-[[asset-cache]]
+[[assets]]
 uri = "/local/path/to/java13.tgz"
 digest = "sha256:another-sha256"
   [metadata]
     name = "java13"
 
-[[asset-cache]]
+[[assets]]
 uri = "/local/path/to/java15.tgz"
 digest = "sha256:another-nother-sha256"
 
@@ -201,27 +243,27 @@ uri = "https://nodejs/asset-package.tar"
 ```
 
 Asset package creation should:
-  - Transform all assets to an image layer filesystem changeset where the asset is provided at `/cnb/assets/<artifact-sha256>`.
+  - Transform all assets to an image layer filesystem changeset where the asset is provided at `/cnb/assets/<artifact-digest>`.
   - Order all assets layers diffID.
   - Add the `io.buildpacks.asset.layers` and `io.buildpacks.asset.metadata` label metadata to the asset image.
   - set the created time in image config to a constant value.
-  - set the modification time of all non-asset files to a constant value
+  - set the modification time of all non-asset files to a constant value.
 
 ## Using Asset Packages
 
 Asset packages can be added to a build by three mechanisms
 1) specify an asset package(s) using the `--asset` flag(s).
-2) buildpackages on a builder may have asset package references in the `io.buildpacks.buildpack.layers` label. If these assets are not in the builder the platform may pull to make them available for a build.
+2) buildpackages on a builder may have asset package references in the `io.buildpacks.buildpack.layers` label that are not included in the builder. The platform may pull to make them available for a build.
 3) Assets package layers can be added to a builder image during its creation. These assets will then be available to all builds that use this builder.
 
 
 When asset packages are added to a build/builder we need to verify the following:
-  - If two assets provide the same `/cnb/assets/<asset-sha256>` these two files must have identical contents. Decisions about rewriting these layers to optimize space are left to the platform.
+  - If two assets provide the same `/cnb/assets/<asset-digest>` these two files must have identical contents. Decisions about rewriting these layers to optimize space are left to the platform.
 
 When creating a builder with asset packages:
   - Asset package layers should be the final k layers in the builder. These should be ordered by `diff-ID`.
   - If any asset layer is a superset of another, only the superset layer is included in the builder.
-  - builders hvae a `io.buildpacks.buildpack.assets` Label containing entries for every asset layer included in the builder.
+  - builders have a `io.buildpacks.buildpack.assets` Label containing entries for every asset layer included in the builder.
 
 ### Adding Asset Package references to a buildpackage
 
@@ -251,12 +293,12 @@ When performing a build. The platform should apply asset layer changesets to the
 ```
 cnb
  └── assets
-     ├── <java11-asset-sha256>
-     ├── <java13-asset-sha256>
-     └── <java15-asset-sha256>
+     ├── <java11-asset-digest>
+     ├── <java13-asset-digest>
+     └── <java15-asset-digest>
 ```
 
-Buildpacks should then be able to quickly check for available assets using a `sha256` of the asset they wish to use in tandem with the `CNB_ASSETS` environment variable.
+Buildpacks should then be able to quickly check for available assets using a `digest` of the asset they wish to use in tandem with the `CNB_ASSETS` environment variable.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -268,41 +310,3 @@ Why should we *not* do this?
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-- Rewriting layer operations. 
-    - Hitting a hard layer limit.
-    - Dependency duplication.
-
-#### Hard Layer limit:
-Given a meta-buildpackage with the following structure:
-```
-A
-├── B
-└── C
-```
-
-We will have associated Asset-Packages with the same structure
-```
-a
-├── b
-└── c
-```
-If buildpackage `B` is used in a build, then the platform needs to be able to determine if all assets require in `b` are on the builder. To do so we just compare 
-
-Say we are preforming a `pack build test-image --asset huge-asset`, and we go over the layer limit. Now we have to combine & re-write some number of layers to stay under this limit. Suddenly the `io.buildpacks.asset.layers` metadata is wrong about the `diffID` values of all combined layers.
-
-Possible solution:
-
-We extend the `io.buildpacks.asset.layers` label to also include a `child-of` field, which points to a newly written layer that will contain this asset.
-
-```
-{
-  "<layer1-diffID>": [
-    {
-      "digest": "sha256:java11-asset-sha256",
-      "uri": "https://path/to/java11.tgz",
-      "metadata": {}
-      "child-of": <parentLayer-diffID>
-    }
-  ]
-}
-```
