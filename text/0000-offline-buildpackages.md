@@ -206,7 +206,7 @@ The `[asset-package]` mapping must have the following fields defined:
 
 Each entry in the `[[assets]]` array may have the following fields defined:
   - `uri` (string), (required) local path or URL
-  - `digest` (string), (required) Must be unique. Must be of the form `<hashing-algorithm>:<hash-value>`. this is used for validation and as an endpoint where an  asset will be provided.
+  - `digest` (string), (required) Must be unique. Must be of the form `<algorithm>:<hash-value>`. this is used for validation and as an endpoint where an  asset will be provided.
   - `metadata` (arbitrary mapping)
 
 Each entry in the `[[include]]` array must have one of the following fields defined
