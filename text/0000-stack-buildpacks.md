@@ -57,7 +57,7 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 * May not create layers using the `<layers>` directory
 
 The stackpack interface is similar to the buildpack interface
-* the same `bin/detect` and `bin/build` scripts are required
+* The same `bin/detect` and `bin/build` scripts are required
 * The `bin/detect` will have read-only access to the app
 * The positional arguments for `bin/detect` and `bin/build` are the same (though the values may be different)
 * The environment variables and inputs for `bin/detect` and `bin/build` are the same (though the values may be different)
