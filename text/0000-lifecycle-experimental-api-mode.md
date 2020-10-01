@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Lifecycle Experimental API Mode
+- Name: Lifecycle Experimantal API Mode and Prelease APIs
 - Start Date: 2020-08-25
 - Author(s): @hone
 - RFC Pull Request: (leave blank)
@@ -22,48 +22,23 @@ experimental - a new API mode that is marked as experimental. Unlike supported a
 [motivation]: #motivation
 
 In order to have a smooth transition to 1.0 of the spec, there needs to be a way for the project to test out these ideas in the wild and gather feedback. Even beyond 1.0, this desire still stands for testing out concepts in an organized fashion where the feedback can be provided. This feedback will help us improve the design before we finalize it. The quality of feedback we get from users about their real life usage of experimental APIs will help us avoid problems we may miss when approving RFCs.
+
 # What it is
 [what-it-is]: #what-it-is
 
-`experimental` is a new API mode for testing out unreleased API / spec changes on their path to being finalized. An experimental API can not be `deprecated` or `supported` as defined in [RFC#49](https://github.com/buildpacks/rfcs/blob/main/text/0049-multi-api-lifecycle-descriptor.md).
+This proposes two changes to Lifecycle:
+* Prerelease API versions which is used for testing API / spec changes.
+* `experimental` is a new API mode for testing implementation of the API similar to the modes defined in [RFC#49](https://github.com/buildpacks/rfcs/blob/main/text/0049-multi-api-lifecycle-descriptor.md).
 
-## Lifecycle Descriptor
+## Prerelease API
 
-This RFC proposes the addition of the `experimental` key in `lifecycle.toml` following the proposed schema:
+A prerelease API is a non-finalized API but is in a testable state. The the API version must be of the format: `<major>.<minor>-<alphanumeric>`, i.e. `1.0-alpha1`. Though these aren't final, there will be a tagged and release version of the appropriate spec for it. This way users can see what is supported when it's used. In most cases, these will be cut from the corresponding branch in `buildpacks/spec`, i.e. Buildpack API `0.5-alpha1` would be cut from the `buildpack/0.5` branch.
 
-```
-[apis]
-[apis.buildpack]
-  experimental = ["0.6-rc1", "1.0-alpha1"]
-[apis.platform]
-  experimental = ["1.0-alpha1"]
+When Lifecycle supports a prerelease API, it can be treated like any other API version and be used in any mode: `experimental`, `supported`, `deprecated`.
 
-[lifecycle]
-  version = "0.10.0"
-```
-`experimental`:
-contains an array of experimental API versions
-the APIs will correspond to specs that may not be released and in branches that are still being worked on.
-the API version must be of the format: `<major>.<minor>-<alphanumeric>`, i.e. `1.0-alpha1`.
+## Experimental API Mode
 
-Since experimental versions are defined with a different format, they will NOT automatically get upgraded to a `supported` release when the experimental API has finalized.
-
-## Lifecycle Labels
-This will extend the the `io.buildpacks.lifecycle.apis` label on the builder or lifecycle image with the values contained in the above descriptor file. For example:
-```json
-{
-  "buildpack": {
-    "experimental": ["0.6-rc1", "1.0-alpha1"],
-  },
-  "platform": {
-    "experimental": ["1.0-alpha1"],
-  }
-}
-```
-
-## API Types
-### Experimental APIs
-API versions aren't limited to those defined in a spec release, but can refer to upcoming spec work happening in a branch.
+This is a new mode for testing implementation of a API. The API can be a full release or a prerelease API.
 
 New `CNB_PLATFORM_EXPERIMENTAL_MODE` and `CNB_BUILDPACK_EXPERIMENTAL` mode environment variables will control experimental mode with:
 allowed values: `warn`, `error`, `silent`
@@ -80,6 +55,46 @@ default value: `warn`
  - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=warn`, **Then** print a warning and continue
  - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=error`, **Then** fail
  - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=silent`, **Then** continue w/o warning
+
+## Lifecycle Descriptor
+
+This RFC proposes the addition of the `experimental` key in `lifecycle.toml` and support for prerelease API versions following the proposed schema:
+
+```
+[apis]
+[apis.buildpack]
+  experimental = ["0.6", "1.0-alpha1"]
+  supported = ["0.5", "0.7-alpha1"]
+  deprecated = ["0.4", "0.5-rc1"]
+[apis.platform]
+  experimental = ["1.0-alpha1"]
+  supported = ["0.6", "0.7-alpha1"]
+  deprecated = ["0.5", "0.6-rc1"]
+
+[lifecycle]
+  version = "0.10.0"
+```
+
+Walking through the Buildpack API side of the example above, the Buildpack API is testing out spec changes for `1.0` with `1.0-alpha1` and `0.7` with `0.7-alpha1`. Buildpack API `0.6` has finalized, but since it included some large features the implementation may under go some changes. Buildpack API `1.0-alpha1` is both experimental in the spec and implementation.
+
+Since experimental versions are defined with a different format, they will NOT automatically get upgraded to a `supported` release when the experimental API has finalized.
+
+### Lifecycle Labels
+This will extend the the `io.buildpacks.lifecycle.apis` label on the builder or lifecycle image with the values contained in the above descriptor file. For example:
+```json
+{
+  "buildpack": {
+    "experimental": ["0.6", "1.0-alpha"],
+    "supported": ["0.5", "0.7-alpha1"],
+    "deprecated": ["0.4", "0.5-rc1"]
+  },
+  "platform": {
+    "experimental": ["1.0-alpha1"],
+    "supported": ["0.6", "0.7-alpha1"],
+    "deprecated": ["0.5", "0.6-rc1"]
+  }
+}
+```
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -116,8 +131,8 @@ The Heroku API marks the status of every API endpoint with the [`stability' attr
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-How does an experimental version map to the branch?
-Is there a better word than "experimental"?
+- Is there a better word than "experimental"?
+- Is it a concern that a user setting a API version to "0.7" which in Lifecycle Version A is experimental but later on in Lifecycle Version B is supported? What do expect the changes coming from "implementation" that could affect users?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
