@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-This is proposal for a new type of buildpack that runs against a stack in order to extend it in ways that are only possible by running privileged commands.
+This is a proposal for a new type of buildpack that runs against a stack in order to extend it in ways that are only possible by running privileged commands.
 
 # Motivation
 [motivation]: #motivation
