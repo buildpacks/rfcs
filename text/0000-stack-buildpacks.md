@@ -24,7 +24,7 @@ However, many applications and buildpacks require modifications to the stack the
 [what-it-is]: #what-it-is
 
 - *root buildpack* - a new type of buildpack that runs as the root user
-- *stack buildpack* - a type of root buildpack that runs against the stack image(s) instead of an app. Stack buildpacks must not make changes to the build and run images that either violate stack [compatibility guarantees](https://github.com/buildpacks/spec/blob/main/platform.md#compatibility-guarantees) or violate the contract defined by that stack's author.
+- *stack buildpack* - (a.k.a. stackpack) a type of root buildpack that runs against the stack image(s) instead of an app. Stack buildpacks must not make changes to the build and run images that either violate stack [compatibility guarantees](https://github.com/buildpacks/spec/blob/main/platform.md#compatibility-guarantees) or violate the contract defined by that stack's author.
 - *userspace buildpack* - the traditional definition of a buildpack (i.e. does not run as root, and runs against an app)
 
 A new type of buildpack, called a Stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. Unlike userspace buildpacks, stack buildpack can modify any path on the filesystem. Userspace buildpack can only create/modify disjoint layers (either by adding a dir to `<layers>` or modifying an app slice), which makes possible features like individual layer reuse that is independent or ordering.
@@ -44,7 +44,7 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 # How it Works
 [how-it-works]: #how-it-works
 
- A stack buildpack (a.k.a. stackpack) is a special case of buildpack that has the following properties:
+ A stack buildpack is a special case of buildpack that has the following properties:
 
 * Is run as the `root` user
 * Configured with `privileged = true` in the `buildpack.toml`
