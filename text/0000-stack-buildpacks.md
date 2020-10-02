@@ -459,7 +459,7 @@ mixin = <boolean (default=false)>
 
 ### Buildpack Plan (TOML)
 
-```toml
+```
 [[entries]]
 name = "<dependency name>"
 mixin = <boolean (default=false)>
