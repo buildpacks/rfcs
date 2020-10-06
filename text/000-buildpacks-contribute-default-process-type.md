@@ -72,24 +72,24 @@ Currently, during the `build` phase, buildpacks may declare process types by wri
 
 This RFC proposes a new `default` key in `<layers>/launch.toml`:
 
-```toml
+```
 [[processes]]
 type = "<process type>"
 command = "<command to run>"
-default = <boolean (defaults to false)>
+default = <boolean (default=false)>
 ```
 
 Example:
 
 ```toml
 [[processes]]
-type = web
-command = bundle exec ruby app.rb
+type = "web"
+command = "bundle exec ruby app.rb"
 default = true
 
 [[processes]]
-type = worker
-command = bundle exec ruby worker.rb
+type = "worker"
+command = "bundle exec ruby worker.rb"
 ```
 
 Buildpacks may set `default = true` to indicate that the process type being defined should be the default process type for the app image. If not specified, no default designation will be assumed (to be consistent with buildpacks implementing earlier buildpack APIs).
