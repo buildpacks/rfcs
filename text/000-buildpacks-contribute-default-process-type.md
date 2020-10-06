@@ -34,30 +34,26 @@ default process type - describes the process type that will be started by the la
 
 #### Happy path
 
-Example: single process app with a buildpack declaring a process type of `web` with `[processes.default]` -> the app image will have a default process type of `web`
+Example: single process app with a buildpack declaring a process type of `web` with `default = true` -> the app image will have a default process type of `web`
 
-Example: single process app with no buildpacks declaring `[processes.default]` -> the app image will have no default process type. Users must specify the process to run at runtime. The lifecycle should print a warning. (This assumes https://github.com/buildpacks/spec/pull/137)
+Example: single process app with no buildpacks declaring `default = true` -> the app image will have no default process type. Users must specify the process to run at runtime. (This assumes https://github.com/buildpacks/spec/pull/137)
 
-Example: single process app with no buildpacks declaring `[processes.default]` and the user passes `-process-type worker` -> the app image will have a default process type of `worker`
+Example: single process app with no buildpacks declaring `default = true` and the user passes `-process-type worker` -> the app image will have a default process type of `worker`
 
-Example: multi-process app with a buildpack declaring a process type of `web` with `[processes.default]` and a later buildpack declaring a process type of `worker` (only) -> the app image will have a default process type of `web`
+Example: multi-process app with a buildpack declaring a process type of `web` with `default = true` and a later buildpack declaring a process type of `worker` (only) -> the app image will have a default process type of `web`
 
 #### Overrides
 
-Example: multi-process app with an earlier buildpack declaring a process type of `web` with `[processes.default]` and a later buildpack declaring a process type of `worker` with `[processes.default]` -> the app image will have a default process type of `worker`
+Example: multi-process app with an earlier buildpack declaring a process type of `web` with `default = true` and a later buildpack declaring a process type of `worker` with `default = true` -> the app image will have a default process type of `worker`
 
-Example: multi-process app with an earlier buildpack declaring a process type of `web` with `[processes.default]` and a later buildpack declaring a process type of `worker` with `[processes.default]` and under `[processes.default]` `override = false` -> the app image will have a default process type of `web`
-
-Example: multi-process app with a buildpack declaring a process type of `web` with `[processes.default]` and the user passes `-process-type worker` -> the app image will have a default process type of `worker`
+Example: multi-process app with a buildpack declaring a process type of `web` with `default = true` and the user passes `-process-type worker` -> the app image will have a default process type of `worker`
 
 #### Overrides - edge cases
 [edge-cases]: #edge-cases
 
-Example: multi-process app with an earlier buildpack declaring a process type of `web` with `[processes.default]` and a later buildpack redefining what `web` means WITHOUT `[processes.default]` -> the app image will have no default process. Users must specify the process to run at runtime.
+Example: multi-process app with an earlier buildpack declaring a process type of `web` with `default = true` and a later buildpack redefining what `web` means WITHOUT `default = true` -> the app image will have no default process. Users must specify the process to run at runtime. The lifecycle should print a warning.
 
-Example: multi-process app with an earlier buildpack declaring a process type of `web` with `[processes.default]` and a later buildpack redefining what `web` means WITH `[processes.default]` -> the app image will have a default process type of `web`, with the latest definition
-
-Example: multi-process app with an earlier buildpack declaring a process type of `web` with `[processes.default]` and a later buildpack redefining what `web` means with `override = false` -> the app image will have a default process type of `web` that is the earlier buildpack's definition.
+Example: multi-process app with an earlier buildpack declaring a process type of `web` with `default = true` and a later buildpack redefining what `web` means WITH `default = true` -> the app image will have a default process type of `web`, with the later buildpack's definition of web.
 
 - Define the target persona: buildpack author, buildpack user.
 
@@ -74,15 +70,13 @@ The changes from this RFC should require a bump to the buildpack API.
 
 Currently, during the `build` phase, buildpacks may declare process types by writing entries to `<layers>/launch.toml`. During the `export` phase, the `<layers>/launch.toml` from each buildpack are aggregated to produce a combined processes list "such that process types from later buildpacks override identical process types from earlier buildpacks" ([spec](https://github.com/buildpacks/spec/blob/main/buildpack.md#process-3)).
 
-This RFC proposes a new boolean `override` key and a new nested table `[processes.default]` in `<layers>/launch.toml`:
+This RFC proposes a new `default` key in `<layers>/launch.toml`:
 
 ```toml
 [[processes]]
 type = "<process type>"
 command = "<command to run>"
-override = <boolean (defaults to true)>
-  [processes.default]
-  override = <boolean (defaults to true)>
+default = <boolean (defaults to false)>
 ```
 
 Example:
@@ -91,22 +85,16 @@ Example:
 [[processes]]
 type = web
 command = bundle exec ruby app.rb
-  [processes.default]
-  override = true
+default = true
 
 [[processes]]
 type = worker
 command = bundle exec ruby worker.rb
-override = false
 ```
 
-Buildpacks may set the outer `override` to `false` that indicate that they do not wish to override identical process types from earlier buildpacks. If not specified, `override` is assumed to be `true` (to be consistent with buildpacks implementing earlier buildpack APIs).
+Buildpacks may set `default = true` to indicate that the process type being defined should be the default process type for the app image. If not specified, no default designation will be assumed (to be consistent with buildpacks implementing earlier buildpack APIs).
 
-Buildpacks may set `[processes.default]` to indicate that the process type being defined should be the default process type for the app image. If not specified, no default designation will be assumed (to be consistent with buildpacks implementing earlier buildpack APIs).
-
-Buildpacks may set the inner `override` to `false` to indicate that the process type being defined should be the default only if an earlier buildpack didn't already declare a default process type.
-
-If a buildpack attempts to define two processes with `[processes.default]` specified, the lifecycle will fail.
+If a buildpack attempts to define two processes with `default = true` specified, the lifecycle will fail.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -114,7 +102,6 @@ If a buildpack attempts to define two processes with `[processes.default]` speci
 Why should we *not* do this?
 
 - Buildpacks could stomp on each other, each trying to declare different default process types. This might be confusing.
-  - This is somewhat helped by the new iteration, with the inner and outer `override` keys.
 - Changing the way things work now could surprise some people.
 - One more thing for buildpack authors to know and care about.
 
@@ -139,11 +126,13 @@ The lifecycle if not provided any `-process-type` will set the default process t
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Should `pack` continue to pass `-process-type web`? It could inspect the buildpack API and only pass the flag if the API version is below 0.X. 
+- Should `pack` continue to pass `-process-type web`?
+  - It could inspect the buildpack API and only pass the flag if the API version is below 0.X.
+  - Builders could set an environment variable to communicate to `pack` that it doesn't need to pass -process-type to the lifecycle
 - What about buildpacks implementing different buildpack APIs that need to work together?
-  - Assuming default values of `override` and `[processes.default]` that are consistent with earlier buildpack API versions will make things easier to reason about.
+  - Assuming `default` if not specified means `default = false` is consistent with earlier buildpack API versions and will make things easier to reason about.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-Does this RFC entail any proposed changes to the core specifications or extensions? New elements in `<layers>/launch.toml`, logic to disambiguate multiple buildpacks specifying different default process types, consumption of the disambiguated default process type by the exporter.
+Does this RFC entail any proposed changes to the core specifications or extensions? New key in `<layers>/launch.toml`, logic to disambiguate multiple buildpacks specifying different default process types, consumption of the disambiguated default process type by the exporter.
