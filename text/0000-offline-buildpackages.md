@@ -57,7 +57,7 @@ Asset caches will also have a `io.buildpacks.asset.layers` Label. This label's c
 {
   "<layer1-diffID>": [
     {
-      "name": "java11"
+      "name": "java11",
       "digest": "sha256:java11-asset-sha256",
       "uri": "https://path/to/java11.tgz",
     },
