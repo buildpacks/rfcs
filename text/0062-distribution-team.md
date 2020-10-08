@@ -3,9 +3,9 @@
 - Name: Create a Distribution Team
 - Start Date: 2020-09-03
 - Author(s): [@jkutner](@jkutner)
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#113](https://github.com/buildpacks/rfcs/pull/113)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/community#35](https://github.com/buildpacks/community/issues/35)
 - Supersedes: N/A
 
 # Summary
