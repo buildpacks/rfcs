@@ -3,9 +3,9 @@
 - Name: Build/Run image configs MUST contain env.PATH
 - Start Date: 2020-08-21
 - Author(s): @aemengo @ameyer-pivotal @mvalliath @TisVictress @micahyoung
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#114](https://github.com/buildpacks/rfcs/pull/114)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/spec#150](https://github.com/buildpacks/spec/issues/150), [buildpacks/docs#223](https://github.com/buildpacks/docs/issues/223)
 - Supersedes: N/A
 
 # Summary
