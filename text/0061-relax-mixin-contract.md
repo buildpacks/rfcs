@@ -3,9 +3,9 @@
 - Name: Relax Mixin Contract
 - Start Date: 2020-08-12
 - Author(s): @sclevine
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#109](https://github.com/buildpacks/rfcs/pull/109)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: https://github.com/buildpacks/spec/issues/149, https://github.com/buildpacks/pack/issues/868, https://github.com/buildpacks/lifecycle/issues/425
 - Supersedes: N/A
 
 # Summary
