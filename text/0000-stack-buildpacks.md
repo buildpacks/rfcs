@@ -159,7 +159,7 @@ A Stack Buildpack that needs to install mixins must select them from the build p
 
 During the export phase, the lifecycle will store any snapshot layers created during the build phase in the cache.
 
-During the restore phase of the next build, the lifecycle will download the snapshot layer with the cache and store it as a tarball in the `<layers>` directory (i.e. it will not extract it). The `restorer` cannot extract the snapshot because it will not run with root privileges. In addition, the `restorer` may run in a different container than the build, which means changes made to the base image are not guaranteed to carry forward.
+During the restore phase of the next build, the lifecycle will download the snapshot layer with the cache and store it as a tarball in the `<layers>` directory (i.e. it will not extract it). The `restorer` cannot extract the snapshot because it will not run with root privileges. In addition, the `restorer` may run in a different container than the build, which means changes made to the base image are not guaranteed to carry forward. The `builder` will run with root privileges, but will drop privileges after executing stackpacks and before running userspace buildpacks.
 
 During the build phase, the lifecycle will extract and apply each snapshot tarball before running stack buildpacks, but after a snapshot-baseline has been captured. This ensures that all changes from the previous snapshot are preserved even if the stack buildpack does not make any additional changes.
 
