@@ -120,16 +120,13 @@ A builder is composed of at least the following directories/files:
 - /workspace
 ```
 
-In addition, builders MAY build in environment variables by defining env-files in
-```
-- /platform/env/<env-files>
-```
-
 ### Env Vars/Labels
 A builder's environment is the build-time environment of the stack, and as such, requires all of the [build image specifications][build-image-specs].
 
 Additionally, a builder requires:
 * The image config's WorkingDir should be set
+* The image config's Env field has the environment variable `CNB_APP_DIR` set to the application directory of the build environment
+* The image config's Env field has the environment variable `SERVICE_BINDING_ROOT` set to a directory
 * The image config's Labels field has the label io.buildpacks.builder.api, set to a string (defaulting to `0.1`)
 * The image config's Labels field has the label io.buildpacks.builder.metadata, set to a JSON object representing [Builder Metadata](#metadata)
 * The image config's Labels field has the label io.buildpacks.buildpack.order, set to a JSON object representing an [Order](#order)
