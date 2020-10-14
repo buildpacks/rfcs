@@ -222,7 +222,7 @@ cache = true
 EOF
 ```
 
-Based on the proposal in [App Mixins](https://github.com/buildpacks/rfcs/pull/110), the user's `project.toml` might include:
+Based on the proposal in [App Mixins](https://github.com/buildpacks/rfcs/pull/112), the user's `project.toml` might include:
 
 ```toml
 [build]
