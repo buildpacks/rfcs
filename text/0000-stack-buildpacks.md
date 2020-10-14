@@ -222,6 +222,15 @@ cache = true
 EOF
 ```
 
+Based on the proposal in [App Mixins](https://github.com/buildpacks/rfcs/pull/110), the user's `project.toml` might include:
+
+```toml
+[build]
+mixins = [ "libpq" ]
+```
+
+This would instruct the Apt Buildpack to install the libpq package.
+
 ## Example: CA Certificate Buildpack
 
 Support for custom CA Certificates can be accomplished with two buildpacks: a stackpack that can install the cert, and a normal buildpack that can provide a cert in the build plan.
