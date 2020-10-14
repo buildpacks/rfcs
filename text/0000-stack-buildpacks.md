@@ -18,7 +18,7 @@ This is a proposal for a new type of buildpack that runs against a stack in orde
 
 Normally, buildpacks do not run as root. This is an intentional design decision that ensures operations like `rebase` will work on day-2.
 
-However, many applications and buildpacks require modifications to the stack they run on, such as adding system packages or custom certificates. For this reason, we need a mechanism that buildpack authors and buildpack users and leverage to extend their stacks.
+However, many applications and buildpacks require modifications to the stack they run on, such as adding system packages or custom certificates. For this reason, we need a mechanism that buildpack authors and buildpack users can leverage to extend their stacks.
 
 # What it is
 [what-it-is]: #what-it-is
