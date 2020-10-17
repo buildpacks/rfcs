@@ -77,7 +77,7 @@ A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` 
     id = "<stackpack id>"
 ```
 
-A stackpack will only execute if it passes detection. When the stackpack is executed, its detect and build scripts use the same parameters as the regular buildpacks. But the arguments may differ. For example, the first positional argument to the `bin/build` (the `<layers>` directory) MUST NOT be a standard layers directory adhering to the [Buildpacks Build specification](https://github.com/buildpacks/spec/blob/main/buildpack.md#build).
+A stackpack will only execute if it passes detection. When the stackpack is executed, its detect and build scripts use the same parameters as the regular buildpacks.
 
 The stackpack's snapshot layer may be enriched by writing a `launch.toml` file. The `launch.toml` may define globs of files to be excluded from the image when it is _used_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered when the image is _used_. The term _used_ is defined as:
 
