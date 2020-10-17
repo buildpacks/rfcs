@@ -60,7 +60,7 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 The stackpack interface is similar to the buildpack interface
 * The same `bin/detect` and `bin/build` scripts are required
 * The `bin/detect` will have read-only access to the app
-* The positional arguments for `bin/detect` and `bin/build` are the same (though the values may be different)
+* The positional arguments for `bin/detect` and `bin/build` are the same
 * The environment variables and inputs for `bin/detect` and `bin/build` are the same (though the values may be different)
 
 However, some of the context it is run in is different from regular buildpacks.
