@@ -82,7 +82,7 @@ A stackpack will only execute if it passes detection. When the stackpack is exec
 The stackpack's snapshot layer may be enriched by writing a `launch.toml` file. The `launch.toml` may define globs of files to be excluded from the image when it is _used_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered when the image is _used_. The term _used_ is defined as:
 
 * *Used for build-time build*: A given path is excluded at normal buildpack build-time, and recovered the next time the build image is extended with the stackpack.
-* *Used for build-time run*: A given path is excluded from the final image, and recovered the next time the run image is extended with the stackpack (either rebase or rebuild).
+* *Used for build-time run*: A given path is excluded from the final image, and restored the next time the run image is extended with the stackpack (either rebase or rebuild).
 * *Used for rebase run*: A given path is excluded from the rebased image, and recovered the next time the run image is extended with the stackpack (either rebase or rebuild).
 
 For example, a stack buildpack may choose to exclude `/var/cache` from the final run image, but may want to mark it as _cached_ to have it restored during build-time and rebase.
