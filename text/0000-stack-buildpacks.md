@@ -50,7 +50,7 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 * Is run as the `root` user
 * Configured with `privileged = true` in the `buildpack.toml`
 * Can only create one layer
-* May include, in the created layer, modifications to any part of the filesystem, excluding `<layers>`, `<platform>`, and `<cnb>` directories
+* May include, in the created layer, modifications to any part of the filesystem, excluding `<app>`, `<layers>`, `<platform>`, and `<cnb>` directories
 * Does not have access to the application source code during the `build` phase
 * Is run before all regular buildpacks
 * Is run against both the build and run images
