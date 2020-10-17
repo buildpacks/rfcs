@@ -167,7 +167,7 @@ During the build and extend phases, the lifecycle will extract and apply snapsho
 
 Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. The image containing the stack buildpacks and the builder binary must be provided to the rebaser operation as an argument. A platform may choose to provide the same stack buildpacks and builder binary used during the build that create the launch-image being rebased, or it may provide updates versions (which may increase the risk of something failing in the rebase process).
 
-A platform may choose to store the stack buildpacks and builder binary in any of the following images:
+A platform may choose to store the stack buildpacks and extender binary in any of the following images:
 * A companion image of the launch-image
 * A builder image that is available when rebasing
 * The launch-image itself (store the stack buildpacks and builder binary alongside the application itself)
