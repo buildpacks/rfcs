@@ -202,6 +202,10 @@ Its `bin/detect` would have the following contents:
  ```bash
 #!/usr/bin/env bash
 
+[[provides]]
+any = true
+mixin = true
+
 exit 0
 ```
 
