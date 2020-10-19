@@ -543,14 +543,16 @@ Usage:
 ```
 /cnb/lifecycle/exporter \
   [-stack-group <stack-group>] \
+  [-stack-layers <stack-layers>] \
   ...
 ```
 
 ##### Inputs
-| Input               | Environment Variable  | Default Value       | Description
-|---------------------|-----------------------|---------------------|---------------------------------------
+| Input               | Environment Variable        | Default Value             | Description
+|---------------------|-----------------------------|---------------------------|---------------------------------------
 | ...                 |                             |                           |
 | `<stack-group>`     | `CNB_STACK_GROUP_PATH`      | `./stack-group.toml`      | Path to stack-group file (see [`group.toml`](#grouptoml-toml))
+| `<stack-layers>`    | `CNB_STACK_LAYERS_DIR`      | `/stack-layers`           | Path to stack layers directory from extend phase
 
 
 #### `rebaser`
