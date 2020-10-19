@@ -500,6 +500,7 @@ Usage:
 | ...                   |                             |                         |
 | `<stack-buildpacks>`  | `CNB_STACK_BUILDPACKS_DIR`  | `/cnb/stack/buildpacks` | Path to stack buildpacks directory (see [Buildpacks Directory Layout]
 | `<stack-group>`       | `CNB_STACK_GROUP_PATH`      | `./stack-group.toml`    | Path to output group definition(#buildpacks-directory-layout))
+| `<stack-order>`.      | `CNB_STACK_ORDER_PATH`.     | `/cnb/stack/order.toml`| Path to order definition (see order.toml)
 
 ##### Outputs
 | Output             | Description
