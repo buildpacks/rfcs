@@ -491,7 +491,8 @@ Usage:
 /cnb/lifecycle/detector \
   ...
   [-stack-buildpacks <stack-buildpacks>] \
-  [-stack-group <group>]
+  [-stack-group <group>] \
+  [-stack-order <order>]
 ```
 
 ##### Inputs
