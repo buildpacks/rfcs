@@ -51,7 +51,7 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 * Configured with `privileged = true` in the `buildpack.toml`
 * Can only create one layer
 * May include, in the created layer, modifications to any part of the filesystem, excluding `<app>`, `<layers>`, `<platform>`, and `<cnb>` directories
-* Does not have access to the application source code during the `build` phase
+* Must not access the application source code during the `build` phase
 * Is run before all regular buildpacks
 * Is run against both the build and run images
 * Is distributed with the stack run and/or build image
@@ -62,12 +62,13 @@ The stackpack interface is similar to the buildpack interface
 * The `bin/detect` will have read-only access to the app
 * The positional arguments for `bin/detect` and `bin/build` are the same
 * The environment variables and inputs for `bin/detect` and `bin/build` are the same (though the values may be different)
+* The working directory is `/` instead of the app source directory
 
 However, some of the context it is run in is different from regular buildpacks.
 
 For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase excluding a few specific directories and files.
 
-Additionally, a platform may store a new stack image to cache the changes. All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
+All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
 
 A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` directory, and providing an `/cnb/stack/order.toml` (following the [`order.toml` schema](https://github.com/buildpacks/spec/blob/main/platform.md#ordertoml-toml)) to define their order of execution. The order can be overridden in the `builder.toml` with the following configuration:
 
@@ -79,11 +80,11 @@ A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` 
 
 A stackpack will only execute if it passes detection. When the stackpack is executed, its detect and build scripts use the same parameters as the regular buildpacks.
 
-The stackpack's snapshot layer may be enriched by writing a `launch.toml` file. The `launch.toml` may define globs of files to be excluded from the image when it is _used_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered when the image is _used_. The term _used_ is defined as:
+The stackpack's snapshot layer may be enriched by writing a `launch.toml` file. The `launch.toml` may define globs of files to be excluded from the image when it is _exported_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered when the image is _exported_. The term _exported_ is defined as:
 
-* *Used for build-time build*: A given path is excluded at normal buildpack build-time, and recovered the next time the build image is extended with the stackpack.
-* *Used for build-time run*: A given path is excluded from the final image, and restored the next time the run image is extended with the stackpack (either rebase or rebuild).
-* *Used for rebase run*: A given path is excluded from the rebased image, and recovered the next time the run image is extended with the stackpack (either rebase or rebuild).
+* *Exported for build-time build*: A given path is excluded at userspace buildpack build-time, and recovered the next time the build image is extended with the stackpack.
+* *Exported for build-time run*: A given path is excluded from the final image, and restored the next time the run image is extended with the stackpack (either rebase or rebuild).
+* *Exported for rebase run*: A given path is excluded from the rebased image, and recovered the next time the run image is extended with the stackpack (either rebase or rebuild).
 
 For example, a stack buildpack may choose to exclude `/var/cache` from the final run image, but may want to mark it as _cached_ to have it restored during build-time and rebase.
 
