@@ -166,7 +166,9 @@ During the build and extend phases, the lifecycle will extract and apply snapsho
 
 ## Rebasing an App
 
-Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. The image containing the stack buildpacks and the builder binary must be provided to the rebaser operation as an argument. A platform may choose to provide the same stack buildpacks and builder binary used during the build that create the launch-image being rebased, or it may provide updates versions (which may increase the risk of something failing in the rebase process).
+Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. It will determine which stackpacks to run using a provided [`stack-group.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#grouptoml-toml). To each stackpack, it will pass the build plan derived from the provided [`plan.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#plantoml-toml).
+
+The image containing the stack buildpacks and the builder binary must be provided to the rebaser operation as an argument. A platform may choose to provide the same stack buildpacks and builder binary used during the build that create the launch-image being rebased, or it may provide updates versions (which may increase the risk of something failing in the rebase process).
 
 A platform may choose to store the stack buildpacks and extender binary in any of the following images:
 * A companion image of the launch-image
