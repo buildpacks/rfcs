@@ -92,23 +92,7 @@ For example, a stack buildpack may choose to exclude `/var/cache` from the final
 
 ### Providing Mixins
 
-A stack buildpack MAY define a set of mixins it provides in either of two ways:
-
-1. Statically in the `buildpack.toml`
-1. Dynamically in the Build Plan.
-
-A stack buildpack MAY define a set of stack specific mixins in the `buildpack.toml` with the following schema:
-
-```
-[[stacks]]
-id = "<stack id or *>"
-
-[stacks.provides]
-any = <boolean (default=false)>
-mixins = [ "mixin name" ]
-```
-
-Additionally, mixins MAY be dynamically provided in the build plan:
+A stack buildpack MAY define a set of mixins dynamically in the build plan:
 
 ```
 [[provides]]
@@ -135,7 +119,6 @@ Stack buildpacks MUST NOT require any entries in the build plan (neither mixins 
 
 After the detect phase, the lifecycle will merge the list of provided mixins from the following sources:
 * `stack.toml`
-* `buildpack.toml` of any stack buildpacks
 * The build plan (any `[[provides]]` tables with `mixin = true`)
 
 If any required mixins from the Build Plan (any `[[required]]` tables with `mixin = true`) are not provided, then the build will fail. Otherwise the build will continue.
@@ -194,9 +177,6 @@ privileged = true
 
 [[stacks]]
 id = "io.buildpacks.stacks.bionic"
-
-[stacks.provides]
-any = true
 ```
 
 Its `bin/detect` would have the following contents:
@@ -420,31 +400,16 @@ Where:
 
 ## buildpack.toml  (TOML)
 
- This proposal adds new keys to the `[buildpack]` table in `buildpack.toml`, and a new `[[mixins]]` array of tables:
+ This proposal adds new keys to the `[buildpack]` table in `buildpack.toml`:
 
  ```
 [buildpack]
 privileged = <boolean (default=false)>
 non-idempotent = <boolean (default=false)>
-
-[[stacks]]
-id = "<stack id or *>"
-
-[stacks.requires]
-mixins = [ "mixin name" ]
-
-[stacks.provides]
-any = <boolean (default=false)>
-mixins = [ "mixin name" ]
  ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
 * `non-idempotent` - when set to `true`, indicates that the buildpack is not idempotent. The lifecycle will provide a clean filesystem from the stack image(s) before each run (i.e. no cache).
-
-Under the `[stacks.provides]` table:
-
-* `any` - a boolean that, when true, indicates that the buildpack can provide all mixins
-* `mixins` - a list of names that match mixins provided by this buildpack
 
 ## Build Plan (TOML)
 
