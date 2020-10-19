@@ -559,7 +559,8 @@ Usage:
 Usage:
 ```
 /cnb/lifecycle/rebaser \
-  [-build-image <build-image>] \
+  [-cache-image <cache-image>] \
+  [-plan <plan>] \
   ...
 ```
 
@@ -567,8 +568,10 @@ Usage:
 | Input               | Environment Variable  | Default Value          | Description
 |---------------------|-----------------------|------------------------|---------------------------------------
 | ...                 |                       |                        |
-| `<stack-group>`     | `CNB_BUILD_IMAGE`     | derived from `<image>` | Image containing `builder` and stack buildpacks
-
+| `<cache-image>`     | `CNB_CACHE_IMAGE`     |                        | Reference to a cache image in an OCI image registry
+| `<plan>`       | `CNB_PLAN_PATH`       | `./plan.toml`     | Path to resolved build plan (see [`plan.toml`](#plantoml-toml))
+| `<platform>`        | `CNB_PLATFORM_DIR`    | `/platform`            | Path to platform directory
+| `<stack-group>`     | `CNB_STACK_GROUP_PATH` | `./stack-group.toml`    | Path to group definition(#buildpacks-directory-layout)) of buildpacks that run during the extend phase that created the image being rebased.
 
 #### `extender`
 Usage:
