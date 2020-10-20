@@ -97,17 +97,17 @@ Similar to [RFC#91](https://github.com/buildpacks/rfcs/pull/91), instead of tyin
 ## Experimental API Mode
 A new mode for testing implementation of a API. The API can be a full release or a prerelease API.
 
-New `CNB_PLATFORM_EXPERIMENTAL_MODE` and `CNB_BUILDPACK_EXPERIMENTAL` mode environment variables will control experimental mode with:
+New `CNB_PLATFORM_EXPERIMENTAL_MODE` mode environment variable will control experimental mode with:
 allowed values: `warn`, `error`, `silent`
 default value: `warn`
 
-**When** the `CNB_PLATFROM_API` environment variable is set to an API version in the deprecated platform API, the lifecycle shall:
+**When** the `CNB_PLATFORM_API` environment variable is set to an API version in the deprecated platform API, the lifecycle shall:
  - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE` is unset, **Then** print a warning and continue
  - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=warn`, **Then** print a warning and continue
  - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=error`, **Then** fail
  - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=silent`, **Then** continue w/o warning
 
-**When** the `api` field in a `buildpack.toml` file is set to an API version in the deprecated buildpack API range the lifecycle shall:
+**When** the `api` field in a `buildpack.toml` file is set to an API version in the experimental buildpack API range the lifecycle shall:
  - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE` is unset, **Then** print a warning and continue
  - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=warn`, **Then** print a warning and continue
  - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=error`, **Then** fail
