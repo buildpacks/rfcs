@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Lifecycle Experimantal API Mode and Prelease APIs
+- Name: Prelease APIs and Experimental Section
 - Start Date: 2020-08-25
 - Author(s): @hone
 - RFC Pull Request: (leave blank)
@@ -31,43 +31,22 @@ This proposes two changes to Lifecycle:
 * `experimental` is a new API mode for testing implementation of the API similar to the modes defined in [RFC#49](https://github.com/buildpacks/rfcs/blob/main/text/0049-multi-api-lifecycle-descriptor.md).
 
 ## Prerelease API
-
 A prerelease API is a non-finalized API but is in a testable state. The the API version must be of the format: `<major>.<minor>-<alphanumeric>`, i.e. `1.0-alpha1`. Though these aren't final, there will be a tagged and release version of the appropriate spec for it. This way users can see what is supported when it's used. In most cases, these will be cut from the corresponding branch in `buildpacks/spec`, i.e. Buildpack API `0.5-alpha1` would be cut from the `buildpack/0.5` branch.
 
 When Lifecycle supports a prerelease API, it can be treated like any other API version and be used in any mode: `experimental`, `supported`, `deprecated`.
 
-## Experimental API Mode
-
-This is a new mode for testing implementation of a API. The API can be a full release or a prerelease API.
-
-New `CNB_PLATFORM_EXPERIMENTAL_MODE` and `CNB_BUILDPACK_EXPERIMENTAL` mode environment variables will control experimental mode with:
-allowed values: `warn`, `error`, `silent`
-default value: `warn`
-
-**When** the `CNB_PLATFROM_API` environment variable is set to an API version in the deprecated platform API, the lifecycle shall:
- - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE` is unset, **Then** print a warning and continue
- - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=warn`, **Then** print a warning and continue
- - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=error`, **Then** fail
- - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=silent`, **Then** continue w/o warning
-
-**When** the `api` field in a `buildpack.toml` file is set to an API version in the deprecated buildpack API range the lifecycle shall:
- - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE` is unset, **Then** print a warning and continue
- - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=warn`, **Then** print a warning and continue
- - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=error`, **Then** fail
- - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=silent`, **Then** continue w/o warning
+### Experimental Section in the API
+For APIs that will need to stabilize over a long time span, they can get added as an "experimental" section inside the API. These will go out into official API releases. Using that part of the API will be experimental and susceptible to change in an upcoming release. This will require a bit more rigor, but will allow us to evolve the experimental sections overtime without as much pressure to "get it right" or "block a release". The downside is that the lifecycle will need to suppert these experimental features since they're part of the API. If the experimental API changes a lot, lifecycle will need to support these differences.
 
 ## Lifecycle Descriptor
-
-This RFC proposes the addition of the `experimental` key in `lifecycle.toml` and support for prerelease API versions following the proposed schema:
+This RFC proposes support for prerelease API versions in the modes:
 
 ```
 [apis]
 [apis.buildpack]
-  experimental = ["0.6", "1.0-alpha1"]
   supported = ["0.5", "0.7-alpha1"]
   deprecated = ["0.4", "0.5-rc1"]
 [apis.platform]
-  experimental = ["1.0-alpha1"]
   supported = ["0.6", "0.7-alpha1"]
   deprecated = ["0.5", "0.6-rc1"]
 
@@ -75,21 +54,18 @@ This RFC proposes the addition of the `experimental` key in `lifecycle.toml` and
   version = "0.10.0"
 ```
 
-Walking through the Buildpack API side of the example above, the Buildpack API is testing out spec changes for `1.0` with `1.0-alpha1` and `0.7` with `0.7-alpha1`. Buildpack API `0.6` has finalized, but since it included some large features the implementation may under go some changes. Buildpack API `1.0-alpha1` is both experimental in the spec and implementation.
-
 Since experimental versions are defined with a different format, they will NOT automatically get upgraded to a `supported` release when the experimental API has finalized.
 
 ### Lifecycle Labels
 This will extend the the `io.buildpacks.lifecycle.apis` label on the builder or lifecycle image with the values contained in the above descriptor file. For example:
+
 ```json
 {
   "buildpack": {
-    "experimental": ["0.6", "1.0-alpha"],
     "supported": ["0.5", "0.7-alpha1"],
     "deprecated": ["0.4", "0.5-rc1"]
   },
   "platform": {
-    "experimental": ["1.0-alpha1"],
     "supported": ["0.6", "0.7-alpha1"],
     "deprecated": ["0.5", "0.6-rc1"]
   }
@@ -117,8 +93,63 @@ The Experimental API version format could instead follow the same format as depr
 ### Unstable Features
 Similar to [RFC#91](https://github.com/buildpacks/rfcs/pull/91), instead of tying features to a specific release, features can be tied behind flags for testing. There's a potential this could be complicated to do if the features are coupled to other changes going on in the API/spec. The benefit is folks can try out individual features in a more explicit way.
 
-### Experimental Section in the API
-Instead of having Experimental APIs, parts of the API can be marked as "experimental". This will go out into an official API release, but using that part of the API will be experimental and suscetible to change in an upcoming release. This will require a bit more rigor, but will allow us to evolve the experimental sections overtime without as much pressure to "get it right" or "block a release". The downside is that the lifecycle will need to suppert these experimental features since they're part of the API. If the experimental API changes a lot, lifecycle will need to support these differences.
+
+## Experimental API Mode
+A new mode for testing implementation of a API. The API can be a full release or a prerelease API.
+
+New `CNB_PLATFORM_EXPERIMENTAL_MODE` and `CNB_BUILDPACK_EXPERIMENTAL` mode environment variables will control experimental mode with:
+allowed values: `warn`, `error`, `silent`
+default value: `warn`
+
+**When** the `CNB_PLATFROM_API` environment variable is set to an API version in the deprecated platform API, the lifecycle shall:
+ - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE` is unset, **Then** print a warning and continue
+ - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=warn`, **Then** print a warning and continue
+ - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=error`, **Then** fail
+ - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=silent`, **Then** continue w/o warning
+
+**When** the `api` field in a `buildpack.toml` file is set to an API version in the deprecated buildpack API range the lifecycle shall:
+ - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE` is unset, **Then** print a warning and continue
+ - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=warn`, **Then** print a warning and continue
+ - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=error`, **Then** fail
+ - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE=silent`, **Then** continue w/o warning
+
+### Lifecycle Descriptor
+
+This adds the `experimental` key in `lifecycle.toml` following the proposed schema:
+
+```
+[apis]
+[apis.buildpack]
+  experimental = ["0.6", "1.0-alpha1"]
+  supported = ["0.5", "0.7-alpha1"]
+  deprecated = ["0.4", "0.5-rc1"]
+[apis.platform]
+  experimental = ["1.0-alpha1"]
+  supported = ["0.6", "0.7-alpha1"]
+  deprecated = ["0.5", "0.6-rc1"]
+
+[lifecycle]
+  version = "0.10.0"
+```
+
+Walking through the Buildpack API side of the example above, the Buildpack API is testing out spec changes for `1.0` with `1.0-alpha1` and `0.7` with `0.7-alpha1`. Buildpack API `0.6` has finalized, but since it included some large features the implementation may under go some changes. Buildpack API `1.0-alpha1` is both experimental in the spec and implementation.
+
+### Lifecycle Labels
+This will extend the the `io.buildpacks.lifecycle.apis` label on the builder or lifecycle image with the values contained in the above descriptor file. For example:
+```json
+{
+  "buildpack": {
+    "experimental": ["0.6", "1.0-alpha"],
+    "supported": ["0.5", "0.7-alpha1"],
+    "deprecated": ["0.4", "0.5-rc1"]
+  },
+  "platform": {
+    "experimental": ["1.0-alpha1"],
+    "supported": ["0.6", "0.7-alpha1"],
+    "deprecated": ["0.5", "0.6-rc1"]
+  }
+}
+```
 
 # Prior Art
 [prior-art]: #prior-art
