@@ -126,7 +126,7 @@ Additionally, a builder requires:
 * The image config's Env field has the environment variable `CNB_LAYERS_DIR` set
 * The image config's Env field has the environment variable `CNB_PLATFORM_DIR` set
 * The image config's Env field has the environment variable `CNB_PLATFORM_DIR` set
-* The image config's Env field has the environment variable `SERVICE_BINDING_ROOT` set to `CNB_PLATFORM_DIR/bindings`
+* The image config's Env field has the environment variable `SERVICE_BINDING_ROOT` set if any services are bound
 * The image config's Labels field has the label io.buildpacks.builder.api, set to a string (defaulting to `0.1`)
 * The image config's Labels field has the label io.buildpacks.builder.metadata, set to a JSON object representing [Builder Metadata](#metadata)
 * The image config's Labels field has the label io.buildpacks.buildpack.order, set to a JSON object representing an [Order](#order)
