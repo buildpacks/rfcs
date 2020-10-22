@@ -21,7 +21,7 @@ A Builder is a critical tool in the CNB ecosystem, and yet, is largely [unspecif
 * **[Platform][platform-docs]** &rarr; A **platform** uses a lifecycle, buildpacks (packaged in a builder), and application source code to produce an OCI image.
 * **[Stack][stack-docs]** &rarr; A stack provides the buildpack lifecycle with build-time and run-time environments in the form of images.
 * **[Lifecycle][lifecycle-docs]** &rarr; The lifecycle orchestrates buildpack execution, then assembles the resulting artifacts into a final app image.
-* **Extension Spec** &rarr; An extension spec defines soemthing that is an optional add-on for Cloud Native Buildpacks systems, but not required to be considered `spec` compliant.
+* **Extension Spec** &rarr; An extension spec defines something that is an optional add-on for Cloud Native Buildpacks systems, but not required to be considered `spec` compliant.
 
 # Motivation
 [motivation]: #motivation
@@ -121,12 +121,12 @@ A builder is composed of at least the following directories/files:
 A builder's environment is the build-time environment of the stack, and as such, requires all of the [build image specifications][build-image-specs].
 
 Additionally, a builder requires:
-* The image config's WorkingDir should be set
+* The image config's WorkingDir should be set to a directory in the builder
 * The image config's Env field has the environment variable `CNB_APP_DIR` set to the application directory of the build environment
-* The image config's Env field has the environment variable `CNB_LAYERS_DIR` set
-* The image config's Env field has the environment variable `CNB_PLATFORM_DIR` set
-* The image config's Env field has the environment variable `CNB_PLATFORM_DIR` set
-* The image config's Env field has the environment variable `SERVICE_BINDING_ROOT` set if any services are bound
+* The image config's Env field has the environment variable `CNB_LAYERS_DIR` set to a directory in the builder
+* The image config's Env field has the environment variable `CNB_PLATFORM_DIR` set to a directory in the builder
+* The image config's Env field has the environment variable `CNB_PLATFORM_DIR` set to a directory in the builder
+* The image config's Env field has the environment variable `SERVICE_BINDING_ROOT` set to a directory in the builder, if any services are bound
 * The image config's Labels field has the label io.buildpacks.builder.api, set to a string (defaulting to `0.1`)
 * The image config's Labels field has the label io.buildpacks.builder.metadata, set to a JSON object representing [Builder Metadata](#metadata)
 * The image config's Labels field has the label io.buildpacks.buildpack.order, set to a JSON object representing an [Order](#order)
