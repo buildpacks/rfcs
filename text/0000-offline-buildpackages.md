@@ -13,7 +13,7 @@
 
 This change allows buildpacks to access cached assets during builds to enable offline builds and asset reuse.
 
-To do so we introduce the asset cache, a distribution artifact that provides vendored assets for buildpacks, and platform mechanisms to provide vendored assets to buildpacks during `build` and `detect`.
+To do so we introduce the asset cache, a distribution artifact that provides vendored assets for buildpacks, and platform mechanisms to provide vendored assets to buildpacks during `build` and `detect`. We also add a top level `[[assets]]` array in `buildpack.toml`
 
 # Motivation
 [motivation]: #motivation
@@ -30,11 +30,11 @@ Buildpack user, Platform operator, Buildpack author
 
 ### Explaining the feature largely in terms of examples.
 
-##### Asset Cache Definition
+### Asset Cache Definition
 We define the asset cache artifact. It is a reproducible OCI image. Each layer in this image contains one or more `asset` files a buildpack may contribute during a future build. Each of these `asset` files will be made available at `/cnb/assets/<asset-digest>` in the build container.
 
-Asset Cache Layers Layout:
-```
+##### General Layer Structure:
+```=
 <layer1> ┳━ /cnb/assets/<java11-asset-digest>
          ┗━ /cnb/assets/<java13-asset-digest>
 
@@ -42,142 +42,176 @@ Asset Cache Layers Layout:
 <layern> ━━ /cnb/assets/<java15-asset-digest>
 ```
 
-##### Asset Image Labels
+### Asset Cache Image Labels
 Asset caches will have two labels. A simple `io.buildpacks.asset.metadata` label that contains the asset's name.
-``` json
+``` json=
 {
   "name": "asset-org/asset-name",
 }
-
 ```
 
-Asset caches will also have a `io.buildpacks.asset.layers` Label. This label's contents will be a `json` object mapping each layer to metadata describing the assets it provides. Note that only the `digest` field is required in the metadata mapping.
+Asset caches will also have a `io.buildpacks.asset.layers` Label. This label maps individual `assets` to the containing layer using `layerDiffID`
 
-``` json
+##### General Format:
+```json=
 {
-  "<layer1-diffID>": [
-    {
-      "name": "java11",
-      "digest": "sha256:java11-asset-sha256",
-      "uri": "https://path/to/java11.tgz",
-    },
-    {
-      "digest": "sha256:<java13-asset-sha256>",
-      "metadata": {
-        "name": "java13"
-      }
+    "asset-sha256":  {
+      "name":"(optional)"
+      "layerDiffID": "(required)"
+      "uri" : "(optional)"
+      "metadata": "(optional)"
     }
-  ],
-  "...": [],
-  "<layern-diffID>": [
-    {
-      "digest": "sha256:<java15-asset-sha256>",
-    }
-  ]
 }
 ```
 
-##### Buildpackage Changes
+##### Example:
 
-To enable buildpackages to reference asset caches, we define a new buildpackage label, `io.buildpacks.buildpackage.assets`.
-
-The contents of this label will be a `json` with a list of data describing each asset cache. This will allow the platform to make decisions about which assets to pull before a build.
-
-The format of this object will be as follows:
- 
-A top level `assetCache` field listing possible asset caches. Each entry in the `assetCache` field will list the `name`, the asset image `refDigest`, an alternative `id`, as well as `layersDiffIDs` field with contents identical to the `io.buildpacks.asset.layers`  label on the associated asset cache.
-
-##### Buildpackage Label
-[buildpackage-label]: #buildpackage-label
-``` json
+``` json=
 {
-  "assetCache": [
-    {
-      "ref": "gcr.io/buildpacks/java-asset-cache",
-      "refDigest": "sha256:<some-java-asset-cache-sha256>",
-      "name": "buildpacks-assets/java-assets@1.1.1",
-      "layerDiffIDs": {
-        "<layer1-diffID>": [
-          {
-            "digest": "sha256:java11-asset-sha256",
-            "uri": "https://path/to/java11.tgz",
-            "metadata": {}
-          },
-          {
-            "digest": "sha256:<java13-asset-sha256>",
-            "metadata": {
-              "extra": "java13 metadata"
-            }
-          }
-        ],
-        "<layer2-diffID>": [
-          "..."
-        ]
-      }
-    },
-    {
-      "ref": "https://buildpacks.io/asset-cache-fallback/java.tgz",
-      "refDigest": "sha256:<some-asset-cache-fallback-sha256>",
-      "name": "buildpack-assets/asset-cache-fallback@1.2.3",
-      "layerDiffIDs": {
-        "<other-layer1-diffID>": [
-          {
-            "digest": "sha256:<java15-asset-sha256>",
-            "uri": "/local/path/to/java15.zip",
-            "metadata": {}
-          }
-        ]
-      }
+  "<java11-asset-sha256>": {
+    "name": "java11",
+    "layerDiffId": "<layer1-diffID>",
+    "uri": "https://path/to/java11.tgz",
+    "metadata": {}
+  },
+  "<java13-asset-sha256>": {
+    "layerDiffId": "<layer1-diffID>",
+    "metadata": {
+      "name": "java13"
     }
-  ]
-}
-```
-
-##### Builder Changes
-
-Builders that contain asset caches will have an `io.buildpacks.asset.layers` with the same format as the asset cache label. Again this label will contain a `<layer1-diffID>` entry for each asset layer contained in the builder.
-
-Builders will additionally need to retain the asset references for each buildpackage in the builder. For this we will extend the existing `io.buildpacks.buildpack.layers` label to contain mappings to contain an `cachedAssets` field identical to the one above.
-
-``` json
-{
-  "buildpack/id": {
-    "0.0.0": {
-      "stacks": [],
-      "layerDiffID": "sha256:some-diff-id",
-      "homepage": "https://homepage-url",
-      "cachedAssets": [
-        {
-          "ref": "gcr.io/buildpacks/java-asset-cache",
-          "refDigest": "sha256:<some-java-asset-cache-sha256>",
-          "name": "buildpacks-assets/java-assets@1.1.1",
-          "layerDiffIDs": {
-            "<layer1-diffID>": [
-              {
-                "digest": "sha256:java11-asset-sha256",
-                "uri": "https://path/to/java11.tgz",
-                "metadata": {}
-              },
-              {
-                "digest": "sha256:<java13-asset-sha256>",
-                "metadata": {
-                  "extra": "java13 metadata"
-                }
-              }
-            ],
-            "<layer2-diffID>": [
-              "..."
-            ]
-          }
-        },
-        {
-          "...": "..."
-        }
-      ]
-    }
+  },
+  "<java15-asset-sha256>": {
+    "layerDiffId": "<layerk-diffID>",
   }
 }
 ```
+
+### Buildpack.toml changes
+
+In order to maintain a link between buildpacks and the assets they may provide we add a top level `[[assets]]` array to the `buildpack.toml` file.
+
+##### General Format
+
+```toml=
+[buildpack]
+  id = "paketo-buildpacks/node-engine"
+  version = "0.0.1"
+ 
+[[assets]]
+  sha256 = "(required)"
+  name = "(optional)"
+  uri = "(optional)"
+  metadata = "(optional)"
+```
+
+
+### Buildpackage Changes
+
+To keep track of the buildpack to asset mapping defined in `buildpack.toml` we add an additional json array under each buildpack entry in the `io.buildpacks.buildpack.layers`. Note that the `asset` array may contain assets not included in the buildpackage.
+
+##### General Format:
+
+```json=
+{
+  "buildpack-id": {
+    "0.0.1": {
+      "api": "0.1",
+      "stacks": [ "..." ]
+      ],
+      "layerDiffID": "sha256:<some-diffID>",
+      "homepage": "https://buildpacks.io",
+      "assets" : ["asset-1-sha256", "asset-2-sha256", "..."]
+    }
+}
+```
+
+##### Example
+
+```json=
+{
+  "buildpacks/nodejs": {
+    "0.0.171": {
+      "api": "0.4",
+      "stacks": [
+        {
+          "id": "io.buildpacks.stacks.bionic"
+        }
+      ],
+      "layerDiffID": "sha256:...",
+      "homepage": "https://buildpacks.io",
+      "assets": ["node12.9.0-sha256", "node14.5.0-sha256"]
+    }
+  },
+```
+
+To keep track of what assets are actually in our buildpackages, and what layer they are packaged in we add the label, `io.buildpacks.assets.layers`. Note, this label has already been defined above on `asset-cache` as well.
+
+
+To tie a buildpack to relevant asset cache images, we add a final label `io.buildpacks.asset.images`, which again is `json`. This maps an OCI image digest to a list of assets the image contains, as well as possible image locations.
+
+
+##### General Format:
+```json=
+{
+    "asset-cache-sha256": {
+        "name": "name from 'io.buildpacks.asset.metadata'"
+        "locations": ["index.docker.io/asset-cache-name", "..."]
+        "assets" : ["asset-1-sha256", "asset-2-sha256", "..."]
+    }
+}
+
+```
+
+These three label let us determine
+- set of all assets that could be used by a buildpackage
+- the set of assets that are currently included in a buildpackage
+- set of assets that may be used by an individual buildpack.
+- set of assets provided by some predefined images.
+- possible locations to fetch assets from
+
+
+To keep our metadata consistent we also propose adding the `assets` array to the `io.buildpacks.buildpackage.metadata` label.
+
+##### General Format
+```json=
+{
+  "id": "buildpack-id",
+  "version": "0.0.1",
+  "homepage": "https:/buildpacks.io",
+  "stacks": [
+    {
+      "id": "io.buildpacks.stacks.bionic"
+    }
+  ]
+  "assets" : ["asset-1-sha256", "asset-2-sha256", "..."]
+}
+
+```
+
+
+### Builder Changes
+
+Builders will also require the changes outline above to the following tags:
+- `io.buildpacks.asset.layers`
+- `io.buildpacks.buildpack.layers`
+- `io.buildpacks.asset.images`
+
+Additionally we will add an `asset` array to `io.buildpacks.builder.metadata` to keep it consistent with the updates to  `io.buildpacks.builpack.layers`.
+
+##### General Format
+```json=
+{
+  "buildpacks": [
+    {
+      "id": "buildpack-id",
+      "version": "0.0.1",
+      "homepage": "https://buildpacks.io"
+      "assets" : ["asset-1-sha256", "asset-2-sha256", "..."]
+    }
+  ]
+}
+```
+
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -204,9 +238,26 @@ Each entry in the `[[include]]` array must have one of the following fields defi
   - `image` (string), image name of an asset, image name resolution is left to the platform.
   - `uri` (string), uri to an asset image archive.
 
+##### General Format:
+```toml=
+[asset-cache]
+    name = "(required)"
+ 
+[[assets]]
+  sha256 = "(required)"
+  name = "(optional)"
+  uri = "(optional)"
+  [metadata]
+    optional_key = "(optional value)"  
 
-#### Example
-``` toml
+[[include]]
+  uri = "(optional)"
+  image = "(optional)" #exactly one of 'uri' or 'image' must be present
+```
+
+
+##### Example
+``` toml=
 [asset-cache]
   name = "my-assets/java-asset@1.2.3"
 
@@ -240,12 +291,22 @@ Asset cache creation should:
   - set the created time in image config to a constant value.
   - set the modification time of all non-asset files to a constant value.
 
+## Metabuildpackage Creation
+
+When creating a metabuildpack, we want to retain all of the asset information from the child buildpacks.
+
+As such `assets` array in `io.buildpacks.buildpack.layers` `io.buildpacks.buildpack.metadata` of the resulting metabuildpack will be a sum of all of the `asset` arrays in its children.
+
+In a similar vein, the `io.buildpacks.asset.images` will contain entries from all of the metabuildpacks children.
+
+If there are conflicts when merging these entries, the platform may decide to continue or fail.  
+
 ## Using Asset Caches
 
 Asset caches can be added to a build by three mechanisms
 1) specify an asset cache(s) using the `--asset` flag(s).
-2) buildpackages on a builder may have asset cache references in the `io.buildpacks.buildpack.layers` label that are not included in the builder. The platform may pull to make them available for a build.
-3) Assets package layers can be added to a builder image during its creation. These assets will then be available to all builds that use this builder.
+2) buildpackages on a builder may have asset cache references in the `io.buildpacks.assets.images` label that are not included in the builder. The platform may pull to make them available for a build.
+3) Assets cache layers can be added to a builder image during its creation. These assets will then be available to all builds that use this builder.
 
 
 When asset caches are added to a build/builder we need to verify the following:
@@ -254,14 +315,14 @@ When asset caches are added to a build/builder we need to verify the following:
 When creating a builder with asset caches:
   - Asset cache layers should be the final k layers in the builder. These should be ordered by `diff-ID`.
   - If any asset layer is a superset of another, only the superset layer is included in the builder.
-  - builders have a `io.buildpacks.buildpack.assets` Label containing entries for every asset layer included in the builder.
+  - builders have a `io.buildpacks.buildpack.assets` Label containing entries for every asset included in the builder.
 
 ### Adding Asset Cache references to a buildpackage
 
 A new `[[asset-cache]]` array is added to the `package.toml` file used to create buildpackages. The values in this array are used to fill out the `io.buildpacks.buildpackage.assets` label.
 
 The following entries in a `package.toml` file would produce the Buildpackage labels in the above example.
-```toml
+```toml=
 [[asset-cache]]
 image = "gcr.io/buildpacks/java-asset-cache"
 
@@ -300,126 +361,6 @@ Why should we *not* do this?
 
 # Alternatives
 [alternatives]: #alternatives
-
-We change the primary mapping for all labels from `layerDiffId` -> `assetDigest` to `assetDigest -> layerDiffId`.
-
-This would change the following labels:
-
-### Asset Cache changes
-`io.buildpacks.asset.layers` (would be renamed to `io.buildpacks.asset.digests`)
-
-``` json
-{
-  "sha256:java11-asset-sha256": {
-    "name": "java11",
-    "layerDiffId": "<layer1-diffID>",
-    "uri": "https://path/to/java11.tgz",
-    "metadata": {}
-  },
-  "sha256:<java13-asset-sha256>": {
-    "layerDiffId": "<layer1-diffID>",
-    "metadata": {
-      "name": "java13"
-    }
-  },
-  "sha256:<java15-asset-sha256>": {
-    "layerDiffId": "<layern-diffID>",
-    "metadata": {}
-  }
-}
-```
-
-### Buildpackage Changes
-
-the contents of the `io.buildpacks.buildpackage.assets` would look like:
-
-Here each `asset` in the `assetCache` array has a `digest` -> `layerDiffId` mapping, instead of a `layerDiffId` -> `digest` mapping
-
-``` json
-{
-  "assetCache": [
-    {
-      "ref": "gcr.io/buildpacks/java-asset-cache",
-      "digest": "sha256:<some-java-asset-cache-sha256>",
-      "name": "buildpacks-assets/java-assets@1.1.1",
-      "assetDigests": {
-        "sha256:java11-asset-sha256": {
-          "layerDiffId": "<layer1-diffID>",
-          "uri": "https://path/to/java11.tgz",
-          "metadata": {}
-        },
-        "sha256:<java13-asset-sha256>": {
-          "layerDiffId": "<layer2-diffID>",
-          "metadata": {
-            "extra": "java13 metadata"
-          }
-        }
-      }
-    },
-    {
-      "ref": "https://buildpacks.io/asset-cache-fallback/java.tgz",
-      "digest": "sha256:<some-asset-cache-fallback-sha256>",
-      "name": "buildpack-assets/asset-cache-fallback@1.2.3",
-      "assetDigests": {
-        "sha256:<java15-asset-sha256>": {
-          "layerDiffId": "other-layer-diffId",
-          "uri": "/local/path/to/java15.zip",
-          "metadata": {}
-        }
-      }
-    }
-  ]
-}
-```
-
-### Builder Changes
-
-Basically incorporating the same structure above into builder metadata.
-
-``` json
-{
-  "buildpack/id": {
-    "0.0.0": {
-      "stacks": [],
-      "layerDiffID": "sha256:some-diff-id",
-      "homepage": "https://homepage-url",
-      "assetCache": [
-        {
-          "ref": "gcr.io/buildpacks/java-asset-cache",
-          "digest": "sha256:<some-java-asset-cache-sha256>",
-          "name": "buildpacks-assets/java-assets@1.1.1",
-          "assetDigests": {
-            "sha256:java11-asset-sha256": {
-              "layerDiffId": "<layer1-diffID>",
-              "uri": "https://path/to/java11.tgz",
-              "metadata": {}
-            },
-            "sha256:<java13-asset-sha256>": {
-              "layerDiffId": "<layer2-diffID>",
-              "metadata": {
-                "extra": "java13 metadata"
-              }
-            }
-          }
-        },
-        {
-          "ref": "https://buildpacks.io/asset-cache-fallback/java.tgz",
-          "digest": "sha256:<some-asset-cache-fallback-sha256>",
-          "name": "buildpack-assets/asset-cache-fallback@1.2.3",
-          "assetDigests": {
-            "sha256:<java15-asset-sha256>": {
-              "layerDiffId": "other-layer-diffId",
-              "uri": "/local/path/to/java15.zip",
-              "metadata": {}
-            }
-          }
-        }
-      ]
-    },
-    "0.0.1": {}
-  }
-}
-```
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
