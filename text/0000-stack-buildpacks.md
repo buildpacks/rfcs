@@ -108,22 +108,39 @@ id = "<stack id or *>"
 mixins = [ "<mixin name or *>" ]
 ```
 
-A userspace buildpack MAY require mixins in the build plan
+A stack buildpack MAY NOT provide mixins in the build plan.
+
+A userspace buildpack MAY NOT provide mixins.
+
+### Requiring Mixins
+
+A userspace or stack buildpack MAY require mixins in the build plan.
 
 ```
 [[requires]]
 mixins = [ "<mixin name>" ]
 ```
 
-A userspace buildpack MAY NOT provide mixins in the build plan.
+## Dependencies
 
-### Providing
+### Providing Dependencies
 
-A stack buildpacks MAY provide any non-mixin entries in the build plan.
+A stack buildpacks MAY provide dependencies in the build plan.
 
-### Requiring Mixins
+```
+[[provides]]
+name = [ "<dependency name>" ]
+```
 
-A stack buildpacks MAY require any entries in the build plan.
+### Requiring Dependencies
+
+A stack buildpack MAY require dependencies in the build plan. Though because stack buildpacks are executed prior to user buildpacks, another stackpack must be providing the entry to resolve successfully.
+
+```
+[[requires]]
+name = [ "<dependency name>" ]
+```
+
 
 ### Resolving Mixins
 
