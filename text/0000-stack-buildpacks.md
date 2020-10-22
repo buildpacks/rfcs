@@ -189,17 +189,13 @@ privileged = true
 id = "io.buildpacks.stacks.bionic"
 
 [stacks.provides]
-any = true
+mixins = [ "*" ]
 ```
 
 Its `bin/detect` would have the following contents:
 
  ```bash
 #!/usr/bin/env bash
-
-[[provides]]
-any = true
-mixin = true
 
 exit 0
 ```
@@ -330,8 +326,7 @@ A buildpack may that requires the `jq` package may have it provided by either a 
 
 ```toml
 [[or.requires]]
-name = "jq"
-mixin = true
+mixins = [ "jq" ]
 
 [[or.requires]]
 name = "jq"
@@ -418,21 +413,18 @@ Where:
  ```
 [buildpack]
 privileged = <boolean (default=false)>
-non-idempotent = <boolean (default=false)>
 
 [[stacks]]
 id = "<stack id or *>"
 
 [stacks.requires]
-mixins = [ "mixin name" ]
+mixins = [ "<mixin name>" ]
 
 [stacks.provides]
-any = <boolean (default=false)>
-mixins = [ "mixin name" ]
+mixins = [ "<mixin name or *>" ]
  ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
-* `non-idempotent` - when set to `true`, indicates that the buildpack is not idempotent. The lifecycle will provide a clean filesystem from the stack image(s) before each run (i.e. no cache).
 
 Under the `[stacks.provides]` table:
 
@@ -442,26 +434,16 @@ Under the `[stacks.provides]` table:
 ## Build Plan (TOML)
 
 ```
-[[provides]]
-name = "<dependency name>"
-mixin = <boolean (default=false)>
-
 [[requires]]
-name = "<dependency name>"
-mixin = <boolean (default=false)>
+mixins = [ "<mixin name>" ]
 
 [requires.metadata]
 # buildpack-specific data
 
 [[or]]
 
-[[or.provides]]
-name = "<dependency name>"
-mixin = <boolean (default=false)>
-
 [[or.requires]]
 name = "<dependency name>"
-mixin = <boolean (default=false)>
 
 [or.requires.metadata]
 # buildpack-specific data
@@ -471,8 +453,7 @@ mixin = <boolean (default=false)>
 
 ```
 [[entries]]
-name = "<dependency name>"
-mixin = <boolean (default=false)>
+mixins = [ "<mixin name or *>" ]
 
 [entries.metadata]
 # buildpack-specific data
