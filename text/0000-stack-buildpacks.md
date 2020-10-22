@@ -420,7 +420,7 @@ Where:
 
 ## buildpack.toml  (TOML)
 
- This proposal adds new keys to the `[buildpack]` table in `buildpack.toml`, and a new `[[mixins]]` array of tables:
+ This proposal adds new keys to the `[buildpack]` table in `buildpack.toml`, and a new `mixins` array:
 
  ```
 [buildpack]
