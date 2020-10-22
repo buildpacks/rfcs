@@ -86,7 +86,7 @@ A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` 
 
 A stackpack will only execute if it passes detection. When the stackpack is executed, its detect and build scripts use the same parameters as the regular buildpacks.
 
-The stackpack's snapshot layer may be enriched by writing a `launch.toml` file. The `launch.toml` may define globs of files to be excluded from the image when it is _exported_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered when the image is _exported_. The term _exported_ is defined as:
+The stackpack's snapshot layer may be enriched by writing a `layer.toml` file. The `layer.toml` may define globs of files to be excluded from the image when it is _exported_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered when the image is _exported_. The term _exported_ is defined as:
 
 * *Exported for build-time build*: A given path is excluded at userspace buildpack build-time, and recovered the next time the build image is extended with the stackpack.
 * *Exported for build-time run*: A given path is excluded from the final image, and restored the next time the run image is extended with the stackpack (either rebase or rebuild).
@@ -98,11 +98,6 @@ For example, a stack buildpack may choose to exclude `/var/cache` from the final
 
 ### Providing Mixins
 
-A stack buildpack MAY define a set of mixins it provides in either of two ways:
-
-1. Statically in the `buildpack.toml`
-1. Dynamically in the Build Plan.
-
 A stack buildpack MAY define a set of stack specific mixins in the `buildpack.toml` with the following schema:
 
 ```
@@ -110,41 +105,34 @@ A stack buildpack MAY define a set of stack specific mixins in the `buildpack.to
 id = "<stack id or *>"
 
 [stacks.provides]
-any = <boolean (default=false)>
-mixins = [ "mixin name" ]
-```
-
-Additionally, mixins MAY be dynamically provided in the build plan:
-
-```
-[[provides]]
-name = "<mixin name>"
-any = <boolean (default=false)>
-mixin = <boolean (default=false)>
+mixins = [ "<mixin name or *>" ]
 ```
 
 A userspace buildpack MAY require mixins in the build plan
 
 ```
 [[requires]]
-name = "<mixin name>"
-mixin = <boolean (default=false)>
+mixins = [ "<mixin name>" ]
 ```
 
 A userspace buildpack MAY NOT provide mixins in the build plan.
 
+### Providing
+
+A stack buildpacks MAY provide any non-mixin entries in the build plan.
+
 ### Requiring Mixins
 
-Stack buildpacks MUST NOT require any entries in the build plan (neither mixins nor non-mixins). This ensures that we do not need to re-run the detect phase.
+A stack buildpacks MAY require any entries in the build plan.
 
 ### Resolving Mixins
 
 After the detect phase, the lifecycle will merge the list of provided mixins from the following sources:
-* `stack.toml`
+* `stack.toml` (for build stage resolution)
+* `run-stack.toml` (for extend stage resolution)
 * `buildpack.toml` of any stack buildpacks
-* The build plan (any `[[provides]]` tables with `mixin = true`)
 
-If any required mixins from the Build Plan (any `[[required]]` tables with `mixin = true`) are not provided, then the build will fail. Otherwise the build will continue.
+If any required mixins from the Build Plan (any `[[required]]` tables with `mixins = [ "<mixin name>" ]`) are not provided, then the build will fail. Otherwise the build will continue.
 
 If a stack buildpack provides a mixin that is not required, the stack buildpack MAY pass detection. This is in contrast to a userspace buildpack providing a dependency that is not required, which fails detection. If a mixin is required for a [single stage only](https://github.com/buildpacks/rfcs/pull/109) with the `build:` or `run:` prefix, a stack buildpack may provide it for both stages without failing detection. However, it will not be included in the Buildpack Build Plan during the stage where it is not required.
 
@@ -156,8 +144,7 @@ The entries of the build plan during the build and extend phases will have a new
 
 ```
 [[entries]]
-name = "libpq"
-mixin = true
+mixins = [ "libpq" ]
 ```
 
 A Stack Buildpack that needs to install mixins must select them from the build plan.
