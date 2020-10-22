@@ -34,7 +34,7 @@ Buildpack user, Platform operator, Buildpack author
 We define the asset cache artifact. It is a reproducible OCI image. Each layer in this image contains one or more `asset` files a buildpack may contribute during a future build. Each of these `asset` files will be made available at `/cnb/assets/<asset-digest>` in the build container.
 
 ##### General Layer Structure:
-```=
+```
 <layer1> ┳━ /cnb/assets/<java11-asset-digest>
          ┗━ /cnb/assets/<java13-asset-digest>
 
@@ -44,29 +44,29 @@ We define the asset cache artifact. It is a reproducible OCI image. Each layer i
 
 ### Asset Cache Image Labels
 Asset caches will have two labels. A simple `io.buildpacks.asset.metadata` label that contains the asset's name.
-``` json=
+``` json
 {
-  "name": "asset-org/asset-name",
+  "name": "asset-org/asset-name"
 }
 ```
 
 Asset caches will also have a `io.buildpacks.asset.layers` Label. This label maps individual `assets` to the containing layer using `layerDiffID`
 
 ##### General Format:
-```json=
+```json
 {
-    "asset-sha256":  {
-      "name":"(optional)"
-      "layerDiffID": "(required)"
-      "uri" : "(optional)"
-      "metadata": "(optional)"
-    }
+  "asset-sha256": {
+    "name": "(optional)",
+    "layerDiffID": "(required)",
+    "uri": "(optional)",
+    "metadata": "(optional)"
+  }
 }
 ```
 
 ##### Example:
 
-``` json=
+``` json
 {
   "<java11-asset-sha256>": {
     "name": "java11",
@@ -92,7 +92,7 @@ In order to maintain a link between buildpacks and the assets they may provide w
 
 ##### General Format
 
-```toml=
+```toml
 [buildpack]
   id = "paketo-buildpacks/node-engine"
   version = "0.0.1"
@@ -111,23 +111,29 @@ To keep track of the buildpack to asset mapping defined in `buildpack.toml` we a
 
 ##### General Format:
 
-```json=
+```json
 {
   "buildpack-id": {
     "0.0.1": {
       "api": "0.1",
-      "stacks": [ "..." ]
+      "stacks": [
+        "..."
       ],
       "layerDiffID": "sha256:<some-diffID>",
       "homepage": "https://buildpacks.io",
-      "assets" : ["asset-1-sha256", "asset-2-sha256", "..."]
+      "assets": [
+        "asset-1-sha256",
+        "asset-2-sha256",
+        "..."
+      ]
     }
+  }
 }
 ```
 
 ##### Example
 
-```json=
+```json
 {
   "buildpacks/nodejs": {
     "0.0.171": {
@@ -139,9 +145,13 @@ To keep track of the buildpack to asset mapping defined in `buildpack.toml` we a
       ],
       "layerDiffID": "sha256:...",
       "homepage": "https://buildpacks.io",
-      "assets": ["node12.9.0-sha256", "node14.5.0-sha256"]
+      "assets": [
+        "node12.9.0-sha256",
+        "node14.5.0-sha256"
+      ]
     }
-  },
+  }
+}
 ```
 
 To keep track of what assets are actually in our buildpackages, and what layer they are packaged in we add the label, `io.buildpacks.assets.layers`. Note, this label has already been defined above on `asset-cache` as well.
@@ -151,15 +161,21 @@ To tie a buildpack to relevant asset cache images, we add a final label `io.buil
 
 
 ##### General Format:
-```json=
+```json
 {
-    "asset-cache-sha256": {
-        "name": "name from 'io.buildpacks.asset.metadata'"
-        "locations": ["index.docker.io/asset-cache-name", "..."]
-        "assets" : ["asset-1-sha256", "asset-2-sha256", "..."]
-    }
+  "asset-cache-sha256": {
+    "name": "name from 'io.buildpacks.asset.metadata'",
+    "locations": [
+      "index.docker.io/asset-cache-name",
+      "..."
+    ],
+    "assets": [
+      "asset-1-sha256",
+      "asset-2-sha256",
+      "..."
+    ]
+  }
 }
-
 ```
 
 These three label let us determine
@@ -173,7 +189,7 @@ These three label let us determine
 To keep our metadata consistent we also propose adding the `assets` array to the `io.buildpacks.buildpackage.metadata` label.
 
 ##### General Format
-```json=
+```json
 {
   "id": "buildpack-id",
   "version": "0.0.1",
@@ -182,10 +198,13 @@ To keep our metadata consistent we also propose adding the `assets` array to the
     {
       "id": "io.buildpacks.stacks.bionic"
     }
+  ],
+  "assets": [
+    "asset-1-sha256",
+    "asset-2-sha256",
+    "..."
   ]
-  "assets" : ["asset-1-sha256", "asset-2-sha256", "..."]
 }
-
 ```
 
 
@@ -199,14 +218,18 @@ Builders will also require the changes outline above to the following tags:
 Additionally we will add an `asset` array to `io.buildpacks.builder.metadata` to keep it consistent with the updates to  `io.buildpacks.builpack.layers`.
 
 ##### General Format
-```json=
+```json
 {
   "buildpacks": [
     {
       "id": "buildpack-id",
       "version": "0.0.1",
-      "homepage": "https://buildpacks.io"
-      "assets" : ["asset-1-sha256", "asset-2-sha256", "..."]
+      "homepage": "https://buildpacks.io",
+      "assets": [
+        "asset-1-sha256",
+        "asset-2-sha256",
+        "..."
+      ]
     }
   ]
 }
@@ -239,7 +262,7 @@ Each entry in the `[[include]]` array must have one of the following fields defi
   - `uri` (string), uri to an asset image archive.
 
 ##### General Format:
-```toml=
+```toml
 [asset-cache]
     name = "(required)"
  
@@ -257,31 +280,30 @@ Each entry in the `[[include]]` array must have one of the following fields defi
 
 
 ##### Example
-``` toml=
+``` toml
 [asset-cache]
   name = "my-assets/java-asset@1.2.3"
 
 [[assets]]
 name = "java11"
 uri = "https://path/to/java11.tgz"
-digest = "sha256:some-sha256"
+sha256 = "some-sha256"
 
 [[assets]]
 uri = "/local/path/to/java13.tgz"
-digest = "sha256:another-sha256"
+sha256 = "another-sha256"
   [metadata]
     extra = "java13 metadata"
 
 [[assets]]
 uri = "/local/path/to/java15.tgz"
-digest = "sha256:another-nother-sha256"
+sha256 = "another-nother-sha256"
 
 [[include]]
 image = "gcr.io/ruby/asset-cache:0.0.1"
 
 [[include]]
 uri = "https://nodejs/asset-cache.tar"
-
 ```
 
 Asset cache creation should:
@@ -322,7 +344,7 @@ When creating a builder with asset caches:
 A new `[[asset-cache]]` array is added to the `package.toml` file used to create buildpackages. The values in this array are used to fill out the `io.buildpacks.buildpackage.assets` label.
 
 The following entries in a `package.toml` file would produce the Buildpackage labels in the above example.
-```toml=
+```toml
 [[asset-cache]]
 image = "gcr.io/buildpacks/java-asset-cache"
 
