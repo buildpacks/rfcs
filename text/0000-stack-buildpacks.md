@@ -92,12 +92,7 @@ For example, a stack buildpack may choose to exclude `/var/cache` from the final
 
 ### Providing Mixins
 
-A stack buildpack MAY define a set of mixins it provides in either of two ways:
-
-1. Statically in the `buildpack.toml`
-1. Dynamically in the Build Plan.
-
-A stack buildpack MAY define a set of stack specific mixins in the `buildpack.toml` with the following schema:
+A stack buildpack MAY define a set of mixins it provides statically in the `buildpack.toml` with the following schema:
 
 ```
 [[stacks]]
@@ -106,15 +101,6 @@ id = "<stack id or *>"
 [stacks.provides]
 any = <boolean (default=false)>
 mixins = [ "mixin name" ]
-```
-
-Additionally, mixins MAY be dynamically provided in the build plan:
-
-```
-[[provides]]
-name = "<mixin name>"
-any = <boolean (default=false)>
-mixin = <boolean (default=false)>
 ```
 
 A userspace buildpack MAY require mixins in the build plan
@@ -136,7 +122,6 @@ Stack buildpacks MUST NOT require any entries in the build plan (neither mixins 
 After the detect phase, the lifecycle will merge the list of provided mixins from the following sources:
 * `stack.toml`
 * `buildpack.toml` of any stack buildpacks
-* The build plan (any `[[provides]]` tables with `mixin = true`)
 
 If any required mixins from the Build Plan (any `[[required]]` tables with `mixin = true`) are not provided, then the build will fail. Otherwise the build will continue.
 
@@ -203,10 +188,6 @@ Its `bin/detect` would have the following contents:
 
  ```bash
 #!/usr/bin/env bash
-
-[[provides]]
-any = true
-mixin = true
 
 exit 0
 ```
@@ -451,7 +432,6 @@ Under the `[stacks.provides]` table:
 ```
 [[provides]]
 name = "<dependency name>"
-mixin = <boolean (default=false)>
 
 [[requires]]
 name = "<dependency name>"
@@ -464,7 +444,6 @@ mixin = <boolean (default=false)>
 
 [[or.provides]]
 name = "<dependency name>"
-mixin = <boolean (default=false)>
 
 [[or.requires]]
 name = "<dependency name>"
