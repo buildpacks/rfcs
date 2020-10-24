@@ -66,9 +66,11 @@ The stackpack interface is similar to the buildpack interface
 
 However, some of the context it is run in is different from regular buildpacks.
 
-For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build phase excluding a few specific directories and files.
+For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build or extend phases excluding a few specific directories and files.
 
-All of the captured changes will be included in a single layer produced as output from the stackpack. The `/layers` dir MAY NOT be used to create arbitrary layers.
+All of the captured changes in each phase (build or extend) will be included in a single layer produced as output from the stackpack. During the build phase, the snapshot will be stored in the `/layers` directory. During the extend phase, the snapshot will be stored in the `/run-layers` directory.
+
+The `/layers` dir MAY NOT be used to create arbitrary layers.
 
 A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` directory, and providing an `/cnb/stack/order.toml` (following the [`order.toml` schema](https://github.com/buildpacks/spec/blob/main/platform.md#ordertoml-toml)) to define their order of execution. The order can be overridden in the `builder.toml` with the following configuration:
 
@@ -80,7 +82,7 @@ A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` 
 
 A stackpack will only execute if it passes detection. When the stackpack is executed, its detect and build scripts use the same parameters as the regular buildpacks.
 
-The stackpack's snapshot layer may be enriched by writing a `launch.toml` file. The `launch.toml` may define globs of files to be excluded from the image when it is _exported_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered when the image is _exported_. The term _exported_ is defined as:
+The stackpack's snapshot layer may be enriched by writing a `stack-layer.toml` file. The `stack-layer.toml` may define globs of files to be excluded from the image when it is _exported_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered when the image is _exported_. The term _exported_ is defined as:
 
 * *Exported for build-time build*: A given path is excluded at userspace buildpack build-time, and recovered the next time the build image is extended with the stackpack.
 * *Exported for build-time run*: A given path is excluded from the final image, and restored the next time the run image is extended with the stackpack (either rebase or rebuild).
@@ -145,13 +147,15 @@ A Stack Buildpack that needs to install mixins must select them from the build p
 
 During the export phase, the lifecycle will store any snapshot layers created during the build phase in the cache.
 
-During the restore phase of the next build, the lifecycle will download the snapshot layer with the cache and store it as a tarball in the `<layers>` directory (i.e. it will not extract it). The `restorer` cannot extract the snapshot because it will not run with root privileges. In addition, the `restorer` may run in a different container than the build, which means changes made to the base image are not guaranteed to carry forward. The `builder` will run with root privileges, but will drop privileges after executing stackpacks and before running userspace buildpacks.
+During the restore phase of the next build, the lifecycle will download the snapshot layer with the cache and store it as a tarball in the `<layers>` directory and the `<run-layers>` directory (i.e. it will not extract it). The `restorer` cannot extract the snapshot because it will not run with root privileges. In addition, the `restorer` may run in a different container than the build, which means changes made to the base image are not guaranteed to carry forward. The `builder` will run with root privileges and untar the snapshot and cache, but will drop privileges after executing stackpacks and before running userspace buildpacks. The `extender` will also run with root privileges and untar the cache.
 
 During the build and extend phases, the lifecycle will extract and apply snapshot tarballs before running stack buildpacks, but after a snapshot-baseline has been captured. This ensures that all changes from the previous snapshot are preserved even if the stack buildpack does not make any additional changes.
 
+At the end of the build phase, the lifeyclce will forcefully delete everything not in `[[excludes]]` after ALL stackpacks run, before buildpacks run (which implies implies that it does not need to do this for extend phase).
+
 ## Rebasing an App
 
-Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. It will determine which stackpacks to run using a provided [`stack-group.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#grouptoml-toml). To each stackpack, it will pass the build plan derived from the provided [`plan.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#plantoml-toml).
+Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. It will determine which stackpacks to run using a provided [`stack-group.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#grouptoml-toml). The Build Plan will be stored in a LABEL of the launch-image, which will be serialized back to a `plan.toml` during rebase. To each stackpack, it will pass the build plan derived from the provided [`plan.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#plantoml-toml).
 
 The image containing the stack buildpacks and the builder binary must be provided to the rebaser operation as an argument. A platform may choose to provide the same stack buildpacks and builder binary used during the build that create the launch-image being rebased, or it may provide updates versions (which may increase the risk of something failing in the rebase process).
 
@@ -203,7 +207,7 @@ for package in $(cat $3 | yj -t | jq -r ".entries | .[] | .name"); do
   apt install $package
 done
 
-cat << EOF > $1/launch.toml
+cat << EOF > $1/stack-layer.toml
 [[excludes]]
 paths = [ "/var/cache" ]
 cache = true
@@ -382,18 +386,20 @@ Stack buildpacks are identical to other buildpacks, with the following exception
 * `/etc/hostname`, `/etc/hosts`, `/etc/mtab`, `/etc/resolv.conf`
 * `/.dockerenv`
 
-## launch.toml (TOML)
+## stack-layer.toml (TOML)
 
 ```
 [[excludes]]
 paths = ["<sub-path glob>"]
 cache = false
+restore = false
 ```
 
 Where:
 
 * `paths` = a list of paths to exclude from the layer
 * `cache` = if true, the paths will be excluded from the launch image layer, but will be included in the cache layer.
+* `restore` = if true, the paths will be restored during the next build.
 
 1. Paths not referenced by an `[[excludes]]` entry will be included in the cache _and_ run image (default).
 1. Any paths with an `[[excludes]]` entry and `cache = true` will be included in the cache image, but not the run image.
