@@ -138,7 +138,7 @@ The lifecycle if not provided any `-process-type` will set the default process t
 
   Options discussed:
 
-  A. `pack` stops sending `-process-type web` when `CNB_PLATFORM_API` is greater than `0.X`. The lifecycle will assume `default = true` for `web` processes from buildpacks implementing earlier buildpack APIs. The lifecycle could print a warning when buildpacks do not specify a process type. `-process-type <unknown process type>` could then become a failure case (vs. warn, what it is today).
+  A. `pack` stops sending `-process-type web` when `CNB_PLATFORM_API` is greater than `0.X`. The lifecycle will assume `default = true` for `web` processes from buildpacks implementing buildpack APIs earlier than `0.Y`. The lifecycle could print a warning when buildpacks do not specify a default process type. `-process-type <unknown process type>` could then become a failure case (vs. warn, what it is today).
 
     Pros:
 
@@ -153,7 +153,7 @@ The lifecycle if not provided any `-process-type` will set the default process t
 
     Pros:
 
-    * This will preserve the existing behavior of `pack` i.e., always try to set `web` as the default process type - but in a way that doesn't stomp on the buildpacks-provided default process type
+    * This will preserve the existing behavior of `pack` i.e., always try to set `web` as the default process type - but in a way that doesn't stomp on the buildpacks-provided default process type.
 
     Cons:
 
