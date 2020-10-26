@@ -57,14 +57,12 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 * Is distributed with the stack run and/or build image
 * May not create layers using the `<layers>` directory
 
-The stackpack interface is similar to the buildpack interface
+The stackpack interface is similar to the buildpack interface:
 * The same `bin/detect` and `bin/build` scripts are required
 * The `bin/detect` will have read-only access to the app
 * The positional arguments for `bin/detect` and `bin/build` are the same
 * The environment variables and inputs for `bin/detect` and `bin/build` are the same (though the values may be different)
 * The working directory is `/` instead of the app source directory
-
-However, some of the context it is run in is different from regular buildpacks.
 
 For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build or extend phases excluding a few specific directories and files.
 
@@ -105,6 +103,10 @@ any = <boolean (default=false)>
 mixins = [ "mixin name" ]
 ```
 
+### Requiring Mixins
+
+A stack buildpack MAY NOT require any entries in the build plan (neither mixins nor non-mixins). This ensures that we do not need to re-run the detect phase.
+
 A userspace buildpack MAY require mixins in the build plan
 
 ```
@@ -115,17 +117,13 @@ mixin = <boolean (default=false)>
 
 A userspace buildpack MAY NOT provide mixins in the build plan.
 
-### Requiring Mixins
-
-Stack buildpacks MUST NOT require any entries in the build plan (neither mixins nor non-mixins). This ensures that we do not need to re-run the detect phase.
-
 ### Resolving Mixins
 
 After the detect phase, the lifecycle will merge the list of provided mixins from the following sources:
 * `stack.toml`
 * `buildpack.toml` of any stack buildpacks
 
-If any required mixins from the Build Plan (any `[[required]]` tables with `mixin = true`) are not provided, then the build will fail. Otherwise the build will continue.
+If any required mixins from the Build Plan (any `[[required]]` tables with `mixins`) are not provided, then the build will fail. Otherwise the build will continue.
 
 If a stack buildpack provides a mixin that is not required, the stack buildpack MAY pass detection. This is in contrast to a userspace buildpack providing a dependency that is not required, which fails detection. If a mixin is required for a [single stage only](https://github.com/buildpacks/rfcs/pull/109) with the `build:` or `run:` prefix, a stack buildpack may provide it for both stages without failing detection. However, it will not be included in the Buildpack Build Plan during the stage where it is not required.
 
