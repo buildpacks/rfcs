@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Prelease APIs and Experimental Section
+- Name: Prelease APIs and Experimental Features
 - Start Date: 2020-08-25
 - Author(s): @hone
 - RFC Pull Request: (leave blank)
@@ -35,8 +35,19 @@ A prerelease API is a non-finalized API but is in a testable state. The the API 
 
 When Lifecycle supports a prerelease API, it can be treated like any other API version and be used in any mode: `experimental`, `supported`, `deprecated`.
 
-### Experimental Section in the API
-For APIs that will need to stabilize over a long time span, they can get added as an "experimental" section inside the API. These will go out into official API releases. Using that part of the API will be experimental and susceptible to change in an upcoming release. This will require a bit more rigor, but will allow us to evolve the experimental sections overtime without as much pressure to "get it right" or "block a release". The downside is that the lifecycle will need to suppert these experimental features since they're part of the API. If the experimental API changes a lot, lifecycle will need to support these differences.
+### Experimental Features in the API
+For APIs that will need to stabilize over a long time span, they can get added as an "experimental" section inside the API as **Experimental Features**. These will go out into official API releases. Using that part of the API will be experimental and susceptible to change in an upcoming release. This will require a bit more rigor, but will allow us to evolve the experimental sections overtime without as much pressure to "get it right" or "block a release". The downside is that the lifecycle will need to suppert these experimental features since they're part of the API. If the experimental API changes a lot, lifecycle will need to support these differences.
+
+There will be a new `CNB_PLATFORM_EXPERIMENTAL_FEATURES` environment variable to control ALL experimental features by the platform. This will let a platform decide if they want to turn on experimental features. For now, all features will be turned on/off for simplicity. If the need arises, a list in the future can be explored.
+
+allowed values: `warn`, `error`, `silent`
+default value: `warn`
+
+**When** lifecycle detects an experimental feature is being used:
+ - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE` is unset, **Then** print a warning and continue
+ - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=warn`, **Then** print a warning and continue
+ - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=error`, **Then** fail
+ - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=silent`, **Then** continue w/o warning
 
 ## Lifecycle Descriptor
 This RFC proposes support for prerelease API versions in the modes:
@@ -100,12 +111,6 @@ A new mode for testing implementation of a API. The API can be a full release or
 New `CNB_PLATFORM_EXPERIMENTAL_MODE` mode environment variable will control experimental mode with:
 allowed values: `warn`, `error`, `silent`
 default value: `warn`
-
-**When** the `CNB_PLATFORM_API` environment variable is set to an API version in the deprecated platform API, the lifecycle shall:
- - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE` is unset, **Then** print a warning and continue
- - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=warn`, **Then** print a warning and continue
- - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=error`, **Then** fail
- - **If** `CNB_PLATFORM_EXPERIMENTAL_MODE=silent`, **Then** continue w/o warning
 
 **When** the `api` field in a `buildpack.toml` file is set to an API version in the experimental buildpack API range the lifecycle shall:
  - **If** `CNB_BUILDPACK_EXPERIMENTAL_MODE` is unset, **Then** print a warning and continue
