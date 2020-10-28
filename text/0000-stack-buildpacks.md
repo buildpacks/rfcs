@@ -424,7 +424,6 @@ mixins = [ "<mixin name or *>" ]
 
 Under the `[stacks.provides]` table:
 
-* `any` - a boolean that, when true, indicates that the buildpack can provide all mixins
 * `mixins` - a list of names that match mixins provided by this buildpack, or the `*` representing all mixins.
 
 ## Build Plan (TOML)
