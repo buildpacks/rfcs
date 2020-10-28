@@ -59,7 +59,13 @@ Asset caches will also have a `io.buildpacks.asset.layers` Label. This label map
     "name": "(optional)",
     "layerDiffID": "(required)",
     "uri": "(optional)",
-    "metadata": "(optional)"
+    "stacks": [
+      "(optional)",
+      "..."
+    ],
+    "metadata": {
+      "(optional)": "(optional)"
+    }
   }
 }
 ```
@@ -72,15 +78,18 @@ Asset caches will also have a `io.buildpacks.asset.layers` Label. This label map
     "name": "java11",
     "layerDiffId": "<layer1-diffID>",
     "uri": "https://path/to/java11.tgz",
+    "stacks": ["io.buildpacks.stacks.bionic"],
     "metadata": {}
   },
   "<java13-asset-sha256>": {
     "layerDiffId": "<layer1-diffID>",
+    "stacks": ["io.buildpacks.stacks.bionic"],
     "metadata": {
       "name": "java13"
     }
   },
   "<java15-asset-sha256>": {
+    "stacks": ["io.buildpacks.stacks.bionic"],
     "layerDiffId": "<layerk-diffID>",
   }
 }
@@ -102,6 +111,7 @@ In order to maintain a link between buildpacks and the assets they may provide w
   name = "(optional)"
   uri = "(optional)"
   metadata = "(optional)"
+  stacks = ["(required)"]
 ```
 
 
@@ -122,9 +132,15 @@ To keep track of the buildpack to asset mapping defined in `buildpack.toml` we a
       "layerDiffID": "sha256:<some-diffID>",
       "homepage": "https://buildpacks.io",
       "assets": [
-        "asset-1-sha256",
-        "asset-2-sha256",
-        "..."
+        {
+          "sha256": "asset-1-sha256"
+        },
+        {
+          "sha256": "asset-2-sha256"
+        },
+        {
+          "sha256": "..."
+        }
       ]
     }
   }
@@ -146,8 +162,12 @@ To keep track of the buildpack to asset mapping defined in `buildpack.toml` we a
       "layerDiffID": "sha256:...",
       "homepage": "https://buildpacks.io",
       "assets": [
-        "node12.9.0-sha256",
-        "node14.5.0-sha256"
+        {
+          "sha256": "node12.9.0-sha256"
+        },
+        {
+          "sha256": "node14.5.0-sha256"
+        }
       ]
     }
   }
@@ -170,8 +190,12 @@ To tie a buildpack to relevant asset cache images, we add a final label `io.buil
       "..."
     ],
     "assets": [
-      "asset-1-sha256",
-      "asset-2-sha256",
+      {
+        "sha256": "asset-1-sha256"
+      },
+      {
+        "sha256": "asset-2-sha256"
+      },
       "..."
     ]
   }
@@ -200,8 +224,12 @@ To keep our metadata consistent we also propose adding the `assets` array to the
     }
   ],
   "assets": [
-    "asset-1-sha256",
-    "asset-2-sha256",
+    {
+      "sha256": "asset-1-sha256"
+    },
+    {
+      "sha256": "asset-2-sha256"
+    },
     "..."
   ]
 }
@@ -226,8 +254,12 @@ Additionally we will add an `asset` array to `io.buildpacks.builder.metadata` to
       "version": "0.0.1",
       "homepage": "https://buildpacks.io",
       "assets": [
-        "asset-1-sha256",
-        "asset-2-sha256",
+        {
+          "sha256": "asset-1-sha256"
+        },
+        {
+          "sha256": "asset-2-sha256"
+        },
         "..."
       ]
     }
@@ -270,7 +302,7 @@ Each entry in the `[[include]]` array must have one of the following fields defi
   sha256 = "(required)"
   name = "(optional)"
   uri = "(optional)"
-  [metadata]
+  [assets.metadata]
     optional_key = "(optional value)"  
 
 [[include]]
@@ -292,7 +324,7 @@ sha256 = "some-sha256"
 [[assets]]
 uri = "/local/path/to/java13.tgz"
 sha256 = "another-sha256"
-  [metadata]
+  [assets.metadata]
     extra = "java13 metadata"
 
 [[assets]]
@@ -312,6 +344,17 @@ Asset cache creation should:
   - Add the `io.buildpacks.asset.layers` and `io.buildpacks.asset.metadata` label metadata to the asset image.
   - set the created time in image config to a constant value.
   - set the modification time of all non-asset files to a constant value.
+
+#### UX in practice
+Likely the creation of asset packages will follow two different routes for implementation buildpacks and metabuildpackages. This dichotomy follows the existing differences between packaging metabuildpackages, and implementation buildpackages.
+
+##### implementation buildpacks
+
+running `pack package-asset <implementation-buildpack.toml>` should produce an asset cache, as a `buildpack.toml` file contains all needed `assets`
+
+##### metabuildpacks
+
+running `pack package-asset <metabuildpack-package.toml>` will use a `package.toml` file as this command needs to reference other `asset-cache` images in the `include` array by specifying a `uri` or `image`.
 
 ## Metabuildpackage Creation
 
@@ -345,6 +388,12 @@ A new `[[asset-cache]]` array is added to the `package.toml` file used to create
 
 The following entries in a `package.toml` file would produce the Buildpackage labels in the above example.
 ```toml
+[buildpack]
+  uri = "buildpack-uri.tgz"
+
+[[dependencies]]
+  image = "buildpack/dependency:0.0.1"
+
 [[asset-cache]]
 image = "gcr.io/buildpacks/java-asset-cache"
 
