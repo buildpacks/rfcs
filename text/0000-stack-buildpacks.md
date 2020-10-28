@@ -395,7 +395,7 @@ restore = false
 Where:
 
 * `paths` = a list of paths to exclude from the layer
-* `cache` = if true, the paths will be excluded from the launch image layer, but will be included in the cache layer.
+* `cache` = if true, the paths will be excluded from the launch image layer, but will be included in a cached layer.
 * `restore` = if true, the paths will be restored during the next build.
 
 1. Paths not referenced by an `[[excludes]]` entry will be included in the cache _and_ run image (default).
