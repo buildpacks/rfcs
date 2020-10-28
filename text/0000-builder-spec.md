@@ -132,8 +132,8 @@ Additionally, a builder requires:
 * The image config's Labels field has the label io.buildpacks.buildpack.order, set to a JSON object representing an [Order](#order)
 * The image config's Labels field has the label io.buildpacks.buildpack.layers, set to a JSON object representing the [buildpack layers](#layers)
 
-If the builder contains an optional [lifecycle descriptor file][lifecycle-descriptor-rfc], it also requires:
-* The image config's Labels field has the label io.buildpacks.lifecycle.version, set to the lifecycle version
+In accordance with the [lifecycle descriptor rfc][lifecycle-descriptor-rfc], it also requires:
+* The image config's Labels field has the label io.buildpacks.lifecycle.version, set to the lifecycle version (greater than `0.9.0`)
 * The image config's Labels field has the label io.buildpacks.lifecycle.apis, set to a JSON object representing the [lifecycle apis](#lifecycle-apis)
 
 #### Order
@@ -175,7 +175,7 @@ The `io.buildpacks.builder.metadata` data should look like:
   ],
   "createdBy": {
     "name": "<creator of builder>", 
-    "version": "<builder version>"
+    "version": "<version of tool used to create builder>"
   }
 }
 ```
