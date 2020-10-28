@@ -18,7 +18,7 @@ This is a proposal for a new type of buildpack that runs against a stack in orde
 
 Normally, buildpacks do not run as root. This is an intentional design decision that ensures operations like `rebase` will work on day-2.
 
-However, many applications and buildpacks require modifications to the stack they run on, such as adding system packages or custom certificates. For this reason, we need a mechanism that buildpack authors and buildpack users can leverage to extend their stacks.
+However, many applications and buildpacks require modifications to the stack they run on, such as adding system packages or custom certificates. For this reason, we need a mechanism that stack authors, buildpack authors, and buildpack users can leverage to extend their stacks.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -28,18 +28,18 @@ However, many applications and buildpacks require modifications to the stack the
 - *userspace buildpack* - the traditional definition of a buildpack (i.e. does not run as root, and runs against an app)
 - *launch image* - the final image produced by a buildpack build. It consists of a run-image combined with layers created by buildpacks.
 
-A new type of buildpack, called a Stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. Unlike userspace buildpacks, stack buildpack can modify any path on the filesystem. Userspace buildpack can only create/modify disjoint layers (either by adding a dir to `<layers>` or modifying an app slice), which makes possible features like individual layer reuse that is independent or ordering.
+A new type of buildpack, called a stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. Unlike userspace buildpacks, stack buildpack can modify any path on the filesystem. Userspace buildpack can only create/modify disjoint layers (either by adding a dir to `<layers>` or modifying an app slice), which makes possible features like individual layer reuse that is independent or ordering.
 
-A stackpack may also define a list of mixins that it provides to the stack, or indicate that it will provide _any_ mixin. In this way, a stack that is missing a mixin required by a buildpack may have that mixin provided by a stack buildpack.
+A stackpack may also define a list of mixins that it can provide to the stack, or indicate that it can provide _any_ mixin. In this way, a stack that is missing a mixin required by a buildpack may have that mixin provided by a stack buildpack.
 
-A stack provider may choose to include stack buildpacks with the stack they distribute. If a stack includes any stack buildpacks, the following will occur when the build phase starts:
+A stack provider may choose to include stack buildpacks with the stack they distribute. If a stack includes a `/cnb/stack/order.toml` file and associated stackpacks, then the following will occur:
 
-1. The platform may compare the list of requested mixins with the static list of mixins provided by the stack buildpacks, and fail the build if it chooses to do so.
-1. The lifecycle will compare the list of required mixins to the list of mixins provided by stack and stack buildpacks in accordance with [stage-specific mixin rules](https://github.com/buildpacks/rfcs/pull/109). If any mixins are still not provided, the build will fail.
-1. The lifecycle will run the detect phase for all stackpacks defined in the build-image.
-1. The lifecycle will execute the stack buildpack build phase for all passing stackpack(s). If no stack buildpacks pass detect, the build will continue the build phase as normal (running userspace buildpacks).
-1. After, during, or before the lifecycle's build phase, the lifecycle will begin a new phase called _extend_.
-1. During the extend phase, stack buildpacks that passed detection will run against the run images accordingly (see details below).
+* Before any lifecycle phases:
+    1. The platform may compare the list of mixins that are statically required by all buildpacks (in the `stacks` sections of their `buildpack.toml` files) with the static list of mixins provided by the stack buildpacks (in the `stacks` sections of their `buildpack.toml` files), and fail the build if it chooses to do so.
+
+* During the detect phase:
+    1. The lifecycle will compare the list of required mixins to the list of mixins provided by stack and stack buildpacks in accordance with [stage-specific mixin rules](https://github.com/buildpacks/rfcs/pull/109). If any mixins are still not provided, the build will fail. To accomplish this, the list of run-time and build-time mixins that are already present in the run image and build image must be provided to the detector.
+    1. The lifecycle will run the detect phase for all stackpacks defined in the `/cnb/stack/order.toml`, and then for all userspace buildpacks defined in `/cnb/order.toml`.
 
 
 # How it Works
@@ -49,7 +49,7 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 
 * Is run as the `root` user
 * Configured with `privileged = true` in the `buildpack.toml`
-* Can only create one layer
+* Can only create one layer per image (both a layer for buildpacks to build on top of, and a layer for the app image)
 * May include, in the created layer, modifications to any part of the filesystem, excluding `<app>`, `<layers>`, `<platform>`, and `<cnb>` directories
 * Must not access the application source code during the `build` phase
 * Is run before all regular buildpacks
@@ -59,14 +59,14 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 
 The stackpack interface is similar to the buildpack interface:
 * The same `bin/detect` and `bin/build` scripts are required
-* The `bin/detect` will have read-only access to the app
+* The `bin/detect` script must not write to the app
 * The positional arguments for `bin/detect` and `bin/build` are the same
 * The environment variables and inputs for `bin/detect` and `bin/build` are the same (though the values may be different)
 * The working directory is `/` instead of the app source directory
 
 For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build or extend phases excluding a few specific directories and files.
 
-All of the captured changes in each phase (build or extend) will be included in a single layer produced as output from the stackpack. During the build phase, the snapshot will be stored in the `/layers` directory. During the extend phase, the snapshot will be stored in the `/run-layers` directory.
+All of the captured changes in each phase (build or extend) will be included in a single layer (one for run, one for build) produced as output from the stackpack. During the build phase, the snapshot will be stored in the `/layers` directory. During the extend phase, the snapshot will be stored in the `/run-layers` directory.
 
 The `/layers` dir MAY NOT be used to create arbitrary layers.
 
@@ -99,8 +99,7 @@ A stack buildpack MAY define a set of mixins it provides statically in the `buil
 id = "<stack id or *>"
 
 [stacks.provides]
-any = <boolean (default=false)>
-mixins = [ "mixin name" ]
+mixins = [ "<mixin name or *>" ]
 ```
 
 ### Requiring Mixins
@@ -112,7 +111,7 @@ A userspace buildpack MAY require mixins in the build plan
 ```
 [[requires]]
 name = "<mixin name>"
-mixin = <boolean (default=false)>
+mixins = [ "<mixin name>" ]
 ```
 
 A userspace buildpack MAY NOT provide mixins in the build plan.
@@ -121,6 +120,7 @@ A userspace buildpack MAY NOT provide mixins in the build plan.
 
 After the detect phase, the lifecycle will merge the list of provided mixins from the following sources:
 * `stack.toml`
+* `run-stack.toml` (for extend stage resolution)
 * `buildpack.toml` of any stack buildpacks
 
 If any required mixins from the Build Plan (any `[[required]]` tables with `mixins`) are not provided, then the build will fail. Otherwise the build will continue.
@@ -414,10 +414,10 @@ privileged = <boolean (default=false)>
 id = "<stack id or *>"
 
 [stacks.requires]
-mixins = [ "mixin name" ]
+mixins = [ "<mixin name>" ]
 
 [stacks.provides]
-mixins = [ "mixin name or *" ]
+mixins = [ "<mixin name or *>" ]
  ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
