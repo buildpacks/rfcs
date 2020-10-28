@@ -135,8 +135,7 @@ The entries of the build plan during the build and extend phases will have a new
 
 ```
 [[entries]]
-name = "libpq"
-mixin = true
+mixin = "libpq"
 ```
 
 A Stack Buildpack that needs to install mixins must select them from the build plan.
@@ -201,7 +200,7 @@ Its `bin/build` would have the following contents:
 
 apt update -y
 
-for package in $(cat $3 | yj -t | jq -r ".entries | .[] | .name"); do
+for package in $(cat $3 | yj -t | jq -r ".entries | .[] | .mixin"); do
   apt install $package
 done
 
@@ -410,7 +409,6 @@ Where:
  ```
 [buildpack]
 privileged = <boolean (default=false)>
-non-idempotent = <boolean (default=false)>
 
 [[stacks]]
 id = "<stack id or *>"
@@ -419,17 +417,15 @@ id = "<stack id or *>"
 mixins = [ "mixin name" ]
 
 [stacks.provides]
-any = <boolean (default=false)>
-mixins = [ "mixin name" ]
+mixins = [ "mixin name or *" ]
  ```
 
 * `privileged` - when set to `true`, the lifecycle will run this buildpack as the `root` user.
-* `non-idempotent` - when set to `true`, indicates that the buildpack is not idempotent. The lifecycle will provide a clean filesystem from the stack image(s) before each run (i.e. no cache).
 
 Under the `[stacks.provides]` table:
 
 * `any` - a boolean that, when true, indicates that the buildpack can provide all mixins
-* `mixins` - a list of names that match mixins provided by this buildpack
+* `mixins` - a list of names that match mixins provided by this buildpack, or the `*` representing all mixins.
 
 ## Build Plan (TOML)
 
@@ -439,10 +435,10 @@ name = "<dependency name>"
 
 [[requires]]
 name = "<dependency name>"
-mixin = <boolean (default=false)>
+mixins = [ "<mixin name>" ]
 
 [requires.metadata]
-# buildpack-specific data
+# buildpack-specific data; not allowed for mixins
 
 [[or]]
 
@@ -451,10 +447,10 @@ name = "<dependency name>"
 
 [[or.requires]]
 name = "<dependency name>"
-mixin = <boolean (default=false)>
+mixins = [ "<mixin name>" ]
 
 [or.requires.metadata]
-# buildpack-specific data
+# buildpack-specific data; not allowed for mixins
 ```
 
 ### Buildpack Plan (TOML)
@@ -462,7 +458,7 @@ mixin = <boolean (default=false)>
 ```
 [[entries]]
 name = "<dependency name>"
-mixin = <boolean (default=false)>
+mixin = "<mixin name>"
 
 [entries.metadata]
 # buildpack-specific data
