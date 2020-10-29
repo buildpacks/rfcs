@@ -147,7 +147,7 @@ During the restore phase of the next build, the lifecycle will download the snap
 
 During the build and extend phases, the lifecycle will extract and apply snapshot tarballs before running stack buildpacks, but after a snapshot-baseline has been captured. This ensures that all changes from the previous snapshot are preserved even if the stack buildpack does not make any additional changes.
 
-At the end of the build phase, the lifeyclce will forcefully delete everything not in `[[excludes]]` after ALL stackpacks run, before buildpacks run (which implies implies that it does not need to do this for extend phase).
+At the end of the build phase, the lifecycle will forcefully delete everything not in `[[excludes]]` after ALL stackpacks run, before buildpacks run (which implies that it does not need to do this for extend phase).
 
 ## Rebasing an App
 
