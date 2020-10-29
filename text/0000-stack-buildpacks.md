@@ -110,8 +110,7 @@ A userspace buildpack MAY require mixins in the build plan
 
 ```
 [[requires]]
-name = "<mixin name>"
-mixins = [ "<mixin name>" ]
+mixin = "<mixin name>"
 ```
 
 A userspace buildpack MAY NOT provide mixins in the build plan.
@@ -389,14 +388,12 @@ Stack buildpacks are identical to other buildpacks, with the following exception
 [[excludes]]
 paths = ["<sub-path glob>"]
 cache = false
-restore = false
 ```
 
 Where:
 
-* `paths` = a list of paths to exclude from the layer
-* `cache` = if true, the paths will be excluded from the launch image layer, but will be included in a cached layer.
-* `restore` = if true, the paths will be restored during the next build.
+* `paths` = a list of paths to exclude from the launch image layer in the extend phase. During the build phase, these paths will be removed from the filesystem before executing any userspace buildpacks.
+* `cache` = if true, the paths will be cached even if they are removed from the layer.
 
 1. Paths not referenced by an `[[excludes]]` entry will be included in the cache _and_ run image (default).
 1. Any paths with an `[[excludes]]` entry and `cache = true` will be included in the cache image, but not the run image.
@@ -434,7 +431,7 @@ name = "<dependency name>"
 
 [[requires]]
 name = "<dependency name>"
-mixins = [ "<mixin name>" ]
+mixin = "<mixin name>"
 
 [requires.metadata]
 # buildpack-specific data; not allowed for mixins
@@ -446,7 +443,7 @@ name = "<dependency name>"
 
 [[or.requires]]
 name = "<dependency name>"
-mixins = [ "<mixin name>" ]
+mixin = "<mixin name>"
 
 [or.requires.metadata]
 # buildpack-specific data; not allowed for mixins
