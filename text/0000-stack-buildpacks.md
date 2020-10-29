@@ -23,12 +23,12 @@ However, many applications and buildpacks require modifications to the stack the
 # What it is
 [what-it-is]: #what-it-is
 
-- *root buildpack* - a new type of buildpack that runs as the root user
-- *stack buildpack* - (a.k.a. stackpack) a type of root buildpack that runs against the stack image(s) instead of an app. Stack buildpacks must not make changes to the build and run images that either violate stack [compatibility guarantees](https://github.com/buildpacks/spec/blob/main/platform.md#compatibility-guarantees) or violate the contract defined by that stack's author.
+- *stack buildpack* - (a.k.a. stackpack) a type of buildpack that runs with root privileges against the stack image(s) instead of an app. Stack buildpacks must not make changes to the build and run images that either violate stack [compatibility guarantees](https://github.com/buildpacks/spec/blob/main/platform.md#compatibility-guarantees) or violate the contract defined by that stack's author.
 - *userspace buildpack* - the traditional definition of a buildpack (i.e. does not run as root, and runs against an app)
-- *launch image* - the final image produced by a buildpack build. It consists of a run-image combined with layers created by buildpacks.
+- *app image* - the final image produced by a buildpack build. It consists of a run-image combined with layers created by buildpacks.
+- *extend phase* - a new buildpack phase in which a stack buildpack may create a layer for the app image.
 
-A new type of buildpack, called a stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. Unlike userspace buildpacks, stack buildpack can modify any path on the filesystem. Userspace buildpack can only create/modify disjoint layers (either by adding a dir to `<layers>` or modifying an app slice), which makes possible features like individual layer reuse that is independent or ordering.
+A new type of buildpack, called a stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. Unlike userspace buildpacks, stack buildpack can modify any path (with exceptions) on the filesystem. Userspace buildpack can only create/modify disjoint layers (either by adding a dir to `<layers>` or modifying an app slice), which makes possible features like individual layer reuse that is independent or ordering.
 
 A stackpack may also define a list of mixins that it can provide to the stack, or indicate that it can provide _any_ mixin. In this way, a stack that is missing a mixin required by a buildpack may have that mixin provided by a stack buildpack.
 
@@ -39,8 +39,14 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 
 * During the detect phase:
     1. The lifecycle will compare the list of required mixins to the list of mixins provided by stack and stack buildpacks in accordance with [stage-specific mixin rules](https://github.com/buildpacks/rfcs/pull/109). If any mixins are still not provided, the build will fail. To accomplish this, the list of run-time and build-time mixins that are already present in the run image and build image must be provided to the detector.
-    1. The lifecycle will run the detect phase for all stackpacks defined in the `/cnb/stack/order.toml`, and then for all userspace buildpacks defined in `/cnb/order.toml`.
+    1. The lifecycle will merge and run the detect phase for all stackpacks defined in the `/cnb/stack/order.toml` and for all userspace buildpacks defined in `/cnb/order.toml`.
 
+* During the build phase (potentially in parallel to extend phase):
+    1. The lifecycle will execute the stack buildpack build phase for all passing stackpack(s) as root.
+    1. The lifecycle will drop privilidges and continue the build phase as normal (running userspace buildpacks).
+
+* During the extend phase (potentially in parallel to build phase):
+    1. During the extend phase, stack buildpacks that passed detection will run against the run images accordingly (see details below).
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -49,26 +55,25 @@ A stack provider may choose to include stack buildpacks with the stack they dist
 
 * Is run as the `root` user
 * Configured with `privileged = true` in the `buildpack.toml`
-* Can only create one layer per image (both a layer for buildpacks to build on top of, and a layer for the app image)
-* May include, in the created layer, modifications to any part of the filesystem, excluding `<app>`, `<layers>`, `<platform>`, and `<cnb>` directories
+* Can only create one layer that is exported in the app image
+* May include, in the created layer, modifications to any part of the filesystem, excluding `<app>`, `<layers>`, `<platform>`, and `<cnb>` directories as well as other directories [listed below](#spec-changes-optional).
 * Must not access the application source code during the `build` phase
-* Is run before all regular buildpacks
-* Is run against both the build and run images
-* Is distributed with the stack run and/or build image
+* Must run before all userspace buildpacks if it passes detection
+* Must run against both the build and run images if it passes detection for that stack type
+* Must be distributed with the stack build image, and may be distributed with the stack run image
 * May not create layers using the `<layers>` directory
 
 The stackpack interface is similar to the buildpack interface:
 * The same `bin/detect` and `bin/build` scripts are required
-* The `bin/detect` script must not write to the app
-* The positional arguments for `bin/detect` and `bin/build` are the same
-* The environment variables and inputs for `bin/detect` and `bin/build` are the same (though the values may be different)
+* The positional arguments for `bin/detect` and `bin/build` are the same as with userspace buildpacks
+* The environment variables and inputs for `bin/detect` and `bin/build` are the same as with userspace buildpacks (though the values may be different)
 * The working directory is `/` instead of the app source directory
 
 For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build or extend phases excluding a few specific directories and files.
 
-All of the captured changes in each phase (build or extend) will be included in a single layer (one for run, one for build) produced as output from the stackpack. During the build phase, the snapshot will be stored in the `/layers` directory. During the extend phase, the snapshot will be stored in the `/run-layers` directory.
+All of the captured changes in the extend phase will be included in a single layer produced as output from the stackpack, which will be mounted into the `/run-layers` directory of the export container. Any changes performed by the stack buildpack to the build image will persist through execution of userspace buildpacks, but not exported as a layer.
 
-The `/layers` dir MAY NOT be used to create arbitrary layers.
+The `<layers>` dir MAY NOT be used to create arbitrary layers.
 
 A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` directory, and providing an `/cnb/stack/order.toml` (following the [`order.toml` schema](https://github.com/buildpacks/spec/blob/main/platform.md#ordertoml-toml)) to define their order of execution. The order can be overridden in the `builder.toml` with the following configuration:
 
@@ -78,15 +83,15 @@ A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` 
     id = "<stackpack id>"
 ```
 
-A stackpack will only execute if it passes detection. When the stackpack is executed, its detect and build scripts use the same parameters as the regular buildpacks.
+A stackpack will only execute if it passes detection. When the stackpack is executed, its detect and build scripts use the same parameters as the userspace buildpacks.
 
-The stackpack's snapshot layer may be enriched by writing a `stack-layer.toml` file. The `stack-layer.toml` may define globs of files to be excluded from the image when it is _exported_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered when the image is _exported_. The term _exported_ is defined as:
+The stackpack's snapshot layer may be enriched by writing a `stack-layer.toml` file. The `stack-layer.toml` may define globs of files to be excluded from the image when it is _exported_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered before the build or extend phase. The term _exported_ is defined as:
 
 * *Exported for build-time build*: A given path is excluded at userspace buildpack build-time, and recovered the next time the build image is extended with the stackpack.
 * *Exported for build-time run*: A given path is excluded from the final image, and restored the next time the run image is extended with the stackpack (either rebase or rebuild).
 * *Exported for rebase run*: A given path is excluded from the rebased image, and recovered the next time the run image is extended with the stackpack (either rebase or rebuild).
 
-For example, a stack buildpack may choose to exclude `/var/cache` from the final run image, but may want to mark it as _cached_ to have it restored during build-time and rebase.
+For example, a stack buildpack may choose to exclude `/var/cache` from the final app image, but may want to mark it as _cached_ to have it restored before the extend phase.
 
 ## Mixins
 
@@ -118,13 +123,19 @@ A userspace buildpack MAY NOT provide mixins in the build plan.
 ### Resolving Mixins
 
 After the detect phase, the lifecycle will merge the list of provided mixins from the following sources:
-* `stack.toml`
-* `run-stack.toml` (for extend stage resolution)
+* Build stack image mixin list
+* Run stack image mixin list
 * `buildpack.toml` of any stack buildpacks
 
-If any required mixins from the Build Plan (any `[[required]]` tables with `mixins`) are not provided, then the build will fail. Otherwise the build will continue.
+If any required mixins from the Build Plan (any `[[requires]]` tables with `mixins`) are not provided, then the build will fail. Otherwise the build will continue.
 
-If a stack buildpack provides a mixin that is not required, the stack buildpack MAY pass detection. This is in contrast to a userspace buildpack providing a dependency that is not required, which fails detection. If a mixin is required for a [single stage only](https://github.com/buildpacks/rfcs/pull/109) with the `build:` or `run:` prefix, a stack buildpack may provide it for both stages without failing detection. However, it will not be included in the Buildpack Build Plan during the stage where it is not required.
+If a stack buildpack provides a mixin that is not required, the stack buildpack MAY pass detection. For each phase, if a stackpack:
+* provides mixins, and at least one of those mixins are required; it MAY pass
+* provides mixins, and none of those mixins are required; it MUST be skipped
+* provides mixins, and none of those mixins are required, but it also provides another dependency (non-mixin), which is required; it MAY pass
+* does not provide mixins; it MAY pass
+
+This is in contrast to a userspace buildpack providing a dependency that is not required, which fails detection. If a mixin is required for a [single stage only](https://github.com/buildpacks/rfcs/pull/109) with the `build:` or `run:` prefix, a stack buildpack may provide it for both stages without failing detection. However, it will not be included in the Buildpack Build Plan during the stage where it is not required.
 
 During the build phase, the lifecycle will create a build plan containing only the entries required during that stage (build or run).
 * If a mixin is required for "run" stage only, it will not appear in the build plan entries during build
@@ -137,7 +148,7 @@ The entries of the build plan during the build and extend phases will have a new
 mixin = "libpq"
 ```
 
-A Stack Buildpack that needs to install mixins must select them from the build plan.
+A stack buildpack that needs to install mixins must select them from the build plan.
 
 ## Caching and Restoring
 
@@ -151,20 +162,20 @@ At the end of the build phase, the lifecycle will forcefully delete everything n
 
 ## Rebasing an App
 
-Before a launch image is rebased, the platform must re-run the any stackpacks that were used to build the launch image against the new run-image. It will determine which stackpacks to run using a provided [`stack-group.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#grouptoml-toml). The Build Plan will be stored in a LABEL of the launch-image, which will be serialized back to a `plan.toml` during rebase. To each stackpack, it will pass the build plan derived from the provided [`plan.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#plantoml-toml).
+Before a app image is rebased, the platform must re-run the any stackpacks that were used to build the app image against the new run-image. It will determine which stackpacks to run using a provided [`stack-group.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#grouptoml-toml). The Build Plan will be stored in a LABEL of the app image, which will be serialized back to a `plan.toml` during rebase. To each stackpack, it will pass the build plan derived from the provided [`plan.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#plantoml-toml).
 
-The image containing the stack buildpacks and the builder binary must be provided to the rebaser operation as an argument. A platform may choose to provide the same stack buildpacks and builder binary used during the build that create the launch-image being rebased, or it may provide updates versions (which may increase the risk of something failing in the rebase process).
+The image containing the stack buildpacks and the builder binary must be provided to the rebaser operation as an argument. A platform may choose to provide the same stack buildpacks and builder binary used during the build that create the app image being rebased, or it may provide updates versions (which may increase the risk of something failing in the rebase process).
 
 A platform may choose to store the stack buildpacks and extender binary in any of the following images:
-* A companion image of the launch-image
+* A companion image of the app image
 * A builder image that is available when rebasing
-* The launch-image itself (store the stack buildpacks and builder binary alongside the application itself)
+* The app image itself (store the stack buildpacks and builder binary alongside the application itself)
 
 Then, the rebase operation can be performed as normal, while including the stackpack layers as part of the stack. This will be made possible by including the stackpack in the run-image, but because the stackpack detect phase is not run, the operation does not need access to the application source.
 
 ## Extending the Run Image
 
-We will introduce a new phase to the lifecycle to support extending the run-image with stack buildpacks. The _extend_ phase will be responsible for running stack buildpacks on the run-image, and creating layers that will be applied to the launch-image.
+We will introduce a new phase to the lifecycle to support extending the run-image with stack buildpacks. The _extend_ phase will be responsible for running stack buildpacks on the run-image, and creating layers that will be applied to the app image.
 
 ## Example: Apt Buildpack
 
@@ -392,7 +403,7 @@ cache = false
 
 Where:
 
-* `paths` = a list of paths to exclude from the launch image layer in the extend phase. During the build phase, these paths will be removed from the filesystem before executing any userspace buildpacks.
+* `paths` = a list of paths to exclude from the app image layer in the extend phase. During the build phase, these paths will be removed from the filesystem before executing any userspace buildpacks.
 * `cache` = if true, the paths will be cached even if they are removed from the layer.
 
 1. Paths not referenced by an `[[excludes]]` entry will be included in the cache _and_ run image (default).
