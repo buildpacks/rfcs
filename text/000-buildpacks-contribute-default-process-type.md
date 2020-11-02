@@ -92,7 +92,7 @@ type = "worker"
 command = "bundle exec ruby worker.rb"
 ```
 
-Buildpacks may set `default = true` to indicate that the process type being defined should be the default process type for the app image. If not specified, no default designation will be assumed (to be consistent with buildpacks implementing earlier buildpack APIs).
+Buildpacks may set `default = true` to indicate that the process type being defined should be the default process type for the app image. If not specified, no default designation will be assumed (to be consistent with buildpacks implementing earlier buildpack APIs). If multiple buildpacks try to set the default process type, the latest buildpack will win.
 
 If a buildpack attempts to define two processes with `default = true` specified, the lifecycle will fail.
 
@@ -168,4 +168,13 @@ The lifecycle if not provided any `-process-type` will set the default process t
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-Does this RFC entail any proposed changes to the core specifications or extensions? New key in `<layers>/launch.toml`, logic to disambiguate multiple buildpacks specifying different default process types, consumption of the disambiguated default process type by the exporter.
+Does this RFC entail any proposed changes to the core specifications or extensions?
+
+Buildpack API:
+* New key in `<layers>/launch.toml`
+* Logic to disambiguate multiple buildpacks specifying different default process types (such that the last buildpack to specify a default process type wins)
+* Consumption of the disambiguated default process type by the exporter when setting the image entrypoint
+
+Platform API:
+* The lifecycle will assume `default = true` for `web` processes from buildpacks implementing buildpack APIs earlier than `0.Y`.
+* If `<process-type>` does not match a buildpack-provided process, the lifecycle will fail (vs. warn)
