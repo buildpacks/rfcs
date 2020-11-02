@@ -104,14 +104,14 @@ Migration plan:
 
 `pack` stops sending `-process-type web` when `CNB_PLATFORM_API` is greater than `0.X`. The lifecycle will assume `default = true` for `web` processes from buildpacks implementing buildpack APIs earlier than `0.Y`. The lifecycle could print an info message when buildpacks do not specify a default process type. `-process-type <unknown process type>` could then become a failure case (vs. warn, what it is today).
 
-    Pros:
+  Pros:
 
-    * Usage of `CNB_PLATFORM_API` will help smooth the transition for other platforms like Tekton.
+  * Usage of `CNB_PLATFORM_API` will help smooth the transition for other platforms like Tekton.
 
-    Cons:
+  Cons:
 
-    * We can't assume that buildpacks will set `default = true`. This could still lead to a prevalence of app images where the start command must be specified by the user at runtime.
-    * The lifecycle's messages could go unseen when `pack` is used in a CI system.
+  * We can't assume that buildpacks will set `default = true`. This could still lead to a prevalence of app images where the start command must be specified by the user at runtime.
+  * The lifecycle's messages could go unseen when `pack` is used in a CI system.
 
 # Drawbacks
 [drawbacks]: #drawbacks
