@@ -132,16 +132,16 @@ If any required mixins from the Build Plan (any `[[requires]]` tables with `mixi
 If a stack buildpack provides a mixin that is not required, the stack buildpack MAY pass detection. For each phase, if a stackpack:
 * provides mixins, and at least one of those mixins are required; it MAY pass
 * provides mixins, and none of those mixins are required; it MUST be skipped
-* provides mixins, and none of those mixins are required, but it also provides another dependency (non-mixin), which is required; it MAY pass
+* provides mixins, and none of those mixins are required, but it also provides another dependency (non-mixin), which is required; it MAY pass following the normal build plan rules (TODO add example)
 * does not provide mixins; it MAY pass
 
-This is in contrast to a userspace buildpack providing a dependency that is not required, which fails detection. If a mixin is required for a [single stage only](https://github.com/buildpacks/rfcs/pull/109) with the `build:` or `run:` prefix, a stack buildpack may provide it for both stages without failing detection. However, it will not be included in the Buildpack Build Plan during the stage where it is not required.
+If a mixin is required for a [single stage only](https://github.com/buildpacks/rfcs/pull/109) with the `build:` or `run:` prefix, a stack buildpack may declare that it provides it for both stages without failing detection. However, it will not be included in the Buildpack Build Plan during the stage where it is not required.
 
-During the build phase, the lifecycle will create a build plan containing only the entries required during that stage (build or run).
-* If a mixin is required for "run" stage only, it will not appear in the build plan entries during build
-* If a mixin is required for "build" stage only, it will not appear in the build plan entries during extend
+During the detect phase, the lifecycle will create a build plan containing only the entries required during that stage (build or run) without the [stage-specifier prefix](https://github.com/buildpacks/rfcs/pull/109).
+* If a mixin is required for "run" stage only, it will not appear in the buildpack plan entries during build
+* If a mixin is required for "build" stage only, it will not appear in the buildpack plan entries during extend
 
-The entries of the build plan during the build and extend phases will have a new `mixin` key. For example:
+The entries of the buildpack plan during the build and extend phases will have a new `mixin` key. For example:
 
 ```
 [[entries]]
@@ -152,19 +152,17 @@ A stack buildpack that needs to install mixins must select them from the build p
 
 ## Caching and Restoring
 
-During the export phase, the lifecycle will store any snapshot layers created during the build phase in the cache.
+During the export phase, the lifecycle will store any excluded cached stackpack layers created during the build or extend phase in the cache.
 
-During the restore phase of the next build, the lifecycle will download the snapshot layer with the cache and store it as a tarball in the `<layers>` directory and the `<run-layers>` directory (i.e. it will not extract it). The `restorer` cannot extract the snapshot because it will not run with root privileges. In addition, the `restorer` may run in a different container than the build, which means changes made to the base image are not guaranteed to carry forward. The `builder` will run with root privileges and untar the snapshot and cache, but will drop privileges after executing stackpacks and before running userspace buildpacks. The `extender` will also run with root privileges and untar the cache.
+During the restore phase of the next build, the lifecycle will download the excluded cached stackpack layers with the cache and store them as tarballs in the `<layers>` directory and the `<run-layers>` directory (i.e. they will not be extracted). The `restorer` cannot extract the these layers because it will not run with root privileges. In addition, the `restorer` may run in a different container than the build, which means changes made to the base image are not guaranteed to carry forward. The `builder` will run with root privileges and untar these layers and cache, but will drop privileges after executing stackpacks and before running userspace buildpacks. The `extender` will also run with root privileges and untar the cache.
 
-During the build and extend phases, the lifecycle will extract and apply snapshot tarballs before running stack buildpacks, but after a snapshot-baseline has been captured. This ensures that all changes from the previous snapshot are preserved even if the stack buildpack does not make any additional changes.
-
-At the end of the build phase, the lifecycle will forcefully delete everything not in `[[excludes]]` after ALL stackpacks run, before buildpacks run (which implies that it does not need to do this for extend phase).
+During the build phase, after the stackpacks have run but before the userspace buildpacks have run, the lifecycle will forcefully delete everything in `[[excludes]]` after ALL stackpacks run, before buildpacks run (which implies that it does not need to do this for extend phase).
 
 ## Rebasing an App
 
-Before a app image is rebased, the platform must re-run the any stackpacks that were used to build the app image against the new run-image. It will determine which stackpacks to run using a provided [`stack-group.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#grouptoml-toml). The Build Plan will be stored in a LABEL of the app image, which will be serialized back to a `plan.toml` during rebase. To each stackpack, it will pass the build plan derived from the provided [`plan.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#plantoml-toml).
+Before an app image is rebased, the platform must re-run any stackpacks that were used to build the app image, against the new run-image. It will determine which stackpacks to run using a provided [`stack-group.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#grouptoml-toml). The Buildpack Plan will be stored in a LABEL of the app image, which will be serialized back to a `plan.toml` during rebase. To each stackpack, it will pass the buildpack plan derived from the provided [`plan.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#plantoml-toml).
 
-The image containing the stack buildpacks and the builder binary must be provided to the rebaser operation as an argument. A platform may choose to provide the same stack buildpacks and builder binary used during the build that create the app image being rebased, or it may provide updates versions (which may increase the risk of something failing in the rebase process).
+The image containing the stack buildpacks and the lifecycle binary must be provided to the rebaser operation as an argument. A platform may choose to provide the same stack buildpacks and lifecycle binary used during the build that create the app image being rebased, or it may provide updated versions (which may increase the risk of something failing in the rebase process).
 
 A platform may choose to store the stack buildpacks and extender binary in any of the following images:
 * A companion image of the app image
