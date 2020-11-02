@@ -96,6 +96,23 @@ Buildpacks may set `default = true` to indicate that the process type being defi
 
 If a buildpack attempts to define two processes with `default = true` specified, the lifecycle will fail.
 
+#### `pack` migration plan
+
+`pack build` has a `--default-process` flag. If this flag is not provided by the user, `pack` will provide `-process-type web` to the lifecycle. As currently architected, this will prevent any default process type contributed by buildpacks from ever taking hold, as the lifecycle will prefer the provided `-process-type` to any default process type contributed by buildpacks.
+
+Migration plan:
+
+`pack` stops sending `-process-type web` when `CNB_PLATFORM_API` is greater than `0.X`. The lifecycle will assume `default = true` for `web` processes from buildpacks implementing buildpack APIs earlier than `0.Y`. The lifecycle could print an info message when buildpacks do not specify a default process type. `-process-type <unknown process type>` could then become a failure case (vs. warn, what it is today).
+
+    Pros:
+
+    * Usage of `CNB_PLATFORM_API` will help smooth the transition for other platforms like Tekton.
+
+    Cons:
+
+    * We can't assume that buildpacks will set `default = true`. This could still lead to a prevalence of app images where the start command must be specified by the user at runtime.
+    * The lifecycle's messages could go unseen when `pack` is used in a CI system.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -118,6 +135,17 @@ Why should we *not* do this?
         (a) each process type, such that process types specified by later buildpacks MAY override process types with the same name that were specified by earlier buildpacks, depending on the value of `override`
 
         (b) the default process type itself, such that a buildpack can indicate something like "make this the default process, but only if other buildpacks didn't specify a default process"
+  - Alternative `pack` migration plan:
+
+    We introduce a new flag, `-platform-process-type` which will be the default process type IF neither the user (via `-process-type`) nor buildpacks specify a default process type. `-platform-process-type <unknown process type>` would be a warn case, and `-process-type <unknown process type>` could then become a failure case.
+
+    Pros:
+
+    * This will preserve the existing behavior of `pack` i.e., always try to set `web` as the default process type - but in a way that doesn't stomp on the buildpacks-provided default process type.
+
+    Cons:
+
+    * It could be trickier to create an image that doesn't have any default process type (users might want to do this). Potentially something like `pack build <app> --default-process none` could produce an app image without a default process type.
 
 - Why is this proposal the best? Easier for end users! It simplifies the build process (need to provide one fewer flag, don't need to rebuild if process types are not known ahead of time).
 - What is the impact of not doing this? A moderate amount of frustration.
@@ -133,31 +161,6 @@ The lifecycle if not provided any `-process-type` will set the default process t
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-
-- Should `pack` continue to pass `-process-type web`?
-
-  Options discussed:
-
-  A. `pack` stops sending `-process-type web` when `CNB_PLATFORM_API` is greater than `0.X`. The lifecycle will assume `default = true` for `web` processes from buildpacks implementing buildpack APIs earlier than `0.Y`. The lifecycle could print a warning when buildpacks do not specify a default process type. `-process-type <unknown process type>` could then become a failure case (vs. warn, what it is today).
-
-    Pros:
-
-    * Usage of `CNB_PLATFORM_API` will help smooth the transition for other platforms like Tekton.
-
-    Cons:
-
-    * We can't assume that buildpacks will set `default = true`. This could still lead to a prevalence of app images where the start command must be specified by the user at runtime.
-    * The lifecycle's warnings could go unseen when `pack` is used in a CI system.
-
-  B. We introduce a new flag, `-platform-process-type` which will be the default process type IF neither the user (via `-process-type`) nor buildpacks specify a default process type. `-platform-process-type <unknown process type>` would be a warn case, and `-process-type <unknown process type>` could then become a failure case.
-
-    Pros:
-
-    * This will preserve the existing behavior of `pack` i.e., always try to set `web` as the default process type - but in a way that doesn't stomp on the buildpacks-provided default process type.
-
-    Cons:
-
-    * It could be trickier to create an image that doesn't have any default process type (users might want to do this). Potentially something like `pack build <app> --default-process none` could produce an app image without a default process type.
 
 - What about buildpacks implementing different buildpack APIs that need to work together?
   - Assuming `default` if not specified means `default = false` is consistent with earlier buildpack API versions and will make things easier to reason about.
