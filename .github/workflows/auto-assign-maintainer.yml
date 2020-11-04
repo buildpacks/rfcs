@@ -1,6 +1,6 @@
 name: Auto-assign Maintainer
 "on":
-  pull_request:
+  pull_request_target:
     types:
     - synchronize
     - reopened
