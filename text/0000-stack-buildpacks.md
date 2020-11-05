@@ -68,6 +68,7 @@ The stackpack interface is similar to the buildpack interface:
 * The positional arguments for `bin/detect` and `bin/build` are the same as with userspace buildpacks
 * The environment variables and inputs for `bin/detect` and `bin/build` are the same as with userspace buildpacks (though the values may be different)
 * The working directory is `/` instead of the app source directory
+* The stackpacks will run in the existing build phase as well as a new extend phase. The _extend_ phase will be responsible for running stack buildpacks on the run-image, and creating layers that will be applied to the app image.
 
 For each stackpack, the lifecycle will use [snapshotting](https://github.com/GoogleContainerTools/kaniko/blob/master/docs/designdoc.md#snapshotting-snapshotting) to capture changes made during the stackpack's build or extend phases excluding a few specific directories and files.
 
@@ -170,10 +171,6 @@ A platform may choose to store the stack buildpacks and extender binary in any o
 * The app image itself (store the stack buildpacks and builder binary alongside the application itself)
 
 Then, the rebase operation can be performed as normal, while including the stackpack layers as part of the stack. This will be made possible by including the stackpack in the run-image, but because the stackpack detect phase is not run, the operation does not need access to the application source.
-
-## Extending the Run Image
-
-We will introduce a new phase to the lifecycle to support extending the run-image with stack buildpacks. The _extend_ phase will be responsible for running stack buildpacks on the run-image, and creating layers that will be applied to the app image.
 
 ## Example: Apt Buildpack
 
