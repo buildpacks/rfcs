@@ -31,19 +31,19 @@ Buildpack user, Platform operator, Buildpack author
 ### Explaining the feature largely in terms of examples.
 
 ### Asset Cache Definition
-We define the asset cache artifact. It is a reproducible OCI image. Each layer in this image contains one or more `asset` files a buildpack may contribute during a future build. Each of these `asset` files will be made available at `/cnb/assets/<asset-digest>` in the build container.
+We define the asset cache artifact. It is a reproducible OCI image. Each layer in this image contains one or more `asset` files a buildpack may contribute during a future build. Each of these `asset` files will be made available at `/cnb/assets/<asset-sha256>` in the build container.
 
 ##### General Layer Structure:
 ```
-<layer1> ┳━ /cnb/assets/<java11-asset-digest>
-         ┗━ /cnb/assets/<java13-asset-digest>
+<layer1> ┳━ /cnb/assets/<java11-asset-sha256>
+         ┗━ /cnb/assets/<java13-asset-sha256>
 
 ...
-<layern> ━━ /cnb/assets/<java15-asset-digest>
+<layern> ━━ /cnb/assets/<java15-asset-sha256>
 ```
 
 ### Asset Cache Image Labels
-Asset caches will have two labels. A simple `io.buildpacks.asset.metadata` label that contains the asset's name.
+Asset caches will have at least one label. An optional `io.buildpacks.asset.metadata` label that contains a human readable asset's name.
 ``` json
 {
   "name": "asset-org/asset-name"
@@ -57,6 +57,8 @@ Asset caches will also have a `io.buildpacks.asset.layers` Label. This label map
 {
   "asset-sha256": {
     "name": "(optional)",
+    "id" : "(required)",
+    "version": "(required)",
     "layerDiffID": "(required)",
     "uri": "(optional)",
     "stacks": [
@@ -75,6 +77,8 @@ Asset caches will also have a `io.buildpacks.asset.layers` Label. This label map
 ``` json
 {
   "<java11-asset-sha256>": {
+    "id": "java",
+    "version": "11.0.9",
     "name": "java11",
     "layerDiffId": "<layer1-diffID>",
     "uri": "https://path/to/java11.tgz",
@@ -82,13 +86,17 @@ Asset caches will also have a `io.buildpacks.asset.layers` Label. This label map
     "metadata": {}
   },
   "<java13-asset-sha256>": {
+    "id": "java",
+    "version": "13.0.2",
     "layerDiffId": "<layer1-diffID>",
     "stacks": ["io.buildpacks.stacks.bionic"],
     "metadata": {
-      "name": "java13"
+      "license": "..."
     }
   },
   "<java15-asset-sha256>": {
+    "id": "java",
+    "version": "15.0.2",
     "stacks": ["io.buildpacks.stacks.bionic"],
     "layerDiffId": "<layerk-diffID>",
   }
@@ -105,13 +113,20 @@ In order to maintain a link between buildpacks and the assets they may provide w
 [buildpack]
   id = "paketo-buildpacks/node-engine"
   version = "0.0.1"
+
+[asset-cache (optional)]
+    name = "(required if included)"
  
 [[assets]]
   sha256 = "(required)"
   name = "(optional)"
+  id   = "(required)"
+  version = "(required)"
   uri = "(optional)"
-  metadata = "(optional)"
   stacks = ["(required)"]
+  [assets.metadata]
+   (optional-key) = "(optional value)"
+
 ```
 
 
@@ -127,19 +142,35 @@ To keep track of the buildpack to asset mapping defined in `buildpack.toml` we a
     "0.0.1": {
       "api": "0.1",
       "stacks": [
+        "stack1",
+        "stack2",
         "..."
       ],
       "layerDiffID": "sha256:<some-diffID>",
       "homepage": "https://buildpacks.io",
       "assets": [
         {
-          "sha256": "asset-1-sha256"
+          "sha256": "asset-1-sha256",
+          "id": "asset-1-id",
+          "version": "asset-1-version",
+          "uri": "asset-1-uri",
+          "name": "Asset 1 Name"
+          "stacks" : ["stack1", "..."]
+          "metadata": {}
         },
         {
-          "sha256": "asset-2-sha256"
+          "sha256": "asset-2-sha256",
+          "id": "asset-2-id",
+          "version": "asset-2-version",
+          "stacks" : ["stack1", "stack2"]
+
         },
         {
-          "sha256": "..."
+          "sha256": "...",
+          "id": "...",
+          "version": "...",
+          "stacks" : ["stack1", "stack2"]
+
         }
       ]
     }
@@ -164,9 +195,22 @@ To keep track of the buildpack to asset mapping defined in `buildpack.toml` we a
       "assets": [
         {
           "sha256": "node12.9.0-sha256"
+          "id": "node",
+          "version" : "12.9.0",
+          "name": "Node JS",
+          "uri" : "https://asset-location-url",
+          "stacks" : ["io.buildpacks.stacks.bionic"],
+          "metadata": {
+            "license": "MIT"
+          }
+
         },
         {
           "sha256": "node14.5.0-sha256"
+          "id": "node",
+          "version" : "14.5.0",
+          "stacks" : ["io.buildpacks.stacks.bionic"]
+
         }
       ]
     }
@@ -191,10 +235,16 @@ To tie a buildpack to relevant asset cache images, we add a final label `io.buil
     ],
     "assets": [
       {
-        "sha256": "asset-1-sha256"
+        "sha256": "asset-1-sha256",
+        "id" : "asset-1-id",
+        "version" : "1.2.3",
+        "stacks" : ["stack1", "..."]
       },
       {
-        "sha256": "asset-2-sha256"
+        "sha256": "asset-2-sha256",
+        "id" : "asset-2-id",
+        "version" : "2.3.4",
+        "stacks" : ["stack1", "..."]
       },
       "..."
     ]
@@ -202,12 +252,15 @@ To tie a buildpack to relevant asset cache images, we add a final label `io.buil
 }
 ```
 
-These three label let us determine
+These two label let us determine
 - set of all assets that could be used by a buildpackage
+    - this is the list of all `asset` entries in any buildpack `io.buildpacks.assets.layers`
 - the set of assets that are currently included in a buildpackage
+    - listed in `io.buildpacks.asset.images`
 - set of assets that may be used by an individual buildpack.
-- set of assets provided by some predefined images.
-- possible locations to fetch assets from
+    - in the `asset` map under a buildpack `id` and `version` combination of `io.buildpacks.assets.layers`
+- locations to fetch assets may be from
+    - this info is included as the `uri` entry in each entry of the `assets` array in `io.buildpacks.assets.layers`
 
 
 To keep our metadata consistent we also propose adding the `assets` array to the `io.buildpacks.buildpackage.metadata` label.
@@ -225,10 +278,16 @@ To keep our metadata consistent we also propose adding the `assets` array to the
   ],
   "assets": [
     {
-      "sha256": "asset-1-sha256"
+      "sha256": "asset-1-sha256",
+      "id" : "asset-1-id",
+      "version" : "1.2.3",
+      "stacks" : ["stack1", "..."]
     },
     {
-      "sha256": "asset-2-sha256"
+      "sha256": "asset-2-sha256",
+      "id" : "asset-2-id",
+      "version" : "2.3.4",
+      "stacks" : ["stack1", "..."]
     },
     "..."
   ]
@@ -255,10 +314,16 @@ Additionally we will add an `asset` array to `io.buildpacks.builder.metadata` to
       "homepage": "https://buildpacks.io",
       "assets": [
         {
-          "sha256": "asset-1-sha256"
+          "sha256": "asset-1-sha256",
+          "id" : "asset-1-id",
+          "version" : "1.2.3",
+          "stacks" : ["stack1", "..."]
         },
         {
-          "sha256": "asset-2-sha256"
+          "sha256": "asset-2-sha256",
+          "id" : "asset-2-id",
+          "version" : "2.3.4",
+          "stacks" : ["stack1", "..."]
         },
         "..."
       ]
@@ -273,69 +338,36 @@ Additionally we will add an `asset` array to `io.buildpacks.builder.metadata` to
 
 ## Asset cache creation
 
-Asset Image creation will be handled by the platform. E.g. `pack package-asset <asset-cache-name> --config <asset.toml>`
+Asset Image creation will be handled by the platform. E.g. `pack package-asset <asset-cache-name> <options>`.
 
-It requires a `asset.toml` file. This file contains three top level objects: Naming info and two methods to specify assets to be included in an asset cache.
+There are two ways to package assets
+1) from a `buildpack.toml` file. This method uses the `assets` array to locate download and verify assets.
+    - Ex: `pack package-asset <asset-cache-name> <path-to-buildpack.toml>`
+3) from an already existing buildpackage. This will download all assets using `uri`s from the `io.buildpacks.buildpack.layers` label, or re-use assets that are included in the specified buildpackage's layers.
+    - Ex: `pack package-asset <asset-cache-name> <path-to-asset.toml>`
+
+The `asset.toml` file may contain three top level objects:
 1) Name information under a top level `[asset-cache]` mapping
-2) An `[[assets]]` array, each entry specifies an individual asset to be included in the asset image
-3) An `[[include]]` array specifying other asset caches. All assets from asset caches in this array will be included in the resultant asset cache.
-
-The `[asset-cache]` mapping may have the following fields defined:
-- `name` (string)
-
-Each entry in the `[[assets]]` array may have the following fields defined:
-  - `uri` (string), (required) local path or URL
-  - `digest` (string), (required) Must be unique. Must be of the form `<algorithm>:<hash-value>`. this is used for validation and as an endpoint where an  asset will be provided.
-  - `metadata`(optional) (arbitrary mapping)
-  - `name` (string),(optional) a human readable name of the dependency
-
-Each entry in the `[[include]]` array must have one of the following fields defined
-  - `image` (string), image name of an asset, image name resolution is left to the platform.
-  - `uri` (string), uri to an asset image archive.
+2) An `[[dependencies]]` array, each entry specifies a buildpackage image by `image` or `uri`. Each buildpackage will have it's associated assets included in the resulting `asset-packages`
+3) An `[[exclude]]` array, each element in this array must include a `sha256` value of an asset that will be excluded from the resulting asset cache. Other values may be included for human readability, but are not functional.
 
 ##### General Format:
 ```toml
 [asset-cache]
     name = "(required)"
  
-[[assets]]
+[[dependencies]]
+  image = "(required)"
+ 
+[[dependencies]]
+  uri = "(required)"
+
+[[exclude]]
   sha256 = "(required)"
+  uri = "(optional)"
+  id = "(optional)"
+  version = "(optional)"
   name = "(optional)"
-  uri = "(optional)"
-  [assets.metadata]
-    optional_key = "(optional value)"  
-
-[[include]]
-  uri = "(optional)"
-  image = "(optional)" #exactly one of 'uri' or 'image' must be present
-```
-
-
-##### Example
-``` toml
-[asset-cache]
-  name = "my-assets/java-asset@1.2.3"
-
-[[assets]]
-name = "java11"
-uri = "https://path/to/java11.tgz"
-sha256 = "some-sha256"
-
-[[assets]]
-uri = "/local/path/to/java13.tgz"
-sha256 = "another-sha256"
-  [assets.metadata]
-    extra = "java13 metadata"
-
-[[assets]]
-uri = "/local/path/to/java15.tgz"
-sha256 = "another-nother-sha256"
-
-[[include]]
-image = "gcr.io/ruby/asset-cache:0.0.1"
-
-[[include]]
-uri = "https://nodejs/asset-cache.tar"
 ```
 
 Asset cache creation should:
@@ -354,7 +386,7 @@ running `pack package-asset <implementation-buildpack.toml>` should produce an a
 
 ##### metabuildpacks
 
-running `pack package-asset <metabuildpack-package.toml>` will use a `package.toml` file as this command needs to reference other `asset-cache` images in the `include` array by specifying a `uri` or `image`.
+running `pack package-asset <metabuildpack-package.toml>` will use a `package.toml` file as this command needs to reference other `buildpackages` images in the `dependencies` array by specifying a `uri` or `image`.
 
 ## Metabuildpackage Creation
 
@@ -364,14 +396,13 @@ As such `assets` array in `io.buildpacks.buildpack.layers` `io.buildpacks.buildp
 
 In a similar vein, the `io.buildpacks.asset.images` will contain entries from all of the metabuildpacks children.
 
-If there are conflicts when merging these entries, the platform may decide to continue or fail.  
+If there are conflicts when merging these entries, the platform may decide to continue or fail.
 
 ## Using Asset Caches
 
-Asset caches can be added to a build by three mechanisms
-1) specify an asset cache(s) using the `--asset` flag(s).
-2) buildpackages on a builder may have asset cache references in the `io.buildpacks.assets.images` label that are not included in the builder. The platform may pull to make them available for a build.
-3) Assets cache layers can be added to a builder image during its creation. These assets will then be available to all builds that use this builder.
+Asset caches can be added to a build by two mechanisms
+1) specify an asset cache(s) using the `--asset-cache` flag(s) in a `pack build <...>`.
+2) Assets cache layers can be added to a builder image during its creation. These assets will then be available to all builds that use this builder. These assets will be pulled from
 
 
 When asset caches are added to a build/builder we need to verify the following:
@@ -382,29 +413,6 @@ When creating a builder with asset caches:
   - If any asset layer is a superset of another, only the superset layer is included in the builder.
   - builders have a `io.buildpacks.buildpack.assets` Label containing entries for every asset included in the builder.
 
-### Adding Asset Cache references to a buildpackage
-
-A new `[[asset-cache]]` array is added to the `package.toml` file used to create buildpackages. The values in this array are used to fill out the `io.buildpacks.buildpackage.assets` label.
-
-The following entries in a `package.toml` file would produce the Buildpackage labels in the above example.
-```toml
-[buildpack]
-  uri = "buildpack-uri.tgz"
-
-[[dependencies]]
-  image = "buildpack/dependency:0.0.1"
-
-[[asset-cache]]
-image = "gcr.io/buildpacks/java-asset-cache"
-
-[[asset-cache]]
-uri = "https://buildpacks.io/asset-cache-fallback/java.tgz"
-
-[[asset-cache]]
-image = "urn:cnb:registry:buildpacks/java-asset-cache"
-```
-
-The platform may verify each `[[asset-cache]]` exists when creating a buildpackage.
 
 ### `lifecycle` changes
 The platform should now provide a `CNB_ASSETS` environment variable to the `build` and `detect phases`. This provides a standard variable buildpacks may use when looking up assets. The value of `CNB_ASSETS` will default to `/cnb/assets`.
@@ -416,12 +424,12 @@ When performing a build. The platform should apply asset layer changesets to the
 ```
 cnb
  └── assets
-     ├── <java11-asset-digest>
-     ├── <java13-asset-digest>
-     └── <java15-asset-digest>
+     ├── <java11-asset-sha256>
+     ├── <java13-asset-sha256>
+     └── <java15-asset-sha256>
 ```
 
-Buildpacks should then be able to quickly check for available assets using a `digest` of the asset they wish to use in tandem with the `CNB_ASSETS` environment variable.
+Buildpacks should then be able to quickly check for available assets using a `sha256` of the asset they wish to use in tandem with the `CNB_ASSETS` environment variable.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -435,4 +443,3 @@ Why should we *not* do this?
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-
