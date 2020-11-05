@@ -172,6 +172,10 @@ A platform may choose to store the stack buildpacks and extender binary in any o
 
 Then, the rebase operation can be performed as normal, while including the stackpack layers as part of the stack. This will be made possible by including the stackpack in the run-image, but because the stackpack detect phase is not run, the operation does not need access to the application source.
 
+## Stack Platform Dir
+
+TODO
+
 ## Example: Apt Buildpack
 
 (**note**: this is only an example. A real Apt Buildpack would probably be more robust).
@@ -360,6 +364,7 @@ In the future, we plan to enhance the stack buildpack interface with the followi
 
 - what about the bill of materials?
 - how do we prevent problems on rebase if the mixins provided by the stack change?
+- how does detect know the run-image mixins?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
