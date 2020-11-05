@@ -190,7 +190,7 @@ privileged = true
 id = "io.buildpacks.stacks.bionic"
 
 [stacks.provides]
-any = true
+mixins = [ "*" ]
 ```
 
 Its `bin/detect` would have the following contents:
@@ -327,8 +327,7 @@ A buildpack may that requires the `jq` package may have it provided by either a 
 
 ```toml
 [[or.requires]]
-name = "jq"
-mixin = true
+mixin = "jq"
 
 [[or.requires]]
 name = "jq"
@@ -340,6 +339,7 @@ In the future, we plan to enhance the stack buildpack interface with the followi
 
 * A `CNB_STACK_TYPE` env var that a stack buildpack can use to behave differently on each part of the stack
 * Support for `creator`. Because of the new extend phase, it is not possible to easily run the entire buildpack process with a single binary.
+* Snapshot caching during the build phase, which would allow stackpack authors cache all changes to the filesystem.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -361,11 +361,8 @@ In the future, we plan to enhance the stack buildpack interface with the followi
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- what happens if a mixin that already exist on the image is required, how does the lifecycle know?
 - what about the bill of materials?
-- what metadata do we need to do a rebase; what are the schema of the labels?
 - how do we prevent problems on rebase if the mixins provided by the stack change?
-- while the rebase process may get its stackpacks from any image passed to it, do we need to support official ways of producing well-formed run-builders?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
@@ -376,9 +373,10 @@ A number of changes to the Platform Specification will be required to execute St
 
 Stack buildpacks are identical to other buildpacks, with the following exceptions:
 
-1. The `<layers>` directory WILL NOT be used to create layers.
+1. The `<layers>` directory WILL NOT be used to create arbitrary layers.
 1. The working directory WILL NOT contain application source code during the build phase.
-1. All changes made to the filesystem during the execution of the stackpack's `bin/build` will be snapshotted and stored as a single layer, with the exception of the following directories:
+1. The stack buildpack's `bin/build` will execute on the run-image during the extend phase.
+1. All changes made to the filesystem during the execution of the stack buildpack's `bin/build` in the extend phase will be snapshotted and stored as a single layer, with the exception of the following directories:
 
 * `/tmp`
 * `/cnb`
@@ -402,15 +400,15 @@ cache = false
 Where:
 
 * `paths` = a list of paths to exclude from the app image layer in the extend phase. During the build phase, these paths will be removed from the filesystem before executing any userspace buildpacks.
-* `cache` = if true, the paths will be cached even if they are removed from the layer.
+* `cache` = if true, the paths will be cached even if they are removed from the filesystem.
 
-1. Paths not referenced by an `[[excludes]]` entry will be included in the cache _and_ run image (default).
-1. Any paths with an `[[excludes]]` entry and `cache = true` will be included in the cache image, but not the run image.
-1. Any paths with an `[[excludes]]` entry and `cache = false` will not be included in the cache image or the run image.
+1. Paths not referenced by an `[[excludes]]` entry will be included in the app-image layer (default).
+1. Any paths with an `[[excludes]]` entry and `cache = true` will be included in the cache image, but not the app image.
+1. Any paths with an `[[excludes]]` entry and `cache = false` will not be included in the cache image or the app image.
 
 ## buildpack.toml  (TOML)
 
- This proposal adds new keys to the `[buildpack]` table in `buildpack.toml`, and a new `mixins` array:
+This proposal adds new keys to the `[buildpack]` table in `buildpack.toml`, and a new `mixins` array:
 
  ```
 [buildpack]
