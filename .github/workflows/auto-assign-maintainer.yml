@@ -10,7 +10,7 @@ name: Auto-assign Maintainer
 jobs:
   core:
     name: Auto-assign Core Maintainer
-    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == "" }}
+    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == '' }}
     runs-on:
     - ubuntu-latest
     steps:
@@ -19,7 +19,7 @@ jobs:
         configuration-path: .github/auto-assign-core.yml
   distribution:
     name: Auto-assign Distribution Maintainer
-    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == "" }}
+    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == '' }}
     runs-on:
     - ubuntu-latest
     steps:
@@ -28,7 +28,7 @@ jobs:
         configuration-path: .github/auto-assign-distribution.yml
   implementation:
     name: Auto-assign Implementation Maintainer
-    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == "" }}
+    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == '' }}
     runs-on:
     - ubuntu-latest
     steps:
@@ -37,7 +37,7 @@ jobs:
         configuration-path: .github/auto-assign-implementation.yml
   learning:
     name: Auto-assign Learning Maintainer
-    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == "" }}
+    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == '' }}
     runs-on:
     - ubuntu-latest
     steps:
@@ -46,7 +46,7 @@ jobs:
         configuration-path: .github/auto-assign-learning.yml
   platform:
     name: Auto-assign Platform Maintainer
-    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == "" }}
+    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == '' }}
     runs-on:
     - ubuntu-latest
     steps:
