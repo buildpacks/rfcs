@@ -341,7 +341,7 @@ To provide additional control over asset creation, we may optionally pass  the `
 [asset-cache (optional)]
   name = "(required)"
  
-[[exclude-buildpack-assets (optional)]]
+[[exclude-dependencies (optional)]]
   id = "(required)"
   version = "(required)"
 
