@@ -176,6 +176,12 @@ Then, the rebase operation can be performed as normal, while including the stack
 
 TODO
 
+seperate env vars for the stack (--stack-env)
+
+no accidental envars coming from other buildpacks or other places
+
+
+
 ## Example: Apt Buildpack
 
 (**note**: this is only an example. A real Apt Buildpack would probably be more robust).
@@ -340,7 +346,7 @@ In the future, we plan to enhance the stack buildpack interface with the followi
 
 * A `CNB_STACK_TYPE` env var that a stack buildpack can use to behave differently on each part of the stack
 * Support for `creator`. Because of the new extend phase, it is not possible to easily run the entire buildpack process with a single binary.
-* Snapshot caching during the build phase, which would allow stackpack authors cache all changes to the filesystem.
+* Snapshot caching during the build and extend phase, which would allow stackpack authors cache all changes to the filesystem.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -363,6 +369,8 @@ In the future, we plan to enhance the stack buildpack interface with the followi
 [unresolved-questions]: #unresolved-questions
 
 - what about the bill of materials?
+    - extend phase artifacts go in the BOM
+    - build phase go in report.toml
 - how do we prevent problems on rebase if the mixins provided by the stack change?
 - how does detect know the run-image mixins?
 
