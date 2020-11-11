@@ -54,7 +54,7 @@ The Buildpacks team is making a commitment to the future of the project that bui
 # Spec. Changes
 [spec-changes]: #spec-changes
 
-The RFC proposes a breaking change to the spec because it will enforce a buildpack version format that is not specified. It will need to be defined here: https://github.com/buildpacks/spec/blob/master/buildpack.md#buildpacktoml-toml
+The RFC proposes a breaking change to the spec because it will enforce a buildpack version format that is not specified. It will need to be defined here: https://github.com/buildpacks/spec/blob/main/buildpack.md#buildpacktoml-toml
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
