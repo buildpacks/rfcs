@@ -3,9 +3,9 @@
 - Name: Buildpacks should be able to define the default process type for an app
 - Start Date: 8/20/20
 - Author(s): natalieparellano
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#110](https://github.com/buildpacks/rfcs/pull/110)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: n/a
 
 # Summary
