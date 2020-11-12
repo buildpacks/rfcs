@@ -42,7 +42,7 @@ Once an RFC has been accepted, the sub-team maintainers should:
 1. Create issues [referencing](https://docs.github.com/en/github/writing-on-github/autolinked-references-and-urls#issues-and-pull-requests) the RFC PR.
 1. Label the PR with `issues-created/<sub-team>` after issues have been created or if zero issues necessary for a given sub-team.
 
-Once an `issues-created/<sub-team>` label has been created for each sub-team, the RFC is ready to merg. The team member who merges the pull request should do the following:
+Once an `issues-created/<sub-team>` label has been created for each sub-team, the RFC is ready to merge. The team member who merges the pull request should do the following:
 
 1. Assign an id based off the pull request number.
 1. Rename the file based off the ID inside `text/`.
@@ -54,8 +54,10 @@ Once an `issues-created/<sub-team>` label has been created for each sub-team, th
 
 ## Automation
 
-The `merge-rfc.sh` script automates several steps of the merge process for accepted RFCs. The following will assign an ID, update the RFC metadata with refencing to the PR and created issues, and merge an RFC to the `main`.
+The `merge-rfc.sh` script automates several steps of the merge process for accepted RFCs. The following will assign an ID, update the RFC metadata with references to the PR and created issues, and merge an RFC to the `main`.
 ```
-./merge-rfc.sh [-i <issue>...] <PR#>
+./merge-rfc.sh [-i <issue>...] [-n] <PR#>
 ```
+Each `<issue>` should be of the form `<org>/<repo>#<number>` (e.g. `buildpacks/spec#1`). In the rare case that no work must be done in the project as a result of the RFC pass the `-n` flag to explicitly indicate that no issues should be linked.
+
 After running the `merge-rfc.sh` script, manually verify the output before pushing changes.
