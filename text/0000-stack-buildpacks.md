@@ -133,8 +133,10 @@ If any required mixins from the Build Plan (any `[[requires]]` tables with `mixi
 If a stack buildpack provides a mixin that is not required, the stack buildpack MAY pass detection. For each phase, if a stackpack:
 * provides mixins, and at least one of those mixins are required; it MAY pass
 * provides mixins, and none of those mixins are required; it MUST be skipped
-* provides mixins, and none of those mixins are required, but it also provides another dependency (non-mixin), which is required; it MAY pass following the normal build plan rules (TODO add example)
+* provides mixins, and none of those mixins are required, but it also provides another dependency (non-mixin), which is required; it MAY pass following the normal build plan rules
 * does not provide mixins; it MAY pass
+
+As an example of these resolution rules, consider a stackpack that provides a mixin and a dependency. TODO
 
 If a mixin is required for a [single stage only](https://github.com/buildpacks/rfcs/pull/109) with the `build:` or `run:` prefix, a stack buildpack may declare that it provides it for both stages without failing detection. However, it will not be included in the Buildpack Build Plan during the stage where it is not required.
 
@@ -172,15 +174,11 @@ A platform may choose to store the stack buildpacks and extender binary in any o
 
 Then, the rebase operation can be performed as normal, while including the stackpack layers as part of the stack. This will be made possible by including the stackpack in the run-image, but because the stackpack detect phase is not run, the operation does not need access to the application source.
 
-## Stack Platform Dir
+## Stack Platform Directory
 
-TODO
+The `detect` and `build` phases will be provided with a stack-specific platform directory, instead of the userspace platform directory. In this way, the lifecycle can ensure that no environment variables or other platform-specific extensions are coming from other buildpacks or other sources that may impact the stackpacks ability to successful rebase in the future.
 
-seperate env vars for the stack (--stack-env)
-
-no accidental envars coming from other buildpacks or other places
-
-
+The new stack-specific platform directory will require new options for the lifecycle detect and build interfaces, but the stackpacks `detect` and `build` executables will retain the same interface (i.e. they simply get a different platform dir than other buildpacks).
 
 ## Example: Apt Buildpack
 
@@ -490,7 +488,8 @@ Usage:
   ...
   [-stack-buildpacks <stack-buildpacks>] \
   [-stack-group <group>] \
-  [-stack-order <order>]
+  [-stack-order <order>] \
+  [-stack-platform <stack-platform>]
 ```
 
 ##### Inputs
@@ -500,6 +499,7 @@ Usage:
 | `<stack-buildpacks>`  | `CNB_STACK_BUILDPACKS_DIR`  | `/cnb/stack/buildpacks` | Path to stack buildpacks directory (see [Buildpacks Directory Layout]
 | `<stack-group>`       | `CNB_STACK_GROUP_PATH`      | `./stack-group.toml`    | Path to output group definition(#buildpacks-directory-layout))
 | `<stack-order>`.      | `CNB_STACK_ORDER_PATH`.     | `/cnb/stack/order.toml`| Path to order definition (see order.toml)
+| `<stack-platform>`   | `CNB_STACK_PLATFORM_DIR`    | `/stack-platform`       | Path to stack-specific platform directory
 
 ##### Outputs
 | Output             | Description
@@ -516,7 +516,8 @@ Usage:
 /cnb/lifecycle/builder \
   ...
   [-stack-buildpacks <stack-buildpacks>] \
-  [-stack-group <stack-group>]
+  [-stack-group <stack-group>] \
+  [-stack-platform <stack-platform>]
 ```
 
 ##### Inputs
@@ -525,6 +526,7 @@ Usage:
 | ...                   |                             |                         |
 | `<stack-buildpacks>`  | `CNB_STACK_BUILDPACKS_DIR`  | `/cnb/stack/buildpacks` | Path to stack buildpacks directory (see [Buildpacks Directory Layout]
 | `<stack-group>`       | `CNB_STACK_GROUP_PATH`      | `./stack-group.toml`    | Path to output group definition(#buildpacks-directory-layout))
+| `<stack-platform>`   | `CNB_STACK_PLATFORM_DIR`    | `/stack-platform`       | Path to stack-specific platform directory
 
 ##### Outputs
 | Output                                     | Description
@@ -550,6 +552,7 @@ Usage:
 | `<stack-layers>`    | `CNB_STACK_LAYERS_DIR`      | `/stack-layers`           | Path to stack layers directory from extend phase
 
 
+
 #### `rebaser`
 Usage:
 ```
@@ -565,7 +568,7 @@ Usage:
 | ...                 |                       |                        |
 | `<cache-image>`     | `CNB_CACHE_IMAGE`     |                        | Reference to a cache image in an OCI image registry
 | `<plan>`       | `CNB_PLAN_PATH`       | `./plan.toml`     | Path to resolved build plan (see [`plan.toml`](#plantoml-toml))
-| `<platform>`        | `CNB_PLATFORM_DIR`    | `/platform`            | Path to platform directory
+| `<stack-platform>`   | `CNB_STACK_PLATFORM_DIR`    | `/stack-platform`       | Path to stack-specific platform directory
 | `<stack-group>`     | `CNB_STACK_GROUP_PATH` | `./stack-group.toml`    | Path to group definition(#buildpacks-directory-layout)) of buildpacks that run during the extend phase that created the image being rebased.
 
 #### `extender`
@@ -577,7 +580,7 @@ Usage:
   [-layers <layers>] \
   [-log-level <log-level>] \
   [-plan <plan>] \
-  [-platform <platform>]
+  [-stack-platform <stack-platform>]
 ```
 
 ##### Inputs
@@ -586,7 +589,7 @@ Usage:
 | `<layers>`     | `CNB_LAYERS_DIR`      | `/layers`         | Path to layers directory
 | `<log-level>`  | `CNB_LOG_LEVEL`       | `info`            | Log Level
 | `<plan>`       | `CNB_PLAN_PATH`       | `./plan.toml`     | Path to resolved build plan (see [`plan.toml`](#plantoml-toml))
-| `<platform>`   | `CNB_PLATFORM_DIR`    | `/platform`       | Path to platform directory
+| `<stack-platform>`   | `CNB_STACK_PLATFORM_DIR`    | `/stack-platform`       | Path to stack-specific platform directory
 | `<stack-buildpacks>`  | `CNB_STACK_BUILDPACKS_DIR`  | `/cnb/stack/buildpacks` | Path to stack buildpacks directory (see [Buildpacks Directory Layout]
 | `<stack-group>`       | `CNB_STACK_GROUP_PATH`      | `./stack-group.toml`    | Path to output group definition(#buildpacks-directory-layout))
 
