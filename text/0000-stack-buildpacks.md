@@ -201,9 +201,7 @@ If only the `chromedriver` is required, or the `google-chrome-stable` is already
 name = "chromedriver"
 ```
 
-If the stack does not already provide `google-chrome-stable`, the stackpack will install it anyways.... TODO
-
-This implies that a build may fail or an app may not work at runtime if that app requires only the `chromedriver` and the `google-chrome-stable` is not provided by the stack.
+If the stack does not already provide `google-chrome-stable`, the stackpack may install it anyways. This prevents the case where an app may not work at runtime if that app requires only the `chromedriver` and the `google-chrome-stable` is not provided by the stack.
 
 ## Caching and Restoring
 
