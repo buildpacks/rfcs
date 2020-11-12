@@ -201,6 +201,8 @@ If only the `chromedriver` is required, or the `google-chrome-stable` is already
 name = "chromedriver"
 ```
 
+If the stack does not already provide `google-chrome-stable`, the stackpack will install it anyways.... TODO
+
 This implies that a build may fail or an app may not work at runtime if that app requires only the `chromedriver` and the `google-chrome-stable` is not provided by the stack.
 
 ## Caching and Restoring
@@ -421,6 +423,7 @@ In the future, we plan to enhance the stack buildpack interface with the followi
     - build phase go in report.toml
 - how do we prevent problems on rebase if the mixins provided by the stack change?
 - how does detect know the run-image mixins?
+- If a mixin is required for build, but is not needed for extend, does the stackpack execute in both phases (and visa versa)?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
