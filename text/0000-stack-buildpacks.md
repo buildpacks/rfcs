@@ -42,7 +42,7 @@ A stack provider may choose to include stack buildpacks with the stack they dist
     1. The lifecycle will merge and run the detect phase for all stackpacks defined in the `/cnb/stack/order.toml` and for all userspace buildpacks defined in `/cnb/order.toml`.
 
 * During the build phase (potentially in parallel to extend phase):
-    1. The lifecycle will execute the stack buildpack build phase for all passing stackpack(s) as root.
+    1. The lifecycle will execute the stack buildpack build phase with root privileges for all passing stackpack(s).
     1. The lifecycle will drop privilidges and continue the build phase as normal (running userspace buildpacks).
 
 * During the extend phase (potentially in parallel to build phase):
@@ -136,8 +136,6 @@ If a stack buildpack provides a mixin that is not required, the stack buildpack 
 * provides mixins, and none of those mixins are required, but it also provides another dependency (non-mixin), which is required; it MAY pass following the normal build plan rules
 * does not provide mixins; it MAY pass
 
-As an example of these resolution rules, consider a stackpack that provides a mixin and a dependency. TODO
-
 If a mixin is required for a [single stage only](https://github.com/buildpacks/rfcs/pull/109) with the `build:` or `run:` prefix, a stack buildpack may declare that it provides it for both stages without failing detection. However, it will not be included in the Buildpack Build Plan during the stage where it is not required.
 
 During the detect phase, the lifecycle will create a build plan containing only the entries required during that stage (build or run) without the [stage-specifier prefix](https://github.com/buildpacks/rfcs/pull/109).
@@ -152,6 +150,58 @@ mixin = "libpq"
 ```
 
 A stack buildpack that needs to install mixins must select them from the build plan.
+
+### Example: PostgreSQL Certs
+
+As an example of these resolution rules, consider an Apt stackpack that provide any (`*`) mixin. During the detect phase, the stackpack will pass in the following cases:
+* a mixin is required by a buildpack
+* a mixin is [required by an app](https://github.com/buildpacks/rfcs/pull/112)
+
+The example stackpack will be skipped after detection in the following cases:
+* no mixins are required by any component of the build
+* A mixin is required by a buildpack, but the stack already provides that mixin.
+* A mixin is required by an app, but the stack already provides that mixin.
+
+### Example: PostgreSQL Certs
+
+As another example of these resolution rules, consider a stackpack that provides the `libpq` mixin and a build plan dependency called `db-cert`. During the detect phase, the stackpack will pass in the following cases:
+* a Ruby app requires the `libpq` mixin and the `db-cert`
+* a Java app requires only the `db-cert`
+* a Python app requires the `db-cert` and the stack already provides the `libpq` mixin
+
+The example stackpack will be skipped after detection in the following cases:
+* an app requires the `libpq` mixin but not the `db-cert`
+* an app requires neither the `libpq` mixin nor the `db-cert`
+
+### Example: Chrome and Chromedriver
+
+As another example of these resolution rules, consider a stackpack that provides the `google-chrome-stable` mixin and a build plan dependency called `chromedriver`. During the detect phase, the stackpack will pass detection in the following cases:
+* an app requires the `google-chrome-stable` mixin and the `chromedriver`
+* an app requires only the `chromedriver`
+* an app requires the `chromedriver` and the stack already provides the `google-chrome-stable` mixin
+
+The example stackpack will be skipped after detection in the following cases:
+* an app requires the `google-chrome-stable` mixin but not the `chromedriver`
+* an app requires neither the `google-chrome-stable` mixin nor the `chromedriver`
+
+During the build phase the example stackpack will be given a [buildpack plan](https://github.com/buildpacks/spec/blob/main/buildpack.md#buildpack-plan-toml) containing the entries it must provide. For example, if both dependencies are required it will receive:
+
+```toml
+[[entries]]
+mixin = "google-chrome-stable"
+
+[[entries]]
+name = "chromedriver"
+```
+
+If only the `chromedriver` is required, or the `google-chrome-stable` is already provided by the stack, the build phase would receive:
+
+```toml
+[[entries]]
+name = "chromedriver"
+```
+
+This implies that a build may fail or an app may not work at runtime if that app requires only the `chromedriver` and the `google-chrome-stable` is not provided by the stack.
 
 ## Caching and Restoring
 
