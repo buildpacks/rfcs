@@ -151,7 +151,7 @@ mixin = "libpq"
 
 A stack buildpack that needs to install mixins must select them from the build plan.
 
-### Example: PostgreSQL Certs
+### Example: Any Mixin Buildpack
 
 As an example of these resolution rules, consider an Apt stackpack that provide any (`*`) mixin. During the detect phase, the stackpack will pass in the following cases:
 * a mixin is required by a buildpack
