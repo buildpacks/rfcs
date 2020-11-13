@@ -3,9 +3,9 @@
 - Name: Builder Spec
 - Start Date: 2020-09-11
 - Author(s): [@dfreilich](https://github.com/dfreilich)
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#116](https://github.com/buildpacks/rfcs/pull/116)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/spec#101](https://github.com/buildpacks/spec/issues/101), [buildpacks/pack#945](https://github.com/buildpacks/pack/issues/945)
 - Supersedes: N/A
 
 # Summary
