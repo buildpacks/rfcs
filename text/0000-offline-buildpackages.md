@@ -228,7 +228,7 @@ To keep track of the buildpack to asset mapping defined in `buildpack.toml` we a
 This label let us determine:
 - set of all assets that could be used by a buildpackage
 - set of assets that may be used by an individual buildpack.
-- locations to fetch assets may be from
+- locations to fetch assets from
 
 
 To keep our metadata consistent we also propose adding the `assets` array to the `io.buildpacks.buildpackage.metadata` label.
@@ -410,7 +410,7 @@ When creating a builder we can now specify `asset-cache` packages we wish to inc
 
 Asset caches can be added to a build by two mechanisms
 1) specify an asset cache(s) using the `--asset-cache` flag(s) in a `pack build <...>`.
-2) Assets cache layers can be added to a builder image during its creation. These assets will then be available to all builds that use this builder. These assets will be pulled from
+2) Assets cache layers can be added to a builder image during its creation. These assets will then be available to all builds that use this builder.
 
 
 When asset caches are added to a build/builder we need to verify the following:
