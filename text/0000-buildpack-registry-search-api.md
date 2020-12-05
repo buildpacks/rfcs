@@ -42,10 +42,6 @@ An external API service that exposes endpoints for retrieving buildpack metadata
 
 ### Supported Endpoints
 
-- **GET /buildpacks**
-  
-  Retrives all the buildpacks in the registry
-
 - **GET /buildpacks?query=text**
 
   Retrievs all the buildpacks that statisfy the search query.  For example:
