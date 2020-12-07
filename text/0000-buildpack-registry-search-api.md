@@ -23,8 +23,6 @@ This is a proposal for a service API that enables clients to search for buildpac
 
 **Client** - represents a physical end-user or software interface e.g. CLI, web UI, etc.
  
-Make a list of the definitions that may be useful for those reviewing. Include phrases and words that buildpack authors or other interested parties may not be familiar with.
-
 # Motivation
 [motivation]: #motivation
 
@@ -61,13 +59,16 @@ An external API service that exposes endpoints for retrieving buildpack metadata
       "ns":"projectriff",
       "name":"java-function",
       "version":"1.4.1",
-      "yanked":false,"addr":"gcr.io/projectriff/java-function@sha256:5eabea8f7b2c09074ec196fe0c321006fb5ad8f282cc918520286d8a0007196f"},
+      "yanked":false,
+      "addr":"gcr.io/projectriff/java-function@sha256:5eabea8f7b2c09074ec196fe0c321006fb5ad8f282cc918520286d8a0007196f"
+    },
     {
       "ns":"projectriff",
       "name":"node-function",
       "version":"1.4.1",
       "yanked":false,
-      "addr":"gcr.io/projectriff/node-function@sha256:194298b826c15bb079c59aed99968d7678a6e1f7a882c9d7f61811e0990717ba"},
+      "addr":"gcr.io/projectriff/node-function@sha256:194298b826c15bb079c59aed99968d7678a6e1f7a882c9d7f61811e0990717ba"
+    },
     {
       "ns":"projectriff",
       "name":"streaming-http-adapter",
@@ -101,9 +102,9 @@ An external API service that exposes endpoints for retrieving buildpack metadata
 # How it Works
 [how-it-works]: #how-it-works
 
-In the initial implementation, we can take advantage of the existing [registry](https://github.com/buildpacks/registry-index) repository to pull buildpack data from.  Pack already performs a clone/pull on this repo for its registry cache.  To keep ensure up-to-date buildpack data, we'd have a polling loop that performs a `git pull`.  This polling would take place in a separate background process.  
+In the initial implementation, we can take advantage of the existing [registry](https://github.com/buildpacks/registry-index) repository to pull buildpack data from.  To keep ensure up-to-date buildpack data, we'd have a polling loop that performs a `git pull`.  This polling would take place in a separate background process.  
 
-Each time the local repository has been updated via `git pull`, buildapack data will be processed/normalized into a single JSON object, where plain text searches can be used against it.   Fields in this JSON object will be re-indexed as searchable fields, which will be compared against the search text during the retrieval algorithm.
+Each time the local repository has been updated via `git pull`, buildpack data will be processed/normalized into a single JSON object, where plain text searches can be used against it.   Fields in this JSON object will be re-indexed as searchable fields, which will be compared against the search text during the retrieval algorithm.
 
 In addition, a server process will expose endpoints and handle incoming request for the GET endpoints mentioned earlier.  For search requests, the text will be extracted from the `query` query parameter and used to search against the normalized buildpacks index.   Results will be added to the server response, as a list of JSON objects.
 
@@ -153,6 +154,7 @@ Why should we *not* do this?
   2. [npm](https://www.npmjs.com/)
   3. [Rust](https://crates.io/)
   4. [Dockerhub](https://hub.docker.com/)
+  5. [Tekton Hub](https://hub-preview.tekton.dev/)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
