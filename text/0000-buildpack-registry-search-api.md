@@ -108,7 +108,7 @@ Search fields will include `ns`, `name`, `license`, and `yanked`.
 
 In addition, a server process will expose endpoints and handle incoming request for the GET endpoints mentioned earlier.  For search requests, the text will be extracted from the `query` query parameter and used to search against the normalized buildpacks index.   Results will be added to the server response, as a list of JSON objects.
 
-*Note:  The Distribution Team maintainers can manage this service, and could even set-up a pager (but only best effort, and during working hours).
+*Note:  Initially, the Distribution Team maintainers can manage this service, and could even set-up a pager (but only best effort, and during working hours).  In the future, we maybe able to extend this to other verified project contributors.
 
 # Drawbacks
 [drawbacks]: #drawbacks
