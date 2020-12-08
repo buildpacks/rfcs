@@ -40,11 +40,11 @@ An external API service that exposes endpoints for retrieving buildpack metadata
 
 ### Supported Endpoints
 
-- **GET /buildpacks?query=text**
+- **GET /search?query=text**
 
-  Retrievs all the buildpacks that statisfy the search query.  For example:
+  Retrievs all the buildpacks that satisfy the search query.  If the response contains more than 20 buildpacks, pagination will be used.  For example:
   ```
-  $ curl https://glacial-plateau-95350.herokuapp.com/buildpacks?query=projectriff
+  $ curl https://registry.buildpacks.io/search?query=projectriff
   ```
   ```json
   [
@@ -79,11 +79,11 @@ An external API service that exposes endpoints for retrieving buildpack metadata
   ]
   ```
 
-- **GET /buildpacks/:id**
+- **GET /buildpacks/:ns/:name**
 
-  Retrieves metadata for a specific buildpack.  This will contain more detailed data.
+  Retrieves metadata for a specific buildpack.  This response *could* contain more detailed data e.g. download metrics.
   ```
-  $ curl https://glacial-plateau-95350.herokuapp.com/buildpacks/1
+  $ curl https://registry.buildpacks.io/buildpacks/projectriff/command-function
   ```
   ```json
   {
@@ -91,10 +91,8 @@ An external API service that exposes endpoints for retrieving buildpack metadata
       "license": "MIT",
       "ns":"projectriff",
       "name":"command-function",
-      "latest_version": "1.4.1",
-      "versions": "/buildpacks/1/versions",
-      "weekly_downloads": 8993,
-      "issues": 44,
+      "version": "1.4.1",
+      "yanked":false,
       "addr":"gcr.io/projectriff/command-function@sha256:99f9054abb73635a9b251b61d3627a8ff86508c767f9d691c426d45e8758596f"
   }
   ```
@@ -105,6 +103,8 @@ An external API service that exposes endpoints for retrieving buildpack metadata
 In the initial implementation, we can take advantage of the existing [registry](https://github.com/buildpacks/registry-index) repository to pull buildpack data from.  To keep ensure up-to-date buildpack data, we'd have a polling loop that performs a `git pull`.  This polling would take place in a separate background process.  
 
 Each time the local repository has been updated via `git pull`, buildpack data will be processed/normalized into a single JSON object, where plain text searches can be used against it.   Fields in this JSON object will be re-indexed as searchable fields, which will be compared against the search text during the retrieval algorithm.
+
+Search fields will include `ns`, `name`, `license`, and `yanked`. 
 
 In addition, a server process will expose endpoints and handle incoming request for the GET endpoints mentioned earlier.  For search requests, the text will be extracted from the `query` query parameter and used to search against the normalized buildpacks index.   Results will be added to the server response, as a list of JSON objects.
 
@@ -167,4 +167,5 @@ Why should we *not* do this?
 
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 
-  A registry dashboard e.g. web-based application with design considerations that provides a clean UX for discovering Buildpacks.
+  1. A registry dashboard e.g. web-based application with design considerations that provides a clean UX for discovering Buildpacks.
+  2. Adding metrics e.g. number of downloads, issues, etc. or any other metadata to the buildpack.
