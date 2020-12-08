@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Buildpack Registry Search API
 - Start Date: 2020-11-11
-- Author(s): elbandito
+- Author(s): @elbandito
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -36,54 +36,114 @@ As the CNB project makes progress towards supporting a centralized Buildpack Reg
 # What it is
 [what-it-is]: #what-it-is
 
-An external API service that exposes endpoints for retrieving buildpack metadata.  Initially, I envision this service providing a few GET endpoints to support plain text query searches, and individual buildpack data retrieval. 
+An external API service that exposes endpoints for retrieving buildpack metadata.  Initially, I envision this service providing a few GET endpoints to support plain text query searches, and individual buildpack data retrieval.  The API endpoints will be versioned, and follow OpenAPI and/or Json Schema/API standards.
+
+### Versioned Endpoints
+
+All the endpoints defined below will be version via a `vN` prefix to the base URL. e.g. `https://registry.buildpacks.io/v1/<endpoint>`.
 
 ### Supported Endpoints
 
-- **GET /search?query=text**
+- **GET /search?matches=text**
 
-  Retrievs all the buildpacks that satisfy the search query.  If the response contains more than 20 buildpacks, pagination will be used.  For example:
+  Retrieves all the buildpacks that satisfy the search query.  If the response contains more than significant number of buildpacks, pagination will be used.  The current approach to pagination is to take inspiration from how [Github](https://docs.github.com/en/free-pro-team@latest/rest/guides/traversing-with-pagination).  
   ```
-  $ curl https://registry.buildpacks.io/search?query=projectriff
+  $ curl https://registry.buildpacks.io/v1/search?matches=projectriff
   ```
   ```json
   [
     {
-      "ns":"projectriff",
-      "name":"command-function",
-      "version":"1.4.1",
-      "yanked":false,
-      "addr":"gcr.io/projectriff/command-function@sha256:99f9054abb73635a9b251b61d3627a8ff86508c767f9d691c426d45e8758596f"
+      "latest": {
+        "description": "The Command Function Buildpack is a Cloud Native Buildpack V3 that provides riff Command Function Invoker to functions",
+        "license": "MIT",
+        "ns":"projectriff",
+        "name":"command-function",
+        "version": "1.4.1",
+        "yanked":false,
+        "addr":"gcr.io/projectriff/command-function@sha256:99f9054abb73635a9b251b61d3627a8ff86508c767f9d691c426d45e8758596f"  
+      },
+      "versions": {
+        "1.4.1": {
+          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/command-function/1.4.1"
+        },
+        "1.3.9": {
+          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/command-function/1.3.9"
+        }
+      }
     },
     {
-      "ns":"projectriff",
-      "name":"java-function",
-      "version":"1.4.1",
-      "yanked":false,
-      "addr":"gcr.io/projectriff/java-function@sha256:5eabea8f7b2c09074ec196fe0c321006fb5ad8f282cc918520286d8a0007196f"
+      "latest": {
+        "description": "The Java Function Buildpack is a Cloud Native Buildpack V3 that provides riff Java Function Invoker to functions",
+        "license": "MIT",
+        "ns":"projectriff",
+        "name":"java-function",
+        "version": "1.4.3",
+        "yanked":false,
+        "addr":"gcr.io/projectriff/java-function@sha256:5eabea8f7b2c09074ec196fe0c321006fb5ad8f282cc918520286d8a0007196f"  
+      },
+      "versions": {
+        "1.4.3": {
+          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/java-function/1.4.3"
+        },
+        "1.3.9": {
+          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/java-function/1.3.9"
+        }
+      }
     },
     {
-      "ns":"projectriff",
-      "name":"node-function",
-      "version":"1.4.1",
-      "yanked":false,
-      "addr":"gcr.io/projectriff/node-function@sha256:194298b826c15bb079c59aed99968d7678a6e1f7a882c9d7f61811e0990717ba"
-    },
-    {
-      "ns":"projectriff",
-      "name":"streaming-http-adapter",
-      "version":"1.4.0",
-      "yanked":false,
-      "addr":"gcr.io/projectriff/streaming-http-adapter@sha256:b202d9ec203e882ee7e3c599d9e867617f909c8b6123e4ce942af47db6e58c45"
+      "latest": {
+        "description": "The Node Function Buildpack is a Cloud Native Buildpack V3 that provides riff Node Function Invoker to functions",
+        "license": "MIT",
+        "ns":"projectriff",
+        "name":"node-function",
+        "version": "1.5.6",
+        "yanked":false,
+        "addr":"gcr.io/projectriff/node-function@sha256:194298b826c15bb079c59aed99968d7678a6e1f7a882c9d7f61811e0990717ba"  
+      },
+      "versions": {
+        "1.5.6": {
+          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/node-function/1.5.6"
+        },
+        "1.3.9": {
+          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/node-function/1.3.9"
+        }
+      }
     }
   ]
   ```
-
+  
 - **GET /buildpacks/:ns/:name**
 
-  Retrieves metadata for a specific buildpack.  This response *could* contain more detailed data e.g. download metrics.
+  Retrieves metadata for a specific buildpack.
   ```
-  $ curl https://registry.buildpacks.io/buildpacks/projectriff/command-function
+  $ curl https://registry.buildpacks.io/v1/buildpacks/projectriff/command-function
+  ```
+  ```json
+  {
+    "latest": {
+      "description": "The Command Function Buildpack is a Cloud Native Buildpack V3 that provides riff Command Function Invoker to functions",
+      "license": "MIT",
+      "ns":"projectriff",
+      "name":"command-function",
+      "version": "1.4.1",
+      "yanked":false,
+      "addr":"gcr.io/projectriff/command-function@sha256:99f9054abb73635a9b251b61d3627a8ff86508c767f9d691c426d45e8758596f"  
+    },
+    "versions": {
+      "1.4.1": {
+        "link": "https://registry.buildpacks.io/buildpacks/v1/projectriff/command-function/1.4.1"
+      },
+      "1.3.9": {
+        "link": "https://registry.buildpacks.io/buildpacks/v1/projectriff/command-function/1.3.9"
+      }
+    }
+  } 
+
+- **GET /buildpacks/:ns/:name/:version**
+
+  Retrieves metadata for a specific buildpack version (`:version` must be a semver or `latest`).  This response *may* contain more metadata e.g. download metrics.  Since `description` and `license` can change between different versions, it should therefore ONLY be included for each specific buildpack version.
+  ```
+  $ curl https://registry.buildpacks.io/buildpacks/v1/projectriff/command-function/1.4.1
   ```
   ```json
   {
@@ -104,11 +164,15 @@ In the initial implementation, we can take advantage of the existing [registry](
 
 Each time the local repository has been updated via `git pull`, buildpack data will be processed/normalized into a single JSON object, where plain text searches can be used against it.   Fields in this JSON object will be re-indexed as searchable fields, which will be compared against the search text during the retrieval algorithm.
 
-Search fields will include `ns`, `name`, `license`, and `yanked`. 
+Search fields will include `ns`, and `name`. 
 
 In addition, a server process will expose endpoints and handle incoming request for the GET endpoints mentioned earlier.  For search requests, the text will be extracted from the `query` query parameter and used to search against the normalized buildpacks index.   Results will be added to the server response, as a list of JSON objects.
 
 *Note:  Initially, the Distribution Team maintainers can manage this service, and could even set-up a pager (but only best effort, and during working hours).  In the future, we maybe able to extend this to other verified project contributors.
+
+### Future Work
+
+- Query fields will be broken-up into separate, finer grained fields e.g. `ns`, `name`, and `yanked`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -117,7 +181,6 @@ Why should we *not* do this?
 - more vulnerable due to Github outages
 - less optimal than using actual DB technology
 - constraint by what's in the index registry repository.  We might want to augment the metadata, with new fields that don't makes sense to have in the index repository.  I think this maybe an issue for the `/buildpacks/1` endpoint that *could* have download data, etc. things that don't belong in the actual repo.
-- without a DB we can't easily do things like ORDER_BY, or use ASC|DESC
 - someone has to maintain the service
 
 
@@ -167,5 +230,6 @@ Why should we *not* do this?
 
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 
-  1. A registry dashboard e.g. web-based application with design considerations that provides a clean UX for discovering Buildpacks.
-  2. Adding metrics e.g. number of downloads, issues, etc. or any other metadata to the buildpack.
+  1. A registry dashboard e.g. web-based application with design considerations that provides a clean UX for discovering buildpacks.
+  2. Adding metrics e.g. number of downloads, issues, etc. 
+  3. Adding additional metadata in either/both the buildpack or buildpack version response objects
