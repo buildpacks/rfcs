@@ -55,7 +55,7 @@ Asset caches will also have a `io.buildpacks.asset.layers` Label. This label map
 ##### General Format:
 ```json
 {
-  "asset-sha256": {
+  "<asset-sha256>": {
     "name": "(optional)",
     "id": "(required)",
     "version": "(required)",
