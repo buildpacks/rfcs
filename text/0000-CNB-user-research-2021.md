@@ -20,7 +20,7 @@ In addition, we want to better understand why app developers switch to CNBs and 
 <li>Understand how buildpack authors currently go about writing buildpacks and customizing builds and what goals they are trying to accomplish by doing so</li>
 <ol>
 <li>Evaluate pain points buildpack authors are experiencing </li>
-<li>Evaluate the relative usability of proposals like packfile or inline buildpacks </li>
+<li>Evaluate the relative usability of proposals like [packfile](https://github.com/sclevine/packfile) or [inline buildpacks](https://github.com/kr/heroku-buildpack-inline) </li>
 </ol>
 <li>Define the different segments of app developers using buildpacks, their goals, challenges, and motivations to switch to buildpacks from other tools</li>
 <ol>
@@ -48,18 +48,18 @@ November 1, 2020 - February 28, 2021 (completed before Buildpacks Summit in the 
  
 **Checkpoints:**
 ☑️ Create initial proposal for funding - Nov 2020
-☑️ Review existing documents - summary doc  - Nov 2020
-☑️ Conduct SME interviews - folder link - Nov 2020
-☐ Define research participants - screener survey doc - Dec 2020
-☐ Write script for first round - script doc - Dec 2020
+☑️ Review existing documents - summary [doc](https://docs.google.com/document/d/1gEVCykAN2j4Ha6NzwHt1m5J1Jtdh16Riio1w3me7peY/edit#)  - Nov 2020
+☑️ Conduct SME interviews - folder [link](https://drive.google.com/drive/folders/1Z7eTLzfdS7JvV6UQXG-1PiZdOevUNqNa) - Nov 2020
+☐ Define research participants - screener survey [doc](https://docs.google.com/document/d/12PQsupIn3I50xC0AzC3ouLKY10V8KpbYh8Vnh8jiK6s/edit) - Dec 2020
+☐ Write script for first round - script [doc](https://docs.google.com/document/d/1rn7ojSXJNbYSzn8p4kaLNGFkT_5Q_zeD03cdZ5h-JlM/edit) - Dec 2020
 ☐ Conduct 10-15 interviews with app developers about benefits and tradeoffs of buildpacks - Jan 2021
-☐ Review and synthesize interview findings -  findings doc - Jan + Feb 2021
+☐ Review and synthesize interview findings -  findings [doc](https://docs.google.com/document/d/1anR_uma7ajr51xfvZAJsSSE5P2-bjPlL6EEBWz8pfTQ/edit#heading=h.7uxlulg7055g) - Jan + Feb 2021
 ☐ Review findings with contributors and edit script - Jan 2021
-☐ Conduct 5-7 usability tests of simple buildpack authorship - list of authors doc - Feb 2021
-☐ Conduct survey - ??
-☐ Review and synthesize usability findings -  findings doc - Feb + Mar 2021
-☐ Present to contributors - Mar 2021
-☐ Conduct follow up usability tests with resulting authorship solutions - April (?) - 2021
+☐ Conduct 5-7 usability tests of simple buildpack authorship - list of authors [doc](https://docs.google.com/document/d/12PQsupIn3I50xC0AzC3ouLKY10V8KpbYh8Vnh8jiK6s/edit) - Feb 2021
+☐ Conduct survey - Feb 2021
+☐ Review and synthesize usability findings -  findings [doc](https://docs.google.com/document/d/1anR_uma7ajr51xfvZAJsSSE5P2-bjPlL6EEBWz8pfTQ/edit#heading=h.7uxlulg7055g) - Feb + Mar 2021
+☐ Present findings to contributors - Mar 2021
+☐ Conduct follow up usability tests with resulting authorship solutions - April (?) 2021
 
 
 # Participants
@@ -73,14 +73,13 @@ November 1, 2020 - February 28, 2021 (completed before Buildpacks Summit in the 
 
 
 # Collaborators
-Engineering Partner: Natalie Arellano (VMware + CNB)
-Supporting Researchers: Megan Taylor (VMware) and Karla Rodriguez (VMware) (maybe)
+Technical Recruiting Partner: [gotomedia](https://www.gotomedia.com/)
+Co-Researcher and Engineering Advisor: Natalie Arellano (VMware + CNB)
+Supporting Researchers: Megan Taylor (VMware)
 Supporting interviewers and notetakers: Sophie Wigmore (VMware + Paketo), Zach (VMware + Paketo), and Daniella Corricelli (VMware + Paketo)
  
 And always looking for more! Just leave a comment if you’d like to get involved :)
 
 # References
 Existing knowledge summary [doc](https://docs.google.com/document/d/1gEVCykAN2j4Ha6NzwHt1m5J1Jtdh16Riio1w3me7peY/edit#) (AKA our assumptions)
-Original study plan doc
-Miro board for brainstorming
-CNB contributors exercise doc
+Initial brainstorm with CNB contributors [doc](https://docs.google.com/document/d/1IqFLsLbVucqi3JnzEeliLZKQwTUe4GdHXk1PrpNqRb0/edit#)
