@@ -76,10 +76,10 @@ November 1, 2020 - February 28, 2021 (completed before Buildpacks Summit in the 
 - User Recruitment Partner: [gotomedia](https://www.gotomedia.com/)
 - Co-Researcher and Engineering Advisor: Natalie Arellano (VMware + CNB)
 - Supporting Researchers: Megan Taylor (VMware)
-- Supporting Interviewers and Notetakers: Sophie Wigmore (VMware + Paketo), Josh Zarrabi(VMware + Paketo), and Daniella Corricelli (VMware + Paketo)
+- Supporting Interviewers and Notetakers: Sophie Wigmore (VMware + Paketo), Josh Zarrabi (VMware + Paketo), and Daniella Corricelli (VMware + Paketo)
  
 And always looking for more! Just leave a comment if you’d like to get involved :)
 
 # References
-Existing knowledge summary [doc](https://docs.google.com/document/d/1gEVCykAN2j4Ha6NzwHt1m5J1Jtdh16Riio1w3me7peY/edit#) (AKA our assumptions)
-Initial brainstorm with CNB contributors [doc](https://docs.google.com/document/d/1IqFLsLbVucqi3JnzEeliLZKQwTUe4GdHXk1PrpNqRb0/edit#)
+- Existing knowledge summary [doc](https://docs.google.com/document/d/1gEVCykAN2j4Ha6NzwHt1m5J1Jtdh16Riio1w3me7peY/edit#) (AKA our assumptions)
+- Initial brainstorm with CNB contributors [doc](https://docs.google.com/document/d/1IqFLsLbVucqi3JnzEeliLZKQwTUe4GdHXk1PrpNqRb0/edit#)
