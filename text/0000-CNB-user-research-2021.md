@@ -47,10 +47,10 @@ In addition, we want to better understand why app developers switch to CNBs and 
 November 1, 2020 - February 28, 2021 (completed before Buildpacks Summit in the spring)
  
 **Checkpoints:**
-[]Create initial proposal for funding - Nov 2020
-[]Review existing documents - summary [doc](https://docs.google.com/document/d/1gEVCykAN2j4Ha6NzwHt1m5J1Jtdh16Riio1w3me7peY/edit#)  - Nov 2020
-[]Conduct SME interviews - folder [link](https://drive.google.com/drive/folders/1Z7eTLzfdS7JvV6UQXG-1PiZdOevUNqNa) - Nov 2020
-[]Define research participants - screener survey [doc](https://docs.google.com/document/d/12PQsupIn3I50xC0AzC3ouLKY10V8KpbYh8Vnh8jiK6s/edit) - Dec 2020
+[X]Create initial proposal for funding - Nov 2020
+[X]Review existing documents - summary [doc](https://docs.google.com/document/d/1gEVCykAN2j4Ha6NzwHt1m5J1Jtdh16Riio1w3me7peY/edit#)  - Nov 2020
+[X]Conduct SME interviews - folder [link](https://drive.google.com/drive/folders/1Z7eTLzfdS7JvV6UQXG-1PiZdOevUNqNa) - Nov 2020
+[X]Define research participants - screener survey [doc](https://docs.google.com/document/d/12PQsupIn3I50xC0AzC3ouLKY10V8KpbYh8Vnh8jiK6s/edit) - Dec 2020
 []Write script for first round - script [doc](https://docs.google.com/document/d/1rn7ojSXJNbYSzn8p4kaLNGFkT_5Q_zeD03cdZ5h-JlM/edit) - Dec 2020
 []Conduct 10-15 interviews with app developers about benefits and tradeoffs of buildpacks - Jan 2021
 []Review and synthesize interview findings -  findings [doc](https://docs.google.com/document/d/1anR_uma7ajr51xfvZAJsSSE5P2-bjPlL6EEBWz8pfTQ/edit#heading=h.7uxlulg7055g) - Jan + Feb 2021
