@@ -20,7 +20,7 @@ In addition, we want to better understand why app developers switch to CNBs and 
 <li>Understand how buildpack authors currently go about writing buildpacks and customizing builds and what goals they are trying to accomplish by doing so</li>
 <ol>
 <li>Evaluate pain points buildpack authors are experiencing </li>
-<li>Evaluate the relative success of </li>
+<li>Evaluate the relative usability of proposals like packfile or inline buildpacks </li>
 </ol>
 <li>Define the different segments of app developers using buildpacks, their goals, challenges, and motivations to switch to buildpacks from other tools</li>
 <ol>
