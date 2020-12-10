@@ -20,7 +20,7 @@ In addition, we want to better understand why app developers switch to CNBs and 
 <li>Understand how buildpack authors currently go about writing buildpacks and customizing builds and what goals they are trying to accomplish by doing so</li>
 <ol>
 <li>Evaluate pain points buildpack authors are experiencing </li>
-<li>Evaluate the relative usability of proposals like <a href="https://github.com/sclevine/packfile">packfile</a> or [inline buildpacks](https://github.com/kr/heroku-buildpack-inline) </li>
+<li>Evaluate the relative usability of proposals like <a href="https://github.com/sclevine/packfile">packfile</a> or <a href="https://github.com/kr/heroku-buildpack-inline">inline buildpacks</a> </li>
 </ol>
 <li>Define the different segments of app developers using buildpacks, their goals, challenges, and motivations to switch to buildpacks from other tools</li>
 <ol>
@@ -73,10 +73,10 @@ November 1, 2020 - February 28, 2021 (completed before Buildpacks Summit in the 
 
 
 # Collaborators
-- Technical Recruiting Partner: [gotomedia](https://www.gotomedia.com/)
+- User Recruitment Partner: [gotomedia](https://www.gotomedia.com/)
 - Co-Researcher and Engineering Advisor: Natalie Arellano (VMware + CNB)
 - Supporting Researchers: Megan Taylor (VMware)
-- Supporting interviewers and notetakers: Sophie Wigmore (VMware + Paketo), Josh Zarrabi(VMware + Paketo), and Daniella Corricelli (VMware + Paketo)
+- Supporting Interviewers and Notetakers: Sophie Wigmore (VMware + Paketo), Josh Zarrabi(VMware + Paketo), and Daniella Corricelli (VMware + Paketo)
  
 And always looking for more! Just leave a comment if you’d like to get involved :)
 
