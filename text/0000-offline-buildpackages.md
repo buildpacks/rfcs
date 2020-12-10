@@ -438,7 +438,7 @@ cnb
      └── <java15-asset-sha256>
 ```
 
-Buildpacks should then be able to quickly check for available assets using a `sha256` of the asset they wish to use in tandem with the `CNB_ASSETS` environment variable.
+Buildpacks should then be able to quickly check for available assets using a `sha256` of the asset they wish to use in tandem with the `CNB_ASSETS` environment variable. The `sha256` value used to perform this lookup should be pulled from the relevant `[[asset]]` entry in `buildpack.toml`
 
 # Drawbacks
 [drawbacks]: #drawbacks
