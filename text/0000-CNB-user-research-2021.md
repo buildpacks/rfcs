@@ -20,7 +20,7 @@ In addition, we want to better understand why app developers switch to CNBs and 
 <li>Understand how buildpack authors currently go about writing buildpacks and customizing builds and what goals they are trying to accomplish by doing so</li>
 <ol>
 <li>Evaluate pain points buildpack authors are experiencing </li>
-<li>Evaluate the relative usability of proposals like [packfile](https://github.com/sclevine/packfile) or [inline buildpacks](https://github.com/kr/heroku-buildpack-inline) </li>
+<li>Evaluate the relative usability of proposals like <a href="https://github.com/sclevine/packfile">packfile</a> or [inline buildpacks](https://github.com/kr/heroku-buildpack-inline) </li>
 </ol>
 <li>Define the different segments of app developers using buildpacks, their goals, challenges, and motivations to switch to buildpacks from other tools</li>
 <ol>
@@ -65,7 +65,7 @@ November 1, 2020 - February 28, 2021 (completed before Buildpacks Summit in the 
 # Participants
 - App developers currently using buildpacks 
 - App developers currently using dockerfiles or another container build technology
-  - A representative slice not a specific subset 
+  - A representative slice, not a specific subset 
 - Buildpack authors, or proxies, like:
   - Senior Dev Ops folks / engineering leads who have a holistic sense of their project
   - People maintaining a “blessed” base image to use with Dockerfiles
