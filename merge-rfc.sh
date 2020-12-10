@@ -1,6 +1,15 @@
 #!/usr/bin/env zsh
 
-set -eu
+set -euo pipefail
+
+script="$0"
+usage() {
+  printf "Usage: %s [-i <issue>...] [-n] <PR#>\n" "$script"
+  printf "Flags:\n"
+  printf "  -i string\n\tgithub issue reference (example: buildpacks/spec#1)\n"
+  printf "  -n\n\tno issues\n"
+  exit 1
+}
 
 id() {
   ID=$(find text -depth 1 | sed -E 's|^text/([[:digit:]]{4})-.*$|\1|' | sort | tail -n 1)
@@ -8,21 +17,25 @@ id() {
   printf "%04d" "${ID}"
 }
 
-script="$0"
-usage() {
-  printf "Usage: %s [-i <issue>...] <PR#>\n" "${0:t}"
-  exit 1
+link_issue() {
+  local issue="$1"
+  link=$(echo "$issue" | sed -E 's|buildpacks/(.*)#([[:digit:]]+)|https://github.com/buildpacks/\1/issues/\2|')
+  printf '[%s](%s)' "$issue" "$link"
 }
 
 issues="N/A"
-while getopts ":i:" opt; do
+no_issues=false
+while getopts ":i:n" opt; do
   case ${opt} in
     i )
       if [[ $issues == "N/A" ]]; then
-        issues=$OPTARG
+        issues=$(link_issue "$OPTARG")
       else
-        issues+=", $OPTARG"
+        issues+=", $(link_issue "$OPTARG")"
       fi
+      ;;
+    n )
+      no_issues=true
       ;;
     \? )
       echo "Invalid option: $OPTARG" 1>&2
@@ -34,6 +47,12 @@ while getopts ":i:" opt; do
       ;;
   esac
 done
+
+if [[ $no_issues = false && $issues == "N/A" ]]; then
+  echo -e "ERROR! No issues were provided. Are you sure there are no issues that should be linked?"
+  echo -e "ERROR! Either -i or -n is required\n"
+  usage
+fi
 
 shift $(($OPTIND - 1))
 if [[ $# != 1 ]]; then

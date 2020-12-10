@@ -5,7 +5,7 @@
 - Author(s): natalieparellano
 - RFC Pull Request: [rfcs#110](https://github.com/buildpacks/rfcs/pull/110)
 - CNB Pull Request: (leave blank)
-- CNB Issue: N/A
+- CNB Issue: [buildpacks/spec#159](https://github.com/buildpacks/spec/issues/159), [buildpacks/spec#160](https://github.com/buildpacks/spec/issues/160), [buildpacks/lifecycle#457](https://github.com/buildpacks/lifecycle/issues/457), [buildpacks/lifecycle#458](https://github.com/buildpacks/lifecycle/issues/458), [buildpacks/pack#946](https://github.com/buildpacks/pack/issues/946), [buildpacks/docs#246](https://github.com/buildpacks/docs/issues/246)
 - Supersedes: n/a
 
 # Summary
