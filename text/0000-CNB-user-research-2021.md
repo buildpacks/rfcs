@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: CNB User Research 2021
 - Start Date: 2020-12-10
-- Author(s): @sampeinado
+- Author(s): sampeinado, speinado@vmware.com
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
