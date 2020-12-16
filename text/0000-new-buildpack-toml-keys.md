@@ -57,7 +57,11 @@ This information could be stored in some other way, completely independent of ea
 # Prior Art
 [prior-art]: #prior-art
 
-Discuss prior art, both the good and bad.
+For prior art, it's very common for to see these fields in the file:
+* [gemspec](https://guides.rubygems.org/specification-reference/) (Ruby)
+* [`package.json`](https://docs.npmjs.com/cli/v6/configuring-npm/package-json) (JavaScript)
+* [`Cargo.toml`](https://doc.rust-lang.org/cargo/reference/manifest.html) (Rust)
+* [`pom.xml`](https://maven.apache.org/pom.html) (Java)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
