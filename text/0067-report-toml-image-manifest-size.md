@@ -3,9 +3,9 @@
 - Name: Add Image Manifest Size to report.toml
 - Start Date: 2020-11-02
 - Author(s): djoyahoy
-- RFC Pull Request:
+- RFC Pull Request: [rfcs#121](https://github.com/buildpacks/rfcs/pull/121)
 - CNB Pull Request:
-- CNB Issue:
+- CNB Issue: [buildpacks/spec#169](https://github.com/buildpacks/spec/issues/169), [buildpacks/lifecycle#490](https://github.com/buildpacks/lifecycle/issues/490)
 - Supersedes: N/A
 
 # Summary
