@@ -46,7 +46,7 @@ A stack provider may choose to include stack buildpacks with the stack they dist
     1. The lifecycle will drop privilidges and continue the build phase as normal (running application buildpacks).
 
 * During the extend phase (potentially in parallel to build phase):
-    1. During the extend phase, stack buildpacks that passed detection will run against the run images accordingly (see details below).
+    1. During the extend phase, stack buildpacks that passed detection will run against the run image accordingly (see details below).
 
 # How it Works
 [how-it-works]: #how-it-works
