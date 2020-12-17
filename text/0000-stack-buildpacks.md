@@ -285,7 +285,7 @@ This would instruct the Apt Buildpack to install the libpq package.
 
 ## Example: CA Certificate Buildpack
 
-Support for custom CA Certificates can be accomplished with two buildpacks: a stackpack that can install the cert, and a normal buildpack that can provide a cert in the build plan.
+Support for custom CA Certificates can be accomplished with two buildpacks: a stackpack that can install the cert, and an application buildpack that can provide a cert in the build plan.
 
 ### CA Cert Installer Stackpack
 
@@ -328,7 +328,7 @@ done
 update-ca-certificates
 ```
 
-### CA Cert Provider Buildpack
+### CA Cert Injector Buildpack
 
 The stackpack must be used with a buildpack that requires a certificate(s) for it to install. That buildpack would have the following `buildpack.toml`:
 
