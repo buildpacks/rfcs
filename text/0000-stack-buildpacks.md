@@ -583,7 +583,6 @@ Usage:
 | Output                                     | Description
 |--------------------------------------------|----------------------------------------------
 | ...                                        |
-| `<layers>/<buildpack ID>.tgz`              | Layer snapshot (see [Buildpack Interface Specfication](buildpack.md)
 | `<layers>/stack-layer.toml`                | Layer snaphot metadata
 
 #### `exporter`
