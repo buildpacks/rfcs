@@ -411,7 +411,6 @@ In the future, we plan to enhance the stack buildpack interface with the followi
 # Prior Art
 [prior-art]: #prior-art
 
-- The term "non-idempotent" is used in section 9.1.2 of [Hypertext Transfer Protocol -- HTTP/1.1 (RFC 2616)](https://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
