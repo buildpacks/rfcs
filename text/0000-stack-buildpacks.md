@@ -28,7 +28,7 @@ However, many applications and buildpacks require modifications to the stack the
 - *app image* - the final image produced by a buildpack build. It consists of a run-image combined with layers created by buildpacks.
 - *extend phase* - a new buildpack phase in which a stack buildpack may create a layer for the app image.
 
-A new type of buildpack, called a stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. Unlike application buildpacks, stack buildpack can modify any path (with exceptions) on the filesystem. Application buildpacks can only create/modify disjoint layers (either by adding a dir to `<layers>` or modifying an app slice), which makes possible features like individual layer reuse that is independent or ordering.
+A new type of buildpack, called a stack buildpack, may run against a stack (both build and run images) in order to extend it in ways that are only possible by running privileged commands. Unlike application buildpacks, stack buildpack can modify any path (with exceptions) on the filesystem. Application buildpacks can only create/modify disjoint layers (either by adding a dir to `<layers>` or modifying an app slice), which makes possible features like individual layer reuse that is independent of ordering.
 
 A stackpack may also define a list of mixins that it can provide to the stack, or indicate that it can provide _any_ mixin. In this way, a stack that is missing a mixin required by a buildpack may have that mixin provided by a stack buildpack.
 
