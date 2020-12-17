@@ -330,7 +330,7 @@ update-ca-certificates
 
 ### CA Cert Provider Buildpack
 
-The stackpack must be used with a buildpack that provides a certificate(s) for it to install. That buildpack would have the following `buildpack.toml`:
+The stackpack must be used with a buildpack that requires a certificate(s) for it to install. That buildpack would have the following `buildpack.toml`:
 
 ```toml
 [buildpack]
