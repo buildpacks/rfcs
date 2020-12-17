@@ -35,7 +35,7 @@ In order to allow platforms to have more dynamic configurations, a new configura
 
 Target persona: platform operator, platform implementor
 
-A new `lifecycle.toml` will be read by lifecycle. By default, this file will be searched at `/cnb/lifecycle.toml`. `CNB_CONFIG_PATH` would be available to override this location.
+A new `lifecycle.toml` will be read by lifecycle. By default, this path searched will be `/cnb/config/lifecycle.toml`. `CNB_CONFIG_PATH` would be available to override this location.
 
 An example `lifecycle.toml` might be produced by the platform with various inputs (source code, platform specific configuration, etc.):
 ```
@@ -54,7 +54,7 @@ The keys of the `[config]` table are expected to match the env var names, minus 
 # How it Works
 [how-it-works]: #how-it-works
 
-Lifecycle will read in `CNB_CONFIG_PATH` or the default of `/cnb/lifecycle.toml` and prioritize the values found over lifecycle's defaults and before present env vars.
+Lifecycle will read in `CNB_CONFIG_PATH` or the default of `/cnb/config/lifecycle.toml` and prioritize the values found over lifecycle's defaults and before present env vars.
 
 If there is no configuration found, lifecycle will resolve configuration as it does today (env vars, defaults).
 
@@ -70,6 +70,7 @@ Another configuration file.
 
 - What other designs have been considered?
   - Lifecycle could load env vars from a known file location. e.g. `source lifecycle.env` or similar prior to resolving lifecycle configuration.
+  - Lifecycle could only allow for non-path based inputs like `log_level` in `lifecycle.toml`, but add an additional path to to a known platform location. Example would be `/cnb/config/order.toml` for `CNB_ORDER_PATH`. This would allow platforms to use a volume at `/cnb/config` and write files that are fed into lifecycle in addition to a `lifecycle.toml` for non-path based configuration.
 - Why is this proposal the best?
   - A well defined configuration file feels less convoluted and less stack specific
 - What is the impact of not doing this?
