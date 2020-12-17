@@ -36,19 +36,19 @@ As the CNB project makes progress towards supporting a centralized Buildpack Reg
 # What it is
 [what-it-is]: #what-it-is
 
-An external API service that exposes endpoints for retrieving buildpack metadata.  Initially, I envision this service providing a few GET endpoints to support plain text query searches, and individual buildpack data retrieval.  The API endpoints will be versioned, and follow OpenAPI and/or Json Schema/API standards.
+An external API service that exposes endpoints for retrieving buildpack metadata against the official CNB buildpack registry.  It's NOT the goal of this API to support private buildpack registries.  I envision this service providing a few GET endpoints to support plain text query searches, and individual buildpack data retrieval.  The API endpoints will be versioned, and follow OpenAPI and/or Json Schema/API standards.
 
 ### Versioned Endpoints
 
-All the endpoints defined below will be version via a `vN` prefix to the base URL. e.g. `https://registry.buildpacks.io/v1/<endpoint>`.
+All the endpoints defined below will be version via a `vN` prefix to the base URL. e.g. `https://registry.buildpacks.io/api/v1/<endpoint>`.
 
 ### Supported Endpoints
 
 - **GET /search?matches=text**
 
-  Retrieves all the buildpacks that satisfy the search query.  If the response contains more than significant number of buildpacks, pagination will be used.  The current approach to pagination is to take inspiration from how [Github](https://docs.github.com/en/free-pro-team@latest/rest/guides/traversing-with-pagination).  
+  Retrieves all the buildpacks that satisfy the search query.  If the response contains more than significant number of buildpacks, pagination will be used.  The current approach to pagination is to take inspiration from [Github](https://docs.github.com/en/free-pro-team@latest/rest/guides/traversing-with-pagination).  
   ```
-  $ curl https://registry.buildpacks.io/v1/search?matches=projectriff
+  $ curl https://registry.buildpacks.io/api/v1/search?matches=projectriff
   ```
   ```json
   [
@@ -64,10 +64,10 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
       },
       "versions": {
         "1.4.1": {
-          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/command-function/1.4.1"
+          "link": "https://registry.buildpacks.io/api/v1/buildpacks/projectriff/command-function/1.4.1"
         },
         "1.3.9": {
-          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/command-function/1.3.9"
+          "link": "https://registry.buildpacks.io/api/v1/buildpacks/projectriff/command-function/1.3.9"
         }
       }
     },
@@ -83,10 +83,10 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
       },
       "versions": {
         "1.4.3": {
-          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/java-function/1.4.3"
+          "link": "https://registry.buildpacks.io/api/v1/buildpacks/projectriff/java-function/1.4.3"
         },
         "1.3.9": {
-          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/java-function/1.3.9"
+          "link": "https://registry.buildpacks.io/api/v1/buildpacks/projectriff/java-function/1.3.9"
         }
       }
     },
@@ -102,10 +102,10 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
       },
       "versions": {
         "1.5.6": {
-          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/node-function/1.5.6"
+          "link": "https://registry.buildpacks.io/api/v1/buildpacks/projectriff/node-function/1.5.6"
         },
         "1.3.9": {
-          "link": "https://registry.buildpacks.io/v1/buildpacks/projectriff/node-function/1.3.9"
+          "link": "https://registry.buildpacks.io/api/v1/buildpacks/projectriff/node-function/1.3.9"
         }
       }
     }
@@ -116,7 +116,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
 
   Retrieves metadata for a specific buildpack.
   ```
-  $ curl https://registry.buildpacks.io/v1/buildpacks/projectriff/command-function
+  $ curl https://registry.buildpacks.io/api/v1/buildpacks/projectriff/command-function
   ```
   ```json
   {
@@ -131,10 +131,10 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
     },
     "versions": {
       "1.4.1": {
-        "link": "https://registry.buildpacks.io/buildpacks/v1/projectriff/command-function/1.4.1"
+        "link": "https://registry.buildpacks.io/buildpacks/api/v1/projectriff/command-function/1.4.1"
       },
       "1.3.9": {
-        "link": "https://registry.buildpacks.io/buildpacks/v1/projectriff/command-function/1.3.9"
+        "link": "https://registry.buildpacks.io/buildpacks/api/v1/projectriff/command-function/1.3.9"
       }
     }
   } 
@@ -143,7 +143,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
 
   Retrieves metadata for a specific buildpack version (`:version` must be a semver or `latest`).  This response *may* contain more metadata e.g. download metrics.  Since `description` and `license` can change between different versions, it should therefore ONLY be included for each specific buildpack version.
   ```
-  $ curl https://registry.buildpacks.io/buildpacks/v1/projectriff/command-function/1.4.1
+  $ curl https://registry.buildpacks.io/buildpacks/api/v1/projectriff/command-function/1.4.1
   ```
   ```json
   {
@@ -166,13 +166,18 @@ Each time the local repository has been updated via `git pull`, buildpack data w
 
 Search fields will include `ns`, and `name`. 
 
-In addition, a server process will expose endpoints and handle incoming request for the GET endpoints mentioned earlier.  For search requests, the text will be extracted from the `query` query parameter and used to search against the normalized buildpacks index.   Results will be added to the server response, as a list of JSON objects.
+In addition, a server process will expose endpoints and handle incoming request for the GET endpoints mentioned earlier.  For search requests, the text will be extracted from the `matches` query parameter and used to search against the normalized buildpacks index.   Results will be added to the server response, as a list of JSON objects.
 
 *Note:  Initially, the Distribution Team maintainers can manage this service, and could even set-up a pager (but only best effort, and during working hours).  In the future, we maybe able to extend this to other verified project contributors.
 
 ### Future Work
 
-- Query fields will be broken-up into separate, finer grained fields e.g. `ns`, `name`, and `yanked`.
+- Additional query fields will be added for finer grained, exact searches. `ns`, `name`, and `yanked`.  These additional query fields will provide 1:1 mappings to specific metadata fields that provide exact matches.
+
+For example:
+```
+
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -180,9 +185,7 @@ In addition, a server process will expose endpoints and handle incoming request 
 Why should we *not* do this?
 - more vulnerable due to Github outages
 - less optimal than using actual DB technology
-- constraint by what's in the index registry repository.  We might want to augment the metadata, with new fields that don't makes sense to have in the index repository.  I think this maybe an issue for the `/buildpacks/1` endpoint that *could* have download data, etc. things that don't belong in the actual repo.
 - someone has to maintain the service
-
 
 # Alternatives
 [alternatives]: #alternatives
@@ -226,7 +229,7 @@ Why should we *not* do this?
 
 - What parts of the design do you expect to be resolved through implementation of the feature?
   
-  I expect to have an API with a GET endpoint with a `query` parameter that returns a list of matching buildpacks from the registry index repo.
+  I expect to have an API with a GET endpoint with a `matches` parameter that returns a list of matching buildpacks from the registry index repo.
 
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 
