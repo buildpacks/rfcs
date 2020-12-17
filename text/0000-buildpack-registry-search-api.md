@@ -42,13 +42,17 @@ An external API service that exposes endpoints for retrieving buildpack metadata
 
 All the endpoints defined below will be version via a `vN` prefix to the base URL. e.g. `https://registry.buildpacks.io/api/v1/<endpoint>`.
 
+### Supported MIME types
+
+`Accept: application/vnd.buildpacks+json`
+
 ### Supported Endpoints
 
 - **GET /search?matches=text**
 
   Retrieves all the buildpacks that satisfy the search query.  If the response contains more than significant number of buildpacks, pagination will be used.  The current approach to pagination is to take inspiration from [Github](https://docs.github.com/en/free-pro-team@latest/rest/guides/traversing-with-pagination).  
   ```
-  $ curl https://registry.buildpacks.io/api/v1/search?matches=projectriff
+  $ curl -H "Content-Type:application/vnd.buildpacks+json" https://registry.buildpacks.io/api/v1/search?matches=projectriff
   ```
   ```json
   [
@@ -116,7 +120,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
 
   Retrieves metadata for a specific buildpack.
   ```
-  $ curl https://registry.buildpacks.io/api/v1/buildpacks/projectriff/command-function
+  $ curl -H "Content-Type:application/vnd.buildpacks+json" https://registry.buildpacks.io/api/v1/buildpacks/projectriff/command-function
   ```
   ```json
   {
@@ -143,7 +147,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
 
   Retrieves metadata for a specific buildpack version (`:version` must be a semver or `latest`).  This response *may* contain more metadata e.g. download metrics.  Since `description` and `license` can change between different versions, it should therefore ONLY be included for each specific buildpack version.
   ```
-  $ curl https://registry.buildpacks.io/buildpacks/api/v1/projectriff/command-function/1.4.1
+  $ curl -H "Content-Type:application/vnd.buildpacks+json" https://registry.buildpacks.io/buildpacks/api/v1/projectriff/command-function/1.4.1
   ```
   ```json
   {
