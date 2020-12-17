@@ -665,4 +665,4 @@ Usage:
 
 - The lifecycle SHALL execute all stack buildpacks in the order defined in `<stack-group>` according to the process outlined in the [Buildpack Interface Specification](buildpack.md).
 - The lifecycle SHALL add all invoked stack buildpacks to`<layers>/config/metadata.toml`.
-- The lifecycle SHALL aggregate all `processes` and BOM entries returned by buildpacks in `<layers>/config/metadata.toml`.
+- The lifecycle SHALL aggregate all BOM entries returned by buildpacks in `<layers>/config/metadata.toml`.
