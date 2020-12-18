@@ -422,6 +422,9 @@ In the future, we plan to enhance the stack buildpack interface with the followi
 - how do we prevent problems on rebase if the mixins provided by the stack change?
 - how does detect know the run-image mixins?
 - If a mixin is required for build, but is not needed for extend, does the stackpack execute in both phases (and visa versa)?
+- How is the buildpack plan provided to a stack buildpack during the extend phase of a rebase operation?
+- Will `io.buildpacks.stack.mixins` on the app image be updated to include stack buildpack-provided mixins?
+- During a rebase, if the new run image statically includes a mixin that was previously provided by a stack buildpack, should the providing stack buildpack rerun?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
