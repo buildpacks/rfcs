@@ -86,11 +86,10 @@ A stack can provide stackpacks by including them in the `/cnb/stack/buildpacks` 
 
 A stackpack will only execute if it passes detection. When the stackpack is executed, its detect and build scripts use the same parameters as the application buildpacks.
 
-The stackpack's snapshot layer may be enriched by writing a `stack-layer.toml` file. The `stack-layer.toml` may define globs of files to be excluded from the image when it is _exported_. Any excluded path may also be marked as _cached_, so that those excluded paths are recovered before the build or extend phase. The term _exported_ is defined as:
+The stackpack's snapshot layer may be enriched by writing a `stack-layer.toml` file. The `stack-layer.toml` may define globs of files to be _excluded_ from the image. Any excluded path may also be marked as _cached_, so that the excluded files are recovered before the build or extend phase. The term _excluded_ is defined as:
 
-* *Exported for build-time build*: A given path is excluded at application buildpack build-time, and recovered the next time the build image is extended with the stackpack.
-* *Exported for build-time run*: A given path is excluded from the final image, and restored the next time the run image is extended with the stackpack (either rebase or rebuild).
-* *Exported for rebase run*: A given path is excluded from the rebased image, and recovered the next time the run image is extended with the stackpack (either rebase or rebuild).
+* *Excluded during build phase*: Files at matching paths are removed from the filesystem before application buildpack execution. If cached, on subsequent build operations, the excluded files will be restored to the build-image filesystem before stackpack execution.
+* *Excluded during extend phase*: A given path is excluded from the snapshot layer (and thus from the final image). If cached, on subsequent build or rebase operations, the excluded files will be restored to the run-image filesystem before stackpack execution.
 
 For example, a stack buildpack may choose to exclude `/var/cache` from the final app image, but may want to mark it as _cached_ to have it restored before the extend phase.
 
