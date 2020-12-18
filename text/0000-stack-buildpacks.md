@@ -586,8 +586,8 @@ Usage:
 | Output                                     | Description
 |--------------------------------------------|----------------------------------------------
 | ...                                        |
-| `<layers>/stack-cache.tar.gz`              | Cache snaphot for each stack buildpack
-| `<layers>/stack-layer.toml`                | Layer snaphot metadata for each stack buildpack
+| `<layers>/<buildpack ID>/stack-cache.tgz`  | Cache snaphot for each stack buildpack
+| `<layers>/<buildpack ID>/stack-layer.toml` | Layer snaphot metadata for each stack buildpack
 
 #### `exporter`
 Usage:
@@ -653,9 +653,9 @@ Usage:
 | [exit status]                              | (see Exit Code table below for values)
 | `/dev/stdout`                              | Logs (info)
 | `/dev/stderr`                              | Logs (warnings, errors)
-| `<layers>/<buildpack ID>.tgz`              | Layer snapshot (see [Buildpack Interface Specfication](buildpack.md)
-| `<layers>/stack-cache.tar.gz`              | Cache snaphot for each stack buildpack
-| `<layers>/stack-layer.toml`                | Layer snaphot metadata for each stack buildpack
+| `<layers>/<buildpack ID>/stack-cache.tgz`  | Cache snaphot for each stack buildpack
+| `<layers>/<buildpack ID>/stack-layer.tgz`  | Layer snapshot (see [Buildpack Interface Specfication](buildpack.md)
+| `<layers>/<buildpack ID>/stack-layer.toml` | Layer snaphot metadata for each stack buildpack
 | `<layers>/config/metadata.toml`            | Build metadata (see [`metadata.toml`](#metadatatoml-toml))
 
 | Exit Code | Result|
