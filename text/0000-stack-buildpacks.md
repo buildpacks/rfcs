@@ -659,8 +659,8 @@ Usage:
 | `11`      | Platform API incompatibility error
 | `12`      | Buildpack API incompatibility error
 | `1-10`, `13-99` | Generic lifecycle errors
-| `401`     | Buildpack build error
-| `400`, `402-499`|  Build-specific lifecycle errors
+| `801`     | Buildpack build error
+| `800`, `802-899`|  Build-specific lifecycle errors
 
 - The lifecycle SHALL execute all stack buildpacks in the order defined in `<stack-group>` according to the process outlined in the [Buildpack Interface Specification](buildpack.md).
 - The lifecycle SHALL add all invoked stack buildpacks to`<layers>/config/metadata.toml`.
