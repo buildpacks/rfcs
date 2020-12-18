@@ -583,7 +583,8 @@ Usage:
 | Output                                     | Description
 |--------------------------------------------|----------------------------------------------
 | ...                                        |
-| `<layers>/stack-layer.toml`                | Layer snaphot metadata
+| `<layers>/stack-cache.tar.gz`              | Cache snaphot for each stack buildpack
+| `<layers>/stack-layer.toml`                | Layer snaphot metadata for each stack buildpack
 
 #### `exporter`
 Usage:
@@ -650,7 +651,8 @@ Usage:
 | `/dev/stdout`                              | Logs (info)
 | `/dev/stderr`                              | Logs (warnings, errors)
 | `<layers>/<buildpack ID>.tgz`              | Layer snapshot (see [Buildpack Interface Specfication](buildpack.md)
-| `<layers>/stack-layer.toml`                | Layer snaphot metadata
+| `<layers>/stack-cache.tar.gz`              | Cache snaphot for each stack buildpack
+| `<layers>/stack-layer.toml`                | Layer snaphot metadata for each stack buildpack
 | `<layers>/config/metadata.toml`            | Build metadata (see [`metadata.toml`](#metadatatoml-toml))
 
 | Exit Code | Result|
