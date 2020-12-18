@@ -411,6 +411,7 @@ In the future, we plan to enhance the stack buildpack interface with the followi
 # Prior Art
 [prior-art]: #prior-art
 
+* [Heroku Apt Buildpack](https://github.com/heroku/heroku-buildpack-apt)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
