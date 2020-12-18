@@ -35,7 +35,7 @@ A stackpack may also define a list of mixins that it can provide to the stack, o
 A stack provider may choose to include stack buildpacks with the stack they distribute. If a stack includes a `/cnb/stack/order.toml` file and associated stackpacks, then the following will occur:
 
 * Before any lifecycle phases:
-    1. The platform may compare the list of mixins that are statically required by all buildpacks (in the `stacks` sections of their `buildpack.toml` files) with the static list of mixins provided by the stack buildpacks (in the `stacks` sections of their `buildpack.toml` files), and fail the build if it chooses to do so.
+    1. The platform may compare the list of mixins that are statically required by all buildpacks (in the `stacks` sections of their `buildpack.toml` files) with the static list of mixins provided by the stack images and the stack buildpacks (in the `stacks` sections of their `buildpack.toml` files), and fail the build if the required mixins cannot be provided.
 
 * During the detect phase:
     1. The lifecycle will compare the list of required mixins to the list of mixins provided by stack and stack buildpacks in accordance with [stage-specific mixin rules](https://github.com/buildpacks/rfcs/pull/109). If any mixins are still not provided, the build will fail. To accomplish this, the list of run-time and build-time mixins that are already present in the run image and build image must be provided to the detector.
