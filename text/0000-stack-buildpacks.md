@@ -392,7 +392,7 @@ name = "jq"
 
 In the future, we plan to enhance the stack buildpack interface with the following:
 
-* A `CNB_STACK_TYPE` env var that a stack buildpack can use to behave differently on each part of the stack
+* Tentatively, add a `CNB_STACK_TYPE` env var that a stack buildpack can use to behave differently on each part of the stack
 * Support for `creator`. Because of the new extend phase, it is not possible to easily run the entire buildpack process with a single binary.
 * Snapshot caching during the build and extend phase, which would allow stackpack authors cache all changes to the filesystem.
 
