@@ -59,7 +59,7 @@ This change should be implemented with Buildpack API 0.6 so that it goes hand-in
 # Alternatives
 [alternatives]: #alternatives
 
-- This [comment](https://github.com/buildpacks/spec/pull/151#issuecomment-708631142) mentions this was discussed in Slack at some point, but the conversation hasn't been located - if anyone can find it, please link!
+- Bash buildpack authors could prepend to the TOML file.
 - What is the impact of not doing this? Potentially aggravating extra labor for Bash buildpack authors.
 
 # Unresolved Questions
