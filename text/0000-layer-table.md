@@ -19,7 +19,7 @@ Introduces a new table in `<layers>/<layer>.toml` to enable Bash buildpacks to e
 # Motivation
 [motivation]: #motivation
 
-- Why should we do this? [RFC 0052](https://github.com/buildpacks/rfcs/blob/main/text/0052-opt-in-layer-caching.md) described a change (to be implemented in Buildpack API 0.6) whereby buildpacks must opt in to layer re-use - i.e., each `<layers>/<layer>.toml` will be restored with no `launch`, `build`, or `cache` flags set and buildpacks must modify the restored TOML to set these flags.
+[RFC 0052](https://github.com/buildpacks/rfcs/blob/main/text/0052-opt-in-layer-caching.md) described a change (to be implemented in Buildpack API 0.6) whereby buildpacks must opt in to layer re-use - i.e., each `<layers>/<layer>.toml` will be restored with no `launch`, `build`, or `cache` flags set and buildpacks must modify the restored TOML to set these flags.
 
 The RFC assumed that Bash buildpacks would be able to easily opt in to layer re-use by appending lines to the TOML, e.g.:
 
