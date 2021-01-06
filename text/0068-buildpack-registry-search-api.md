@@ -5,7 +5,7 @@
 - Author(s): @elbandito
 - RFC Pull Request: [rfcs#125](https://github.com/buildpacks/rfcs/pull/125)
 - CNB Pull Request: (leave blank)
-- CNB Issue: N/A
+- CNB Issue: [registry-api#3](https://github.com/buildpacks/registry-api/issues/3)
 - Supersedes: N/A
 
 # Summary
@@ -17,20 +17,20 @@ This is a proposal for a service API that enables clients to search for buildpac
 
 **API** - Application Programmer Interface
 
-**Buildpack Registry** - the CNB centeralized [registry](https://github.com/buildpacks/registry-index) that contains metadata for all the community supported buildpacks 
+**Buildpack Registry** - the CNB centeralized [registry](https://github.com/buildpacks/registry-index) that contains metadata for all the community supported buildpacks
 
 **Service** - an independent web process running in the cloud that provides RESTful endpoints
 
 **Client** - represents a physical end-user or software interface e.g. CLI, web UI, etc.
- 
+
 # Motivation
 [motivation]: #motivation
 
 As the CNB project makes progress towards supporting a centralized Buildpack Registry, I anticipate the need to quickly search for and identify specific buildpacks.  To support this, I propose the creation of an API search service that customers could use directly and/or indirectly via a web dashboard or CLI.
 
-- What use cases does it support?  
+- What use cases does it support?
   - Customers looking to quickly indentify usefulful buildpacks to build their applications.
-- What is the expected outcome?  
+- What is the expected outcome?
   - Customers will be able to quickly find relevant buildpacks for their use cases.
 
 # What it is
@@ -50,7 +50,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
 
 - **GET /search?matches=text**
 
-  Retrieves all the buildpacks that satisfy the search query.  If the response contains more than significant number of buildpacks, pagination will be used.  The current approach to pagination is to take inspiration from [Github](https://docs.github.com/en/free-pro-team@latest/rest/guides/traversing-with-pagination).  
+  Retrieves all the buildpacks that satisfy the search query.  If the response contains more than significant number of buildpacks, pagination will be used.  The current approach to pagination is to take inspiration from [Github](https://docs.github.com/en/free-pro-team@latest/rest/guides/traversing-with-pagination).
   ```
   $ curl -H "Content-Type:application/vnd.buildpacks+json" https://registry.buildpacks.io/api/v1/search?matches=projectriff
   ```
@@ -64,7 +64,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
         "name":"command-function",
         "version": "1.4.1",
         "yanked":false,
-        "addr":"gcr.io/projectriff/command-function@sha256:99f9054abb73635a9b251b61d3627a8ff86508c767f9d691c426d45e8758596f"  
+        "addr":"gcr.io/projectriff/command-function@sha256:99f9054abb73635a9b251b61d3627a8ff86508c767f9d691c426d45e8758596f"
       },
       "versions": {
         "1.4.1": {
@@ -83,7 +83,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
         "name":"java-function",
         "version": "1.4.3",
         "yanked":false,
-        "addr":"gcr.io/projectriff/java-function@sha256:5eabea8f7b2c09074ec196fe0c321006fb5ad8f282cc918520286d8a0007196f"  
+        "addr":"gcr.io/projectriff/java-function@sha256:5eabea8f7b2c09074ec196fe0c321006fb5ad8f282cc918520286d8a0007196f"
       },
       "versions": {
         "1.4.3": {
@@ -102,7 +102,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
         "name":"node-function",
         "version": "1.5.6",
         "yanked":false,
-        "addr":"gcr.io/projectriff/node-function@sha256:194298b826c15bb079c59aed99968d7678a6e1f7a882c9d7f61811e0990717ba"  
+        "addr":"gcr.io/projectriff/node-function@sha256:194298b826c15bb079c59aed99968d7678a6e1f7a882c9d7f61811e0990717ba"
       },
       "versions": {
         "1.5.6": {
@@ -115,7 +115,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
     }
   ]
   ```
-  
+
 - **GET /buildpacks/:ns/:name**
 
   Retrieves metadata for a specific buildpack.
@@ -131,7 +131,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
       "name":"command-function",
       "version": "1.4.1",
       "yanked":false,
-      "addr":"gcr.io/projectriff/command-function@sha256:99f9054abb73635a9b251b61d3627a8ff86508c767f9d691c426d45e8758596f"  
+      "addr":"gcr.io/projectriff/command-function@sha256:99f9054abb73635a9b251b61d3627a8ff86508c767f9d691c426d45e8758596f"
     },
     "versions": {
       "1.4.1": {
@@ -141,7 +141,7 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
         "link": "https://registry.buildpacks.io/buildpacks/api/v1/projectriff/command-function/1.3.9"
       }
     }
-  } 
+  }
 
 - **GET /buildpacks/:ns/:name/:version**
 
@@ -164,11 +164,11 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
 # How it Works
 [how-it-works]: #how-it-works
 
-In the initial implementation, we can take advantage of the existing [registry](https://github.com/buildpacks/registry-index) repository to pull buildpack data from.  To keep ensure up-to-date buildpack data, we'd have a polling loop that performs a `git pull`.  This polling would take place in a separate background process.  
+In the initial implementation, we can take advantage of the existing [registry](https://github.com/buildpacks/registry-index) repository to pull buildpack data from.  To keep ensure up-to-date buildpack data, we'd have a polling loop that performs a `git pull`.  This polling would take place in a separate background process.
 
 Each time the local repository has been updated via `git pull`, buildpack data will be processed/normalized into a single JSON object, where plain text searches can be used against it.   Fields in this JSON object will be re-indexed as searchable fields, which will be compared against the search text during the retrieval algorithm.
 
-Search fields will include `ns`, and `name`. 
+Search fields will include `ns`, and `name`.
 
 In addition, a server process will expose endpoints and handle incoming request for the GET endpoints mentioned earlier.  For search requests, the text will be extracted from the `matches` query parameter and used to search against the normalized buildpacks index.   Results will be added to the server response, as a list of JSON objects.
 
@@ -197,26 +197,26 @@ Why should we *not* do this?
 - What other designs have been considered?
 
   - Do nothing
-  
-    We already have buildpack metadata stored in the [registry](https://github.com/buildpacks/registry-index).  
+
+    We already have buildpack metadata stored in the [registry](https://github.com/buildpacks/registry-index).
     Customers can simply explore this repository for buildpack information.  Perhaps someone else in the community will
     come up with their own solution that can be donated to CNB.
 
   - Having a separate, independent service responsible for:
     1. pulling from the registry-index repository
     2. augmenting buildpack data
-    3. persisting it to a hosted PostgresDB  
+    3. persisting it to a hosted PostgresDB
 
 - Why is this proposal the best?
 
-  Seems like a good first iterative step that's easy to implement with less moving parts. 
+  Seems like a good first iterative step that's easy to implement with less moving parts.
   Helps us to quickly get something out there for customers to experiment with (MVP).
 
 - What is the impact of not doing this?
 
-  Customers will struggle to find relevant buildpacks to aid them in their development.  
- 
- 
+  Customers will struggle to find relevant buildpacks to aid them in their development.
+
+
 # Prior Art
 [prior-art]: #prior-art
 
@@ -232,11 +232,11 @@ Why should we *not* do this?
 - What parts of the design do you expect to be resolved before this gets merged?
 
 - What parts of the design do you expect to be resolved through implementation of the feature?
-  
+
   I expect to have an API with a GET endpoint with a `matches` parameter that returns a list of matching buildpacks from the registry index repo.
 
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 
   1. A registry dashboard e.g. web-based application with design considerations that provides a clean UX for discovering buildpacks.
-  2. Adding metrics e.g. number of downloads, issues, etc. 
+  2. Adding metrics e.g. number of downloads, issues, etc.
   3. Adding additional metadata in either/both the buildpack or buildpack version response objects
