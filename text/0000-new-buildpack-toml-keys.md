@@ -28,7 +28,7 @@ New optional fields in the `buildpack.toml` would allow us to introduce more inf
 
 * Add `description` as a free text field
 * Add `licenses` table
-* Add `keywords` table
+* Add `keywords` array
 
 # How it Works
 [how-it-works]: #how-it-works
