@@ -71,6 +71,7 @@ Another configuration file.
 - What other designs have been considered?
   - Lifecycle could load env vars from a known file location. e.g. `source lifecycle.env` or similar prior to resolving lifecycle configuration.
   - Lifecycle could only allow for non-path based inputs like `log_level` in `lifecycle.toml`, but add an additional path to to a known platform location. Example would be `/cnb/config/order.toml` for `CNB_ORDER_PATH`. This would allow platforms to use a volume at `/cnb/config` and write files that are fed into lifecycle in addition to a `lifecycle.toml` for non-path based configuration.
+  - Lifecycle could load up values via a similar method that lifecycle's launcher does. e.g. `/platform/env/lifecycle/CNB_ODER_PATH`
 - Why is this proposal the best?
   - A well defined configuration file feels less convoluted and less stack specific
 - What is the impact of not doing this?
@@ -87,6 +88,7 @@ TODO
 
 - Is the convention based name of `CNB_ORDER_PATH` to `order_path` appropriate? We could introduce a schema for this file that is more rigid.
 - Do we need the root `[config]` table? 
+- If a builder has `CNB_ORDER_PATH` set explicitly, the `lifecycle.toml` will not be able to override it without the platform explicitly removing the env vars.
 
 
 # Spec. Changes (OPTIONAL)
