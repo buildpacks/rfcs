@@ -38,7 +38,7 @@ See the spec changes below for full details.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- It introduces some none machine readable fields to an otherwise machine readable descriptor.
+- It introduces some non-machine-readable fields to an otherwise machine readable descriptor.
 
 # Alternatives
 [alternatives]: #alternatives
