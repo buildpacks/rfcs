@@ -42,8 +42,10 @@ cache = false
 A Bash buildpack could then write something like the following:
 
 ```bash
-echo "[types]" >> layer.toml
-echo "launch = true" >> layer.toml
+cat >> launch.toml <<EOL
+[types]
+launch = true
+EOL
 ```
 
 This change should be implemented with Buildpack API 0.6 so that it goes hand-in-hand with the opt in layer re-use feature.
@@ -67,6 +69,7 @@ This change should be implemented with Buildpack API 0.6 so that it goes hand-in
 
 - Since we are moving the `launch`, `build`, and `cache` keys, could they be re-named for further clarity?
 - Is `types` the right name for this table?
+- Would any changes be necessary to [`io.buildpacks.lifecycle.metadata`](https://github.com/buildpacks/spec/blob/main/platform.md#iobuildpackslifecyclemetadata-json)? This label includes `launch`, `build`, and `cache` keys for each referenced layer. If so, should the lifecycle standardize this label for buildpacks implementing different Buildpack APIs?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
