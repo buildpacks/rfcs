@@ -42,10 +42,6 @@ In addition, we want to better understand why app developers switch to CNBs and 
 </ol>
 </ol>
 
-1. Anti-goals
-a. example
-b. example
-
 # Process
 **Timeline:** 
 November 1, 2020 - February 28, 2021 (completed before Buildpacks Summit in the spring)
