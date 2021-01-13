@@ -13,7 +13,7 @@
 
 This change allows buildpacks to access cached assets during builds to enable offline builds and asset reuse.
 
-To do so we introduce the asset cache, a distribution artifact that provides vendored assets for buildpacks, and platform mechanisms to provide vendored assets to buildpacks during `build` and `detect`. We also add a top level `[[assets]]` array in `buildpack.toml`
+To do so we introduce the asset cache, a distribution artifact that provides vendored assets for buildpacks, and platform mechanisms to provide vendored assets to buildpacks during `build`. We also add a top level `[[assets]]` array in `buildpack.toml`
 
 # Motivation
 [motivation]: #motivation
@@ -46,11 +46,11 @@ We define the asset cache artifact. It is a reproducible OCI image. Each layer i
 Asset caches will have two labels. An`io.buildpacks.asset.cache.metadata` label that contains a human readable name.
 ``` json
 {
-  "name": "asset-org/asset-name"
+  "name": "asset-cache-org/asset-cache-name"
 }
 ```
 
-Asset caches will also have a `io.buildpacks.asset.cache.layers` Label. This label maps individual `assets` to the containing layer using `layerDiffID`
+Asset caches will also have a `io.buildpacks.asset.layers` Label. This label maps individual `assets` to the containing layer using `layerDiffID`
 
 ##### General Format:
 ```json
@@ -61,6 +61,9 @@ Asset caches will also have a `io.buildpacks.asset.cache.layers` Label. This lab
     "version": "(required)",
     "layerDiffID": "(required)",
     "uri": "(optional)",
+    "licenses" : ["(optional)"],
+    "description" : "(optional)",
+    "homepage" : "(optional)",
     "stacks": [
       "(optional)",
       "..."
@@ -120,6 +123,9 @@ In order to maintain a link between buildpacks and the assets they may provide w
   id   = "(required)"
   version = "(required)"
   uri = "(optional)"
+  licenses = ["(optional)"]
+  description = "(optional)"
+  homepage = "(optional)"
   stacks = ["(required)"]
   [assets.metadata]
    optional-key = "(optional value)"
@@ -151,6 +157,9 @@ To keep track of the buildpack to asset mapping defined in `buildpack.toml` we a
           "id": "asset-1-id",
           "version": "asset-1-version",
           "uri": "asset-1-uri",
+          "licenses" : ["license1"],
+          "description" : "Some asset",
+          "homepage" : "https://buildpacks.io",
           "name": "Asset 1 Name",
           "stacks": [
             "stack1",
@@ -203,11 +212,14 @@ To keep track of the buildpack to asset mapping defined in `buildpack.toml` we a
           "version": "12.9.0",
           "name": "Node JS",
           "uri": "https://asset-location-url",
+          "licenses" : ["GPLv3"],
+          "description" : "the twelfth version of node",
+          "homepage" : "https://buildpacks.io",
           "stacks": [
             "io.buildpacks.stacks.bionic"
           ],
           "metadata": {
-            "license": "MIT"
+            "packaged-by": "buildpacks.io"
           }
         },
         {
@@ -232,7 +244,7 @@ This label let us determine:
 
 ### Builder Changes
 
-To keep track of what assets are actually in our builder, and what layer they are contained in we add the label, `io.buildpacks.asset.cache.layers`. Note, this label has already been defined above on asset-cache.
+To keep track of what assets are actually in our builder, and what layer they are contained in we add the label, `io.buildpacks.asset.layers`. Note, this label has already been defined above on asset-cache.
 
 Builders will also require the same changes outlined in the Buildpackage section above to the io.buildpacks.buildpack.layers tag.
 
@@ -249,6 +261,11 @@ Builders will also require the same changes outlined in the Buildpackage section
         {
           "sha256": "asset-1-sha256",
           "id": "asset-1-id",
+          "name": "Asset Name",
+          "uri": "https://asset-location-url",
+          "licenses" : ["license1"],
+          "description" : "First Asset Description",
+          "homepage" : "https://buildpacks.io",
           "version": "1.2.3",
           "stacks": [
             "stack1",
@@ -281,7 +298,7 @@ Asset Cache image creation will be handled by the platform. E.g. `pack package-a
 
 There are two cases depending on weather `<buildpack-uri> points to a buildpackage or a directory containing a `buildpack.toml` file.
 1) Directory containing a `buildpack.toml` file. This method uses the `assets` array to locate download and verify assets.
-2) An existing buildpackage. This will download all assets using `uri`s from the `io.buildpacks.buildpack.layers` label, or re-use assets that are included in the specified buildpackage's layers.
+2) An existing buildpackage. This will download all assets using `uri`s from the `io.buildpacks.buildpack.layers` label.
 
 The `--config` flag is always optional but recommended to control naming of the generated asset and control which assets are added to the asset-cache. (May also manually pass naming info)
 
@@ -299,14 +316,14 @@ To provide additional control over asset creation, we may optionally pass  the `
 [asset-cache (optional)]
   name = "(required)"
  
-[[exclude-buildpack-assets (optional)]]
+[[exclude-buildpack (optional)]]
   id = "(required)"
   version = "(required)"
 
-[[exclude-assets (optional)]]
+[[exclude (optional)]]
   sha256 = "(required)"
 
-[[asset-override (optional)]]
+[[override (optional)]]
   uri = "preferred/asset/location"
   sha256 = "asset-sha256"
 ```
@@ -316,15 +333,15 @@ To provide additional control over asset creation, we may optionally pass  the `
 [asset-cache]
   name = "node-asset-cache"
  
-[[exclude-buildpack-assets]]
+[[exclude-buildpack]]
   id = "buildpacks/node-engine"
   version = "1.2.3"
 
-[[exclude-assets]]
+[[exclude]]
   sha256 = "vulnerable-node10-sha256"
   name = "Node js version with security vulnerability. (non-functional)"
 
-[[asset-override]]
+[[override]]
   uri = "../local/path/to/nodejs-asset"
   sha256 = "node13-sha256"
 ```
@@ -334,7 +351,7 @@ Asset cache creation should:
   - filter excluded assets specified in the `config` file.
   - Transform all remaining assets to an image layer filesystem changeset where the asset is provided at `/cnb/assets/<artifact-digest>`.
   - Order all assets layers diffID.
-  - Add the `io.buildpacks.asset.cache.layers` label metadata to the asset image. If no name is specified for `io.buildpacks.asset.cache.metadata`, generate one.
+  - Add the `io.buildpacks.asset.layers` label metadata to the asset image. If no name is specified for `io.buildpacks.asset.cache.metadata`, generate one.
   - set the created time in image config to a constant value.
   - set the modification time of all non-asset files to a constant value.
 
@@ -391,7 +408,7 @@ description = "builder.toml definition of some builder"
 
 [assets]
   [[assets.asset-caches]]
-    uri = "some-asset-cache
+    uri = "some-asset-cache"
     
   [[assets.asset-caches]]
     uri = "some-other-asset-cache"
@@ -459,5 +476,4 @@ Why should we *not* do this?
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-
 
