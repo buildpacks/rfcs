@@ -361,10 +361,9 @@ Asset cache creation should:
 
 When creating a metabuildpack, we want to retain all of the asset information from the child buildpacks.
 
-As such `assets` array in `io.buildpacks.buildpack.layers` of the resulting metabuildpack will be a sum of all of the `asset` arrays in its children.
+As such the `assets` array of each buildpack listed in the `io.buildpacks.buildpack.layers` metadata must preserve their respective `assets` array.
 
-If there are conflicts when merging these entries, the platform may decide to continue or fail.
-
+The platform may choose to fail if there are conflicting assets between any of it's children.
 
 ## Builder Creation
 
