@@ -30,7 +30,7 @@ The prepare phase would support the following features and capabilities:
 # What it is
 [what-it-is]: #what-it-is
 
-The prepare phase will run before all other phase, and prepare the execution environment for a buildpack build. This phase will have access to secrets and credentials used to access registries and other services.
+The prepare phase will run before all other phases, and prepare the execution environment for a buildpack build. This phase will have access to secrets and credentials used to access registries and other services.
 
 ## Responsibilities
 
