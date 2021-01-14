@@ -48,7 +48,8 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 * Log level
 * Run-image
 * Stack ID
-* Project descriptor (optional)
+* [stack.toml](https://github.com/buildpacks/spec/blob/main/platform.md#stacktoml-toml)
+* Project descriptor
 * App source code
 * Previous Image
 * Destination tag(s)
