@@ -158,8 +158,8 @@ As an example of these resolution rules, consider an Apt stackpack that provide 
 
 The example stackpack will be skipped after detection in the following cases:
 * no mixins are required by any component of the build
-* A mixin is required by a buildpack, but the stack already provides that mixin.
-* A mixin is required by an app, but the stack already provides that mixin.
+* a mixin is required by a buildpack, but the stack already provides that mixin
+* a mixin is required by an app, but the stack already provides that mixin
 
 ### Example: PostgreSQL Certs
 
