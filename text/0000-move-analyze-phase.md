@@ -52,6 +52,9 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 * App source code
 * Previous Image
 * Destination tag(s)
+* gid
+* uid
+* log-level
 
 ## Output
 
