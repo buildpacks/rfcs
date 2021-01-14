@@ -85,6 +85,7 @@ The app source code (which may be provided to the prepare either as a directory,
 [alternatives]: #alternatives
 
 - [Reverse the order of analyze and detect phases](https://github.com/buildpacks/spec/pull/172)
+- Split analyze into two parts (one to write `analyzed.toml` and one to analyze layers). The first (`analyzed.toml`) would be moved before the detect phase, and the second part (analyzing layers) would be merged into the restore phase.
 
 # Prior Art
 [prior-art]: #prior-art
