@@ -16,7 +16,6 @@ This is a proposal to re-order and adjust Lifecycle phases. Specifically, moving
 # Definitions
 [definitions]: #definitions
 
-* __stack descriptor__ - an enhanced version of the [`stack.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#stacktoml-toml)
 * __project descriptor__ - the [`project.toml`](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md) extension specification
 
 # Motivation
@@ -35,13 +34,13 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 ## Responsibilities
 
 * Stack validation, to ensure that a new run-image is campatible with the previous app image
-* Retrive run-image mixins, which will be used by subsequent phases
+* Retrieve identifier (imageID or digest), stack ID, and mixins, which will be used by subsequent phases
 * Validation of registry credentials, to avoid a long build that fails during export phase
 * Parsing the project descriptor and performance various operations based on its contents, include:
     - downloading buildpacks
     - creating ephemeral buildpacks
     - applying include and exclude rules
-    - modifying environment variables
+    - adding environment variables to <platform>/env
     - producing an [`order.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#ordertoml-toml) to be consumed by later phases
 
 ## Inputs
@@ -51,14 +50,15 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 * Stack ID
 * Project descriptor (optional)
 * App source code
+* Previous Image
+* Destination tag(s)
 
 ## Output
 
 * Exit status
 * Info-level logs to `stdout`
 * Error-level logs to `stderr`
-* Stack descriptor
-* Analysis metadata [`analyzed.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#analyzedtoml-toml)
+* Analysis metadata [`analyzed.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#analyzedtoml-toml), including run-image information.
 * Buildpacks (derived from inline buildpacks in project descriptor, or buildpacks in project descriptor that are not present in the builder)
 * Buildpacks order [`order.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#ordertoml-toml)
 * Lifecycle configuration (derived from configuration in project descriptor)
@@ -76,6 +76,8 @@ The [logic in the `analyzer` phase that reads image metadata and outputs an `ana
 The [logic in `pack` that parses a `project.toml`](https://github.com/buildpacks/pack/blob/main/project/project.go) would be copied or moved into the `analyzer`.
 
 The [logic in the `analyzer` phase that analyzes layers](hhttps://github.com/buildpacks/lifecycle/blob/main/analyzer.go#L54-L116) would be moved to the `restorer`. `restorer` already takes in `group.toml` as a flag.
+
+The app source code (which may be provided to the prepare either as a directory, volume, or tarball) would be mutated (either by copying it to a new location, or making changes directly). The `analyzer` may delete files to apply the include and exclude rules from `project.toml`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -98,6 +100,7 @@ The [logic in the `analyzer` phase that analyzes layers](hhttps://github.com/bui
 
 - Does `pack` still need to parse `project.toml`, or is there value in reading it early on (before lifecycle runs)?
 - Should we create a shared library for `project.toml` parsing?
+- How should `analyzed.toml` be changed to include run-image information (mixins)
 
 # Spec. Changes
 [spec-changes]: #spec-changes
