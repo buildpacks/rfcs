@@ -39,6 +39,14 @@ $ pack buildpack create <id> \
 
 See https://github.com/buildpacks/pack/pull/1025
 
+The default language will be Bash. This is based on [CNB user research](https://docs.google.com/document/d/1uNE8qkvhBCLIQUjIEbOTfT1epEt9_nHk_fNc64YPEvY/edit), which found:
+
+> Comfort with Go is required to interpret buildpacks / paketo source code
+> * We assume Go experience is not something we can expect our users to have
+
+> Part of the reason developers take to docker easily is because the commands are similar to shell scripts
+> * We assume shell scripts is what devs will be most comfortable with / wil analogize from
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
