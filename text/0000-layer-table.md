@@ -67,7 +67,7 @@ This change should be implemented with Buildpack API 0.6 so that it goes hand-in
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Since we are moving the `launch`, `build`, and `cache` keys, could they be re-named for further clarity?
+- **Out of scope:** Since we are moving the `launch`, `build`, and `cache` keys, could they be re-named for further clarity?
 - Is `types` the right name for this table?
 - Would any changes be necessary to [`io.buildpacks.lifecycle.metadata`](https://github.com/buildpacks/spec/blob/main/platform.md#iobuildpackslifecyclemetadata-json)? This label includes `launch`, `build`, and `cache` keys for each referenced layer. If so, should the lifecycle standardize this label for buildpacks implementing different Buildpack APIs?
 
