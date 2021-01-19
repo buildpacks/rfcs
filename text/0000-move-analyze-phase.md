@@ -36,7 +36,7 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 * Stack validation, to ensure that a new run-image is campatible with the previous app image
 * Retrieve identifier (imageID or digest), stack ID, and mixins, which will be used by subsequent phases
 * Validation of registry credentials, to avoid a long build that fails during export phase
-* Parsing the project descriptor and performance various operations based on its contents, include:
+* Parsing the project descriptor and performing various operations based on its contents, include:
     - downloading buildpacks
     - creating ephemeral buildpacks
     - applying include and exclude rules
@@ -56,6 +56,10 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 * gid
 * uid
 * log-level
+* Path to output analyzed.toml
+* Layers Directory
+* Skip Layers
+* Daemon
 
 ## Output
 
@@ -71,7 +75,7 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 # How it Works
 [how-it-works]: #how-it-works
 
-A platform MUST execute the analyze phase either by invoking the `/cnb/lifecycle/detector` binary or by executing `/cnb/lifecycle/creator`.
+A platform MUST execute the analyze phase either by invoking the `/cnb/lifecycle/analyzer` binary or by executing `/cnb/lifecycle/creator`.
 
 The `analyzer` binary will have access to the [`Keychain`](https://github.com/buildpacks/lifecycle/blob/main/auth/env_keychain.go), and MUST NOT execute arbitrary code provided by either the buildpack user or buildpack author.
 
