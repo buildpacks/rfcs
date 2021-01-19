@@ -31,7 +31,7 @@ Doing this would support the following features and capabilities:
 
 The analyze phase will now run before the detect phase. The analyze phase will have access to secrets and credentials used to access registries and other services, as it does today. Analyze will no longer require a [`group.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#grouptoml-toml). It will do this by splitting off some of the responsibilites into the restore phase.
 
-## Responsibilities
+## New Responsibilities in analzyer
 
 * Stack validation, to ensure that a new run-image is campatible with the previous app image
 * Retrieve identifier (imageID or digest), stack ID, and mixins, which will be used by subsequent phases
