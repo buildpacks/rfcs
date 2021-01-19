@@ -61,6 +61,7 @@ The default language will be Bash. This is based on [CNB user research](https://
 # Prior Art
 [prior-art]: #prior-art
 
+- [paketo-bootstrapper](https://github.com/paketo-community/bootstrapper)
 - [`rails new`](https://guides.rubyonrails.org/command_line.html)
 - [`npm init`](https://docs.npmjs.com/cli/v6/commands/npm-init)
 
