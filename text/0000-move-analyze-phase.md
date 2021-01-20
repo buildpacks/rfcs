@@ -13,18 +13,12 @@
 
 This is a proposal to re-order and adjust Lifecycle phases. Specifically, moving "analyze" before "detect".
 
-# Definitions
-[definitions]: #definitions
-
-* __project descriptor__ - the [`project.toml`](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md) extension specification
-
 # Motivation
 [motivation]: #motivation
 
 Doing this would support the following features and capabilities:
 * [Stack buildpacks](https://github.com/buildpacks/rfcs/pull/111), which require a phase to read run-image mixins validation prior to detection
-* [Inline buildpacks](https://github.com/buildpacks/rfcs/blob/main/text/0048-inline-buildpack.md), which require parsing of the `project.toml` in the lifecycle
-* [Lifecycle configuration](https://github.com/buildpacks/rfcs/pull/128)
+* Validating registry access for all images that are used can happen prior to `detector` or `builder` phases, providing faster failures for end users.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -67,8 +61,6 @@ A platform MUST execute the analyze phase either by invoking the `/cnb/lifecycle
 The `analyzer` binary will have access to the [`Keychain`](https://github.com/buildpacks/lifecycle/blob/main/auth/env_keychain.go), and MUST NOT execute arbitrary code provided by either the buildpack user or buildpack author.
 
 The [logic in the `analyzer` phase that reads image metadata and outputs an `analyzed.toml`](https://github.com/buildpacks/lifecycle/blob/main/analyzer.go#L34-L40) would be remain.
-
-The [logic in `pack` that parses a `project.toml`](https://github.com/buildpacks/pack/blob/main/project/project.go) would be copied or moved into the `analyzer`.
 
 The [logic in the `analyzer` phase that analyzes layers](hhttps://github.com/buildpacks/lifecycle/blob/main/analyzer.go#L54-L116) would be moved to the `restorer`. `restorer` already takes in `group.toml` as a flag.
 
