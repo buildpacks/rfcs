@@ -56,7 +56,7 @@ The default language will be Bash. This is based on [CNB user research](https://
 [alternatives]: #alternatives
 
 - Do it by hand
-- A separate tool (no Pack) can create the scaffolding
+- A separate tool (not Pack) can create the scaffolding
 
 # Prior Art
 [prior-art]: #prior-art
