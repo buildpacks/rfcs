@@ -36,12 +36,6 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 * Stack validation, to ensure that a new run-image is campatible with the previous app image
 * Retrieve identifier (imageID or digest), stack ID, and mixins, which will be used by subsequent phases
 * Validation of registry credentials, to avoid a long build that fails during export phase
-* Parsing the project descriptor and performing various operations based on its contents, include:
-    - downloading buildpacks
-    - creating ephemeral buildpacks
-    - applying include and exclude rules
-    - adding environment variables to <platform>/env
-    - producing an [`order.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#ordertoml-toml) to be consumed by later phases
 
 ## Inputs
 
@@ -49,16 +43,13 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 * Run-image
 * Stack ID
 * [stack.toml](https://github.com/buildpacks/spec/blob/main/platform.md#stacktoml-toml)
-* Project descriptor
-* App source code
 * Previous Image
+* Cache Image
 * Destination tag(s)
 * gid
 * uid
-* log-level
 * Path to output analyzed.toml
 * Layers Directory
-* Skip Layers
 * Daemon
 
 ## Output
@@ -67,10 +58,6 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 * Info-level logs to `stdout`
 * Error-level logs to `stderr`
 * Analysis metadata [`analyzed.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#analyzedtoml-toml), including run-image information.
-* Buildpacks (derived from inline buildpacks in project descriptor, or buildpacks in project descriptor that are not present in the builder)
-* Buildpacks order [`order.toml`](https://github.com/buildpacks/spec/blob/main/platform.md#ordertoml-toml)
-* Lifecycle configuration (derived from configuration in project descriptor)
-* Mutated app source code (applying include and exclude rules in project descriptor)
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -85,13 +72,10 @@ The [logic in `pack` that parses a `project.toml`](https://github.com/buildpacks
 
 The [logic in the `analyzer` phase that analyzes layers](hhttps://github.com/buildpacks/lifecycle/blob/main/analyzer.go#L54-L116) would be moved to the `restorer`. `restorer` already takes in `group.toml` as a flag.
 
-The app source code (which may be provided to the prepare either as a directory, volume, or tarball) would be mutated (either by copying it to a new location, or making changes directly). The `analyzer` may delete files to apply the include and exclude rules from `project.toml`.
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
 * Platform maintainers will need to update the order of their container execution and also update flags for `analyzer`, `detector`, and `restorer`.
-* Lifecycle will now take on the responsibility of processing `project.toml`
 
 # Alternatives
 [alternatives]: #alternatives
@@ -106,8 +90,6 @@ The app source code (which may be provided to the prepare either as a directory,
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Does `pack` still need to parse `project.toml`, or is there value in reading it early on (before lifecycle runs)?
-- Should we create a shared library for `project.toml` parsing?
 - How should `analyzed.toml` be changed to include run-image information (mixins)
 
 # Spec. Changes
