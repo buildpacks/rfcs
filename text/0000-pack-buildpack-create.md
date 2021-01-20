@@ -34,6 +34,12 @@ $ pack buildpack create <id> \
     --stack <stack>
 ```
 
+Where the flags include:
+
+* `language` - a choice of programming languages to use for the template. Pack will support Bash and Go at a minimum.
+* `stack` - a set of compatible stacks for the buildpack. may be specificied multiple times.
+* `path` - the location on the filesystem to generate the artifacts
+
 # How it Works
 [how-it-works]: #how-it-works
 
