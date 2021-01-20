@@ -3,9 +3,9 @@
 - Name: New Buildpack Descriptor Keys
 - Start Date: 2020-12-12
 - Author(s): [@jkutner](@jkutner)
-- RFC Pull Request: (leave blank)
-- CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- RFC Pull Request: [rfcs#127](https://github.com/buildpacks/rfcs/pull/127)
+- CNB Pull Request: [buildpacks/pack#1022](https://github.com/buildpacks/pack/pull/1022)
+- CNB Issue: [buildpacks/spec#181](https://github.com/buildpacks/spec/issues/181), [buildpacks/docs#288](https://github.com/buildpacks/docs/issues/288)
 - Supersedes: N/A
 
 # Summary
