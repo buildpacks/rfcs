@@ -61,6 +61,8 @@ or run the following command :
 $ pack build --post-buildpack containers.instana.io/instana/release/google/buildpack --builder gcr.io/buildpacks/builder <image-name>
 ```
 
+Finally, we will officially deprecate `from=builder` as an acceptable value for the `--buildpack` flag.
+
 # How it Works
 [how-it-works]: #how-it-works
 
