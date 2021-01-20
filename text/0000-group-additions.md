@@ -21,7 +21,7 @@ N/A
 # Motivation
 [motivation]: #motivation
 
-Many buildpack users what the default groups provided by a builder image, but need to inject a single buildpack into the begining or end of those groups. Today, there is no officially supported way to do this without explicitly specifying all of the builpacks in the group or using an undocumented feature like `from=builder`. Most recently, we've see this recommended by the [Instana Buildpacks](https://github.com/instana/instana-buildpacks/tree/main/google-cloud-platform/cloud-run).
+Many buildpack users want to adapt the default groups provided by a builder image by injecting a single buildpack into the begining or end of those groups. Today, there is no officially supported way to do this without explicitly specifying all of the builpacks in the group or using an undocumented feature like `from=builder`. Most recently, we've see this recommended by the [Instana Buildpacks](https://github.com/instana/instana-buildpacks/tree/main/google-cloud-platform/cloud-run).
 
 # What it is
 [what-it-is]: #what-it-is
