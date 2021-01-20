@@ -32,6 +32,7 @@ Add a new command to Pack:
 $ pack buildpack create <id> \
     --language <lang> \
     --stack <stack>
+    --path <path>
 ```
 
 Where the flags include:
