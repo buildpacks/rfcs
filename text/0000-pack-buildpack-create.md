@@ -39,7 +39,7 @@ Where the flags include:
 * `stack` - a set of compatible stacks for the buildpack. may be specificied multiple times.
 * `path` - the location on the filesystem to generate the artifacts
 
-The command will generate the minimal artifacts required to implement a buildpack in Bash.
+The command will create a directory named for the buildpack ID, or the second component of a `<namespace>/<name>` ID. Inside of that directory, it will generate the minimal artifacts required to implement a buildpack in Bash.
 
 The `pack buildpack new` is only a generator. It will not be a _living command_ (i.e. you cannot re-run it to update a buildpack).
 
