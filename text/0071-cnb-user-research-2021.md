@@ -2,8 +2,8 @@
 [meta]: #meta
 - Name: CNB User Research 2021
 - Start Date: 2020-12-10
-- Author(s): sampeinado, speinado@vmware.com
-- RFC Pull Request: (leave blank)
+- Author(s): [@sampeinado](@sampeinado)
+- RFC Pull Request: [rfcs#126](https://github.com/buildpacks/rfcs/pull/126)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
