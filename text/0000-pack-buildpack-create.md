@@ -16,7 +16,7 @@ This is a proposal for a new command in Pack that would create the scaffolding f
 # Definitions
 [definitions]: #definitions
 
-- *Scaffold* - the essential files and directory required for a buildpack
+- *Scaffold* - the essential files and directories required for a buildpack
 
 # Motivation
 [motivation]: #motivation
@@ -29,30 +29,47 @@ Every new buildpack requires a few essential files and directories. We can make 
 Add a new command to Pack:
 
 ```
-$ pack buildpack create <id> \
-    --language <lang> \
-    --stack <stack>
+$ pack buildpack new <id> \
+    --stack <stack> \
     --path <path>
 ```
 
 Where the flags include:
 
-* `language` - a choice of programming languages to use for the template. Pack will support Bash and Go at a minimum.
 * `stack` - a set of compatible stacks for the buildpack. may be specificied multiple times.
 * `path` - the location on the filesystem to generate the artifacts
+
+The command will generate the minimal artifacts required to implement a buildpack in Bash.
+
+The `pack buildpack new` is only a generator. It will not be a _living command_ (i.e. you cannot re-run it to update a buildpack).
+
+## Future Work
+
+In the future, we may add support for a `--template` flag, which would create buildpacks from templates stored in a curated repository. In this way we can support many different languages, and even support versions the same language with different opinions.
 
 # How it Works
 [how-it-works]: #how-it-works
 
 See https://github.com/buildpacks/pack/pull/1025
 
-The default language will be Bash. This is based on [CNB user research](https://docs.google.com/document/d/1uNE8qkvhBCLIQUjIEbOTfT1epEt9_nHk_fNc64YPEvY/edit), which found:
+The only supported language will be Bash. This is based on [CNB user research](https://docs.google.com/document/d/1uNE8qkvhBCLIQUjIEbOTfT1epEt9_nHk_fNc64YPEvY/edit), which found:
 
 > Comfort with Go is required to interpret buildpacks / paketo source code
 > * We assume Go experience is not something we can expect our users to have
 
 > Part of the reason developers take to docker easily is because the commands are similar to shell scripts
 > * We assume shell scripts is what devs will be most comfortable with / wil analogize from
+
+The generated files will include:
+
+
+* `buildpack.toml`
+* `bin/build`
+* `bin/detect`
+
+The `buildpack.toml` will be pre-poluated with the values provided in the CLI command and some defaults (like `0.0.0` for the version).
+
+The `bin/` scripts will be made executable on Linux and MacOS platforms.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -75,7 +92,8 @@ The default language will be Bash. This is based on [CNB user research](https://
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What languages would we support?
+- What language(s) would we support?
     - Golang
     - Bash
     - Python?
+- Should we generate test stubs?
