@@ -16,31 +16,21 @@ Given our contributors’ strong understanding of buildpacks and their spec, the
 In addition, we want to better understand why app developers switch to CNBs and what challenges they face when doing so. As a project, we have clear assumptions about why CNBs are valuable relative to other containerization tools, but we don’t know which reasons are most important to which users. Without this clarity, our ability to market the project’s strengths and prioritize the most valuable features is limited. 
 
 # Objectives
-<ol>
-<li>Understand how buildpack authors currently go about writing buildpacks and customizing builds and what goals they are trying to accomplish by doing so</li>
-<ol>
-<li>Evaluate pain points buildpack authors are experiencing </li>
-<li>Evaluate the relative usability of proposals like <a href="https://github.com/sclevine/packfile">packfile</a> or <a href="https://github.com/kr/heroku-buildpack-inline">inline buildpacks</a> </li>
-</ol>
-<li>Define the different segments of app developers using buildpacks, their goals, challenges, and motivations to switch to buildpacks from other tools</li>
-<ol>
-<li>Identify a tipping point at which users can be considered “converted”</li>
-<li>Enable us to become more strategic in our communication in conference talks, blog posts, and working group </li>
-</ol>
-<li>Provide survey responses to key topics the project is currently working on</li>
-<ol>
-<li>How and where they find information today</li>
-<li>Which platforms they use CNBs on</li>
-<li>Expectations around inner loop development</li>
-</ol>
-<li>Anti-goals</li>
-<ol>
-<li>Who’s using what buildpacks brand</li>
-<li>Usability of the `pack` CLI, except as it relates to buildpack authorship</li>
-<li>Challenges of platform implementors integrating the lifecycle</li>
-<li>Challenges of platform operators doing governance</li> 
-</ol>
-</ol>
+1. Understand how buildpack authors currently go about writing buildpacks and customizing builds and what goals they are trying to accomplish by doing so
+    1. Evaluate pain points buildpack authors are experiencing
+    1. Evaluate the relative usability of proposals like [packfile](https://github.com/sclevine/packfile) or [inline buildpacks](https://github.com/kr/heroku-buildpack-inline)
+1. Define the different segments of app developers using buildpacks, their goals, challenges, and motivations to switch to buildpacks from other tools
+    1. Identify a tipping point at which users can be considered "converted"
+    1. Enable us to become more strategic in our communication in conference talks, blog posts, and working group
+1. Provide survey responses to key topics the project is currently working on
+    1. How and where they find information today
+    1. Which platforms they use CNBs on
+    1. Expectations around inner loop development
+1. Anti-goals
+    1. Who’s using what buildpacks brand
+    1. Usability of the `pack` CLI, except as it relates to buildpack authorship
+    1. Challenges of platform implementors integrating the lifecycle
+    1. Challenges of platform operators doing governance
 
 # Process
 **Timeline:** 
