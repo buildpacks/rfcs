@@ -40,6 +40,7 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 * Previous Image
 * Cache Image
 * Destination tag(s)
+* Cache Dir
 * gid
 * uid
 * Path to output analyzed.toml
