@@ -80,11 +80,11 @@ As any other end-user, I use the stack images as usual.
 
 > If applicable, provide sample error messages, deprecation warnings, or migration guidance.
 
-All migration needs should be covered by an API bump and for implementations, changing the values they use for `-uid` and `-gid` to SID strings. Platforms that accept older API versions will need to continue to convert `CNB_USER_ID` into equivalent Security descriptors. See detailed migration steps below ([High-level migration steps](#high-level-migration-steps)
+All migration needs should be covered by an API bump and for implementations, changing the values they use for `-uid` and `-gid` to SID strings. Platforms that accept older API versions will need to continue to convert `CNB_USER_ID` into equivalent Security descriptors. See detailed migration steps below ([High-level migration steps](#high-level-migration-steps))
 
 > If applicable, describe the differences between teaching this to existing users and new users.
 
-SID usage will be very similar to Linux, though likely only every using the SID for the already-existing user `ContainerUser`. Any Linux-specific documentation or existing Windows samples for Windows run images would need to change to reflect the new variables for Windows.
+SID usage will be very similar to Linux, though almost always using the SID for the standard Docker Windows user `ContainerUser`. Any Linux-specific documentation or existing Windows samples for Windows run images would need to change to reflect the new variables for Windows.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -112,7 +112,7 @@ err = windows.SetNamedSecurityInfo(
     filePath,                           // path to file on filesystem
     windows.SE_FILE_OBJECT,             // type of object (file)
     windows.OWNER_SECURITY_INFORMATION, // fields of the security descriptor to write (owner only)
-    ownerSID,                    // owner SID
+    ownerSID,                           // owner SID
     nil,                                // group SID
     nil,                                // system ACL
     nil,                                // discretionary ACL
@@ -149,7 +149,7 @@ tarHeader.PAXRecords["MSWINDOWS.rawsd"] = rawSDBase64
 // ...
 ```
 
-These prototype functions generate identical Security Descriptors as the syscalls but need some further tested and supported, likely as part of `imgutil/layer`.
+These prototype functions generate identical Security Descriptors as the syscalls but need further testing and long term support, likely as part of `imgutil`.
 
 But once these functions are incorporated and used everywhere that currently sets `tar.Header.Uid/Gid`, the Windows images they generate will have the correct permissions.
 
