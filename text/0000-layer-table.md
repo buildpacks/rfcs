@@ -51,7 +51,9 @@ EOL
 This change should be implemented with Buildpack API 0.6 so that it goes hand-in-hand with the opt in layer re-use feature.
 
 - If a buildpack implementing Buildpack API less than 0.6 tries to write `<layers>/<layer>.toml` with a `[types]` table, the lifecycle should fail.
+    - From opt in layer RFC: <layers>/<layer>.toml will be restored with the top level keys intact for older buildpack apis.
 - If a buildpack implementing Buildpack API 0.6 or above tries to write `<layers>/<layer>.toml` with a top level `launch`, `build`, or `cache` key, the lifecycle should fail.
+- For either buildpack API, if a buildpack were to mistakenly append bare `launch`, `build`, or `cache` keys to `<layers>/<layer>.toml` they would just be part of metadata.
 
 # Drawbacks
 [drawbacks]: #drawbacks
