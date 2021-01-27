@@ -3,9 +3,9 @@
 - Name: Set Image Working Directory to value of CNB_APP_DIR
 - Start Date: 2021-01-13
 - Author(s): @josegonzalez
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#134](https://github.com/buildpacks/rfcs/pull/134)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/spec#183](https://github.com/buildpacks/spec/issues/183), [buildpacks/lifecycle#516](https://github.com/buildpacks/lifecycle/issues/516), [buildpacks/docs#290](https://github.com/buildpacks/docs/issues/290)
 - Supersedes: N/A
 
 # Summary
