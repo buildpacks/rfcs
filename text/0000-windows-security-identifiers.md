@@ -13,7 +13,7 @@
 The spec states behavior that is currently unimplemented in `pack`/`lifecycle` and should be changed before it is implemented (example: [platform.md - **Build image**](https://github.com/buildpacks/spec/blob/313078611d8a7925cb69a241df58e7d749d7f364/platform.md#:~:text=CNB_USER_ID%20set%20to%20the%20user), related: [spec issue](https://github.com/buildpacks/spec/issues/129)):
 > The image config's Env field has the environment variable CNB_USER_ID set to the user †UID/‡SID of the user specified in the User field.
 
-Instead, Windows stack authors should specify *alternative* env vars for Windows `CNB_USER_SID`/`CNB_GROUP_SID` (instead of `CNB_USER_ID`/`CNB_GROUP_ID`) where the values are Windows Security Descriptor strings (ex: `CNB_USER_SID=S-1-5-93-2-1`). Elsewhere, in the platform spec (example: [creator](https://github.com/buildpacks/spec/blob/313078611d8a7925cb69a241df58e7d749d7f364/platform.md#creator)), lifecycle binaries are called with `-uid <uid>` and `-gid <gid>` flags. Instead, these flags should be defined as `-uid <†UID/‡SID>` or `-gid <†UID/‡SID>` to accept SIDs. Finally, all platforms/implementations should use this SID values to generate Windows image layer entries and container files with Security Descriptors instead of leaving them blank or converting from POSIX UID/GIDs.
+Instead, Windows stack authors should specify *alternative* env vars for Windows `CNB_USER_SID`/`CNB_GROUP_SID` (instead of `CNB_USER_ID`/`CNB_GROUP_ID`) where the values are Windows Security Descriptor strings (ex: `CNB_USER_SID=S-1-5-93-2-1`). Elsewhere, in the platform spec (example: [creator](https://github.com/buildpacks/spec/blob/313078611d8a7925cb69a241df58e7d749d7f364/platform.md#creator)), lifecycle binaries are called with `-uid <uid>` and `-gid <gid>` flags. Instead, new flags should be used instead for Windows images: `-usid <SID>` or `-gsid <SID>` to accept SIDs. Finally, all platforms/implementations should use this SID values to generate Windows image layer entries and container files with Security Descriptors instead of leaving them blank or converting from POSIX UID/GIDs.
 
 For context, file and directory entries in Microsoft Windows NTFS file systems use a Security Descriptor encoded into the file system to store owner/group data. Windows OCI layers also encode a Security Descriptor in the tar header to store owner/group data for container files. The Security Descriptor is a data structure comprised of a pair of Security Identifier (SID) strings to specify a file's Owner and Group (along with optional Access Control Lists for detailed access permissions). This differs from POSIX file systems which use User Identifier/Group Identifier integer values encoded into the file system/OCI layer tar header.
 
@@ -80,7 +80,7 @@ As any other end-user, I use the stack images as usual.
 
 > If applicable, provide sample error messages, deprecation warnings, or migration guidance.
 
-All migration needs should be covered by an API bump and for implementations, changing the values they use for `-uid` and `-gid` to SID strings. Platforms that accept older API versions will need to continue to convert `CNB_USER_ID` into equivalent Security descriptors. See detailed migration steps below ([High-level migration steps](#high-level-migration-steps))
+All migration needs should be covered by an API bump and for implementations, adding new flags for `-usid` and `-gsid` (and rejecting their POSIX equivalents) when running on Windows. Platforms that accept older API versions will need to continue to convert `CNB_USER_ID` into equivalent Security descriptors. See detailed migration steps below ([High-level migration steps](#high-level-migration-steps))
 
 > If applicable, describe the differences between teaching this to existing users and new users.
 
@@ -159,7 +159,7 @@ In terms of `pack` and `lifecycle` specifically, most migration work will need t
 Even though some Windows functionality is technically "experimental", to migrate smoothly we should:
 1. Add new static helper functions to `imgutil/layer` or `imgutil/archive` to convert SIDs to `MSWINDOWS.rawsd` strings that can be used for `tar.Header.PAXRecords["MSWINDOWS.rawsd"]`.
 1. Change `pack` to stop writing `tar.Header.Uid/Gid` in Windows images and instead write `tar.Header.PAXRecords["MSWINDOWS.rawsd"]` using `imgutil`'s new static helper functions to convert SIDs. Root-owned files should always have the well-known SID for `BUILTIN\Administrators` (`S-1-5-32-544`). While deprecating, `pack` can convert `CNB_USER_ID=1` to the well-known SID for `BUILTIN\Users` (`S-1-5-32-545`) and warn when `CNB_USER_SID` is not provided.
-1. Change `lifecycle` flags `-uid` and `-gid` to require SIDs on Windows, stop writing `tar.Header.Uid/Gid` for exported images, instead write `tar.Header.PAXRecords["MSWINDOWS.rawsd"]` based on SIDs, and bump the API.
+1. Add `lifecycle` flags `-usid` and `-gsid` only for Windows, stop writing `tar.Header.Uid/Gid` for exported images, instead write `tar.Header.PAXRecords["MSWINDOWS.rawsd"]` based on SIDs, and bump the API.
 1. Change platforms that use the new lifecycle, to always call `lifecycle` with SID values.
 1. Change samples and documentation along the way to demonstrate how to use the new values.
 
@@ -212,7 +212,7 @@ In terms of timing, there are currently few Windows stacks and waiting to introd
 > What parts of the design do you expect to be resolved before this gets merged?
 
 * Agreement on the stack env var names (i.e. `CNB_USER_SID`/`CNB_GROUP_SID`)
-* Agreement on the implementation command-line flag conventions (i.e. `creator -uid <SID string>` for Windows/`creator -uid <GID integer>` for Linux)
+* Agreement on the implementation command-line flag conventions (i.e. `creator -usid <SID string> ...` for Windows/`creator -uid <GID integer>...` for Linux)
 * Any broader spec changes, beyond just amending UID/GID references with Windows-specific SID equivalents
 
 > What parts of the design do you expect to be resolved through implementation of the feature?
@@ -234,10 +234,7 @@ In terms of timing, there are currently few Windows stacks and waiting to introd
 
 ### General changes
 * Amend all references to POSIX UID/GID to use SID for Windows images
-* Changes to lifecycle flags:
-  * `-uid`/`-gid` would now either accept SID values, *or*
-  * have alternatives on Windows (i.e. `-owner-sid`/`-group-sid`)
-
+* Add new flags on Windows (i.e. `-usid`/`-gsid`)
 
 ### Specific spec examples
 Some areas of the platform spec that should change:
