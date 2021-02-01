@@ -23,13 +23,13 @@ There are various technical details involved with this design change, detailed b
 
 # Definitions
 [definitions]: #definitions
+* *Security Principal*: Any entity that can be authenticated by the Windows operating system, such as a user account, a computer account, or a thread or process that runs in the security context of a user or computer account, or the security groups for these accounts
 * *Security Identifier*: A unique value of variable length that is used to identify a Windows *Security Principal*. Expressed as a string. Maximum 256 bytes.
   * [Microsoft SID definition](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/78eb9013-1c3a-4970-ad1f-2b1dad588a25) 
   * [SID components](https://docs.microsoft.com/en-us/windows/win32/secauthz/sid-components)
   * [SID formal spec](https://docs.microsoft.com/en-us/windows/win32/secauthz/security-identifiers)
   * [Well-known Windows SIDs](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/81d92bba-d22b-4a8c-908a-554ab29148ab)
   * [Container-specific SIDs in moby/moby](https://github.com/moby/moby/blob/751d5f879a4f625bd32b08481bbb45e5d2db5b6c/pkg/system/syscall_windows.go)
-* *Security Principal*: Any entity that can be authenticated by the Windows operating system, such as a user account, a computer account, or a thread or process that runs in the security context of a user or computer account, or the security groups for these accounts
 * *Security Descriptor*: A data structure, binary-encoded into the header on an NTFS or Windows OCI layer tar archive. It contains the security attributes of a file entry including who owns the object; who can access the object and what they can do with it; what level of audit logging can be applied to the object; and what kind of restrictions apply to the use of the security descriptor. The relevant attributes here are `OwnerSid` (*Owner*), `GroupSid` (*Group*) - both SIDs.
   * [Microsoft Security Descriptor definition](https://docs.microsoft.com/en-us/windows/win32/secauthz/security-descriptors)
   * [Security Descriptor formal spec](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/7d4dac05-9cef-4563-a058-f108abecce1d)
