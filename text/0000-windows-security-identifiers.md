@@ -245,9 +245,6 @@ Under [**Build Image**](https://github.com/buildpacks/spec/blob/313078611d8a7925
 > The image config's Env field has the environment variable CNB_GROUP_ID set to the primary group †GID/‡SID of the user specified in the User field.
 >
 
-Under [**Run Image**](https://github.com/buildpacks/spec/blob/313078611d8a7925cb69a241df58e7d749d7f364/platform.md#:~:text=set%20to%20a%20user%20with%20the%20same%20user)
-> The image config's User field is set to a user with the same user †UID/‡SID and primary group †GID/‡SID as in the build image.
-
 And the lifecycle commands that use `-uid` (example:
 [creator](https://github.com/buildpacks/spec/blob/313078611d8a7925cb69a241df58e7d749d7f364/platform.md#creator
 ))
