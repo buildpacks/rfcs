@@ -123,7 +123,7 @@ err = windows.SetNamedSecurityInfo(
 
 The `StringToSid` function converts the string SID to a struct and `SetNamedSecurityInfo` changes the Owner field of the file's on-disk Security Descriptor. The `nil` fields - Group, DACL, SACL - are not set here but can be set in this API. 
 
-Unfortunately these functions can't be used in any cross-platform way, as both `windows.StringToSid` and `windows.SetNamedSecurityInfo` wrap underlying Windows-only API syscalls.
+Unfortunately these functions can't be used in any cross-platform way, as both `windows.StringToSid` and `windows.SetNamedSecurityInfo` wrap underlying Windows-only API syscalls. Currently, `pack` can create Windows buildpackage/builder images from any OS/Arch - Linux/Darwin/Windows - but relying on these syscalls would regress this functionality to just Windows/amd64.
 
 Instead, a roughly-equivalent, cross-platform working prototype is here: https://github.com/micahyoung/sid-to-rawsd/tree/25fe3b86eb42823171828dfd972d9cb9ee86f988
 
