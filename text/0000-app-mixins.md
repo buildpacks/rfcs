@@ -11,14 +11,14 @@
 # Summary
 [summary]: #summary
 
-This is a proposal for allowing application developers (buildpack users) to specify mixins that will be dynamically included with their build and run images. In this way, users can include custom system packages (and other libraries) with their applications.
+This is a proposal for allowing application developers (buildpack users) to specify mixins that will be dynamically included with their build and run images. In this way, users can include custom system packages with their applications.
 
 # Motivation
 [motivation]: #motivation
 
-Mixins already allow buildpack authors to create buildpacks that depend on an extended set of OS packages without affecting build time, but it's common for application code to depend on OS packages too. But allowing buildpacks to arbitrarily install OS packages during build would drastically increase build time, especially when CNB tooling is used to build or rebase many apps with similar package requirements.
+Mixins already allow buildpack authors to create buildpacks that depend on an extended set of OS packages without affecting build time, but it's common for application code to depend on OS packages too. However, allowing buildpacks to arbitrarily install OS packages during build would drastically increase build time, especially when CNB tooling is used to build or rebase many apps with similar package requirements.
 
-For that reason, this proposal defines a mechanism to implement dynamic installation of mixins at build time while minimizing the performance impact. This is accomplished by allowing stack images to satisfy mixin requires statically and/or reject dynamic mixin installation early in the build process.
+For that reason, this proposal defines a mechanism to implement dynamic installation of mixins at build time while minimizing the performance impact. This is accomplished by allowing stack images to satisfy required mixin statically and/or reject dynamic mixin installation early in the build process.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -54,7 +54,7 @@ When a list of mixins are required by buildpacks via the build plan and the buil
 
 ## Stack Buildpacks
 
-The complete details of a Stack buildpack are described in [another RFC proposal](https://github.com/buildpacks/rfcs/pull/111).
+The complete details of a Stack buildpack are described in [RFC-0069: Stack buildpacks](https://github.com/buildpacks/rfcs/blob/main/text/0069-stack-buildpacks.md).
 
 ## Rebasing an App
 
@@ -91,7 +91,7 @@ mixins = [ "build:libpq-dev", "run:libpq" ]
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Installing a mixin a build-time means that the `rebase` must also update the provided mixin. In this way, `rebase` becomes an operation that _may_ do more than edit JSON on a registry. It must also re-run a stack buildpack.
+- Installing a mixin at build-time means that the `rebase` must also update the provided mixin. In this way, `rebase` becomes an operation that _may_ do more than edit JSON on a registry. It must also re-run a stack buildpack.
 
 # Alternatives
 [alternatives]: #alternatives
