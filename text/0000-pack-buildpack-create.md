@@ -30,14 +30,20 @@ Add a new command to Pack:
 
 ```
 $ pack buildpack new <id> \
+    --api <api> \
+    --name <name> \
+    --path <path> \
     --stack <stack> \
-    --path <path>
+    --version <version>
 ```
 
 Where the flags include:
 
-* `stack` - a set of compatible stacks for the buildpack. may be specificied multiple times.
+* `api` - the buildpack API compatibility version
+* `name` - the name of the buildpack in the `buildpack.toml`
 * `path` - the location on the filesystem to generate the artifacts
+* `stack` - a set of compatible stacks for the buildpack. may be specificied multiple times. (defaults to `io.buildpacks.stacks.bionic` because it is required)
+* `version` - the version of the buildpack in `buildpack.toml` (defaults to `0.0.0` because it is required)
 
 The command will create a directory named for the buildpack ID, or the second component of a `<namespace>/<name>` ID. Inside of that directory, it will generate the minimal artifacts required to implement a buildpack in Bash.
 
