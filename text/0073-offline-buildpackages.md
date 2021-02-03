@@ -3,9 +3,9 @@
 - Name: Asset Cache
 - Start Date: 2020-04-27
 - Author(s): dwillist
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#81](https://github.com/buildpacks/rfcs/pull/81)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/spec#184](https://github.com/buildpacks/spec/issues/184), [buildpacks/pack#1055](https://github.com/buildpacks/pack/issues/1055), [buildpacks/lifecycle#521](https://github.com/buildpacks/lifecycle/issues/521)
 - Supersedes: NA
 
 # Summary
