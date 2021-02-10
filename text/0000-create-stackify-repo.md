@@ -29,11 +29,11 @@ Stackify will be a tool that will be useful to users who would like to customize
 
 Users can use stackify to add packages and ca-certificates to a base image as well as add all required CNB metadata to the image.
 
-Stackify can be integrated into Pack in the form of a `pack create-stack` command.
+Stackify can be integrated into Pack in the form of a `pack stack create` command.
 
 # How it Works
 [how-it-works]: #how-it-works
-For stacks defined by the buildpacks project, Stackify will add mixins labels for each package installed on the image. If Stackify is used to give add a stack ID other than one defined by the buildpacks project, mixin labels will not be added.
+For stacks defined by the buildpacks project, Stackify will add mixin labels for each package installed on the image. If Stackify is used to add a stack ID other than one defined by the buildpacks project, mixin labels will not be added.
 
 If Stackify is used with an already valid stack image, the `CNB_*` labels and users will not be changed unless new user and group ID's are passed, in which case the labels and user will be overwritten.
 
@@ -48,66 +48,84 @@ Stackify will be run once for each image (build and run):
 stackify 
   --base-image string
     	Source image ref
-  --stack-image string
+  --destination string
     	Destination for stack image
+  --stack-id string
+      Stack ID to add to image metadata
   --certs-dir string
     	Path to directory with CA Certs to add to image
-  --group-id string
-    	CNB Group ID
-  --image-type string
-    	Type of image to create (build or run)
-  --mixins string
+  --mixin-labels string
     	Comma-separated list of mixins to add to labels
   --packages string
     	Comma-separated list of packages to add to image
-  --stack-id string
-      Stack ID to add to image metadata
   --user-id string
     	CNB User ID
+  --group-id string
+    	CNB Group ID
+  --build
+      Add build image metadata (must specify either --build or --run)
+  --run
+      Add run image metadata (must specify either --build or --run)
 ```
 
-This will be called under the hood by the `pack create-stack` command, which will take a TOML config file:
+This will be called under the hood by the `pack stack create` command, which will take a TOML config file. Pack will have to copy the stackify image onto each base image and then run stackify with the specified inputs for each image.
 
-`pack create-stack my-stack -c /path/to/config.toml`
+This command can be invoked by passing in `--run-image`, `--build-image`, or both, depending on which images you would like to have created.
+
+`pack stack create my-stack --run-image <run-tag> --build-image <build-tag> -c /path/to/config.toml`
 
 Config file:
 ```
+[stack]
+id = "(required)"
+maintainer = "(optional)"
+homepage = "(optional)"
+description = "(optional)"
+
+[stack.distro]
+name = "(optional)"
+version = "(optional)"
+
+[stack.metadata]
+# arbitrary keys and values
+
 [build]
-image = "paketobuildpacks/build:base"
-outputTag = "some-registry/some-custom-stack-build-image"
+base-image = "paketobuildpacks/build:base"
 
-[run]
-image = "paketobuildpacks/run:base"
-outputTag = "some-registry/some-custom-stack-run-image"
+[[build.ca-certs]]
+uri = "/path/to/dir/with/build-certs"
 
-[caCerts]
+[[build.ca-certs]]
+uri = "file:///path/to/ca-cert.pem"
 
-[caCerts.build]
-path = "/path/to/dir/with/build-certs"
+[[build.ca-certs]]
+uri = "https://example.com/ca-cert.pem"
 
-[caCerts.run]
-path = "/path/to/dir/with/run-certs"
-
-[[packages]]
+[[build.packages]]
 name = "cowsay"
 
-[[packages]]
+[[build.packages]]
 name = "fortune"
-phase = "build"
 
-[[packages]]
+[run]
+base-image = "paketobuildpacks/run:base"
+
+[[run.ca-certs]]
+path = "/path/to/dir/with/run-certs"
+
+[[run.packages]]
+name = "cowsay"
+
+[[run.packages]]
 name = "rolldice"
-phase = "run"
 
-[[mixins]]
-name = "set=build-utils"
-phase = "build"
+[[mixin-labels]]
+name = "build:set=build-utils"
 
-[[mixins]]
-name = "set=run-utils"
-phase = "run"
+[[mixin-labels]]
+name = "run:set=run-utils"
 
-[[mixins]]
+[[mixin-labels]]
 name = "set=shared-utils"
 
 [user]
@@ -118,7 +136,7 @@ groupID = 1000
 # Drawbacks
 [drawbacks]: #drawbacks
 * Stackify must be run on the image being "stackify-ed" in order to add ca-certificates and packages.
-  * Pack have to run stackify within the image that is being modified.
+  * Pack has to run stackify within the image that is being modified.
 * If we do not do enough validation, users may be able to successfully use stackify with incompatible or invalid base images.
 * Some of the CNB metadata can be difficult to generate, particularly the mixins
 
