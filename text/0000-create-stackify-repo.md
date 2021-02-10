@@ -47,21 +47,21 @@ Stackify will be run once for each image (build and run):
 ```
 stackify 
   --base-image string
-    	Source image ref
+      Source image ref
   --destination string
-    	Destination for stack image
+      Destination for stack image
   --stack-id string
       Stack ID to add to image metadata
   --certs-dir string
-    	Path to directory with CA Certs to add to image
+      Path to directory with CA Certs to add to image
   --mixin-labels string
-    	Comma-separated list of mixins to add to labels
+      Comma-separated list of mixins to add to labels
   --packages string
-    	Comma-separated list of packages to add to image
+      Comma-separated list of packages to add to image
   --user-id string
-    	CNB User ID
+      CNB User ID
   --group-id string
-    	CNB Group ID
+      CNB Group ID
   --build
       Add build image metadata (must specify either --build or --run)
   --run
