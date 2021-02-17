@@ -3,9 +3,9 @@
 - Name: Pack Command to Create a Buildpack Repo
 - Start Date: 2021-01-19
 - Author(s): [jkutner](https://github.com/jkutner)
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#136](https://github.com/buildpacks/rfcs/pull/136)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/pack#1025](https://github.com/buildpacks/pack/issues/1025)
 - Supersedes: N/A
 
 # Summary
