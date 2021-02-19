@@ -61,7 +61,7 @@ or
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-## proejct.toml (TOML)
+## project.toml (TOML)
 
 ```toml
 [project]
