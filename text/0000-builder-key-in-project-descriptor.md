@@ -68,7 +68,7 @@ or
 id = "<string>"
 ...
 
-[[build]]
+[build]
 builder = "<string>" # optional
 ...
 ```
