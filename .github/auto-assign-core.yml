@@ -1,0 +1,9 @@
+addAssignees: true
+numberOfAssignees: 1
+
+filterLabels:
+  include:
+  - Core
+
+assignees:
+- hone

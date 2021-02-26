@@ -1,0 +1,10 @@
+addAssignees: true
+numberOfAssignees: 1
+
+filterLabels:
+  include:
+  - Learning
+
+assignees:
+- jkutner
+- jromero

@@ -120,7 +120,7 @@ provided (all named images will have the same layers).
 
 The `exporter` phase will be responsible for the combined activities of the
 previous `exporter` and `cacher` phases
-(see https://github.com/buildpacks/spec/blob/master/buildpack.md#phase-4-export).
+(see https://github.com/buildpacks/spec/blob/main/buildpack.md#phase-4-export).
 
 The previous `/lifecycle/cacher` phase will be removed from the spec.
 

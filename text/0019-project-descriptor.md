@@ -2,8 +2,8 @@
 [meta]: #meta
 - Name: Minimal Project Descriptor
 - Start Date: 2019-06-11
-- CNB Pull Request: [rfcs#32](https://github.com/buildpack/rfcs/pull/32)
-- CNB Issue: 32
+- CNB Pull Request: (leave blank)
+- CNB Issue: (leave blank)
 - Supersedes: https://github.com/buildpack/rfcs/pull/25
 
 # Summary
@@ -156,7 +156,7 @@ pipeline = "foobar"
 # How it Works
 [how-it-works]: #how-it-works
 
-The `project.toml` contents will be read by the platform and/or the lifecycle. The launch image will contain labels for the data in all fields except `include` and `exclude`.
+The `project.toml` contents will be read by the platform and/or the lifecycle. The launch image will contain labels for the data in all fields except `include`, `exclude`, and all keys under `build`.
 
 ## Example: Basic app
 
