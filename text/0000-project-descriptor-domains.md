@@ -64,6 +64,44 @@ value = "<string>"
 
 Schema versioning is a feature any reverse domain namespace can do as well.
 
+## Non Buildpacks Project Descriptor Example
+
+For a non-project buildpacks project adopting the [fly.io](https://fly.io) `fly.toml` taken from the [phoenix-liveview-clustoer example app](https://github.com/fly-apps/phoenix-liveview-cluster/blob/master/fly.toml):
+
+```TOML
+[io.fly]
+app = "liveview-counter"
+
+kill_signal = "SIGTERM"
+kill_timeout = 5
+
+[io.fly.experimental]
+private_network = true
+
+[[io.fly.services]]
+  internal_port = 4000
+  protocol = "tcp"
+
+  [io.fly.services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+
+  [[io.fly.services.ports]]
+    handlers = ["http"]
+    port = "80"
+
+  [[io.fly.services.ports]]
+    handlers = ["tls", "http"]
+    port = "443"
+
+  [[io.fly.services.tcp_checks]]
+    grace_period = "30s" # seems to take about 30s to boot
+    interval = "10s"
+    port = "8080"
+    restart_limit = 0
+    timeout = "2s"
+```
+
 ## Backwards Compatibility
 
 The bundler project switch from YAML to a proprietary Ruby DSL for the `Gemfile` and was able to detect the differences to determine which version to use. Our parsers can detect for `[io.buildpacks]` key specifically to differentiate between the two. In the future, the API key under this table can be used.
