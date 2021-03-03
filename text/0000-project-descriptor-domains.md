@@ -104,7 +104,7 @@ private_network = true
 
 ## Backwards Compatibility
 
-The bundler project switch from YAML to a proprietary Ruby DSL for the `Gemfile` and was able to detect the differences to determine which version to use. Our parsers can detect for `[io.buildpacks]` key specifically to differentiate between the two. In the future, the API key under this table can be used.
+The bundler project switched from YAML to a proprietary Ruby DSL for the `Gemfile` and was able to detect the differences to determine which version to use. Our parsers can detect for `[io.buildpacks]` key specifically to differentiate between the two. In the future, the API key under this table can be used.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -137,6 +137,4 @@ Discuss prior art, both the good and bad.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
-Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
-Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fields, new fields in the buildpackage label, etc.
-This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are necessary, they should be documented here.
+This will require a change to the [Project Descriptor Extensions spec](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md). The overall change will include the `[project]` key as it stands today as well as the move to reverse domain notation for other keys. The `[io.buildpacks]` will now contain its own schema as well.
