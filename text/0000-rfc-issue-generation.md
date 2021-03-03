@@ -17,9 +17,9 @@ This information would later be used by automation to generate issue in the appr
 # Definitions
 [definitions]: #definitions
 
-- [RFC]()
-- [Repositories]()
-- [Maintainers]()
+- [RFC](https://github.com/buildpacks/rfcs/blob/rfc-issue-generation/text/0004-rfc-process.md#what-it-is) - The formal process of recording and collecting input for proposed changes.
+- [Repositories](https://github.com/buildpacks) - The code repositories maintained by the Cloud Native Buildpacks project.
+- [Maintainers](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#maintainers) - Individuals with elevated responsibilities regarding the day-to-day operations of any given sub-team.
 
 # Motivation
 [motivation]: #motivation
@@ -74,18 +74,49 @@ TODO
 
 ### Use comments instead
 
+Instead of maintainers creating "suggested edits" to the RFC which then require the author to merge with proper DCO signing, 
+the maintainers could simply comment on the RFC. Once the RFC is merged automation could detect issues by looking through the comments.
+
 ```text
-/pending-issue buildpacks/pack: implement feature A [good first issue]
+FORMAT:
+  - /add-issue <repo>: <title> [labels]...
+  - /remove-issue <permalink-to-comment>
 ```
-
-### Keep information seperate
-
-Find an alternative location to store this information that the maintainers would use.
 
 Examples:
 
-    - Google Sheets
-    - Seperate Repository
+```text
+/add-issue buildpacks/pack: implement this feature [good first issue]
+```
+
+```text
+/remove-issue https://github.com/... 👈 link to comment
+```
+
+##### Pros
+
+- No need for maintainers to suggest edits and ensure author adds issues.
+
+##### Cons
+
+- No call-to-action for maintainers. The maintainers would have to remember to do this.
+
+### Keep management of issues seperate
+
+Find an alternative location to store pending issues to create.
+
+Examples:
+
+  - Google Sheets
+  - Seperate Repository
+
+##### Pros
+
+- No need for maintainers to suggest edits and ensure author adds issues.
+
+##### Cons
+
+- Location of issue "management" is distant from RFC making it hard to trace or more tedious to work with.
 
 # Prior Art
 [prior-art]: #prior-art
