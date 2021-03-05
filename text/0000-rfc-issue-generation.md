@@ -6,7 +6,7 @@
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
-- Supersedes: "N/A" (TODO: There may be an RFC to mention here)
+- Supersedes: "N/A"
 
 # Summary
 [summary]: #summary
