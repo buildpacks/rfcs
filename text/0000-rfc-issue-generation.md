@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-This RFC proposes additional information to be added to the RFC template that would be filled out during the RFC process. 
+This RFC proposes additional information to be added to the RFC template that would be filled out during the RFC process.
 This information would later be used by automation to generate issue in the appropriete repositories.
 
 # Definitions
@@ -24,15 +24,17 @@ This information would later be used by automation to generate issue in the appr
 # Motivation
 [motivation]: #motivation
 
-The current RFC process requires labels for individual sub-teams of relevance to be added. 
+The current RFC process [requires labels for individual sub-teams of relevance to be added](https://github.com/buildpacks/rfcs/blob/main/text/0059-label-rfcs.md).
 Later, after the RFC has been approved, it requires maintainers of affected sub-teams to create issues on their respective repositories.
-This typically happens days, weeks, if not months after the maintainers might have reviewed the RFC. 
+This typically happens days, weeks, if not months after the maintainers might have reviewed the RFC.
 In addition, it usually requires the person merging the RFC to hunt down (or ping) any maintainers for sub-teams that haven't created relevant issues.
+
+The goal of this RFC is to minimize the overhead of creating issues for maintainers and the individual merging the RFCs by incoorporating the processes into the review process as opposed to the merge process.
 
 # What it is
 [what-it-is]: #what-it-is
 
-The proposal would be to add the following information somewhere in the RFC template:
+The proposal would be to add the following information to the end of the RFC template:
 
 ```markdown
 # Issues to Create
@@ -57,7 +59,13 @@ This is the technical portion of the RFC, where you explain the design in suffic
 The section should return to the examples given in the previous section, and explain more fully how the detailed proposal makes those examples work.
 -->
 
-TODO
+During the review process, as maintainers review the RFC they can [suggest changes](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/commenting-on-a-pull-request#adding-line-comments-to-a-pull-request) to this section by adding a line in the following format:
+
+```
+- <repo>: <title> [labels]...
+```
+
+Once, the RFC is approved and ready to merge the [`merge-rfc.sh`](https://github.com/buildpacks/rfcs/blob/main/merge-rfc.sh) can parse the list in this section and create the respective issues.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -66,7 +74,7 @@ TODO
 Why should we *not* do this?
 -->
 
-TODO
+- The RFC author is required to accept the suggested changes, preferably with proper DCO signatures. This would be adding a bit of toil on the authors behalf.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -75,7 +83,7 @@ TODO
 ### Use comments instead
 
 Instead of maintainers creating "suggested edits" to the RFC which then require the author to merge with proper DCO signing, 
-the maintainers could simply comment on the RFC. Once the RFC is merged automation could detect issues by looking through the comments.
+the maintainers could simply comment on the RFC. Once the RFC is merged the [`merge-rfc.sh`](https://github.com/buildpacks/rfcs/blob/main/merge-rfc.sh) script could detect issues by looking through the comments.
 
 ```text
 FORMAT:
@@ -99,7 +107,7 @@ Examples:
 
 ##### Cons
 
-- No call-to-action for maintainers. The maintainers would have to remember to do this.
+- No call-to-action for maintainers. The maintainers would have to remember to do this during their review.
 
 ### Keep management of issues seperate
 
@@ -121,20 +129,17 @@ Examples:
 # Prior Art
 [prior-art]: #prior-art
 
-Discuss prior art, both the good and bad.
+None
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What parts of the design do you expect to be resolved before this gets merged?
-- What parts of the design do you expect to be resolved through implementation of the feature?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+None
 
-# Spec. Changes (OPTIONAL)
+# Spec. Changes
 [spec-changes]: #spec-changes
-Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
-Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fields, new fields in the buildpackage label, etc.
-This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are necessary, they should be documented here.
+
+None
 
 # Issues to Create
 
@@ -150,4 +155,4 @@ Issues listed below will be created once this RFC is approved and merged:
 -->
 
 - buildpacks/rfcs: Add "issues to create" to RFC template
-- buildpacks/rfcs: Automate "issue to create" from RFCs
+- buildpacks/rfcs: Create issues from RFCs (merge-rfc.sh)
