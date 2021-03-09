@@ -12,7 +12,7 @@
 [summary]: #summary
 
 For any given process, the buildpack should be able to specify a working
-directory for a process that is not `CNB_APP_DIR`.
+directory that is not `CNB_APP_DIR`.
 
 # Motivation
 [motivation]: #motivation
@@ -48,8 +48,8 @@ direct = false
 directory = "<working directory>"
 ```
 
-If `directory` is no set the launcher will be invoked in `CNB_APP_DIR` as
-normal. However, if give a relative path such as `src/app` the launcher should
+If `directory` is not set the launcher will be invoked in `CNB_APP_DIR` as
+normal. However, if given a relative path such as `src/app` the launcher should
 be invoked from `$CNB_APP_DIR/src/app`. If given an absolute path such as
 `/mounted/bin`, the launcher should invoke from `/mounted/bin`.
 
@@ -62,4 +62,4 @@ be invoked from `$CNB_APP_DIR/src/app`. If given an absolute path such as
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-Add a new field `directory` field to `processes` in `launch.toml`
+Add a new field `directory` field to `processes` in`launch.toml`
