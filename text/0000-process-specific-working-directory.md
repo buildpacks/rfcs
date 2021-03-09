@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Process Specific Working Directory
 - Start Date: 2021-03-09
-- Author(s): ForestEckhardt, rmoran
+- Author(s): ForestEckhardt, ryanmoran
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
