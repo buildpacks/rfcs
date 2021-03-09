@@ -1,0 +1,12 @@
+addAssignees: true
+numberOfAssignees: 1
+
+filterLabels:
+  include:
+  - Implementation
+
+assignees:
+- ekcasey
+- natalieparellano
+- nebhale
+- sclevine
