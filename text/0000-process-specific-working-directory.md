@@ -12,7 +12,7 @@
 [summary]: #summary
 
 For any given process, the buildpack should be able to specify a working
-directory for a process that is not `/workspace`.
+directory for a process that is not `CNB_APP_DIR`.
 
 # Motivation
 [motivation]: #motivation
@@ -25,9 +25,9 @@ directory without needing to invoke a shell.
 [what-it-is]: #what-it-is
 
 It is a common pattern in buildpacks to execute the process from a directory
-that is not `/workspace`. In these cases, buildpack authors are required to
+that is not `CNB_APP_DIR`. In these cases, buildpack authors are required to
 write a process command that includes a change into the directory that the
-process should run from. This often looks like `cd /workspace/sub-directory &&
+process should run from. This often looks like `cd $CNB_APP_DIR/sub-directory &&
 ./execute-process`. Unfortunately, this means that the command can only be run
 on a stack that includes a shell. It also means that including additional flags
 or arguments to the command at runtime is cumbersome.
@@ -48,9 +48,9 @@ direct = false
 directory = "<working directory>"
 ```
 
-If `directory` is no set the launcher will be invoked in `/workspace` as
+If `directory` is no set the launcher will be invoked in `CNB_APP_DIR` as
 normal. However, if give a relative path such as `src/app` the launcher should
-be invoked from `/workspace/src/app`. If given an absolute path such as
+be invoked from `$CNB_APP_DIR/src/app`. If given an absolute path such as
 `/mounted/bin`, the launcher should invoke from `/mounted/bin`.
 
 # Prior Art
