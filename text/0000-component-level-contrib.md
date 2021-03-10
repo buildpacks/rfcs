@@ -15,7 +15,8 @@
 Our current contribution guidelines do not define a process for accepting component-level contributions, such as existing git repositories, that were developed outside of the project.
 While the lack of guidelines has not prevented components from being contributed (e.g., #123), establishing formal guidelines will ensure fair and orderly consideration of future proposals.
 
-# Proposed Guidelines
+# What it is
+[what-it-is]: #what-it-is
 [proposed-guidelines]: #proposed-guidelines
 
 - Component-level contributions must be proposed as project-wide RFCs
