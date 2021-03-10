@@ -30,14 +30,16 @@ The general flow of this process is
 
 The goal of this RFC is to:
 - Reach consensus on the overall code promotion process for the `pack` repo
-- Reach consensus on a possible target structure for `pack`
+- Reach consensus on a "probable" target structure for `pack`
 
 The goal of this RFC is NOT:
 - to precisely define what packages we want & what their contents/functionality should be.
 
 
-#### Current structure
-The current structure does not provide a standardized structure 
+
+### Current structure
+The current state of the `pack` repo does not provide a standardized structure, and much of the logic
+in the inaccessible `internal` package.
 ```
 .
 ├── builder
@@ -58,8 +60,9 @@ The current structure does not provide a standardized structure
     └── pedantic_imports
 ```
 
-
-First refactoring target structure. Note this is not set in stone.
+### Short term target structure
+This is a short term approximation for the structure that we would like to see. This is not set in stone
+and may be updated during implementation. 
 
 ```
 .
@@ -75,7 +78,9 @@ First refactoring target structure. Note this is not set in stone.
 └── go.mod
 ```
 
-Possible Future Structure
+### Possible Future structure.
+This is a long term guess about which functionality we would want to pull out into packages as well as additional 
+commands that could be used by other platforms (such as Tekton)
 
 ```
 .
