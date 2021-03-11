@@ -31,7 +31,8 @@ The Project Descriptor will move to using reverse domains for top level keys as 
 The current schema as part of this proposal would look something like this:
 
 ```TOML
-[project]
+[_]
+api = "0.2"
 id = "<string>" # machine readable
 name = "<string>" # human readable
 version = "<string>"
@@ -39,12 +40,12 @@ authors = ["<string>"]
 documentation-url = "<url>"
 source-url = "<url>"
 
-[[project.licenses]]
+[[_.licenses]]
 type = "<string>"
 uri = "<uri>"
 
 [io.buildpacks]
-api = "0.2"
+api = "0.1"
 
 [io.buildpacks.build]
 include = ["<string>"]
@@ -58,17 +59,25 @@ name = "<string>"
 value = "<string>"
 ```
 
-`[project]` table is fairly generic and not buildpack specific, so it will remain as the only non reverse domain key.
+## `[project]` -> `[_]`
 
-`[build]` now becomes `[io.buildpacks.build]`. With these new namespaces, we can also spec the schema version for our own namespace. This will be schema `0.2` since the [current extension spec is `0.1`](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md). The [schema validation RFC](https://github.com/buildpacks/rfcs/blob/main/text/0054-project-descriptor-schema.md) can now be applied just to our own `[io.buildpacks]` namespace.
+`[project]` table is fairly generic and not buildpack specific, so it will remain as the only non reverse domain key. There is one wrinkle to keeping the `[project]` key. It squats on the `.project` Top Level Domain (TLD), which means that if anyone ever secured that TLD they wouldn't be able to use it with this file. The TOML spec says that any ["bare key"](https://toml.io/en/v1.0.0#keys) can include the following characters `A-Za-z0-9_-`. Domains can't contain `_`, so for brevity I'm proposing to just use `_` as the name. This will ensure there will be 0 conflicts or domain squatting.
 
-Schema versioning is a feature any reverse domain namespace can do as well.
+There will be a `api` key in this table to show which schema version to use for the overall file. It'll be bumped to `0.2` encapsulating the changes to this table as well as the domain namespace tables.
+
+## Reverse Domain Namespaced Tables
+All other tables will namespaced by reverse domains. With these new namespaces, a versioned schema CAN apply to each table.
+
+[build]` table will now be `[io.buildpacks.build]`. The keys under `[build]` will not change. The [schema validation RFC](https://github.com/buildpacks/rfcs/blob/main/text/0054-project-descriptor-schema.md) can now be applied just to our own `[io.buildpacks]` namespace. While not mandatory for other namespaced tables, the `[io.buildpacks]` will have belong in the spec.
 
 ## Non Buildpacks Project Descriptor Example
 
 For a non-project buildpacks project adopting the [fly.io](https://fly.io) `fly.toml` taken from the [phoenix-liveview-clustoer example app](https://github.com/fly-apps/phoenix-liveview-cluster/blob/master/fly.toml):
 
 ```TOML
+[_]
+api = "0.2"
+
 [io.fly]
 app = "liveview-counter"
 
@@ -123,6 +132,12 @@ There are two major drawbacks:
 [alternatives]: #alternatives
 
 This suprsedes the [Project Descriptor Flexibility RFC](https://github.com/buildpacks/rfcs/pull/95).
+
+## Special Case Project Namespace
+During the WG, there was a suggestion to just special case the "project" TLD. This would have the following implications:
+
+1. Forbid the project table from being customized (thus, you cannot add keys to '[project]` or `[project.mydomain]`)
+1. As an escape hatch, the project descriptor still allows the key quoted. For example, `["project.mydomain"]` and interpret it as the "project.mydomain" table.
 
 # Prior Art
 [prior-art]: #prior-art
