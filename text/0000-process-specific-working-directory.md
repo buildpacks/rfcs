@@ -43,7 +43,7 @@ the working directory of the process when it is invoked.
 # How it Works
 [how-it-works]: #how-it-works
 
-A new field `directory` would be added the the `processes` in `launch.toml`.
+A new field `working-directory` would be added the the `processes` in `launch.toml`.
 ```toml
 [[processes]]
 type = "<process type>"
@@ -53,10 +53,10 @@ direct = false
 working-directory = "<working directory>"
 ```
 
-If `directory` is not set the launcher will be invoked in `CNB_APP_DIR` as
-normal. However, if given a relative path such as `src/app` the launcher should
-be invoked from `$CNB_APP_DIR/src/app`. If given an absolute path such as
-`/mounted/bin`, the launcher should invoke from `/mounted/bin`.
+If `working-directory` is not set the process will be invoked in `CNB_APP_DIR`
+as normal. However, if given a relative path such as `src/app` the process
+should be invoked from `$CNB_APP_DIR/src/app`. If given an absolute path such
+as `/mounted/bin`, the process should invoke from `/mounted/bin`.
 
 The `working-directory` specified for the process **should not** affect the working
 directory for either `profile.d` or `exec.d` scripts.
@@ -73,4 +73,4 @@ metadata `WorkingDir` field.
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-Add a new field `directory` field to `processes` in`launch.toml`
+Add a new field `working-directory` field to `processes` in`launch.toml`
