@@ -139,6 +139,24 @@ During the WG, there was a suggestion to just special case the "project" TLD. Th
 1. Forbid the project table from being customized (thus, you cannot add keys to '[project]` or `[project.mydomain]`)
 1. As an escape hatch, the project descriptor still allows the key quoted. For example, `["project.mydomain"]` and interpret it as the "project.mydomain" table.
 
+## Reverse Domains Under a Key
+
+Similar to the older design, we could define the root level of this TOML does not use reverse domain keys and move them under a generic `config` (or similar) key. This would allow us to use descriptive keys for things that are generic (such as `[project]`) and still allow folks using the `.project` TLD to use this feature without workarounds.
+
+Example:
+
+```TOML
+[project]
+id = ""
+name = ""
+# ...
+
+[config.com.example]
+awesome = "sauce"
+```
+
+This would also allow us to keep the `build` key if we'd like to keep it.
+
 # Prior Art
 [prior-art]: #prior-art
 
