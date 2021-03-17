@@ -56,7 +56,7 @@ The GitHub API is queried and a graph is rendered from the information. Links be
 [drawbacks]: #drawbacks
 
 - Not all contributors may want their organization affliations displayed
-- The buildpacks community might not want this information publically depicted
+- The buildpacks community might not want this information publicly depicted
 
 # Prior Art
 [prior-art]: #prior-art
