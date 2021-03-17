@@ -133,6 +133,10 @@ There are two major drawbacks:
 
 This suprsedes the [Project Descriptor Flexibility RFC](https://github.com/buildpacks/rfcs/pull/95).
 
+## Table Name Variatons with `_`
+
+The biggest bikeshed is if we like the idea behind the current proposal, but disliked `_` as the table name we can pick any variaton that included it like `_p`, `_project`, `_project_`.
+
 ## Special Case Project Namespace
 During the WG, there was a suggestion to just special case the "project" TLD. This would have the following implications:
 
