@@ -68,7 +68,7 @@ There will be a `api` key in this table to show which schema version to use for 
 ## Reverse Domain Namespaced Tables
 All other tables will namespaced by reverse domains. With these new namespaces, a versioned schema CAN apply to each table.
 
-[build]` table will now be `[io.buildpacks.build]`. The keys under `[build]` will not change. The [schema validation RFC](https://github.com/buildpacks/rfcs/blob/main/text/0054-project-descriptor-schema.md) can now be applied just to our own `[io.buildpacks]` namespace. While not mandatory for other namespaced tables, the `[io.buildpacks]` will have belong in the spec.
+`[build]` table will now be `[io.buildpacks.build]`. The keys under `[build]` will not change. The [schema validation RFC](https://github.com/buildpacks/rfcs/blob/main/text/0054-project-descriptor-schema.md) can now be applied just to our own `[io.buildpacks]` namespace. While not mandatory for other namespaced tables, the `[io.buildpacks]` will have belong in the spec.
 
 ## Non Buildpacks Project Descriptor Example
 
