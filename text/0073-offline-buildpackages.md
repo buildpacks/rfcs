@@ -296,7 +296,7 @@ Builders will also require the same changes outlined in the Buildpackage section
 
 Asset Cache image creation will be handled by the platform. E.g. `pack package-asset-cache <image-name> <buildpack-uri> --config <optional-path-to-asset-cache.toml>`.
 
-There are two cases depending on weather `<buildpack-uri> points to a buildpackage or a directory containing a `buildpack.toml` file.
+There are two cases depending on whether `<buildpack-uri>` points to a buildpackage or a directory containing a `buildpack.toml` file.
 1) Directory containing a `buildpack.toml` file. This method uses the `assets` array to locate download and verify assets.
 2) An existing buildpackage. This will download all assets using `uri`s from the `io.buildpacks.buildpack.layers` label.
 
@@ -447,7 +447,7 @@ When creating a builder with asset caches:
 
 
 ### `lifecycle` changes
-Builders should now provide a `CNB_ASSETS` environment variable to the `build` phase`. This provides a standard variable buildpacks may use when looking up assets. The value of `CNB_ASSETS` will default to `/cnb/assets`.
+Builders should now provide a `CNB_ASSETS` environment variable to the `build` phase. This provides a standard variable buildpacks may use when looking up assets. The value of `CNB_ASSETS` will default to `/cnb/assets`.
 
 ### Platform container setup
 
