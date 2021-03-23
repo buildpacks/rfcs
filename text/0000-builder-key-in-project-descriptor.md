@@ -64,7 +64,7 @@ or
 Since a builder can be selected multiple ways, the following defines the order of precedence when selecting a builder:
 
 1. `--builder` flag (highest precedence)
-2. `project.toml` → `uild.builder`
+2. `project.toml` → `build.builder`
 3. configured builder (set via pack config default-builder)
 
 ## project.toml (TOML)
