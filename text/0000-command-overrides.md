@@ -33,16 +33,25 @@ The launcher should be able to determine if arguments have been passed by the us
 # What it is
 [what-it-is]: #what-it-is
 
-The proposal essentially involves adding an additional `additional_default_args` key in the `Launch Metadata` (launch.toml) that is a list of strings. This list of strings would be a set of additional arguments that would be appended to the existing command invocation if the user does not provide any arguments themselves.
+The proposal involves adding an changing the `command` key to be a string array instead of a single string. This array would be the command and its associated arguments that would be set by default and any additional arguments passed by the user would be appended to it. The `args` array would refer to a set of default arguments that will be appened to the `command` array if no arguments are passed by the user during runtime.
+
 
 ```toml
 [[processes]]
 type = "<process type>"
-command = "<command>"
-args = ["<arguments>"]
-additional_default_args = ["<additional>", "<default>", "<arguments>"]
+command = ["command", "along", "with", "additional", "arguments"]
+args = ["default", "arguments", "that", "can", "be", "overridden"]
 direct = false
 ```
+
+This would bring the definition of `command` and `args` to be consistent with the `Kubernetes` definition of the same. This table summarizes the field names used by Docker/OCI, Kubernetes, the current API and the proposed API.
+
+
+| OCI/Docker   | Kubernetes | Proposed  | Current            |
+| ------------ | ---------- | --------- | ------------------ |
+| `ENTRYPOINT` | `command`  | `command` | `command` + `args` |
+| `CMD`        | `args`     | `args`    | N/A                |
+
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -53,9 +62,8 @@ Let's see how this proposal will work through an example. Let's say we have a pr
 ```toml
 [[processes]]
 type = "hi"
-command = "echo"
-args = ["Hello"]
-additional_default_args = ["world"]
+command = ["echo", "Hello"]
+args = ["World"]
 direct = <direct>
 ```
 
@@ -91,22 +99,30 @@ args = ["Hello", "universe"]
 direct = <direct>
 ```
 
-This way we can preserve the current behaviour of appending user-provided arguments and remain backwards compatible, while at the same allowing a way to provide a set of additional default arguments that can be over-ridden by the user.
-
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
 Why should we *not* do this?
 
-N/A
+This could potentitally cause confusion amongst existing Buildpack authors since the keys in the `launch.toml` remain the same but their meaning and behavior change drastically. However, this would be a one-time change and would make us consistent with other container ecosystems. 
 
 # Alternatives
 [alternatives]: #alternatives
 
-The other alternative to support something like this is to change `command` from a string to an array of strings specifying the command and the additional arguments it will always be run with and `args` to become a set of default arguments that can be over-ridden by the user.
+The other alternative to support something like this involves adding an additional `additional_default_args` key in the `Launch Metadata` (launch.toml) that is a list of strings. This list of strings would be a set of additional arguments that would be appended to the existing command invocation if the user does not provide any arguments themselves.
 
-Although this would be a backwards incompatible change, this would be more in-line with with concepts that other tools like `Kubernetes` and `Docker` support. This would like help new users relate the above fields to concepts they are familiar with and avoid confusion.
+Although this would be a backwards compatible change, this would be an even larger deviation from other container ecosystems and a possible point of confusion for new users in the future.
+
+The above example would look like below if this alternative were to be followed - 
+
+```toml
+[[processes]]
+type = "<process type>"
+command = "<command>"
+args = ["<arguments>"]
+additional_default_args = ["<additional>", "<default>", "<arguments>"]
+direct = <direct>
+```
 
 # Prior Art
 [prior-art]: #prior-art
@@ -120,7 +136,7 @@ Discuss prior art, both the good and bad.
 
 - What parts of the design do you expect to be resolved before this gets merged?
 
-Should we go with the alternative proposal and make a backwards incompatible change for a possible improvement in user experience.
+Should we go with the alternative proposal or should we make a backwards incompatible change for a possible improvement in user experience.
 
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 
@@ -129,4 +145,5 @@ N/A
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-A new `launch.toml` field under the `[[process]]` array called `additional_default_args`.
+
+The `command` and `args` key under the `[[process]]` array would change as described above.
