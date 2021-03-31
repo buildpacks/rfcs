@@ -18,37 +18,63 @@ This is a proposal to change the location of layer specific TOML metadata files 
 
 Currently all the metadata files live under the `<layers>` folder. This means that application metadata files like `launch.toml`, `build.toml` or `store.toml` share the same directory as layer metadata files. Since the layers could possibly be named `launch`, `build` or `store` this leads to ambiguity, conflicts and/or restrictions on layer names and their associated metadata files that should not exist. This also prevents us from possibly adding new metadata files in the future without breaking backwards compatibility with buildpacks who may have been creating layers with the same name. This proposal seeks to disambiguate special metadata files from free-form layer metadata files.
 
+
 # What it is
 [what-it-is]: #what-it-is
 
 The proposal is as follows - 
 
-All layer metadata files should be prefixed with the string `layer.`. For example, the current implementation expects layer specific metadata file for a layer `<layers>/example` to be located at `<layers>/example.toml`, we now propose that the associated layer metadata file be located at `<layers>/layer.example.toml`.
+The current structure of the `<layers>` folder is -
 
-This RFC would also prohibit buildpack authors from putting any files in the `<layers>` directory that is not currently a recognized metadata file or begins with the `layer.` prefix. This is to allow the buildpack API to accommodate more of special metadata files like `build.toml` without breaking any backwards compatibility in an unambiguous fashion.
+```
+<layers>
+├── launch.toml
+├── build.toml
+├── store.toml
+├── layer-x.toml
+├── layer-x
+│   └── ...
+```
+
+The proposal is to change this structure to - 
+
+
+```
+<buildpack-workspace>
+├── launch.toml
+├── build.toml
+├── store.toml
+├── layers
+│   ├── layer-x.toml
+│   ├── layer-x
+│   └── ...
+└── ...
+```
+
+The top level `<buildpack-workspace>` would house any files and folder that are applicable at a `buildpack` level. Any layer specific files and directory structure would be moved to the `layers` sub-directory inside the `<buildpack-workspace>`.
 
 # How it Works
 [how-it-works]: #how-it-works
 
-The lifecycle would look for layer metadata files at `<layers>/layer.<layer>.toml` instead of `<layers>/<layer>.toml`.
+The lifecycle would stages the reference `<layers>` directory would now take in `<buildpack-workspace>` directory instead. The behavior with respect to the various metadata files and the lifecycle would remain the same, however the `analysis`, `restore`, `build` and `export` phases would have to be updated to look for the various layer directories inside the `layers` sub-folder in the `buildpack-workspace`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 Why should we *not* do this?
 
-This will break backwards compatibility for numerous buildpacks that don't use a set of bindings like `libcnb`.
+This will break backwards compatibility for numerous buildpacks that don't use a set of bindings like `libcnb`. This would also result in a one-time loss of layer caches for app images.
 
 # Alternatives
 [alternatives]: #alternatives
 
 - What other designs have been considered?
 
-We could have separate folders for layers and their metadata files and the application metadata files.
+We could add a prefix to each of the layer metadata files like `layer.`. This would allow us to re-use the cached layers but may lead to awkwardness around naming the layer metadata files.
 
 - Why is this proposal the best?
 
-It seemed easier to add a prefix instead of creating a sub-folder in order to provide proper namespacing for layer metadata.
+Although this is a drastic change, this also open up possibilities in the future to introduce other top level concepts inside the `<buildpacks-workspace>` apart from just `layers`.
 
 - What is the impact of not doing this?
 
