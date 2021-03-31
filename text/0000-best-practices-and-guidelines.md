@@ -77,8 +77,9 @@ These could be detailed sections or checklists that they can follow to ensure th
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this?
-N/A?
+## Why should we *not* do this?
+
+More maintenance and support burden on the Learning team.
 
 # Alternatives
 [alternatives]: #alternatives
