@@ -32,6 +32,7 @@ Examples -
 
 - A consistent naming scheme for `buildpacks`, `stack` IDs
 - A consistent way to "configure" `buildpacks` like specifying environment variables through a project descriptor.
+- A consistent format for `Bill-of-materials` metadata section to allow consistent rendering and parsing and easy integration with third-party dependency scanning tools.
 
 ## Transfer of knowledge and best pratices accrued over time by experienced users to newer users
 
@@ -64,7 +65,7 @@ Examples -
 # What it is
 [what-it-is]: #what-it-is
 
-The `guidelines` would be contained in a new repository called `guidelines` which will be created in the `buildpacks` Github organization. This repository will be maintained by the `Learning team`. The repository should have seperate sections that target different personas and list guidelines and best practices specific to them -
+The `guidelines` would be contained in a sub-folder of the `buildpacks/docs` repository and it will be maintained by the `Learning team`. The folder should have separate sections that target different personas and list guidelines and best practices specific to them -
 
 - Buildpack users
 - Buildpack authors
@@ -82,7 +83,14 @@ N/A?
 # Alternatives
 [alternatives]: #alternatives
 
-Have an extension to the spec that contains a list of `SHOULD`s and `MAY`s that capture the guidelines.
+## Create a new repository
+
+The guidelines and best-practices could be a separate repository under the buildpacks organization. This would allow the guidelines and best-practices to have a different review and approval process for the `guidelines`.
+
+## Extend the spec
+
+Have an extension to the spec that contains a list of `SHOULD`s and `MAY`s that capture the guidelines. This may however confuse users and may tie up something like the `spec` which is not geared towards end-users to `guidelines` which are supposed to be.
+
 
 # Prior Art
 [prior-art]: #prior-art
