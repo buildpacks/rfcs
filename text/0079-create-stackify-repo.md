@@ -3,9 +3,9 @@
 - Name: Create stackify repo
 - Start Date: 2020-11-06
 - Authors: @martyspiewak @mdelillo @dumez-k
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#123](https://github.com/buildpacks/rfcs/pull/123)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/pack#1101](https://github.com/buildpacks/pack/issues/1101), [buildpacks/docs#321](https://github.com/buildpacks/docs/issues/321)
 - Supersedes: N/A
 
 # Summary
