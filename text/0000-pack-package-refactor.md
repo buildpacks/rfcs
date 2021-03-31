@@ -84,15 +84,12 @@ and may be updated during implementation.
 ```
 
 ### Possible Future structure.
-This is a long term guess about which functionality we would want to pull out into packages as well as additional 
-commands that could be used by other platforms (such as Tekton)
+This is a long term guess about which functionality we would want to pull out into packages or separate repositories.
 
 ```
 .
 ├── cmd/
-│   ├── pack/ → current pack cli
-│   ├── env-vars/ → cli for handling platform env vars.
-│   └── fetcher/ → cli to download buildpacks.
+│   └── pack/ → current pack cli
 ├── pkg/
 │   ├── client/ → current pack client library
 │   ├── descriptor/ → lib for processing project descriptor
