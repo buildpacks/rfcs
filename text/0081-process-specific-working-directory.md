@@ -5,7 +5,7 @@
 - Author(s): ForestEckhardt, ryanmoran, fg-j
 - RFC Pull Request: [rfcs#144](https://github.com/buildpacks/rfcs/pull/144)
 - CNB Pull Request: (leave blank)
-- CNB Issue: [buildpacks/spec#212](https://github.com/buildpacks/spec/issues/212)
+- CNB Issue: [buildpacks/spec#212](https://github.com/buildpacks/spec/issues/212), [buildpacks/spec#216](https://github.com/buildpacks/spec/issues/216)
 - Supersedes: N/A
 
 # Summary
