@@ -1,0 +1,106 @@
+# Meta
+[meta]: #meta
+- Name: BOM inclusion in layer content metadata
+- Start Date: 2021-04-01
+- Author(s): [@samj1912](https://github.com/samj1912)
+- RFC Pull Request: (leave blank)
+- CNB Pull Request: (leave blank)
+- CNB Issue: (leave blank)
+- Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
+
+# Summary
+[summary]: #summary
+
+This RFC proposes the inclusion of a `BOM` (Bill-of-materials) table in layer content metadata TOML files (`<layer-name.toml>`). This would allow the `BOM`s generated from a layer to have the same lifetime as the layer itself and avoid various gotchas that happen currently as a result of the BOM being defined in the `launch.toml` or `build.toml`.
+
+# Motivation
+[motivation]: #motivation
+
+## Why should we do this?
+
+Currently `BOM` is a buildpack level entity and has to be defined in either the `launch.toml` or the `build.toml`. This presents several limitations which may be alleviated the this proposal.
+
+Often times `BOM` describes the artifacts present in the layer. Having this present in the `launch.toml` or `build.toml` which are ephemeral between builds means that the `BOM` has to be generated for each build, even if the layer itself has not changed and is cached. 
+
+This leads to surprising behaviors for users at times when they may be generating a `BOM` as part of the layer generation process and may find that their `BOM` is missing if the `BOM` generation process is not called when the layer is assumed to be cached.
+
+Having the `BOM` be a part of the layer content metadata also means that we can pin-point which layer contributed a BOM entry without having to implement extra logic in downstream buildpacks.
+
+- What is the expected outcome?
+
+The lifecycle is able to generate the final `BOM` by combining the `BOM` entries from top level metadata files like `launch.toml` and `build.toml` and also the ones from `<layer-name>.toml` which handling layer caching correctly i.e. if the layer is cached and re-used in the new build - the `BOM` associated with that layer will also be re-used.
+
+# What it is
+[what-it-is]: #what-it-is
+
+The layer content metadata files would be updated to include - 
+
+```
+[[bom]]
+name = "<dependency name>"
+
+[bom.metadata]
+# arbitrary metadata describing the dependency
+```
+
+For each dependency contributed to the app image or build environment, the buildpack layer:
+
+- SHOULD add a bill-of-materials entry to the bom array describing the dependency, where:
+  - name is REQUIRED.
+  - metadata MAY contain additional data describing the dependency.
+  
+The buildpack SHOULD NOT add bom to a layer content metadata file describing the contents that are not contributed by the same layer.
+
+# How it Works
+[how-it-works]: #how-it-works
+
+The lifecycle would be responsible for the generation of the appropriate metadata files and labels given partial `BOM` entries in the `launch.toml`, `build.toml` and `<layer-name>.toml`. The generation of these artifacts given `BOM` entries in `<layer-name>.toml` would be controlled as follows - 
+
+If the layer has `types.launch` set to `true` then all the `bom` entries will be contributed to the app image.
+If the layer has `types.build` set to `true` then all the `bom` entries will be contributed to the build environment.
+If the layer has `types.cache` set to `true` and if the layer is reused in the next build, the respective `bom` entries should be re-populated from the cached layer content metadata file. If `types.cache` is set to `false` all the `bom` entries from the previous build must be cleaned before/during the export.
+
+All `bom` entries should respect any combination of the above.
+
+# Drawbacks
+[drawbacks]: #drawbacks
+
+Why should we *not* do this?
+
+Additional complexity and utility pushed down to the lifecycle.
+
+# Alternatives
+[alternatives]: #alternatives
+
+Keep it as it is and provide a similar functionality in language bindings like `libcnb`. Currently the layer content metadata files are already being used to store and regenerate the `BOM` in buildpacks from the `paketo` project.
+
+# Prior Art
+[prior-art]: #prior-art
+
+<!-- TODO -->
+
+# Unresolved Questions
+[unresolved-questions]: #unresolved-questions
+
+N/A
+
+# Spec. Changes (OPTIONAL)
+[spec-changes]: #spec-changes
+
+A new array of tables `[[bom]]` to be added to the layer content metadata files  - 
+
+```toml
+[types]
+  launch = false
+  build = false
+  cache = false
+
+[metadata]
+# buildpack-specific data
+
+[[bom]]
+name = "<string>"
+
+[bom.metadata]
+# Additional metadata
+```
