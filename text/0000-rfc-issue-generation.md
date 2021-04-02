@@ -11,15 +11,16 @@
 # Summary
 [summary]: #summary
 
-This RFC proposes additional information to be added to the RFC template that would be filled out during the RFC process.
-This information would later be used by automation to generate issue in the appropriete repositories.
+This RFC proposes an automated mechanism for generating issues for the appropriete repositories from RFCs during the RFC process.
 
 # Definitions
 [definitions]: #definitions
 
+- _Bot_ - The GitHub account used to run automated actions.
 - [RFC](https://github.com/buildpacks/rfcs/blob/rfc-issue-generation/text/0004-rfc-process.md#what-it-is) - The formal process of recording and collecting input for proposed changes.
 - [Repositories](https://github.com/buildpacks) - The code repositories maintained by the Cloud Native Buildpacks project.
 - [Maintainers](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#maintainers) - Individuals with elevated responsibilities regarding the day-to-day operations of any given sub-team.
+- Queued Issues - A list of issues to be created when the RFC is merged.
 
 # Motivation
 [motivation]: #motivation
@@ -33,6 +34,95 @@ The goal of this RFC is to minimize the overhead of creating issues for maintain
 
 # What it is
 [what-it-is]: #what-it-is
+
+
+
+# How it Works
+[how-it-works]: #how-it-works
+
+When a pull request is created on `buildpacks/rfcs` the bot would post a comment with the following content:
+
+>
+> Maintainers,
+>
+> As you review this RFC please queue up issues to be created using the following commands:
+>
+>  - `/queue-issue <repo> "<title>" [labels]...`
+>  - `/unqueue-issue <uuid>`
+>
+> **Queued Issues**
+> 
+> _(none yet)_
+>
+
+The bot, likely to be implemented via GitHub Actions, will monitor comments to pull requests. It will parse the contents in search for instructions `/queue-issue` or `/unqueue-issue`. If found, it would take the approprite action by updating the initial comment posted with a list of queued issues. In the case of an addition a short UID would be generated.
+
+##### Example Addition
+
+Addition Comment:
+
+```
+/queue-issue buildpacks/rfcs "Create issues from RFCs (merge-rfc.sh)"
+```
+
+Updated Bot Comment:
+
+>
+> Maintainers,
+>
+> As you review this RFC please queue up issues to be created using the following commands:
+>
+>  - `/queue-issue <repo> "<title>" [labels]...`
+>  - `/unqueue-issue <uid>`
+>
+> **Queued Issues**
+> 
+> - Xoq7ID - buildpacks/rfcs "Create issues from RFCs (merge-rfc.sh)" [label1][label2]
+>
+
+
+##### Example Removal
+
+Remove Comment:
+
+```
+/unqueue-issue Xoq7ID
+```
+
+Updated Bot Comment:
+
+>
+> Maintainers,
+>
+> As you review this RFC please queue up issues to be created using the following commands:
+>
+>  - `/queue-issue <repo> "<title>" [labels]...`
+>  - `/unqueue-issue <uid>`
+>
+> **Queued Issues**
+> 
+> _(none)_
+>
+
+Once the RFC is merged via the [`merge-rfc.sh`](https://github.com/buildpacks/rfcs/blob/main/merge-rfc.sh) script, the script could detect issues by looking through the top comment from the _bot_ and creating any queued issues. Some additions that the script may do but subject to change:
+
+- Prepend `[RFC #<number>]` to issue titles.
+- Append link to Pull Request to issue description.
+- Add additional labels.
+
+##### Pros
+
+- No need for maintainers to suggest edits and ensure author adds issues.
+
+##### Cons
+
+- Added complexity of implementing and maintaining a bot.
+
+# Alternatives
+[alternatives]: #alternatives
+
+
+### Add markdown to RFC template
 
 The proposal would be to add the following information to the end of the RFC template:
 
@@ -51,14 +141,6 @@ Issues listed below will be created once this RFC is approved and merged:
 -->
 ```
 
-# How it Works
-[how-it-works]: #how-it-works
-
-<!--
-This is the technical portion of the RFC, where you explain the design in sufficient detail.
-The section should return to the examples given in the previous section, and explain more fully how the detailed proposal makes those examples work.
--->
-
 During the review process, as maintainers review the RFC they can [suggest changes](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/commenting-on-a-pull-request#adding-line-comments-to-a-pull-request) to this section by adding a line in the following format:
 
 ```
@@ -67,47 +149,14 @@ During the review process, as maintainers review the RFC they can [suggest chang
 
 Once, the RFC is approved and ready to merge the [`merge-rfc.sh`](https://github.com/buildpacks/rfcs/blob/main/merge-rfc.sh) can parse the list in this section and create the respective issues.
 
-# Drawbacks
-[drawbacks]: #drawbacks
-
-<!--
-Why should we *not* do this?
--->
-
-- The RFC author is required to accept the suggested changes, preferably with proper DCO signatures. This would be adding a bit of toil on the authors behalf.
-
-# Alternatives
-[alternatives]: #alternatives
-
-
-### Use comments instead
-
-Instead of maintainers creating "suggested edits" to the RFC which then require the author to merge with proper DCO signing, 
-the maintainers could simply comment on the RFC. Once the RFC is merged the [`merge-rfc.sh`](https://github.com/buildpacks/rfcs/blob/main/merge-rfc.sh) script could detect issues by looking through the comments.
-
-```text
-FORMAT:
-  - /add-issue <repo>: <title> [labels]...
-  - /remove-issue <permalink-to-comment>
-```
-
-Examples:
-
-```text
-/add-issue buildpacks/pack: implement this feature [good first issue]
-```
-
-```text
-/remove-issue https://github.com/... 👈 link to comment
-```
 
 ##### Pros
 
-- No need for maintainers to suggest edits and ensure author adds issues.
+- Minimal additional implementation complexity.
 
 ##### Cons
 
-- No call-to-action for maintainers. The maintainers would have to remember to do this during their review.
+- The RFC author is required to accept the suggested changes, preferably with proper DCO signatures. This would be adding a bit of toil on the authors behalf.
 
 ### Keep management of issues seperate
 
@@ -129,30 +178,14 @@ Examples:
 # Prior Art
 [prior-art]: #prior-art
 
-None
+- [prow](https://github.com/kubernetes/test-infra/tree/master/prow) - A heavy-weight k8s automation system used largely by the k8s ecosystem to automate certain aspects of the review process using "chat-ops" (`/test`, `/approve`, `/assign` comments).
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-None
+- Should these operations be restricted to users that are in `@buildpacks/*-maintainer` groups? Maybe expand it to `@buildpacks/*-contributors`?
 
 # Spec. Changes
 [spec-changes]: #spec-changes
 
 None
-
-# Issues to Create
-
-<!-- THIS SECTION IS INTENDED TO BE FILLED BY MAINTAINERS DURING THE RFC PROCESS. -->
-
-Issues listed below will be created once this RFC is approved and merged:
-
-<!--
-  FORMAT: - <repo>: <title> [labels]...
-  EXAMPLES:
-      - buildpacks/lifecycle: Implement something
-      - buildpacks/pack: Support this thing [good first issue][status/triage]
--->
-
-- buildpacks/rfcs: Add "issues to create" to RFC template
-- buildpacks/rfcs: Create issues from RFCs (merge-rfc.sh)
