@@ -35,7 +35,7 @@ The goal of this RFC is to minimize the overhead of creating issues for maintain
 # What it is
 [what-it-is]: #what-it-is
 
-
+This solution is comprised of a _bot_ (a faux GitHub account) and updates to the [`merge-rfc.sh`](https://github.com/buildpacks/rfcs/blob/main/merge-rfc.sh) script. The bot, likely to be implemented via GitHub Actions, monitors pull requests in `buildpacks/rfcs` for comments while maintaining a list of _queued issues_. `merge-rfc.sh` would be updated to parse the list of queued issues and create those issues in their respective repositories.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -48,21 +48,21 @@ When a pull request is created on `buildpacks/rfcs` the bot would post a comment
 > As you review this RFC please queue up issues to be created using the following commands:
 >
 >  - `/queue-issue <repo> "<title>" [labels]...`
->  - `/unqueue-issue <uuid>`
+>  - `/unqueue-issue <uid>`
 >
 > **Queued Issues**
 > 
 > _(none yet)_
 >
 
-The bot, likely to be implemented via GitHub Actions, will monitor comments to pull requests. It will parse the contents in search for instructions `/queue-issue` or `/unqueue-issue`. If found, it would take the approprite action by updating the initial comment posted with a list of queued issues. In the case of an addition a short UID would be generated.
+The bot will monitor comments to pull requests. It will parse the contents in search for instructions `/queue-issue` or `/unqueue-issue`. If found, it would take the approprite action by updating the initial comment posted with a list of queued issues. In the case of an addition a short UID would be generated.
 
-##### Example Addition
+#### Example Addition
 
 Addition Comment:
 
 ```
-/queue-issue buildpacks/rfcs "Create issues from RFCs (merge-rfc.sh)"
+/queue-issue buildpacks/rfcs "Create issues from RFCs (merge-rfc.sh)" [label1][label2]
 ```
 
 Updated Bot Comment:
@@ -81,7 +81,7 @@ Updated Bot Comment:
 >
 
 
-##### Example Removal
+#### Example Removal
 
 Remove Comment:
 
@@ -109,6 +109,11 @@ Once the RFC is merged via the [`merge-rfc.sh`](https://github.com/buildpacks/rf
 - Prepend `[RFC #<number>]` to issue titles.
 - Append link to Pull Request to issue description.
 - Add additional labels.
+
+# Drawbacks
+[drawbacks]: #drawbacks
+
+The following are pros and cons as compared to alternative solutions.
 
 ##### Pros
 
