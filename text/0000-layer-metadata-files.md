@@ -56,7 +56,7 @@ The top level `<buildpack-workspace>` would house any files and folder that are 
 # How it Works
 [how-it-works]: #how-it-works
 
-The lifecycle would stages the reference `<layers>` directory would now take in `<buildpack-workspace>` directory instead. The behavior with respect to the various metadata files and the lifecycle would remain the same, however the `analysis`, `restore`, `build` and `export` phases would have to be updated to look for the various layer directories inside the `layers` sub-folder in the `buildpack-workspace`.
+The lifecycle phases that reference the `<layers>` directory would now take in `<buildpack-workspace>` directory instead. The behavior with respect to the various metadata files and the lifecycle would remain the same, however the `analysis`, `restore`, `build` and `export` phases would have to be updated to look for the various layer directories inside the `layers` sub-folder in the `buildpack-workspace`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -70,11 +70,17 @@ This will break backwards compatibility for numerous buildpacks that don't use a
 
 - What other designs have been considered?
 
-We could add a prefix to each of the layer metadata files like `layer.`. This would allow us to re-use the cached layers but may lead to awkwardness around naming the layer metadata files.
+## Alternative 1
+
+We could add a prefix to each of the layer metadata files like `layer.`. This would allow us to re-use the cached layers but may lead to awkwardness around naming the layer metadata files - for eg. if a layer is called `layer.build` the metadata file would end up being `layer.layer.build.toml`
+
+## Alternative 2
+
+We could add a prefix for each of the special metadata files and reserve it for CNB usage. For eg. `launch.toml` could be renamed to `cnb.launch.toml`. This way, we will only be prohibiting layers that have a prefix `cnb.` or a layer named `cnb`. The downsides to this alternative are the fact that the metadata files would not be usable across builds and we would still be prohibiting a class of layer names that may be valid.
 
 - Why is this proposal the best?
 
-Although this is a drastic change, this also open up possibilities in the future to introduce other top level concepts inside the `<buildpacks-workspace>` apart from just `layers`.
+Although this is a drastic change, this also open up possibilities in the future to introduce other top level concepts inside the `<buildpacks-workspace>` apart from just `layers` while still allowing layer names to be free-form and without any restrictions.
 
 - What is the impact of not doing this?
 
@@ -90,4 +96,3 @@ We keep having this ambiguity and possible issues in the future when we want to 
 [unresolved-questions]: #unresolved-questions
 
 <!-- TODO -->
-
