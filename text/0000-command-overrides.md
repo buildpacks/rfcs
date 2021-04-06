@@ -99,6 +99,8 @@ args = ["Hello", "universe"]
 direct = <direct>
 ```
 
+NOTE - The lifecycle should validate that `command` is indeed an array of strings instead of a single string and show a warning/error otherwise.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
