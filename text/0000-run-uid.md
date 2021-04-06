@@ -29,7 +29,7 @@ Run-time user: The user which is referenced in the `User` field of the run image
 
 - Why should we do this?
 
-Currently the [Platform Spec](https://github.com/buildpacks/spec/blob/main/platform.md#run-image) says that the run-time image's `User` along with its `CNB_USER_ID` environment variable must be set to the same user and uid as the build image.
+Currently the [Platform Spec](https://github.com/buildpacks/spec/blob/main/platform.md#run-image) says that the run-time image's `User` along with its `CNB_USER_ID` environment variable must be set to the same user and UID†/SID‡ (OwnerSid) as the build image.
 
 This prevents use cases where you may want the run-time user to not have the permissions to modify the built image during run-time and in general restrict the set of permissions on it. 
 
@@ -39,12 +39,12 @@ This limitation seems to be enforced only by the spec and from my limited testin
 
 - What is the expected outcome?
 
-Modification of the spec to allow a different run-time user than build-time. We can still enforce them being a part of the same unix group to avoid too much divergence from run-time and build-time images which may cause issues, while at the same time providing the flexibility to accommodate above use-cases.
+Modification of the spec to allow a different run-time user than build-time. We can still enforce them being a part of the same primary group †GID/‡SID (GroupSid) to avoid too much divergence from run-time and build-time images which may cause issues, while at the same time providing the flexibility to accommodate above use-cases.
 
 # What it is
 [what-it-is]: #what-it-is
 
-A change to the spec to lift the restriction on the run-time user id being the same as the build-time user id.
+A change to the spec to lift the restriction on the run-time user being the same as the build-time user.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -57,3 +57,10 @@ Since pack and in turn the lifecycle already supports this, I don't imagine we w
 Does this RFC entail any proposed changes to the core specifications or extensions? 
 
 Yes, see above.
+
+
+# Notes
+
+When a word or bullet point is prefixed with a †, it SHALL be assumed to apply only to Linux stacks.
+
+When a word or bullet point is prefixed with a ‡, it SHALL be assumed to apply only to Windows stacks.
