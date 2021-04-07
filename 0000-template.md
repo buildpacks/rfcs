@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-The project has made improving our documentation a priority for 2021. In order to deliver on this promise, this RFC proposes defining a minimum standard for documentation that should be met before we're able to ship new versions of the lifecycle.
+The project has made improving our documentation a priority for 2021. In order to help deliver on this promise, this RFC proposes defining a minimum standard for documentation that should be met before we're able to ship new versions of the lifecycle.
 
 # Definitions
 [definitions]: #definitions
