@@ -36,7 +36,7 @@ Today, our minimum standard for docs gating the implementation team's ability to
 
 Proposal: For each new version of the lifecycle, we should create a `release/lifecycle/<lifecycle version>` milestone and branch on the docs repo (see [docs release process](https://github.com/buildpacks/docs/blob/main/RELEASE.md#lump-changes) for more information on this process). Prior to shipping the lifecycle, `release/lifecycle/<lifecycle version>` should contain:
 * Migration guides for the new APIs implemented.
-* New content in the lifecycle-specific docs (or wherever is relevant) such that every new feature in the lifecycle is fully explained in the docs (ideally, this content could be linked to from the migration guides)
+* New content in the lifecycle-specific docs (or wherever is relevant) such that every new feature in the lifecycle is fully explained in the docs (ideally, this content could be linked to from the migration guides).
 
 `release/lifecycle/<lifecycle version>` should be merged into `main` immediately after the lifecycle is shipped. 
 
