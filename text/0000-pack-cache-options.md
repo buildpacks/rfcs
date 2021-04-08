@@ -111,6 +111,15 @@ pack build --cache 'type=build;format=image;name=io.docker.io/myorg/my-cache:bui
 pack build --cache 'format=image;name=io.docker.io/myorg/my-cache:build'
 ```
 
+When no flags are provided the following equate to the defaults:
+
+```
+# default when no cache flag is provided
+pack build --cache 'type=build;format=volume;name=pack-<type>-<app-uuid>' --cache 'type=volume;format=volume;name=pack-<type>-<app-uuid>'
+```
+
+> NOTE: Templating as done internally by Pack for `<type>` and `<app-uuid>` is not a proposed part of this solution.
+
 # How it Works
 [how-it-works]: #how-it-works
 
@@ -125,7 +134,14 @@ Pack would parse the `--cache` flags and apply any options to the two particular
 <!-- 
 Why should we *not* do this? -->
 
-_**TODO**_
+#### Pros
+
+- The fomat is extensible to allow for additional cache formats or additional options.
+
+#### Cons
+
+- There is added complexity in the syntax since it's freeform.
+    - Given that the target use cases are more advanced this should be too impactful.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -134,7 +150,51 @@ _**TODO**_
 - Why is this proposal the best?
 - What is the impact of not doing this? -->
 
-_**TODO**_
+### Additional flags
+
+- `--build-cache-dir` - sets the build cache to use a directory at the provided parameter.
+- `--build-cache-image` - sets the build cache to use an image with the provided name.
+- `--build-cache-volume` - sets the build cache to use an image with the provided name.
+- `--launch-cache-dir` - sets the build cache to use a directory at the provided parameter.
+- `--launch-cache-volume` - sets the launch cache to use an image with the provided name.
+
+##### Examples
+
+```bash
+# specify named volume build cache
+pack build --build-cache-volume my-build-cache
+
+# specify bind mount cache (relative to current working directory)
+pack build --build-cache-dir ./my-build-cache
+
+# specify named volume build cache (name only)
+pack build --build-cache-volume my-cool-build-cache
+
+# specify image cache
+pack build --build-cache-image io.docker.io/myorg/my-cache:build
+```
+
+When no flags are provided the following equate to the defaults:
+
+```
+# default when no cache flag is provided
+pack build --build-cache-volume my-app-build-cache --launch-cache-volume my-app-build-cache
+```
+
+##### Pros
+
+- Flags are more human readable and minimal.
+
+##### Cons
+
+- Flags need to be treated as exclusive which may add confusion. 
+    
+    For example the following should be invalid:
+    ```
+    pack build --build-cache-image <image> --build-cache-volume <volume>
+    ``` 
+- The number of flags pollute the output of `pack build --help`.
+- If additional options are necessary, a new flag must be introduced.
 
 # Prior Art
 [prior-art]: #prior-art
@@ -153,6 +213,7 @@ Discuss prior art, both the good and bad. -->
 
 - Since we will always be pushing the image to a registry (as per [spec](https://github.com/buildpacks/lifecycle/issues/484#issuecomment-754707323)), maybe we should rename format `image` to `registry`? Not to be confused with buildpacks registry...
     `pack build --cache 'format=registry;name=io.docker.io/myorg/my-cache:build'`
+
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
