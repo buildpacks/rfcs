@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Allowing different run-time and build-time uids
+- Name: Recommending different run-time and build-time users
 - Start Date: 2021-03-15
 - Author(s): [@samj1912](https://github.com/samj1912)
 - RFC Pull Request: (leave blank)
@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-This proposal proposes a change to the spec to allow for a different run-time user than the build-time user for various scenarios where you may want the run-time user to have different (ideally fewer) permissions than the build-time user.
+This proposal proposes a change to the spec to recommend a different run-time user than the build-time user in order to improve the security of the output images that are generated as a part of the build process.
 
 # Definitions
 [definitions]: #definitions
@@ -24,6 +24,10 @@ Build-time user: The user which is referenced in the `User` field of the build i
 
 Run-time user: The user which is referenced in the `User` field of the run image.
 
+Build-time group: The primary †GID/‡SID (GroupSid) of the `User` of build image.
+
+Run-time group: The primary †GID/‡SID (GroupSid) of the `User` of run image.
+
 # Motivation
 [motivation]: #motivation
 
@@ -31,20 +35,20 @@ Run-time user: The user which is referenced in the `User` field of the run image
 
 Currently the [Platform Spec](https://github.com/buildpacks/spec/blob/main/platform.md#run-image) says that the run-time image's `User` along with its `CNB_USER_ID` environment variable must be set to the same user and UID†/SID‡ (OwnerSid) as the build image.
 
-This prevents use cases where you may want the run-time user to not have the permissions to modify the built image during run-time and in general restrict the set of permissions on it. 
+This prevents use cases where you may want the run-time user to not have the permissions to modify the built image during run-time and in general restrict the set of permissions on it. The run-time user having the same set of permissions as the build-time user could have wide-ranging security implications.
 
 The above restriction seems to impose limitations on such use cases which are valid and are supposed to be in line with the Cloud Native Buildpack policy of secure container environments (for eg. we prevent building/running as root user).
 
-This limitation seems to be enforced only by the spec and from my limited testing, it looks like platforms like [pack](https://github.com/buildpacks/pack) and [kpack](https://github.com/pivotal/kpack) don't actually enforce this and stacks with different run-time and build-time users seem to work as expected.
+This limitation currently seems to be enforced only by the spec and from my testing, it looks like platforms like [pack](https://github.com/buildpacks/pack) and [kpack](https://github.com/pivotal/kpack) don't actually enforce this and stacks with different run-time and build-time users seem to work as expected.
 
 - What is the expected outcome?
 
-Modification of the spec to allow a different run-time user than build-time. We can still enforce them being a part of the same primary group †GID/‡SID (GroupSid) to avoid too much divergence from run-time and build-time images which may cause issues, while at the same time providing the flexibility to accommodate above use-cases.
+Modification of the spec to recommend a different run-time user than the build-time user. For applications wishing to have write access during run-time can set the file system permissions accordingly during build-time. Stacks may also choose to have different build-time and run-time groups to enforce even stricter permissions.
 
 # What it is
 [what-it-is]: #what-it-is
 
-A change to the spec to lift the restriction on the run-time user being the same as the build-time user.
+A change to the spec to revert the restriction on the run-time user being the same as the build-time user.
 
 # How it Works
 [how-it-works]: #how-it-works
