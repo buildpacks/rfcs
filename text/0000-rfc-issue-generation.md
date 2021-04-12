@@ -30,7 +30,7 @@ Later, after the RFC has been approved, it requires maintainers of affected sub-
 This typically happens days, weeks, if not months after the maintainers might have reviewed the RFC.
 In addition, it usually requires the person merging the RFC to hunt down (or ping) any maintainers for sub-teams that haven't created relevant issues.
 
-The goal of this RFC is to minimize the overhead of creating issues for maintainers and the individual merging the RFCs by incoorporating the processes into the review process as opposed to the merge process.
+The goal of this RFC is to minimize the overhead of creating issues for maintainers and the individual merging the RFCs by incorporating the processes into the review process as opposed to the merge process.
 
 # What it is
 [what-it-is]: #what-it-is
