@@ -40,7 +40,7 @@ While the lack of guidelines has not prevented components from being contributed
 - If a proposed contribution is an adapter or integration with another service or technology, that technology must be notable and/or widely used (at the Core Team’s discretion). 
 - If a component is proposed for donation by one or more Core Team members individually, those Core Team members must abstain from voting over its acceptance.
 - If a component is proposed for donation by one or more Core Team members’ employer or employers, those Core Team members must abstain from voting over its acceptance. Supermajority consensus of non-abstaining Core Team members is still required.
-- Component-level contributions are subject legal review by the Cloud Native Computing Foundation / Linux Foundation. Adherance to these guidances does not guarantee acceptance.
+- Component-level contributions are subject legal review by the Cloud Native Computing Foundation / Linux Foundation. Adherance to these guidances does not guarantee acceptance. The investigation of this is to be done by the Core Team before acceptance.
 
 
 # Drawbacks
