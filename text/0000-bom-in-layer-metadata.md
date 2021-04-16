@@ -49,7 +49,7 @@ For each dependency contributed to the app image or build environment, the build
   - name is REQUIRED.
   - metadata MAY contain additional data describing the dependency.
   
-The buildpack SHOULD NOT add bom to a layer content metadata file describing the contents that are not contributed by the same layer. `BOM` entries that are not related to a specific layer should go in the buildpack level `BOM` entries in `launch.toml` or `build.toml`.
+The buildpack SHOULD NOT add bom to a layer content metadata file describing the contents that are not contributed by the same layer. `BOM` entries that describe contribution to the application directory should go in the buildpack-level `BOM` entries in `launch.toml` or `build.toml`.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -60,7 +60,7 @@ The lifecycle would be responsible for the generation of the appropriate metadat
 - If the layer has `types.build` set to `true` then all the `bom` entries will be written to `report.toml`.
 - If the layer has `types.cache` set to `true` and if the layer is reused in the next build, the respective `bom` entries should be re-populated from the cached layer content metadata file.
 - If `types.cache` is set to `false`, but `types.launch` is set to `true` before a rebuild, the layer content metdata file should be restored with the `BOM` section. If the buildpack sets `types.launch` to `true` after the re-build, the final value of `bom` after the re-build should be used.
-- If neither `types.launch` or `types.build` are set to `true` the `bom` entries will not be exported anywhere. However they will be preserved in the layer metadata file if `types.cache` is set to `true`.
+- If neither `types.launch` or `types.build` are set to `true` but the layer is present during the export phase the `bom` entries should STILL be written to `report.toml` as the contents of this layer may have been used to generate other artifacts in the same buildpack and someone went through the effort of adding these entries to the `bom`. 
 
 All `bom` entries should respect any combination of the above.
 
