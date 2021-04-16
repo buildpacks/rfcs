@@ -79,7 +79,11 @@ Keep it as it is and provide a similar functionality in language bindings like `
 # Prior Art
 [prior-art]: #prior-art
 
-<!-- TODO -->
+The paketo Java buildpacks regenerate the BOM everytime even if the layer is reused.
+
+
+1. `libpak`  has logic to autogenerate BOM entries for certain types of layers, and it uses the layer types to determine whether it needs a launch or build BOM entry - https://github.com/paketo-buildpacks/libpak/blob/a7abf79a2a53ada27c56d48db765454405ab8259/layer.go#L139-L148
+2. It also includes the layer name in the BOM metadata.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
@@ -105,4 +109,54 @@ name = "<string>"
 
 [bom.metadata]
 # Additional metadata
+```
+
+A new layer key should be added to the `bom` entries in `io.buildpacks.build.metadata`, `metadata.toml` and `report.toml` -
+
+Example - 
+
+```json
+{
+  "processes": [
+    {
+      "type": "<process-type>",
+      "command": "<command>",
+      "args": [
+        "<args>"
+      ],
+      "direct": false
+    }
+  ],
+  "buildpacks": [
+    {
+      "id": "<buildpack ID>",
+      "version": "<buildpack version>",
+      "homepage": "<buildpack homepage>"
+    }
+  ],
+  "bom": [
+    {
+      "name": "<bom-entry-name>",
+      // This key should be absent if the BOM was provided
+      // in launch.toml or build.toml instead of <layer>.toml
+      "layer": "<layer-name>",
+      "metadata": {
+        // arbitrary buildpack provided metadata
+      },
+      "buildpack": {
+        "id": "<buildpack ID>",
+        "version": "<buildpack version>"
+      }
+    },
+  ],
+ "launcher": {
+    "version": "<launcher-version>",
+    "source": {
+      "git": {
+        "repository": "<launcher-source-repository>",
+        "commit": "<launcher-source-commit>"
+      }
+    }
+  }
+}
 ```
