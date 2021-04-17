@@ -135,10 +135,10 @@ All the endpoints defined below will be version via a `vN` prefix to the base UR
     },
     "versions": {
       "1.4.1": {
-        "link": "https://registry.buildpacks.io/buildpacks/api/v1/projectriff/command-function/1.4.1"
+        "link": "https://registry.buildpacks.io/api/v1/buildpacks/projectriff/command-function/1.4.1"
       },
       "1.3.9": {
-        "link": "https://registry.buildpacks.io/buildpacks/api/v1/projectriff/command-function/1.3.9"
+        "link": "https://registry.buildpacks.io/api/v1/buildpacks/projectriff/command-function/1.3.9"
       }
     }
   }
