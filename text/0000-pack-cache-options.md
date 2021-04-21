@@ -203,7 +203,8 @@ Discuss prior art, both the good and bad. -->
 
 * [Docker CLI `--mount` flag](https://docs.docker.com/storage/bind-mounts/):
     `--mount type=bind,source="$(pwd)"/target,target=/app`
-
+* [BuildKit `--output` flag](https://github.com/moby/buildkit#output):
+    `--output type=image,name=docker.io/username/image,push=true`
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
