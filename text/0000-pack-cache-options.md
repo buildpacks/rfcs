@@ -27,7 +27,7 @@ Allow users to configure the various cache options.
 * **lifecycle** - Component that executes in a container running all the necessary buildpacks and producing the final app image.
 
 #### Cache Types
-* **build cache** - Cache container `build` layers. That is layers that were created by buildpacks and marked as `build=true` and `cache=true`.
+* **build cache** - Cache containing layers that should be restored on subsequent builds. That is layers that were created by buildpacks and marked as `cache=true`.
 * **launch cache** - Cache containing `launch` layers. That is layers that were created by buildpacks and marked as `launch=true` (regardless of `cache` option).
 
 #### Lifecycle (Platform API) flags
