@@ -1,7 +1,7 @@
 # Meta
 [meta]: #meta
 - Name: Pack cache options
-- Start Date: (fill in today's date: YYYY-MM-DD)
+- Start Date: 2021-03-25
 - Author(s): [@jromero](https://github.com/jromero), [@dwillist](https://github.com/dwillist)
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
@@ -81,12 +81,12 @@ pack build --cache 'type=<type>;format=<format>;<additional-options>' --cache ..
 
 ### `cache` flag options
 * _**type**_ - The type of cache to configure [`build`, `launch`] (default: `build`).
-* _**format**_ - The format in which to store that cache [`dir`, `image`, `volume`] (default: `volume`). 
+* _**format**_ - The format in which to store that cache [`bind`, `image`, `volume`] (default: `volume`). 
 
 ###### Format specific options
 
-* `dir`
-    * _**path**_ - Path to the directory to use as cache.
+* `bind`
+    * _**source**_ - Path to the local directory to use as cache.
 * `image`
     * _**name**_ - Name of the image to use to save as cache (including tag).
 * `volume`
@@ -99,7 +99,7 @@ pack build --cache 'type=<type>;format=<format>;<additional-options>' --cache ..
 pack build --cache 'type=build;format=volume;name=my-build-cache'
 
 # specify bind mount cache (relative to current working directory)
-pack build --cache 'type=build;format=dir;path=./my-build-cache'
+pack build --cache 'type=build;format=bind;source=./my-build-cache'
 
 # specify named volume build cache (name only)
 pack build --cache 'name=my-cool-build-cache'
@@ -205,6 +205,7 @@ Discuss prior art, both the good and bad. -->
     `--mount type=bind,source="$(pwd)"/target,target=/app`
 * [BuildKit `--output` flag](https://github.com/moby/buildkit#output):
     `--output type=image,name=docker.io/username/image,push=true`
+
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
