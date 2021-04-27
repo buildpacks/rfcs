@@ -3,9 +3,9 @@
 - Name: Project Descriptor Domains
 - Start Date: 2021-02-26
 - Author(s): hone
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#140](https://github.com/buildpacks/rfcs/pull/140)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: [PR#95](https://github.com/buildpacks/rfcs/pull/95)
 
 # Summary
