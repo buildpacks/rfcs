@@ -52,7 +52,7 @@ One can make extensive use of [rivo/tview](github.com/rivo/tview) to provide a U
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- None
+- This RFC would increase maintenance cost and surface area. It provides a whole net new path that will need to be tested and maintained.
 
 # Alternatives
 [alternatives]: #alternatives
