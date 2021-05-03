@@ -31,6 +31,7 @@ Lifecycle-specific content: https://github.com/buildpacks/docs/tree/main/content
 
 
 Today, our minimum standard for docs gating the implementation team's ability to ship the lifecycle is largely non-existent. We do require that the spec has been released (for which there are release notes), and we also provide release notes for the lifecycle. We've lately been trying to have migration guides at least in PR status to the docs repo. However the migration guides often do not contain enough information to sufficiently explain a feature, because "core" documentation is missing - see [exec.d on Windows](https://buildpacks.io/docs/reference/spec/migration/buildpack-api-0.5-0.6/#execd-on-windows) which explains that Windows is now supported but doesn't link to any further documentation to understand exec.d, because said documentation does not exist.
+# What it is
 
 Proposal: For each new version of the lifecycle, we should create a `release/lifecycle/<lifecycle version>` milestone and branch on the docs repo (see [docs release process](https://github.com/buildpacks/docs/blob/main/RELEASE.md#lump-changes) for more information on this process). Prior to shipping the lifecycle, `release/lifecycle/<lifecycle version>` should contain:
 * Migration guides for the new APIs implemented.
