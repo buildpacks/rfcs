@@ -29,8 +29,6 @@ Lifecycle-specific content: https://github.com/buildpacks/docs/tree/main/content
 - What use cases does it support? Every persona will be happier about this.
 - What is the expected outcome? Better docs!
 
-# What it is
-[what-it-is]: #what-it-is
 
 Today, our minimum standard for docs gating the implementation team's ability to ship the lifecycle is largely non-existent. We do require that the spec has been released (for which there are release notes), and we also provide release notes for the lifecycle. We've lately been trying to have migration guides at least in PR status to the docs repo. However the migration guides often do not contain enough information to sufficiently explain a feature, because "core" documentation is missing - see [exec.d on Windows](https://buildpacks.io/docs/reference/spec/migration/buildpack-api-0.5-0.6/#execd-on-windows) which explains that Windows is now supported but doesn't link to any further documentation to understand exec.d, because said documentation does not exist.
 
