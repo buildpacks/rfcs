@@ -16,8 +16,8 @@ This RFC proposes the introduction of a  `build-write` flag in addition to the `
 # Definitions
 [definitions]: #definitions
 
-Build layers: Layers from a specific buildpack that are available to subsequent buildpacks during the build process.
-layerize: The process of converting a layer directory to a tarball which will be used to create the final application image during the export phase.
+- Build layers: Layers from a specific buildpack that are available to subsequent buildpacks during the build process.
+- layerize: The process of converting a layer directory to a tarball which will be used to create the final application image during the export phase.
 
 # Motivation
 [motivation]: #motivation
@@ -49,6 +49,10 @@ There are various use cases when you may want a common workspace that multiple b
 
 In such a case a buildpack could provide a layer that is marked as `build-writable` i.e. subsequent buildpacks can modify its contents and the final state of the layer at the end of the build process is what is exported out.
 
+One example might be an Android SDK buildpack that sets up ANDROID_SDK_ROOT (pointing to a layer), which a Gradle buildpack may later write into when gradle runs.
+
+Another example can be a CCache buildpack that sets up `CCACHE_DIR` (pointing to a layer), which a CMake buildpack may use for its build cache.
+
 ## What is the expected outcome?
 
 The spec and lifecycle is modified to support the above use cases.
@@ -68,7 +72,8 @@ The lifecycle will have to layerize the layers marked `build-write` as `false` d
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Possibly mixing the concerns of the `build` and the `export` phases.
+- Possibly mixing the concerns of the `build` and the `export` phases.
+- Added complexity of more flags for users.
 
 # Alternatives
 [alternatives]: #alternatives
