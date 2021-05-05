@@ -61,6 +61,7 @@ The lifecycle would be responsible for the generation of the appropriate metadat
 - If the layer has `types.cache` set to `true` and if the layer is reused in the next build, the respective `bom` entries should be re-populated from the cached layer content metadata file.
 - If `types.cache` is set to `false`, but `types.launch` is set to `true` before a rebuild, the layer content metdata file should be restored with the `BOM` section. If the buildpack sets `types.launch` to `true` after the re-build, the final value of `bom` after the re-build should be used.
 - If neither `types.launch` or `types.build` are set to `true` but the layer is present during the export phase the `bom` entries should STILL be written to `report.toml` as the contents of this layer may have been used to generate other artifacts in the same buildpack and someone went through the effort of adding these entries to the `bom`. 
+- For each of these bullets, flags that are not indicated, won't influence where the bom entries will be written to.
 
 All `bom` entries should respect any combination of the above.
 
