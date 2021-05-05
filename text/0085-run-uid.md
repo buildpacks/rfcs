@@ -3,9 +3,9 @@
 - Name: Recommending different run-time and build-time users
 - Start Date: 2021-03-15
 - Author(s): [@samj1912](https://github.com/samj1912)
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#146](https://github.com/buildpacks/rfcs/pull/146)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/spec#223](https://github.com/buildpacks/spec/issues/223)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
