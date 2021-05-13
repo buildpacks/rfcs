@@ -118,6 +118,7 @@ The distribution team already handles a part of the Buildpack Author experience 
 
 - Who are the maintainers?
 - Would this sub-team own the pack buildpack author tooling (like `pack buildpack new` and inline buildpacks)?
+- What should the team name be?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
