@@ -3,9 +3,9 @@
 - Name: Guidelines for Component-level Contributions
 - Start Date: 2021-03-08
 - Author(s): @sclevine
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#143](https://github.com/buildpacks/rfcs/pull/143)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [community#93](https://github.com/buildpacks/community/issues/93)
 - Supersedes: N/A
 
 # Summary
