@@ -80,6 +80,7 @@ The buildpack sub-team should provide feedback on RFCs that change the buildpack
 ## Future Scope
 The following are examples of additional tools that would fall to the purview of the buildpack team:
 1. Language bindings for other languages
+1. Project Templates for bootstrapping buildpacks
 1. A test harness for integration testing buildpacks
 1. A DSL for writing buildpacks (e.g. [packfile](https://github.com/sclevine/packfile) or similar)
 
