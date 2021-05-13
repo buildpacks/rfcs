@@ -31,7 +31,7 @@ As such, `libcnb` currently doesn't have well-defined processes around how it sh
 
 Also, our user research has indicated that authoring a buildpack is difficult, and many potential buildpack authors are not go developers. In order to grow the number of buildpack authors there needs to be alternative language bindings whether provided by the project or fostered from the community:
 
-- [python](https://github.com/paketo-buildpacks/packit)
+- [python](https://github.com/samj1912/python-libcnb)
 - [bash](https://github.com/jkutner/libcnb.bash)
 - [rust](https://github.com/Malax/libcnb)
 - [community go alternative](https://github.com/paketo-buildpacks/packit)
@@ -45,9 +45,10 @@ The high level charter of the proposed Buildpack Authors subteams is to help bui
 
 More concretely the sub-team  would serve the following goals:
 1. Create a community focused on the needs of buildpack authors.
-2. Devote attention to improving our existing buildpack-author tooling (`libcnb`).
-3. Provide a home for any future buildpack author tooling (testing buildpacks and language buildpack templates).
-4. Encourage buildpack authors to get more involved in and contribute to the project by creating a team exclusively focused on building more shared tooling for buildpack authors.
+1. Advocate for Buildpack Author needs from the community throughout the project
+1. Devote attention to improving our existing buildpack-author tooling (`libcnb`).
+1. Provide a home for any future buildpack author tooling (testing buildpacks and language buildpack templates).
+1. Encourage buildpack authors to get more involved in and contribute to the project by creating a team exclusively focused on building more shared tooling for buildpack authors.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -59,13 +60,16 @@ The Buildpack Author sub-team will follow the same guidelines as other sub-teams
 - include at least one core team member
 - responsible for narrower sets of concerns related to specific aspects of the project
 
-## `libcnb` Responsibilties
-The buildpack sub-team would given responsibility for `libcnb`, including:
+## Language Binding Responsibilties
+These are the responsibilities for maintaining any language binding:
 1. Implementing new APIs in a timely manner
 1. Release process, planning and updates
 1. Triaging issues and supporting users
 1. Documentation
+1. Buildpack Examples using these bindings
 1. Planning and executing improvements
+
+Today, this means taking ownership over the `libcnb` repo doing the above for it.
 
 ## Inline Buildpack Responsibilites
 The buildpack sub-team is responsible for sheparding and maintaining [Inline Buildpacks](https://github.com/buildpacks/rfcs/blob/main/text/0048-inline-buildpack.md).
