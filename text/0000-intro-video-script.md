@@ -35,7 +35,7 @@ Hopefully this will help familiarize more people with our project.
 
 When was the last time you struggled to wrangle yet another Dockerfile? As an application developer, you should only have to focus on what you do best - writing code, without having to worry about your container build strategy. Buildpacks can help you with just that! They are a better approach to building container images for applications.
 
-Buildpacks are programs that transform source code into container images by analyzing the code and determining the best way to build it. They can provide dependencies, configuration, run compilation, and much more! A buildpack can be written by anyone, and shared with everyone! Google, Heroku/Salesforce, and the Paketo project provide buildpacks for a wide variety of language families, and you can discover even more by searching the buildpack registry. With buildpacks, you can use best-in-class container build strategies from industry experts with ease.
+Buildpacks are programs that transform source code into container images by analyzing the code and determining the best way to build it. They can provide dependencies, configuration, run compilation, and much more! A buildpack can be written by anyone, and shared with everyone! Google, Heroku, Salesforce, and the Paketo project provide buildpacks for a wide variety of language families, and you can discover even more by searching the buildpack registry. With buildpacks, you can use best-in-class container build strategies from industry experts with ease.
 
 Even more so, the Cloud Native Buildpacks project provides a specification for buildpack authors and platforms that ensures builds are fast, secure, customizable, and can run on any cloud. It is a Cloud Native Computing Foundation project with many existing integrations and many more to come.
 
@@ -50,7 +50,7 @@ After this RFC will get accepted and merged, we will start working on the actual
 # Drawbacks
 [drawbacks]: #drawbacks
 
-N/A
+* It is difficult to maintain a video, compared to maintaining documents (although we do not expect that this video will need to change any time soon because it is very basic).
 
 # Alternatives
 [alternatives]: #alternatives
