@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Write flag for build layers
+- Name: Make build layers read only
 - Start Date: 2021-04-15
 - Author(s): [@samj1912](https://github.com/samj1912)
 - RFC Pull Request: (leave blank)
@@ -11,7 +11,9 @@
 # Summary
 [summary]: #summary
 
-This RFC proposes the introduction of a  `build-write` flag in addition to the `build` flag. The idea behind this flag is to expose build layers that are both read-write (if `build-write` is set to `true`) or build layers that are read-only (if `build-write` is set to `false`) for subsequent buildpacks.
+This RFC proposes that build layers should be read-only for subsequent buildpacks.
+
+> NOTE: This RFC should be implemented as an atomic change alongside RFC https://github.com/buildpacks/rfcs/pull/163
 
 # Definitions
 [definitions]: #definitions
@@ -43,16 +45,6 @@ Unbeknownst to the buildpack author, python has a side-effect on execution where
 
 This could easily be fixed if buildpack #1 only exposed its build layers as read-only to subsequent buildpacks or if it discarded the modifications made by subsequent buildpacks essentially making it "read-only" in the context of the build process.
 
-### Example use case for read and write build layers
-
-There are various use cases when you may want a common workspace that multiple buildpacks can collaborate on during the build process and this workspace needs to be cached, hence it can be a temporary directory.
-
-In such a case a buildpack could provide a layer that is marked as `build-writable` i.e. subsequent buildpacks can modify its contents and the final state of the layer at the end of the build process is what is exported out.
-
-One example might be an Android SDK buildpack that sets up ANDROID_SDK_ROOT (pointing to a layer), which a Gradle buildpack may later write into when gradle runs.
-
-Another example can be a CCache buildpack that sets up `CCACHE_DIR` (pointing to a layer), which a CMake buildpack may use for its build cache.
-
 ## What is the expected outcome?
 
 The spec and lifecycle is modified to support the above use cases.
@@ -60,20 +52,17 @@ The spec and lifecycle is modified to support the above use cases.
 # What it is
 [what-it-is]: #what-it-is
 
-New layer types that dictate when the given layer directories are layerized. For layers marked as `build-write` to be `false`, they should be layerized immediately after the buildpack that provided the layer is finished with its build process. This way any modification made by the future buildpacks would be ignore while still making this layer available to future buildpacks.
-
-For layers that are marked as `build-write` as true, they should be layerized at the end of the entire build phase of the lifecycle so any changes made by subsequent buildpacks are present in the final app image.
+Updates to the lifecycle so that `build` layers created by buildpacks should be layerized immediately after the buildpack that provided the layer is finished with its build process. This way any modification made by the future buildpacks would be ignore while still making this layer available to future buildpacks.
 
 # How it Works
 [how-it-works]: #how-it-works
 
-The lifecycle will have to layerize the layers marked `build-write` as `false` during the `build` phase of the lifecycle instead of the `export` phase.
+The lifecycle will have to layerize the layers marked `build` as `true` during the `build` phase of the lifecycle instead of the `export` phase.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 - Possibly mixing the concerns of the `build` and the `export` phases.
-- Added complexity of more flags for users.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -101,21 +90,9 @@ TODO
 
 The impact this would have on the performance of the export step. The exact details of which parts of the lifecycle build and export phases that need to be changed.
 
+How to handle the cases when users want a common build workspace that is cached. This will be covered in a subsequent RFC and that RFC and this RFC should be implemented as an "atomic" change to avoid existing use cases from being broken without a proper migration path.
+
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-Layer content meteadata TOML - s
-
-```toml
-[types]
-  launch = false
-  build = false
-  # New flag
-  # If build is set to false, this flag will have no effect.
-  # The default is false.
-  build-write = false
-  cache = false
-
-[metadata]
-# buildpack-specific data
-```
+None.
