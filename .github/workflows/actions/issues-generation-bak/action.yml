@@ -1,0 +1,9 @@
+name: 'Issues Generation'
+description: 'Manage issues to create for an RFC pull request.'
+inputs:
+  github-token:
+    description: GitHub token of bot account.
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

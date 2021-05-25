@@ -1,0 +1,10 @@
+name: Issues Generation
+
+on:
+  issue_comment:
+    types: [created, deleted]
+  pull_request_review_comment:
+    types: [created, deleted]
+
+jobs:
+  
