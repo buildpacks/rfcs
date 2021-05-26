@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Buildpacks Authors' Tooling Sub-Team
+- Name: Buildpack Authors' Tooling Sub-Team
 - Start Date: 2021-05-11
 - Author(s): [@ekcasey](https://github.com/ekcasey), [@hone](https://github.com/hone), [@samj1912](https://github.com/samj1912)
 - RFC Pull Request: (leave blank)
@@ -11,12 +11,13 @@
 # Summary
 [summary]: #summary
 
-This RFC proposes the creation of a "Buildpacks Author" sub-team in the project governance with a charter of maintaining buildpack author tooling for creating buildpacks.
+This RFC proposes the creation of a "Buildpack Authors' Tooling" sub-team in the project governance with a charter of maintaining buildpack author tooling for creating buildpacks.
 
 # Definitions
 [definitions]: #definitions
 
 - *sub-team* - Sub-teams are responsible for narrower sets of concerns related to specific aspects of the project. Each sub-team will include at least one core team member to help align with the broader roadmap.
+- *Buildpack Authors' Tooling sub-team (BAT) - the proposed sub-team in this RFC.
 - *Buildpack API* - The API Cloud Native buildpacks must implement in order to participate in a build.
 - *Language bindings* - A library that provides language specific constructs to make interaction with the buildpack API easier.
 - *[`libcnb`](https://github.com/buildpacks/libcnb)* - Go language bindings for the Buildpack API.
@@ -41,7 +42,7 @@ Ultimately, there needs to be a group of people focused on addressing this need 
 # What it is
 [what-it-is]: #what-it-is
 
-The high level charter of the proposed Buildpack Authors subteams is to help buildpack authors create buildpacks.
+The high level charter of the proposed BAT subteam is to help buildpack authors create buildpacks.
 
 More concretely the sub-team  would serve the following goals:
 1. Create a community focused on the needs of buildpack authors.
@@ -55,7 +56,7 @@ More concretely the sub-team  would serve the following goals:
 
 ## Sub-team Guidelines
 
-The Buildpack Author sub-team will follow the same guidelines as other sub-teams:
+The BAT sub-team will follow the same guidelines as other sub-teams:
 
 - include at least one core team member
 - responsible for narrower sets of concerns related to specific aspects of the project
