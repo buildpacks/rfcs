@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Buildpacks Author Sub-Team
+- Name: Buildpacks Authors' Tooling Sub-Team
 - Start Date: 2021-05-11
 - Author(s): [@ekcasey](https://github.com/ekcasey), [@hone](https://github.com/hone), [@samj1912](https://github.com/samj1912)
 - RFC Pull Request: (leave blank)
