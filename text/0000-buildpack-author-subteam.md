@@ -71,15 +71,22 @@ These are the responsibilities for maintaining any language binding:
 
 Today, this means taking ownership over the `libcnb` repo doing the above for it.
 
-## Inline Buildpack Responsibilites
-The buildpack sub-team is responsible for sheparding and maintaining [Inline Buildpacks](https://github.com/buildpacks/rfcs/blob/main/text/0048-inline-buildpack.md).
-
 ## Collaboration with other teams
-The buildpack sub-team should engage with the learning team in order to:
+This sub-team will engage with other teams in order to:
+1. Assist in creating/reviewing PRs for future Buildpack Author features
+
+The engangements specific to the learning team:
 1. Improve documentation for buildpack authors
 1. Document buildpack best practices
 
-The buildpack sub-team should provide feedback on RFCs that change the buildpack API with an eye to the potential implications for buildpack authors.
+The engangements specific to the platform team:
+1. Create and maintain the buildpack template repo for `pack buildpack new` to use
+
+The engagements specific to the core team:
+1. Provide feedback on RFCs that change the buildpack API with an eye to the potential implications for buildpack authors.
+
+## Home for Buildpack Authors
+Since this team is chartered with championing the needs of Buildpack Authors. The sub-team will explicitly seek out participation from Buildpack Authors including but not limited to some of known authors: Paketo, Heroku, Bloomberg, Google, and Digital Ocean. This way the sub-team can act in with the different philosophies, values, and use cases in mind. Like all other sub-teams, the sub-team sync meetings will be open where knowledge can be shared across various projects.
 
 ## Future Scope
 The following are examples of additional tools that would fall to the purview of the buildpack team:
@@ -117,8 +124,6 @@ The distribution team already handles a part of the Buildpack Author experience 
 [unresolved-questions]: #unresolved-questions
 
 - Who are the maintainers?
-- Would this sub-team own the pack buildpack author tooling (like `pack buildpack new` and inline buildpacks)?
-- What should the team name be?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
