@@ -1,42 +1,70 @@
+export const REGEX_ISSUE = `([^\\s]+)\\s+("([^\\"]+)"|'([^\\']+)')(.*)`
 
-
-export type Add = {
+export interface QueuedIssue {
     repo: string
     title: string
     labels: Array<string>
 }
 
-export type Remove = {
+export interface Add {
+    op: "add"
+    issue: QueuedIssue
+}
+
+export interface Remove {
+    op: "remove"
     uid: string
 }
 
-export function parse(contents: string): { actions: Array<Add | Remove>, errors: Array<string> } {
-    let actions = new Array<Add | Remove>();
-    let errors = new Array<string>();
+export type Operation = Add | Remove
+
+
+export function parse(contents: string): Array<Operation> {
+    let actions = new Array<Operation>();
 
     parseAdditions(contents).forEach(a => actions.push(a))
+    parseRemovals(contents).forEach(a => actions.push(a))
 
-    return { actions, errors }
+    return actions
 }
 
-function parseAdditions(contents: string) {
-    let issues = new Array<Add>();
+function parseRemovals(contents: string) {
+    let issues = new Array<Remove>();
 
     var match
-    let regex = /^\/queue-issue\s+([^\s]+)\s+("([^\"]+)"|'([^\']+)')(.*)/mg
+    let regex = /^\/unqueue-issue\s+(\w+)/mg
     while (match = regex.exec(contents)) {
-        console.log("Adding:", match[0])
+        console.log("Removing:", match[0])
         issues.push({
-            repo: match[1],
-            title: match[3] || match[4],
-            labels: parseLabels(match[5])
+            op: "remove",
+            uid: match[1]
         })
     }
 
     return issues
 }
 
-function parseLabels(contents: string): Array<string> {
+function parseAdditions(contents: string) {
+    let issues = new Array<Add>();
+
+    var match
+    let regex = new RegExp(`^/queue-issue\\s+${REGEX_ISSUE}$`, "mg");
+    while (match = regex.exec(contents)) {
+        console.log("Adding:", match[0])
+        issues.push({
+            op: "add",
+            issue: {
+                repo: match[1],
+                title: match[3] || match[4],
+                labels: parseLabels(match[5])
+            }
+        })
+    }
+
+    return issues
+}
+
+export function parseLabels(contents: string): Array<string> {
     let labels = new Array<string>();
 
     var match

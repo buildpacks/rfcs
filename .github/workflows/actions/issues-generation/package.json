@@ -27,7 +27,8 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^5.0.0",
-    "@octokit/rest": "^18.5.3"
+    "@octokit/rest": "^18.5.3",
+    "hash.js": "^1.1.7"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
