@@ -3,9 +3,9 @@
 - Name: BOM inclusion in layer content metadata
 - Start Date: 2021-04-01
 - Author(s): [@samj1912](https://github.com/samj1912)
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#151](https://github.com/buildpacks/rfcs/pull/151)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/spec#227](https://github.com/buildpacks/spec/issues/227), [buildpacks/lifecycle#623](https://github.com/buildpacks/lifecycle/issues/623), [buildpacks/docs#375](https://github.com/buildpacks/docs/issues/375)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
