@@ -1,0 +1,10 @@
+name: 'Issue Generation'
+description: 'Automation to keep track of what issues to generate for pull requests.'
+author: 'buildpacks'
+inputs:
+  github-token:
+    description: GitHub token of bot account.
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
