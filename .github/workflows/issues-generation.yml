@@ -7,4 +7,12 @@ on:
     types: [created, deleted]
 
 jobs:
-  
+  release:
+    if: ${{ startsWith(github.ref, 'refs/heads/release/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate changelog
+        uses: ./.github/workflows/actions/release-notes
+        id: changelog
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

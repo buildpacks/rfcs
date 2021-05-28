@@ -1,11 +1,10 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Issue Generation'
+description: 'Automation to keep track of what issues to generate for pull requests.'
+author: 'buildpacks'
 inputs:
-  milliseconds: # change this
+  github-token:
+    description: GitHub token of bot account.
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
 runs:
   using: 'node12'
   main: 'dist/index.js'

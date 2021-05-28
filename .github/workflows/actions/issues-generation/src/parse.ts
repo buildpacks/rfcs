@@ -1,77 +1,119 @@
 export const REGEX_ISSUE = `([^\\s]+)\\s+("([^\\"]+)"|'([^\\']+)')(.*)`
 
 export interface QueuedIssue {
-    repo: string
-    title: string
-    labels: Array<string>
+  repo: string
+  title: string
+  labels: string[]
 }
 
 export interface Add {
-    op: "add"
-    issue: QueuedIssue
+  op: 'add'
+  issue: QueuedIssue
 }
 
 export interface Remove {
-    op: "remove"
-    uid: string
+  op: 'remove'
+  uid: string
 }
 
 export type Operation = Add | Remove
 
+/**
+ * Extract Operations found in any content
+ *
+ * @param contents
+ * @returns array of operations extracted
+ */
+export function parseUserComment(contents: string): Operation[] {
+  const actions: Operation[] = []
 
-export function parse(contents: string): Array<Operation> {
-    let actions = new Array<Operation>();
+  for (const addition of extractAdditions(contents)) {
+    actions.push(addition)
+  }
 
-    parseAdditions(contents).forEach(a => actions.push(a))
-    parseRemovals(contents).forEach(a => actions.push(a))
+  for (const removals of parseRemovals(contents)) {
+    actions.push(removals)
+  }
 
-    return actions
+  return actions
 }
 
-function parseRemovals(contents: string) {
-    let issues = new Array<Remove>();
-
-    var match
-    let regex = /^\/unqueue-issue\s+(\w+)/mg
-    while (match = regex.exec(contents)) {
-        console.log("Removing:", match[0])
-        issues.push({
-            op: "remove",
-            uid: match[1]
-        })
+/**
+ * parse an individual issue
+ *
+ * @returns QueuedIssue or undefined when not a match
+ */
+export function parseIssue(str: string): QueuedIssue | undefined {
+  const match = new RegExp(REGEX_ISSUE).exec(str)
+  if (match && match.length >= 6) {
+    return {
+      repo: match[1],
+      title: match[3] || match[4],
+      labels: extractLabels(match[5])
     }
+  }
 
-    return issues
+  return
 }
 
-function parseAdditions(contents: string) {
-    let issues = new Array<Add>();
+/**
+ * Extract additions from any content
+ *
+ * @param contents
+ * @returns array of additions
+ */
+function extractAdditions(contents: string): Add[] {
+  const issues: Add[] = []
 
-    var match
-    let regex = new RegExp(`^/queue-issue\\s+${REGEX_ISSUE}$`, "mg");
-    while (match = regex.exec(contents)) {
-        console.log("Adding:", match[0])
-        issues.push({
-            op: "add",
-            issue: {
-                repo: match[1],
-                title: match[3] || match[4],
-                labels: parseLabels(match[5])
-            }
-        })
+  let match
+  const regex = new RegExp(`^/queue-issue\\s+(.*)$`, 'mg')
+  while ((match = regex.exec(contents))) {
+    const issue = parseIssue(match[1])
+    if (issue) {
+      console.log('Adding:', match[0]) // eslint-disable-line no-console
+      issues.push({op: 'add', issue})
     }
+  }
 
-    return issues
+  return issues
 }
 
-export function parseLabels(contents: string): Array<string> {
-    let labels = new Array<string>();
+/**
+ * Extract labels from any content
+ *
+ * @param contents
+ * @returns array of labels
+ */
+export function extractLabels(contents: string): string[] {
+  const labels: string[] = []
 
-    var match
-    let regex = /(\[([^\]]+)\])/g
-    while (match = regex.exec(contents)) {
-        labels.push(match[2])
-    }
+  let match
+  const regex = /(\[([^\]]+)\])/g
+  while ((match = regex.exec(contents))) {
+    labels.push(match[2])
+  }
 
-    return labels
+  return labels
+}
+
+/**
+ * Extract removals from any content
+ *
+ * @param contents
+ * @returns array of removals found
+ */
+function parseRemovals(contents: string): Remove[] {
+  const issues: Remove[] = []
+
+  let match
+  const regex = /^\/unqueue-issue\s+(\w+)/gm
+  while ((match = regex.exec(contents))) {
+    console.log('Removing:', match[0]) // eslint-disable-line no-console
+    issues.push({
+      op: 'remove',
+      uid: match[1]
+    })
+  }
+
+  return issues
 }
