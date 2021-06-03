@@ -37,7 +37,7 @@ As an application developer, you should focus on what you do best - writing code
 
 Buildpacks are programs that transform source code into container images by analyzing the code and determining the best way to build it. They can provide dependencies, configuration, run compilation, and much more! A buildpack can be written by anyone, and shared with everyone! Google, Heroku, and the Paketo project provide buildpacks for a wide variety of language families, and you can discover even more by searching the buildpack registry. With buildpacks, you can use best-in-class container build strategies from industry experts with ease.
 
-Even more so, the Cloud Native Buildpacks project provides a specification for buildpack authors and platforms that ensures builds are fast, secure, customizable, and can run on any cloud. It is a Cloud Native Computing Foundation project with many existing integrations. Platforms such as Google Cloud Run, Hashicorp Waypoint, Heroku, Spaceship, and VMWare Tanzu, just to name a few, all support using buildpacks to make container images.
+Even more, the Cloud Native Buildpacks project provides a specification for buildpack authors and platforms that ensures builds are fast, secure, customizable, and can run on any cloud. It is a Cloud Native Computing Foundation project with many existing integrations. Platforms that use buildpacks to make container images include Google Cloud Run, Hashicorp Waypoint, Heroku, Spaceship, and VMWare Tanzu, just to name a few.
 
 You are invited to join our community. Try Buildpacks with your favorite language today.
 
