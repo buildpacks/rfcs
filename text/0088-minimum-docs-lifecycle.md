@@ -3,9 +3,9 @@
 - Name: Define a minimum standard for docs in order to ship the lifecycle
 - Start Date: 4/7/2021
 - Author(s): natalieparellano
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#153](https://github.com/buildpacks/rfcs/pull/153)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/lifecycle#627](https://github.com/buildpacks/lifecycle/issues/627)
 - Supersedes: N/A
 
 # Summary
