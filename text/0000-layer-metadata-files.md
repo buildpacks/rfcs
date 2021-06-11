@@ -1,8 +1,8 @@
 # Meta
 [meta]: #meta
-- Name: Disambiguate layer metadata files from Application metadata files
+- Name: Combine and organize metadata file locations across lifecycle
 - Start Date: 2021-03-11
-- Author(s): [samj1912](https://github.com/samj1912)
+- Author(s): [jabrown85](https://github.com/jabrown85) [samj1912](https://github.com/samj1912)
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-This is a proposal to change the location of layer specific TOML metadata files from application specific TOML metadata files like `launch.toml` or `build.toml` in order to disambiguate special metadata files from layer metadata files that can have similar names.
+This is a proposal to change the default locations of several files and directories. Part of the reasoning behind this is to disambiguate metadata files from application or layer files and avoid naming collisions.
 
 # Motivation
 [motivation]: #motivation
@@ -22,15 +22,24 @@ Currently all the metadata files live under the `<layers>` folder. This means th
 # What it is
 [what-it-is]: #what-it-is
 
-The proposal is as follows - 
+The proposal is as follows -
 
-The current structure of the `<layers>` folder is -
+The current folder structure is -
 
 ```
-`/layers` (configurable with `CNB_LAYERS_DIR` or -layers) 
+/cnb (provided by builder image)
+├── buildpacks
+│   └── <buildpacks>
+├── lifecycle
+│   └── <creator/builder/etc>
+├── order.toml
+└── stack.toml
+/layers (configurable with `CNB_LAYERS_DIR` or -layers)
 ├── group.toml
 ├── plan.toml
-├── <escaped_buildpack_id> (buildpack arg `$1` )
+├── order.toml (written by a platform, optionally)
+├── report.toml
+├── <escaped_buildpack_id> (buildpack arg `$1`)
 │   ├── build.toml
 │   ├── launch.toml
 │   ├── store.toml
@@ -38,126 +47,125 @@ The current structure of the `<layers>` folder is -
 │   └── <layer>
 └── config
     └── metadata.toml
+/workspace (configurable with `CNB_APP_DIR ` or -app)
+└── <app source code to transform>
 ```
 
-
-The proposal is to change this structure to - 
-
+This proposal is to change this folder structure to -
 
 ```
-`/output` (configurable with `CNB_OUTPUT_DIR` or -output-dir) 
-├── group.toml
-├── plan.toml
-├── layers
-│   └── <escaped_buildpack_id> (`CNB_BP_LAYERS_DIR` )
+/cnb (provided by builder image)
+├── buildpacks
+│   └── <buildpacks>
+├── lifecycle
+│   └── <creator/builder/etc>
+├── order.toml
+└── stack.toml
+/workspace (configurable with `CNB_WORKSPACE_DIR`)
+├── app (configurable with `CNB_APP_DIR ` or -app)
+│    └── <app source code to transform>
+├── platform-config (configurable with `CNB_PLATFORM_CONFIG_DIR`)
+│   └── order.toml (written by a platform, optionally - prior to `lifecycle` execution `platform/prepare`)
+├── lifecycle-config (configurable with `CNB_LIFECYCLE_CONFIG_DIR`)
+│   └── group.toml
+│   └── plan.toml
+│   └── report.toml
+├── layers (configurable with `CNB_LAYERS_DIR` or -layers)
+│   └── new-buildpack (`CNB_BP_LAYERS_DIR`)
 │       ├── <layer>.toml
 │       └── <layer>
-└── config
-    ├── metadata.toml
-    └── <escaped_buildpack_id> (`CNB_BP_CONFIG_DIR`  )
-        ├── build.toml
-        ├── launch.toml
-        └── store.toml
+│   └── old-buildpack (buildpack arg `$1`)
+│       ├── build.toml
+│       ├── launch.toml
+│       ├── store.toml
+│       ├── <layer>.toml
+│       └── <layer>
+├── layers-config (configurable with `CNB_LAYERS_CONFIG_DIR`)
+│    ├── metadata.toml
+│    └── new-buildpack (`CNB_BP_CONFIG_DIR`)
+│        ├── build.toml
+│        ├── launch.toml
+│        └── store.toml
 ```
-
-The top level `<output-dir>` would be the mounted volume that contains the output from buildpacks. The `<layers>` sub-directory would contains the layer contributions by each buildpack under an `<escaped-buildpack-id>` directory. This directory would be passed to the buildpack via the environment variable `CNB_BP_LAYERS_DIR`. Similarly any config files would reside in the `<config>`, under a sub-directory for each buildpack. This directory would be passed to the buildpack via the environment variable `CNB_BP_CONFIG_DIR`.
 
 # How it Works
 [how-it-works]: #how-it-works
 
-The lifecycle phases that reference the `<layers>` directory would now take in `<output-dir>` directory instead. The behavior with respect to the various metadata files and the lifecycle would remain the same, however the `analysis`, `restore`, `build` and `export` phases would have to be updated to look for the various layer directories inside the `layers` and `config` sub-folder in the `<output-dir>`.
+The top-level `cnb` remains unchanged. The new `/workspace` purpose is a directory that holds all the files during a build. This directory is likely to be a volume mount on a platform. The platform may choose to use multiple mounts at any of the levels under `/workspace`. By locating files that are not layer specific in new sub-directories, we will gain the ability to add new directories and files to `/workspace` without name collisions.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 Why should we *not* do this?
 
-This will break backwards compatibility for numerous buildpacks that don't use a set of bindings like `libcnb`. This would also result in a one-time loss of layer caches for app images. It would also result in longer path names. We would also have to re-work the export logic to account for the export of the various files which are partially present in the `config` sub-directory and the `layers` sub-directory.
+The complexity introduced into lifecycle to keep the compatibility between versions is not to be disregarded. It would also result in longer path names. We would also have to re-work the export logic to account for the export of the various files which are partially present in the `config` sub-directory and the `layers` sub-directory.
+
+Platform maintainers will have to update their mounts and configuration to update to the platform API that implements this.
+
+An example migration that wishes to use the new defaults may look like this
+
+Before:
+```
+	appMount := corev1.VolumeMount{
+		Name:      appVolume,
+		MountPath: "/workspace",
+	}
+
+	layersMount := corev1.VolumeMount{
+		Name:      layersVolume,
+		MountPath: "/layers",
+	}
+```
+
+After:
+```
+	workspaceMount := corev1.VolumeMount{
+		Name:      workspaceVolume,
+		MountPath: "/workspace",
+	}
+```
+
+If the platform wishes to keep the app source code on it's own volume for any reason, it would look more like this:
+```
+	workspaceMount := corev1.VolumeMount{
+		Name:      workspaceVolume,
+		MountPath: "/workspace",
+	}
+
+	appMount := corev1.VolumeMount{
+		Name:      appVolume,
+		MountPath: "/workspace/app",
+	}
+```
+
+If a platform wants to keep the changes to an absolute minimum they could do so by setting the configuration to something like this:
+```
+CNB_APP_DIR=/workspace
+CNB_LAYERS_DIR=/layers
+CNB_PLATFORM_CONFIG_DIR=/layers
+CNB_LIFECYCLE_CONFIG_DIR=/layers
+CNB_LAYERS_CONFIG_DIR=/layers/config
+CNB_WORKSPACE_DIR=/layers
+```
+
+This would allow for everything to be stored in the already configured `/layers` volume and use the existing `/workspace` for the app source code. Future upgrades with this configuration could lead to name collisions between layers and new CNB directories.
 
 # Alternatives
 [alternatives]: #alternatives
 
 - What other designs have been considered?
 
-## Alternative 1
+## `/cnb` being the root for everything
 
-We could add a prefix to each of the layer metadata files like `layer.`. This would allow us to re-use the cached layers but may lead to awkwardness around naming the layer metadata files - for eg. if a layer is called `layer.build` the metadata file would end up being `layer.layer.build.toml`
+`/cnb` being the entire root was considered but is less desirable due to conflicting specifications (distribution). If buildpacks are located in `/cnb/buildpacks` on a builder - this makes it impossible for a single mount of `/cnb` for a platform. Platforms would have to juggle multiple mounts.
 
-```
-`/layers` (configurable with `CNB_LAYERS_DIR` or -layers) 
-├── group.toml
-├── plan.toml
-├── <escaped_buildpack_id> (buildpack arg `$1` )
-│   ├── build.toml
-│   ├── launch.toml
-│   ├── store.toml
-│   ├── layer.<layer>.toml
-│   └── <layer>
-└── config
-    └── metadata.toml
-```
+## `/cnb/workspace` being the root for build-specific files
 
-## Alternative 2
-
-We could add a prefix for each of the special metadata files and reserve it for CNB usage. For eg. `launch.toml` could be renamed to `cnb.launch.toml`. This way, we will only be prohibiting layers that have a prefix `cnb.` or a layer named `cnb`. The downsides to this alternative are the fact that the metadata files would not be usable across builds and we would still be prohibiting a class of layer names that may be valid.
-
-```
-`/layers` (configurable with `CNB_LAYERS_DIR` or -layers) 
-├── group.toml
-├── plan.toml
-├── <escaped_buildpack_id> (buildpack arg `$1` )
-│   ├── cnb.build.toml
-│   ├── cnb.launch.toml
-│   ├── cnb.store.toml
-│   ├── <layer>.toml
-│   └── <layer>
-└── config
-    └── metadata.toml
-```
-
-
-## Alternative 3
-
-The top level `<buildpack-workspace>` would house any files and folder that are applicable at a `buildpack` level. Any layer specific files and directory structure would be moved to the `layers` sub-directory inside the `<buildpack-workspace>`.
-
-```
-`/layers` (configurable with `CNB_LAYERS_DIR` or -layers) 
-├── group.toml
-├── plan.toml
-├── <escaped_buildpack_id> (buildpack arg `$1` )
-│   ├── build.toml
-│   ├── launch.toml
-│   ├── store.toml
-│   └── layers
-│       ├── <layer>.toml
-│       └── <layer>
-└── config
-    └── metadata.toml
-```
-
-
-## Alternative 4
-
-```
-`/layers` (configurable with `CNB_LAYERS_DIR` or -layers-dir) 
-├── group.toml
-├── plan.toml
-├── <escaped_buildpack_id> (`CNB_BP_LAYERS_DIR`)
-│   ├── <layer>.toml
-│   └── <layer>
-└── config
-    ├── metadata.toml
-    └── <escaped_buildpack_id> (`CNB_BP_CONFIG_DIR`  )
-        ├── build.toml
-        ├── launch.toml
-        └── store.toml
-```
-
-This structure doesn't break layer re-use and has the same length for path names but the top level directory is called `layers` when it houses more than just layers. And also the `config` directory may clash with the `escaped_buildpack_id`.
+This makes the path deeper than we want. `/layers` would turn into `/cnb/workspace/layers` by default.
 
 ## Why is this proposal the best?
 
-Although this is a drastic change, this also open up possibilities in the future to introduce other top level concepts inside the `CNB_BP_CONFIG_DIR` apart from the current ones while still allowing layer names to be free-form and without any restrictions.
+Although this is a drastic change, this also open up possibilities in the future to introduce other top level concepts inside the `CNB_WORKSPACE_DIR` apart from the current ones while still allowing layer names to be free-form and without any restrictions.
 
 ## What is the impact of not doing this?
 
