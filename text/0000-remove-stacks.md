@@ -80,7 +80,7 @@ A buildpack app may have a build.Dockerfile and/or run.Dockerfile in its app dir
 
 Both Dockerfiles must accept `base_image` and `build_id` args. The `base_image` arg allows the lifecycle to specify the original base image. The `build_id` arg allows the app developer to bust the cache after a certain layer and must be defaulted to `0`.  
 
-A runtime base image may indicate that it does not preserve ABI compatibility by adding the label `io.buildpacks.unsafe=true`. Rebasing an app with this label requires passing a new `--force` flag to `pack rebase`.
+A runtime base image may indicate that it preserves ABI compatibility by adding the label `io.buildpacks.rebasable=true`. Rebasing an app without this label set to `true` requires passing a new `--force` flag to `pack rebase`.
 
 ### Platform-specified Dockerfiles
 
@@ -99,6 +99,7 @@ ARG build_id=0
 
 LABEL io.buildpacks.image.distro=ubuntu
 LABEL io.buildpacks.image.version=18.04
+LABEL io.buildpacks.rebasable=true
 
 ENV CNB_USER_ID=1234
 ENV CNB_GROUP_ID=1235
@@ -117,6 +118,8 @@ ARG base_image
 FROM ${base_image}
 ARG build_id=0
 
+LABEL io.buildpacks.rebasable=true
+
 RUN echo ${build_id}
 
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
@@ -128,9 +131,9 @@ ARG base_image
 FROM ${base_image}
 ARG build_id=0
 
-LABEL io.buildpacks.unsafe=true
+LABEL io.buildpacks.rebasable=false
 
-RUN curl -L https://example.com/mypkg-install | sh
+RUN curl -L https://example.com/mypkg-install | sh # installs to /opt
 ```
 
 # Drawbacks
