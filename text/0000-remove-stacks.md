@@ -35,7 +35,7 @@ Summary of changes:
 ## Base Image Metadata
 
 Instead of a stack ID, runtime and build-time base images are labeled with the following canonicalized metadata:
-- OS (e.g., `linux`, `$GOOS`)
+- OS (e.g., "linux", `$GOOS`)
 - Architecture (e.g., "x86_64", `$GOARCH`)
 - Distribution (optional) (e.g., "ubuntu", `$ID`)
 - Version (optional) (e.g., "18.04", `$VERSION_ID`)
@@ -45,6 +45,10 @@ For Linux-based images, each field should be canonicalized against values specif
 The `stacks` list in `buildpack.toml` is replaced by a `platforms` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS and Architecture.
 
 `buildpack.toml` no longer contains OS package information. Buildpacks may express runtime package dependencies during detection (see "Runtime Base Image Selection" below).
+
+App image builds fail if the build image and selected run image have mismatched metadata. We may consider introducing a flag to skip this validation.
+
+When an app image is rebased, `pack rebase` will fail if the new run image and previous run image have mismatched metadata. This check may be skipped for Distribution and Version by passing a new `--force` flag to `pack rebase`.
 
 ## Mixins
 
