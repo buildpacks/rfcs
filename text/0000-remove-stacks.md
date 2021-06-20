@@ -42,9 +42,7 @@ Instead of a stack ID, runtime and build-time base images are labeled with the f
 
 For Linux-based images, each field should be canonicalized against values specified in `/etc/os-release` (`$ID` and `$VERSION_ID`).
 
-The `stacks` list in `buildpack.toml` is replaced by a `platforms` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS and Architecture.
-
-`buildpack.toml` no longer contains OS package information. Buildpacks may express runtime package dependencies during detection (see "Runtime Base Image Selection" below).
+The `stacks` list in `buildpack.toml` is replaced by a `platforms` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS and Architecture. Each entry may also contain a list of package names (as PURL URLs without versions or qualifiers) that specify detect-time and build-time (but not runtime) OS package dependencies. Buildpacks may express runtime OS package dependencies during detection (see "Runtime Base Image Selection" below).
 
 App image builds fail if the build image and selected run image have mismatched metadata. We may consider introducing a flag to skip this validation.
 
@@ -56,7 +54,7 @@ The mixins label on each base image is replaced by a layer in each base image co
 
 ### Validations
 
-Buildpack base image metadata specified in `buildpack.toml`'s `platforms` list are validated against the runtime and build-time base images.
+Buildpack base image metadata and packages specified in `buildpack.toml`'s `platforms` list are validated against the runtime and build-time base images.
 
 Runtime and build-time base image packages are no longer validated against each other.
 
@@ -66,7 +64,7 @@ When an app image is rebased, `pack rebase` will fail if packages are removed fr
 
 Builders may specify an ordered list of runtime base images, where each entry may contain a list of runtime base image mirrors.
 
-Buildpacks may specify a list of package names (as a PURL URL without a version or qualifiers) in a `packages` table in the build plan.
+Buildpacks may specify a list of package names (as PURL URLs without versions or qualifiers) in a `packages` table in the build plan.
 
 The first runtime base image that contains all required packages is selected. When mirrors are present, the runtime base image mirror matching the app image is always used, including for package queries.
 
