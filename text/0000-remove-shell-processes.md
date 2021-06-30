@@ -88,7 +88,7 @@ The following changes have been made:
 
 ## Using Environment Variables in a Process
 
-One upside to our previous execution strategy was that it enable users to include environment variable references in arguments that were later evaluated in the container. To preserve this feature we can instead adopt a variabtion on the Kubernetes strategy for [environment variables interpolation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config). If a buildpack or user includes `${<env>}` in the `command` or `args` and `{env}` is the name of an environment variable set in the launch environment, the launcher will replace this string with the value of the environment variable after apply buildpack-provided env modifications and before launching the process.
+One upside to our previous execution strategy was that it enable users to include environment variable references in arguments that were later evaluated in the container. To preserve this feature we can instead adopt a variation on the Kubernetes strategy for [environment variables interpolation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config). If a buildpack or user includes `${<env>}` in the `command` or `args` and `{env}` is the name of an environment variable set in the launch environment, the launcher will replace this string with the value of the environment variable after apply buildpack-provided env modifications and before launching the process.
 
 
 # How it Works
@@ -165,7 +165,7 @@ will become the following, using the new platform API
 docker run --entrypoint launcher <image> echo hello '${WORLD}'
 docker run --entrypoint launcher <image> bash -c 'echo hello "${WORLD:-world}"'
 ```
-The first command in this example did not need to change to behave as expected with the new API. Previously it was necessary to use a shell process in order to evaluate `${WORLD}`. Now, the shell is unescessary. However, if the user wants to use more features of Bash interpolation they will need to explicitly invoke a shell, as shown in the second command in this example.
+The first command in this example did not need to change to behave as expected with the new API. Previously it was necessary to use a shell process in order to evaluate `${WORLD}`. Now, the shell is unnescessary. However, if the user wants to use more features of Bash interpolation they will need to explicitly invoke a shell, as shown in the second command in this example.
 
 ### Example 3 - A Script Process
 The follow custom script command:
@@ -299,7 +299,7 @@ In exchange for a reduction in complexity and cognitive overhead buildpack-autho
 
 ## `$(<env>)` syntax
 
-We could use `$(<env>)` for environment variable replacements instead of `${<env>}`. urrently, Kubernetes only replaces `$(FOO)` if `FOO` matches the name of an enivornment variable defined in the `env` section of the PodSpec, otherwise `$(FOO)` is passed through literally. The would allow thelauncher to pick up where kubernetes leaves off and evaluate an remaining references.
+We could use `$(<env>)` for environment variable replacements instead of `${<env>}`. Currently, Kubernetes only replaces `$(FOO)` if `FOO` matches the name of an environment variable defined in the `env` section of the PodSpec, otherwise `$(FOO)` is passed through literally. The would allow the launcher to pick up where kubernetes leaves off and evaluate any remaining references.
 pros:
 * Users can continue to use a syntax they are already familiar with
 cons:
@@ -312,7 +312,7 @@ pros:
 cons:
 * The exec.d interface must be duplicated in both the buildpack and platform API
 * If we modify the interface the same app might behave differently or fail to run on specific platforms depending on which version of the platform API they are using
-* Users must directly implement our less-than-perfectly-intuitive exec.d interface instead of whatever better UX buildpack authors invent.
+* Users must directly implement our less-than-perfectly-intuitive exec.d interfaces instead of whatever better UX buildpack authors invent.
 
 ## Lifecycle support for `<app>.profile`
 We could consider having the lifecycle convert `<app>/.profile` files into exec.d  
