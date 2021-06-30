@@ -88,7 +88,7 @@ The following changes have been made:
 
 ## Using Environment Variables in a Process
 
-One upside to our previous execution strategy was that it enable users to include environment variable references in arguments that were later evaluated in the container. To preserve this feature we can instead adopt a variation on the Kubernetes strategy for [environment variables interpolation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config). If a buildpack or user includes `${<env>}` in the `command` or `args` and `{env}` is the name of an environment variable set in the launch environment, the launcher will replace this string with the value of the environment variable after apply buildpack-provided env modifications and before launching the process.
+One upside to our previous execution strategy was that it enable users to include environment variable references in arguments that were later evaluated in the container. To preserve this feature we can instead adopt the Kubernetes strategy for [environment variables interpolation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config). If a buildpack or user includes `$(<env>)` in the `command` or `args` and `<env>` is the name of an environment variable set in the launch environment, the launcher will replace this string with the value of the environment variable after apply buildpack-provided env modifications and before launching the process.
 
 
 # How it Works
@@ -150,9 +150,9 @@ docker run --entrypoint launcher <image> -- echo hello '$WORLD'
 will become the following, using the new platform API
 ```
 docker run --entrypoint launcher <image> env
-docker run --entrypoint launcher <image> echo hello '${WORLD}'
+docker run --entrypoint launcher <image> echo hello '$(WORLD)'
 ```
-Previously, in the second command in this example `${WORLD}` would not have been interpolated because this is a direct process; instead the output would include the literal string `$WORLD`. With the changes proposed, `${WORLD}` will now be evaluated, even though the process is direct.
+Previously, in the second command in this example, `$WORLD` would not have been interpolated because this is a direct process; instead the output would include the literal string `$WORLD`. With the changes proposed, `$(WORLD)` will now be evaluated, even though the process is direct.
 
 ### Example 2 - A Shell Process
 The follow custom shell command:
@@ -162,10 +162,12 @@ docker run --entrypoint launcher <image> echo hello '${WORLD:-world}'
 ```
 will become the following, using the new platform API
 ```
-docker run --entrypoint launcher <image> echo hello '${WORLD}'
+docker run --entrypoint launcher <image> echo hello '$(WORLD)'
 docker run --entrypoint launcher <image> bash -c 'echo hello "${WORLD:-world}"'
 ```
-The first command in this example did not need to change to behave as expected with the new API. Previously it was necessary to use a shell process in order to evaluate `${WORLD}`. Now, the shell is unnescessary. However, if the user wants to use more features of Bash interpolation they will need to explicitly invoke a shell, as shown in the second command in this example.
+The first command in this example needed to adopt the new environment variable syntax to behave as expected with the new API. Previously it was necessary to use a shell process in order to evaluate `${WORLD}`. Now, the shell is unnecessary.
+
+If the user wishes, they may explicitly invoke a shell and let Bash handle the interpolation, which provides a richer feature set.
 
 ### Example 3 - A Script Process
 The follow custom script command:
@@ -176,6 +178,35 @@ will become the following, using the new platform API
 ```
 docker run --entrypoint launcher <image> bash -c 'for opt in $JAVA_OPTS; do echo $opt; done'
 ```
+
+### Example 4 - A Script Process in Kubernetes
+
+Because we have adopted the Kubernetes environment variable notation here, users may need to escape some references in their PodSpec in specific situations. This is necessary only if all of the following are true:
+* The user is providing a `command` or `args` which contain an environment variable reference.
+* The variable is explicitly initialized in the `env` section of the PodSpec.
+* The user wishes for the variable to be interpolated **after** build-provided env modifications have been applied.
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: env-example
+spec:
+  containers:
+  - name: env-print-demo
+    image: bash
+    env:
+    - name: IN_CONTAINER_1
+      value: "k8s-val"
+    - name: IN_K8S
+      value: "val2"
+    command: ["bash", "-c", "echo $$(IN_CONTAINER_1)) $(IN_CONTAINER_2) $(IN_K8S) ${IN_BASH}"]
+```
+In the above example the environment variables will be interpolated as follows:
+- `$IN_CONTAINER` - Interpolated by the launcher after buildpack-provided modifications (e.g. `k8s-val:buildpack-appended-val`)
+- `$IN_CONTAINER_2` - Interpolated by the launcher after buildpack-provided modifications. No escaping is required here because `$IN_CONTAINER_2` is not set in `env`.
+- `$IN_K8S` - Interpolated by Kubernetes before the container runs. Buildpack-provided modifications will not affect the resulting value.
+- `$IN_BASH` - Interpolated by Bash.
 
 ## What About Profile Scripts?
 
@@ -303,13 +334,26 @@ In exchange for a reduction in complexity and cognitive overhead buildpack-autho
 # Alternatives
 [alternatives]: #alternatives
 
-## `$(<env>)` syntax
+## `$((<env>))` syntax
 
-We could use `$(<env>)` for environment variable replacements instead of `${<env>}`. Currently, Kubernetes only replaces `$(FOO)` if `FOO` matches the name of an environment variable defined in the `env` section of the PodSpec, otherwise `$(FOO)` is passed through literally. The would allow the launcher to pick up where kubernetes leaves off and evaluate any remaining references.
+We could use our own explicit syntax like `$((<env>))` or environment variable replacements instead of `$(<env>)`.
 pros:
-* Users can continue to use a syntax they are already familiar with
+* Extremely explicit
+* There is never any need to escape values in k8s
+* Eliminates all conflicts or situations where the evaluation order must be explained
 cons:
-* User provided variables may be evaluated too soon, before buildpack modifications are applied.
+* A third syntax
+* A buildpack-specific syntax that users must learn about through documentation
+
+## `${<env>}` syntax
+We could use Bash-like `${<env>}` syntax for environment variable replacements instead of `$(<env>)`.
+
+pros:
+* It might "just work" in a lot of cases
+* Familiar
+cons:
+* The launcher might evaluate env vars that were truly intended for Bash to evaluate (e.g. in a command like `["bash", "-c", "source foo-setter.sh && echo ${FOO}"]`)
+* Users might reasonably expect things like `$FOO` or `${FOO:-dafault-foo}` to work and discover the limitations only via trial and error or documentation.
 
 ## Lifecycle support for `<app>/.exec`
 When we remove support for `<app>/.profile` we could add support for `<app>/.exec` or similar where `<app>/.exec` must implement the `exec.d` interface.
