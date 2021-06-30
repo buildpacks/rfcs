@@ -207,7 +207,9 @@ EOF
   /usr/sbin/sshd -f $ssh_dir/sshd_config -o "Port ${ssh_port}"
 fi
 ```
-This script does not require any changes and would work as an `exec.d` or `profile.d`.
+This script does not require any changes and would work as an `exec.d` helper. To implement the new buildpack API the buildpack author would have to:
+* Move the above script from `<layer>/profile.d/sshd` to `<layer>/exec.d/sshd`.
+* Ensure script is executable by run-image user (if it isn't already).
 
 **Example 2: paketo-buildpacks/node-engine **
 
