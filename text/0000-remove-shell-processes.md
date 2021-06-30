@@ -224,6 +224,8 @@ export MEMORY_AVAILABLE
 
 The following revised version of this script would implement the `exec.d` interface
 ```
+#!/usr/bin/env bash
+
 if [[ -z "$MEMORY_AVAILABLE" ]]; then
 		memory_in_bytes="$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)"
 		MEMORY_AVAILABLE="$(( $memory_in_bytes / ( 1024 * 1024 ) ))"
@@ -233,6 +235,8 @@ cat << EOF >&3
 MEMORY_AVAILABLE = "${MEMORY_AVAILABLE}" 
 EOF
 ```
+
+As in the example above. The buildpack author would need to move the script to the new directory and ensure the file is created with the correct permissions.
 
 ### `<app>/.profile`
 
