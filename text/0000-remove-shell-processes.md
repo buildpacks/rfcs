@@ -100,7 +100,7 @@ The Paketo .Net Execute Buildpack may generates shell processes similar to the f
 ```
 [[processes]]
 type = "web"
-command = "dotnet my-app.dll --url http://0.0.0.0:${PORT:-8080}"
+command = "dotnet my-app.dll --urls http://0.0.0.0:${PORT:-8080}"
 direct = false
 ```
 NOTE: the buildpack API used by this buildpack (`0.5`) predates the introduction of `default`.
