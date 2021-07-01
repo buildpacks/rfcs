@@ -32,7 +32,7 @@ This RFC proposes that we allow buildpacks to select a minimal runtime base imag
 
 Builders may specify an ordered list of runtime base images, where each entry may contain a list of runtime base image mirrors.
 
-Buildpacks may specify a list of package names (as PURL URLs without versions or qualifiers) in a `packages` table in the build plan during detection.
+Buildpacks may specify a list of package names (as [PURL URLs](https://en.wikipedia.org/wiki/Persistent_uniform_resource_locator) without versions or qualifiers) in a `packages` table in the build plan during detection.
 
 The first runtime base image that contains all required packages is selected. When mirrors are present, the runtime base image mirror matching the app image is always used, including for package queries.
 
@@ -52,5 +52,4 @@ The first runtime base image that contains all required packages is selected. Wh
 [unresolved-questions]: #unresolved-questions
 
 - Should packages be determined during the detect or build phase? Opinion: detect phase, so that a runtime base image's app-specified Dockerfiles may by applied in parallel to the buildpack build process.
-
 
