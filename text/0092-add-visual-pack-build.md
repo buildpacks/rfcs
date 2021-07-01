@@ -3,9 +3,9 @@
 - Name: Add Visual Pack Build
 - Start Date: 2020-05-14
 - Author(s): aemengo
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#160](https://github.com/buildpacks/rfcs/pull/160)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [pack#1200](https://github.com/buildpacks/pack/issues/1200), [pack#1201](https://github.com/buildpacks/pack/issues/1201), [pack#1203](https://github.com/buildpacks/pack/issues/1203), [pack#1204](https://github.com/buildpacks/pack/issues/1204), [pack#1205](https://github.com/buildpacks/pack/issues/1205), [pack#1206](https://github.com/buildpacks/pack/issues/1206)
 - Supersedes: https://github.com/buildpacks/rfcs/pull/152
 
 # Summary
