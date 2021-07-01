@@ -59,6 +59,8 @@ Updates to the lifecycle so that `build` layers created by buildpacks should be 
 
 The lifecycle will have to layerize the layers marked `build` as `true` during the `build` phase of the lifecycle instead of the `export` phase.
 
+The layerized output from the `build` phase of lifecycle could be stored at `/<layers>/@exported` (which should not clash with any buildpack IDs) where `<layers>`. The exporter will just read from this to construct the final image.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -92,7 +94,7 @@ The impact this would have on the performance of the export step. The exact deta
 
 How to handle the cases when users want a common build workspace that is cached. This will be covered in a subsequent RFC and that RFC and this RFC should be implemented as an "atomic" change to avoid existing use cases from being broken without a proper migration path.
 
-# Spec. Changes (OPTIONAL)
+# Spec. Changes
 [spec-changes]: #spec-changes
 
 None.
