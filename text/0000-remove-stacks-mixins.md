@@ -40,11 +40,38 @@ Instead of a stack ID, runtime and build-time base images are labeled with the f
 
 For Linux-based images, each field should be canonicalized against values specified in `/etc/os-release` (`$ID` and `$VERSION_ID`).
 
-The `stacks` list in `buildpack.toml` is replaced by a `platforms` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS and Architecture. Each entry may also contain a list of package names (as PURL URLs without versions or qualifiers) that specify detect-time and build-time (but not runtime) OS package dependencies. Buildpacks may express runtime OS package dependencies during detection (see "Runtime Base Image Requirements" below).
+The `stacks` list in `buildpack.toml` is replaced by a `platforms` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS and Architecture. Each entry may also contain a list of package names (as PURL URLs without versions or qualifiers) that specify detect-time and build-time (but not runtime) OS package dependencies. Packages may be specified for all Versions of a distribution, or for a specific Version. Buildpacks may express **runtime** OS package dependencies during detection (see "Runtime Base Image Requirements" below).
 
-App image builds fail if the build image and selected run image have mismatched metadata. We may consider introducing a flag to skip this validation.
+App image builds fail if the build image and selected run image have mismatched metadata. We may introduce flags or additional labels to skip this validation (e.g., for cross-compilation or minimal runtime base images). An image without a specified Distribution is compatible with images specifying any Distribution. An image specifying a Distribution without a Version is compatible with images specifying any Versions of that Distribution.
 
 When an app image is rebased, `pack rebase` will fail if the new run image and previous run image have mismatched metadata. This check may be skipped for Distribution and Version by passing a new `--force` flag to `pack rebase`.
+
+#### Example: buildpack.toml `platforms` table
+
+```toml
+[[platforms]]
+os = "linux"
+arch = "x86_64"
+[[platforms.distros]]
+name = "ubuntu"
+[[platforms.distros.versions]]
+version = "18.04"
+packages = ["pkg:deb/ubuntu/curl"]
+[[platforms.distros.versions]]
+version = "20.04"
+packages = ["pkg:deb/ubuntu/curl2"]
+
+[[platforms]]
+os = "linux"
+arch = "x86_64"
+[[platforms.distros]]
+name = "ubuntu"
+packages = ["pkg:deb/ubuntu/curl"]
+[[platforms.distros.versions]]
+version = "14.04"
+[[platforms.distros.versions]]
+version = "16.04"
+```
 
 ## Mixins
 
