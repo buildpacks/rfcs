@@ -27,7 +27,7 @@ This RFC proposes that we replace stackpacks with multi-purpose build-time and r
 # How it Works
 [how-it-works]: #how-it-works
 
-Note: kaniko, BuildKit, and/or the original Docker daemon may be used to apply Dockerfiles at the platform's discretion. 
+Note: kaniko, buildah, BuildKit, the original Docker daemon may be used to apply Dockerfiles at the platform's discretion. 
 
 ### App-specified Dockerfiles
 
@@ -39,9 +39,9 @@ A runtime base image may indicate that it preserves ABI compatibility by adding 
 
 ### Platform-specified Dockerfiles
 
-The same Dockerfiles may be used to create new stacks or modify existing stacks outside of the app build process. For both app-specified and stack-modifying Dockerfiles, any specified labels override existing values.
+The same Dockerfiles may be used to create new base images or modify existing base images outside of the app build process. For both app-specified and base-image-modifying Dockerfiles, any specified labels override existing values.
 
-Dockerfiles that are used to create a stack must create a `/cnb/stack/genpkgs` executable that outputs a [CycloneDX](https://cyclonedx.org)-formatted list of packages in the image with PURL IDs when invoked. This executable is executed after any run.Dockerfile or build.Dockerfile is applied, and the output replaces the label `io.buildpacks.sbom`. This label doubles as a Software Bill-of-Materials for the base image. In the future, this label will serve as a starting point for the application SBoM.
+Dockerfiles that are used to create a base image must create a `/cnb/image/genpkgs` executable that outputs a [CycloneDX](https://cyclonedx.org)-formatted list of packages in the image with PURL IDs when invoked. This executable is executed after any run.Dockerfile or build.Dockerfile is applied, and the output replaces the label `io.buildpacks.sbom`. This label doubles as a Software Bill-of-Materials for the base image. In the future, this label will serve as a starting point for the application SBoM.
 
 ### Examples
 
@@ -64,7 +64,7 @@ RUN groupadd cnb --gid ${CNB_GROUP_ID} && \
 
 USER ${CNB_USER_ID}:${CNB_GROUP_ID}
 
-COPY genpkgs /cnb/stack/genpkgs
+COPY genpkgs /cnb/image/genpkgs
 ```
 
 run.Dockerfile present in an app directory that always installs the latest version of curl:
