@@ -61,7 +61,7 @@ The structure would look like -
         └── env
 ```
 
-Each buildpack will be passed an environment variable `CNB_BP_SHARED_LAYERS_DIR` with the location to the shared layers directory for a buildpack.
+Each buildpack will be passed an environment variable `CNB_BP_SHARED_LAYERS_DIR` with the location to the shared layers directory for a buildpack. Additionally all the lifecycle binaries that accept `-layers`  would accept a `-shared-layers` with the location for this shared layers directory. Older platform APIs could still utilize this and the lifecycle would default to use `<layers>/@shared` (this should not clash with any valid buildpack ID since `@` is not a valid symbol for buildpack IDs ) sub-directory for shared layers in that case.
 
 The `<shared-layer>.toml` would look like - 
 
@@ -82,6 +82,7 @@ The `env` directory would be used to set build time only variables for subsequen
 All layers created in the `shared-layers` directory are build layers by default. The `cache` layer flag decides if the layer will be cached for the next run or not. This flag will follow the same semantics as [specified here.](https://github.com/buildpacks/spec/blob/main/buildpack.md#cached-layers). The `<shared-layer>.toml` for each layer will be restored with the same semantics as [specified here.](https://github.com/buildpacks/spec/blob/main/buildpack.md#cached-layers) with the `types` table being omitted during subsequent restores to avoid stale layers.
 
 A `shared-layer` is associated with a specific buildpack that created it and it is expected to be wiped if the associated buildpack is not involved during the build process. The `env` directory is co-located with the `shared-layer` so that the associated environment variables that may point to directories in the `shared-layer` follow the same lifecycle as the `shared-layer` itself.
+
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -108,8 +109,6 @@ The plan would be that this `<shared-layers>` directory would be relocated along
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-
-- How would we accomodate for older platform APIs that may not have a mounted volume for `shared-layers`?
 
 
 # Spec. Changes (OPTIONAL)
