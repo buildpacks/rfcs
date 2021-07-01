@@ -98,6 +98,8 @@ Buildpacks may specify a list of package names (as PURL URLs without versions or
 [alternatives]: #alternatives
 
 - Keep stacks.
+- Make the above changes but keep some existing terminology: stacks, build-image, run-image.
+- Continue to allow for static definition of runtime package requirements in `buildpack.toml`.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
