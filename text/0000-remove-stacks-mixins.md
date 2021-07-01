@@ -105,7 +105,7 @@ Buildpacks may specify a list of package names (as PURL URLs without versions or
 [unresolved-questions]: #unresolved-questions
 
 - Should packages be determined during the detect or build phase? Opinion: detect phase, so that (in a later RFC), a runtime base image's app-specified Dockerfiles may by applied in parallel to the buildpack build process.
-
+- How will migration work? Can we make new base images compatible with older buildpacks? Can we make newer buildpacks compatible with older stacks?
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
