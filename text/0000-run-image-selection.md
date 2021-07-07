@@ -14,7 +14,7 @@
 
 *NOTE: This proposal is part of a larger initiative to reduce complexity originally outlined in https://github.com/buildpacks/rfcs/pull/167*
 
-This RFC introduces functionality for dynamically selecting runtime  base images, as a partial alternative to stackpacks (along with [RFC#173](https://github.com/buildpacks/rfcs/pull/173)).
+This RFC introduces functionality for dynamically selecting runtime base images, as a partial alternative to stackpacks (along with [RFC#173](https://github.com/buildpacks/rfcs/pull/173)).
 
 # Motivation
 [motivation]: #motivation
@@ -52,4 +52,3 @@ The first runtime base image that contains all required packages is selected. Wh
 [unresolved-questions]: #unresolved-questions
 
 - Should packages be determined during the detect or build phase? Opinion: detect phase, so that a runtime base image's app-specified Dockerfiles may by applied in parallel to the buildpack build process.
-
