@@ -40,7 +40,7 @@ The first runtime base image that contains all required packages is selected. Wh
 [drawbacks]: #drawbacks
 
 - Involves breaking changes.
-- Buildpacks cannot install OS packages directly, only select runtime base images.
+- Buildpacks cannot use this mechanism to install OS packages directly, only select runtime base images.
 
 # Alternatives
 [alternatives]: #alternatives
