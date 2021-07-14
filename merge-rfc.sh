@@ -146,6 +146,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 sed $SEDOPTION "s|- RFC Pull Request:.*|- RFC Pull Request: [${REPO}#${PR_NUMBER}](https://github.com/${OWNER}/${REPO}/pull/${PR_NUMBER})|" "${SOURCE_DOC}"
 sed $SEDOPTION "s|- CNB Issue:.*|- CNB Issue: $ISSUES_TEXT|" "${SOURCE_DOC}"
+sed $SEDOPTION "s|- State:.*|- State: **Approved**|" "${SOURCE}"
 
 echo "> Moving ${SOURCE_DOC} to ${TARGET_DOC}..."
 git mv "${SOURCE_DOC}" "${TARGET_DOC}"
