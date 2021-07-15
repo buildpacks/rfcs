@@ -45,7 +45,7 @@ Both Dockerfiles must accept `base_image` and `build_id` args.
 The `base_image` arg allows the lifecycle to specify the original base image.
 The `build_id` arg allows the app developer to bust the cache after a certain layer and must be defaulted to `0`. When the `$build_id` arg is referenced in a `RUN` instruction, all subsequent layerrs will be rebuilt on the next build (as the value will change).
 
-A runtime base image may indicate that it preserves ABI compatibility by adding the label `io.buildpacks.rebasable=true`. In the case of builder-specified Dockerfiles, `io.buildpacks.rebasable=false` is set automatically before `run.Dockerfile` is applied and must be explicitly set to `true` if desired. Rebasing an app without this label set to `true` requires passing a new `--force` flag to `pack rebase`.
+A runtime base image may indicate that it preserves ABI compatibility by adding the label `io.buildpacks.rebasable=true`. In the case of builder-specified Dockerfiles, `io.buildpacks.rebasable=false` is set automatically before a runtime Dockerfile is applied and must be explicitly set to `true` if desired. Rebasing an app without this label set to `true` requires passing a new `--force` flag to `pack rebase`.
 
 
 #### Example: App-specified Dockerfile Hook
