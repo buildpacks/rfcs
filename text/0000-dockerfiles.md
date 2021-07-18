@@ -31,15 +31,32 @@ Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to ap
 
 ### Builder-specified Dockerfiles
 
-A builder may specify any number of executable "hooks" in `/cnb/hooks.d/`.
-Hook files in this directory are executed in the context of app directory and must output Dockerfiles that are applied to the build-time and runtime base images before an image is built.
+A builder image may include any number of "hook" files in `/cnb/hooks.d/`.
+The `pack create-builder` command is used to copy hooks into the builder image via `builder.toml`. E.g.,
+```toml
+[[hooks]]
+name = "app-hook"
+path = "./myhook"
+```
+(Note: this format should not be considered final. Additional fields will be required to mark the format, target, etc. of the hook. These may be defined in subsequent spec PRs / sub-team RFCs.)
 
-If a hook exits with a non-zero status value, the build fails. If a hook exits with a zero status value and no output, the hook is ignored. Directories and non-executable files are ignored.
+Each hook file path must be in the format `/cnb/hooks.d/<name>.(build.|run.|)<format>(.out|)`, where:
 
-Each executable must be in the format `/cnb/hooks.d/<name>.(build.|run.|)<format>`, where build, run, or empty specify the build-time base image, runtime base image, or both bash images, respectively. The only valid format is `Dockerfile`, although support for, e.g. LLB JSON, could be added in the future. 
+1. `build`, `run`, or empty specify the build-time base image, runtime base image, or both bash images, respectively.
+2. The only valid format is `Dockerfile`, although support for, e.g. LLB JSON, could be added in the future.
+3. If the `.out` suffix is present and the file is executable, the hook is executed in the context of the app directory, and its output must match `<format>`.
+4. If the `.out` suffix is not present, the contents of the file must match `<format>`.
 
-A runtime Dockerfile is applied to the selected runtime base image after the detection phase.
-A build-time Dockerfile is applied to the build-time base image before the detection phase.
+Hook files are evaluated (either read or executed) and the resulting Dockerfiles are applied to the build-time and runtime base images in lexographical order by `<name>`.
+Executable hook files must not modify the app directory when executed and may be executed in parallel.
+However, the resulting Dockerfiles must not be applied in parallel.
+A Dockerfile intended for the runtime base image is applied after the detection phase.
+A Dockerfile intended for the build-time base image is applied before the detection phase.
+
+If an executable hook exits with a non-zero status value, the build fails.
+If a executable hook exits with a zero status value and no output, the hook is ignored. 
+Directories are ignored.
+Files at the top-level of `/cnb/hooks.d/` that do not match the specified file name format result in a build failure.
 
 Both Dockerfiles must accept `base_image` and `build_id` args.
 The `base_image` arg allows the lifecycle to specify the original base image.
@@ -53,12 +70,12 @@ A runtime base image may indicate that it preserves ABI compatibility by adding 
 This example hook would allow an app to provide runtime and build-time base image extensions as "run.Dockerfile" and "build.Dockerfile."
 The app developer can decide whether the extensions are rebasable.
 
-##### `/cnb/hooks.d/app.build.Dockerfile`
+##### `/cnb/hooks.d/app.build.Dockerfile.out`
 ```
 #!/bin/sh
 cat build.Dockerfile
 ```
-##### `/cnb/hooks.d/app.run.Dockerfile`
+##### `/cnb/hooks.d/app.run.Dockerfile.out`
 ```
 #!/bin/sh
 cat run.Dockerfile
@@ -70,7 +87,7 @@ This example hook would allow a builder to install RPMs for each language runtim
 
 Note: The Dockerfiles referenced must disable rebasing, and build times will be slower compared to buildpack-provided runtimes.
 
-##### `/cnb/hooks.d/app.Dockerfile`
+##### `/cnb/hooks.d/app.Dockerfile.out`
 ```
 #!/bin/sh
 [[ -f Gemfile.lock ]] && cat /cnb/hooks.d/app.Dockerfile.d/Dockerfile-ruby
@@ -107,7 +124,7 @@ USER ${CNB_USER_ID}:${CNB_GROUP_ID}
 COPY genpkgs /cnb/image/genpkgs
 ```
 
-run.Dockerfile for use with the example `app.Dockerfile` hook that always installs the latest version of curl:
+`run.Dockerfile` for use with the example `app.run.Dockerfile.out` hook that always installs the latest version of curl:
 ```
 ARG base_image
 FROM ${base_image}
@@ -117,9 +134,9 @@ RUN echo ${build_id}
 
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 ```
-(note: this Dockerfile disables rebasing as OS package installation is not rebasable)
+(note: this Dockerfile disables rebasing, as OS package installation is not rebasable)
 
-run.Dockerfile for use with the example `app.Dockerfile` hook that installs a special package to /opt:
+`run.Dockerfile` for use with the example `app.run.Dockerfile.out` hook that installs a special package to /opt:
 ```
 ARG base_image
 FROM ${base_image}
