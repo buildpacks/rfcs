@@ -42,7 +42,7 @@ path = "./myhook"
 
 Each hook file path must be in the format `/cnb/hooks.d/<name>.(build.|run.|)<format>(.out|)`, where:
 
-1. `build`, `run`, or empty specify the build-time base image, runtime base image, or both bash images, respectively.
+1. `build`, `run`, or empty specify the build-time base image, runtime base image, or both base images, respectively.
 2. The only valid format is `Dockerfile`, although support for, e.g. LLB JSON, could be added in the future.
 3. If the `.out` suffix is present and the file is executable, the hook is executed in the context of the app directory, and its output must match `<format>`.
 4. If the `.out` suffix is not present, the contents of the file must match `<format>`.
