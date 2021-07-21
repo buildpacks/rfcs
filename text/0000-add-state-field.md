@@ -31,7 +31,7 @@ A new `State:` field in the `Meta` section of the RFC template. See [#meta](#met
 
 The acceptable values are distinguished in the following ways:
 - **Approved**: The Core team has approved the RFC and is accepting PRs for its implementation.
-- **On Hold**: The Core team has approved the RFC, but there's since been contention about aspects of the proposal. PRs are currently not being accepted for its implementation, until these issues can be resolved.
+- **On Hold**: The Core team has approved the RFC, but PRs are currently not being accepted for its implementation. A reason must be provided in the RFC.
 
 The `State:` field does not intend to reflect states that are already implied by the RFC process. Examples including: *Draft*, *In Review*, *Closed*, etc.
 
