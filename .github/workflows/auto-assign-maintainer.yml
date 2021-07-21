@@ -53,3 +53,12 @@ jobs:
     - uses: kentaro-m/auto-assign-action@v1.2.0
       with:
         configuration-path: .github/auto-assign-platform.yml
+  bat:
+    name: Auto-assign Buildpack Authors' Tooling Maintainer
+    if:   ${{ github.event.pull_request.assignee == null && join(github.event.pull_request.assignees) == '' }}
+    runs-on:
+      - ubuntu-latest
+    steps:
+      - uses: kentaro-m/auto-assign-action@v1.2.0
+        with:
+          configuration-path: .github/auto-assign-bat.yml
