@@ -3,8 +3,7 @@
 - Name: (fill in the feature name: My Feature)
 - Start Date: (fill in today's date: YYYY-MM-DD)
 - Author(s): (Github usernames)
-<!-- Acceptable values: Approved, On Hold, Draft` -->
-- Status: Draft
+- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
