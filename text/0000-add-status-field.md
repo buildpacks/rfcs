@@ -1,9 +1,9 @@
 # Meta
 [meta]: #meta
-- Name: Add State to RFC Metadata
+- Name: Add Status to RFC Metadata
 - Start Date: 2021-07-14
 - Author(s): @aemengo, @ekcasey
-- State: Approved | On Hold
+- Status: Approved | On Hold
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -12,7 +12,7 @@
 # Summary
 [summary]: #summary
 
-This is a proposal to add a `State:` field to the `Meta` section of the RFC template.
+This is a proposal to add a `Status:` field to the `Meta` section of the RFC template.
 
 # Definitions
 [definitions]: #definitions
@@ -22,18 +22,18 @@ This is a proposal to add a `State:` field to the `Meta` section of the RFC temp
 # Motivation
 [motivation]: #motivation
 
-This RFC formally introduces the **"On Hold"** state for an RFC, in a way that's clear to the community.
+This RFC formally introduces the **"On Hold"** status for an RFC, in a way that's clear to the community.
 
 # What it is
 [what-it-is]: #what-it-is
 
-A new `State:` field in the `Meta` section of the RFC template. See [#meta](#meta) for example.
+A new `Status:` field in the `Meta` section of the RFC template. See [#meta](#meta) for example.
 
 The acceptable values are distinguished in the following ways:
 - **Approved**: The Core team has approved the RFC and is accepting PRs for its implementation.
 - **On Hold**: The Core team has approved the RFC, but PRs are currently not being accepted for its implementation. A reason must be provided in the RFC.
 
-The `State:` field does not intend to reflect states that are already implied by the RFC process. Examples including: *Draft*, *In Review*, *Closed*, etc.
+The `Status:` field does not intend to reflect states that are already implied by the RFC process. Examples including: *Draft*, *In Review*, *Closed*, etc.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -41,19 +41,19 @@ The `State:` field does not intend to reflect states that are already implied by
 We will add the following to the RFC `Meta` section template:
 
 ```
-- State: Approved | On Hold
+- Status: Approved | On Hold
 ```
 
 When an RFC is approved, the [../merge-rfc.sh](../merge-rfc.sh) script reflects the change like so:
 
 ```
-- State: **Approved** | On Hold
+- Status: **Approved** | On Hold
 ```
 
 When an RFC is put on hold (_via Pull Request_) then change is reflected like so:
 
 ```
-- State: Approved | **On Hold**
+- Status: Approved | **On Hold**
 ```
 
 # Drawbacks
@@ -64,8 +64,8 @@ When an RFC is put on hold (_via Pull Request_) then change is reflected like so
 # Alternatives
 [alternatives]: #alternatives
 
-- Communicate "On Hold" state through word of mouth
-- Reject the "On Hold" state altogether
+- Communicate "On Hold" status through word of mouth
+- Reject the "On Hold" status altogether
 
 # Prior Art
 [prior-art]: #prior-art
@@ -76,9 +76,9 @@ When an RFC is put on hold (_via Pull Request_) then change is reflected like so
 [unresolved-questions]: #unresolved-questions
 
 - Should **"Implemented"** be one of the accepted values?
-    - Perhaps, but then what's the process of keeping the _Implemented_ state in sync?
+    - Perhaps, but then what's the process of keeping the _Implemented_ status in sync?
 
-- How do we retroactively add a **State:** field to prior RFCs?
+- How do we retroactively add a **Status:** field to prior RFCs?
     - Manually?
 
 - How do we validate the [#meta](#meta) section of prior RFCs?
