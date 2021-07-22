@@ -22,22 +22,28 @@ Relying on Dockerfiles for base image generation and manipulation allows us to a
 # What it is
 [what-it-is]: #what-it-is
 
-This RFC proposes that we replace stackpacks with multi-purpose build-time and runtime Dockerfiles.
+This RFC proposes that we replace stackpacks with build-time and runtime Dockerfiles that act as pre-build hooks.
+These hooks would be equivalent to base image / builder customizations, but would execute immediately before a build.
+
+Most importantly: the changes below do not impact buildpacks or the buildpack API.
+For a given application, a build that uses hooks could be optimized by creating a more narrowly-scoped builder with the hooks pre-applied, without modifying the buildpacks.
 
 # How it Works
 [how-it-works]: #how-it-works
 
 Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to apply Dockerfiles at the platform's discretion. 
 
-### Builder-specified Dockerfiles
+### Dynamically-applied Dockerfiles
 
-A builder image may include any number of "hook" files in `/cnb/hooks.d/`.
+A builder image may include any number of "hook" files in `/cnb/hooks.d/`. Hooks may be associated with zero or more buildpack IDs.
 The `pack create-builder` command is used to copy hooks into the builder image via `builder.toml`. E.g.,
 ```toml
 [[hooks]]
 name = "app-hook"
 path = "./myhook"
+buildpacks = ["com.example.buildpack1"]
 ```
+
 (Note: this format should not be considered final. Additional fields will be required to mark the format, target, etc. of the hook. These may be defined in subsequent spec PRs / sub-team RFCs.)
 
 Each hook file path must be in the format `/cnb/hooks.d/<name>.(build.|run.|)<format>(.out|)`, where:
@@ -47,14 +53,19 @@ Each hook file path must be in the format `/cnb/hooks.d/<name>.(build.|run.|)<fo
 3. If the `.out` suffix is present and the file is executable, the hook is executed in the context of the app directory, and its output must match `<format>`.
 4. If the `.out` suffix is not present, the contents of the file must match `<format>`.
 
-Hook files are evaluated (either read or executed) and the resulting Dockerfiles are applied to the build-time and runtime base images in lexographical order by `<name>`.
-Executable hook files must not modify the app directory when executed and may be executed in parallel.
-However, the resulting Dockerfiles must not be applied in parallel.
-A Dockerfile intended for the runtime base image is applied after the detection phase.
-A Dockerfile intended for the build-time base image is applied before the detection phase.
+Additionally, each hook file may be accompanied by an additional file of the same name, but with the suffix `.buildpacks`.
+This file contains a newline-separated list of buildpack IDs.
+If present, the hook is ignored unless one of the buildpacks in the list is selected during the buildpack detection phase.
+
+Hook files are evaluated (either read or executed) after the detection phase.
+All Dockerfiles are applied to base images after the hooks are evaluated and before the buildpack build phase.
+The resulting Dockerfiles are applied to the build-time and runtime base images in lexographical order by `<name>`.
+
+Executable hook files must not modify the app directory when executed and may be evaluated in parallel.
+However, the resulting Dockerfiles must not be applied in parallel to the same base image.
 
 If an executable hook exits with a non-zero status value, the build fails.
-If a executable hook exits with a zero status value and no output, the hook is ignored. 
+If an executable hook exits with a zero status value and no output, the hook is ignored. 
 Directories are ignored.
 Files at the top-level of `/cnb/hooks.d/` that do not match the specified file name format result in a build failure.
 
@@ -81,9 +92,9 @@ cat build.Dockerfile
 cat run.Dockerfile
 ```
 
-#### Example: RPM Dockerfile Hook
+#### Example: RPM Dockerfile Hook (app-based)
 
-This example hook would allow a builder to install RPMs for each language runtime.
+This example hook would allow a builder to install RPMs for each language runtime, based on the app directory.
 
 Note: The Dockerfiles referenced must disable rebasing, and build times will be slower compared to buildpack-provided runtimes.
 
@@ -94,9 +105,43 @@ Note: The Dockerfiles referenced must disable rebasing, and build times will be 
 [[ -f package.json ]] && cat /cnb/hooks.d/app.Dockerfile.d/Dockerfile-node
 ```
 
-### Platform-specified Dockerfiles
+#### Example: RPM Dockerfile Hook (buildpack-based)
 
-The same Dockerfile format may be used to create new base images or modify existing base images outside of the app build process. Any specified labels override existing values.
+This example hook would allow a builder to install RPMs for each language runtime, based on the available buildpacks.
+
+Note: The Dockerfiles referenced must disable rebasing, and build times will be slower compared to buildpack-provided runtimes.
+
+
+##### `/cnb/hooks.d/ruby.Dockerfile`
+```
+...
+LABEL io.buildpacks.rebasable=false # default, not needed
+RUN yum install ruby
+...
+```
+
+##### `/cnb/hooks.d/ruby.Dockerfile.buildpacks`
+```
+com.example.ruby
+```
+
+##### `/cnb/hooks.d/node.Dockerfile`
+```
+...
+LABEL io.buildpacks.rebasable=false # default, not needed
+RUN yum install nodejs
+...
+```
+
+##### `/cnb/hooks.d/node.Dockerfile.buildpacks`
+```
+com.example.node
+```
+
+
+### Dockerfiles for Base Images
+
+The same Dockerfile format may be used to create new base images or modify existing base images outside of the app build process (e.g., before creating a builder). Any specified labels override existing values.
 
 Dockerfiles that are used to create a base image must create a `/cnb/image/genpkgs` executable that outputs a [CycloneDX](https://cyclonedx.org)-formatted list of packages in the image with PURL IDs when invoked. This executable is executed after all Dockerfiles are applied, and the output replaces the label `io.buildpacks.sbom`. This label doubles as a Software Bill-of-Materials for the base image. In the future, this label will serve as a starting point for the application SBoM.
 
@@ -148,6 +193,17 @@ RUN curl -L https://example.com/mypkg-install | sh # installs to /opt
 ```
 (note: rebasing is explicitly allowed because only a single directory in /opt is created)
 
+### Future: Dynamic Run-time Base Image Selection
+
+The outcomes targeted by https://github.com/buildpacks/rfcs/pull/174 could be achieved with an additional type of hook.
+
+For example, we could introduce a `ref` format that replaces the image instead of extending it:
+```
+/cnb/hooks.d/myhook.run.ref # contains: index.docker.io/example/my-ruby-run-image
+/cnb/hooks.d/myhook.run.buildpacks # contains: com.example.ruby-buildpack
+```
+
+This would simplify buildpacks by removing the need for PURLs outside of SBoM generation. The `packages` table could be removed from both buildpack.toml and `/bin/detect`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -158,6 +214,8 @@ RUN curl -L https://example.com/mypkg-install | sh # installs to /opt
 [alternatives]: #alternatives
 
 - Stackpacks
+- "Stackpacks-lite" -- Instead of `.buildpacks`, have hooks participate in buildpack detection (provide-only, must come first)
+- Use directories for hooks: `/cnb/hooks.d/app.build.Dockerfile.out` -> `/cnb/hooks.d/app/build.Dockerfile.out`
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
