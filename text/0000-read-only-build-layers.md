@@ -57,9 +57,12 @@ Updates to the lifecycle so that `build` layers created by buildpacks should be 
 # How it Works
 [how-it-works]: #how-it-works
 
-The lifecycle will have to layerize the layers marked `build` as `true` during the `build` phase of the lifecycle instead of the `export` phase.
+The lifecycle will have to layerize all the necessary buildpack layers (either `launch = true` or `cache = true`) during the `build` phase of the lifecycle instead of the `export` phase.
 
 The layerized output from the `build` phase of lifecycle could be stored at `/<layers>/@exported` (which should not clash with any buildpack IDs) where `<layers>`. The exporter will just read from this to construct the final image.
+
+For example the output could look like `<layers>/@exported/<buildpack-id>/<layer-name>.tar` and `<layers>/@exported/<buildpack-id>/<layer-name>.diffId`
+
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -73,6 +76,7 @@ The layerized output from the `build` phase of lifecycle could be stored at `/<l
 
 We could change the the layer so that it is owned by root or a different user between the build steps of different buildpacks so that subsequent buildpacks cannot modify the layers created by other buildpacks. This would require elevated privileges during the build phase of the lifecycle.
 
+Alternatively we could also allow a buildpack to specify a different build `UID` and `GID` that it wants to run as. This will require the lifecycle to run a specific buildpack with the buildpack specified `UID` and `GID`.
 
 - Why is this proposal the best?
 
