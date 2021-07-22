@@ -24,7 +24,7 @@ The "stack" and "mixin" concepts add unnecessary complexity to the project and m
 [what-it-is]: #what-it-is
 
 Summary of changes:
-- Replace mixins with a [CycloneDX](https://cyclonedx.org)-formatted list of packages.
+- Remove mixins
 - Replace stack metadata (including stack IDs) with canonical OS metadata.
 
 # How it Works
@@ -41,7 +41,7 @@ Instead of a stack ID, runtime and build-time base images are labeled with the f
 OS and Architecture must be valid identifiers as defined [here](https://golang.org/doc/install/source#environment).
 For Linux-based images, each field should be canonicalized against values specified in `/etc/os-release` (`$ID` and `$VERSION_ID`).
 
-The `stacks` list in `buildpack.toml` is replaced by a `targets` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS and Architecture. Each entry may also contain a list of package names (as PURL URLs without versions or qualifiers) that specify detect-time and build-time (but not runtime) OS package dependencies. Packages may be specified for all Versions of a distribution, or for a specific Version. Buildpacks may express **runtime** OS package dependencies during detection (see "Runtime Base Image Requirements" below).
+The `stacks` list in `buildpack.toml` is replaced by a `targets` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS and Architecture.
 
 App image builds fail if the build image and selected run image have mismatched metadata. We may introduce flags or additional labels to skip this validation (e.g., for cross-compilation or minimal runtime base images). An image without a specified Distribution is compatible with images specifying any Distribution. An image specifying a Distribution without a Version is compatible with images specifying any Versions of that Distribution.
 
@@ -55,30 +55,21 @@ os = "linux"
 arch = "x86_64"
 [[targets.distros]]
 name = "ubuntu"
-[[targets.distros.versions]]
-version = "18.04"
-packages = ["pkg:deb/ubuntu/curl"]
-[[targets.distros.versions]]
-version = "20.04"
-packages = ["pkg:deb/ubuntu/curl2"]
+versions = ["18.04", "20.04"]
 
 [[targets]]
 os = "linux"
 arch = "x86_64"
 [[targets.distros]]
 name = "ubuntu"
-packages = ["pkg:deb/ubuntu/curl"]
-[[targets.distros.versions]]
-version = "14.04"
-[[targets.distros.versions]]
-version = "16.04"
+versions = ["14.04", "16.04"]
 ```
 
 ## Mixins
 
-The mixins label on each base image is replaced by a layer in each base image containing a single file consisting of a [CycloneDX](https://cyclonedx.org)-formatted list of packages. Each package entry has a [PURL](https://github.com/package-url/purl-spec)-formatted ID that uniquely identifies the package.
+Mixins are no longer used. If an SBoM is available, platforms may warn when, e.g., a rebase operation would change the available packages.
 
-### Example: CycloneDX package list
+### Example: CycloneDX SBoM
 
 ```json
 {
@@ -97,22 +88,21 @@ The mixins label on each base image is replaced by a layer in each base image co
       "name": "libcurl",
       "version": "4.5.6",
       "purl": "pkg:deb/ubuntu/libcurl@4.5.6"
-    }
+    },
+    ...
   ]
 }
 ```
 
 ### Validations
 
-Buildpack base image metadata and packages specified in `buildpack.toml`'s `targets` list are validated against the runtime and build-time base images.
+Buildpack base image metadata specified in `buildpack.toml`'s `targets` list are validated against the runtime and build-time base images.
 
 Runtime and build-time base image packages are no longer validated against each other.
 
-When an app image is rebased, `pack rebase` will fail if packages are removed from the new runtime base image. This check may be skipped by passing a new `--force` flag to `pack rebase`.
-
-## Runtime Base Image Requirements
-
-Buildpacks may specify a list of package names (as PURL URLs without versions or qualifiers) in a `packages` table in the build plan. The build will fail if these packages are not present in the runtime base image.
+If an SBoM is available, `pack rebase` will fail if packages are removed from the new runtime base image.
+This check may be skipped by passing a new `--force` flag to `pack rebase`.
+However, this validation is not enforced by the specification.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -124,12 +114,11 @@ Buildpacks may specify a list of package names (as PURL URLs without versions or
 
 - Keep stacks.
 - Make the above changes but keep some existing terminology: stacks, build-image, run-image.
-- Continue to allow static definition of runtime package requirements in `buildpack.toml`.
+- Continue to allow buildpacks to specify package requirements (e.g., by PURL instead of mixins)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Should runtime packages be determined during the detect or build phase? Opinion: detect phase, so that (in a later RFC), a runtime base image's app-specified Dockerfiles may by applied in parallel to the buildpack build process.
 - How will migration work? Can we make new base images compatible with older buildpacks? Can we make newer buildpacks compatible with older stacks?
 - What should builder.toml (and similar stack-dependent config files) look like? What should assets look like? Note: these could be decided in subsequent subteam RFCs / spec PRs.
 
