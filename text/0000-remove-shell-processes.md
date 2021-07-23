@@ -7,6 +7,7 @@
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: [RFC 0045](https://github.com/buildpacks/rfcs/blob/main/text/0045-launcher-arguments.md)
+- Depends On: [RFC #175]
 
 # Summary
 [summary]: #summary
@@ -272,6 +273,8 @@ As in the example above. The buildpack author would need to move the script to t
 ### `<app>/.profile`
 
 When a platform upgrades to the new platform API, user-provided profile scripts will no longer be supported. A buildpack could provide an identical or similar interface by detecting a `.profile` file in the app dir, wrapping it so that it implements the `exec.d` interface and add creating an executable with that layer. A platform that wishes to always provide that functionality could add a buildpack like this to every build. By making dynamic runtime environment modification a buildpack concern and not duplicating similar behavior in the platform API, we reduce the surface area and complexity of the platform API and thus improve normalization of the spec.
+
+In order to prevent regressions for users, this RFC should not be implemented until a [utility buildpack](https://github.com/buildpacks/rfcs/pull/175) providing support for `<app>/.profile` is released, allowing platforms to provide uninterrupted support for the `.profile` interface.
 
 ## API compat
 
