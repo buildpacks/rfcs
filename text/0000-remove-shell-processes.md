@@ -329,6 +329,22 @@ However, any additional user-provided args should NOT be Bash evaluated to reduc
 ### profiles
 Profiles contributed by older buildpacks will still be evaluated when executing shell process types. But user provided profiles will not be evaluated when using the new platform API, even when a shell process is executed. Again, this is done to prevent differences between the buildpack APIs from leaking into the user interface. Users will only need think about differences between platform APIs.
 
+## Migration Path
+
+### Buildpack Authors
+When migrating to the new API, buildpack authors should take the following steps:
+1. Does the buildpack contribute any profile.d helpers? If so, replace these with equivalent exec.d helpers.
+1. Does the buildpack contribute a `direct=true` process?  If so, remove `direct=true` from the process definition, this is now the default.
+1. Does the buildpack contribute a `direct=false` process? If so, there are two options:
+   1. Explicitly add `bash` or `cmd` to the process definition, this is the safest path forward.
+   2. Remove an unnecessary dependency on  `bash` or `cmd` by:
+        * Changing any environment variable references to use the `$(<env)` syntax.
+        * Ensure that your process functions properly as PID1.
+
+## Platform Maintainers
+
+Before upgrading to the new API platform, platforms that wish to support the `<app>/.profile` or `<app>/.profile.bat` should ensure that all builds contain a buildpack that provides support for this feature, whenever the stack provides the requisite shell.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
