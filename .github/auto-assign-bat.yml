@@ -3,9 +3,8 @@ numberOfAssignees: 1
 
 filterLabels:
   include:
-  - Learning
+  - Buildpack Authors' Tooling
 
 assignees:
-- jkutner
-- jromero
-- samj1912
+- ekcasey
+- hone
