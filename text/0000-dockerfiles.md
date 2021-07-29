@@ -78,14 +78,20 @@ However,
 - If a hook is missing `/bin/build`, the hook root is treated as a pre-populated `<output>` directory.
 
 After `/bin/build` executes, the `<output>` directory may contain
-- `build.toml`, with the same contents as a buildpack's `build.toml`
+- `build.toml`, with the same contents as a normal buildpack's `build.toml`, but
+  - With an additional `args` table array with `name` and `value` fields that are provided as build args to `build.Dockerfile` or `Dockerfile`
+- `launch.toml`, with the same contents as a normal buildpack's `launch.toml`, but
+  - Without the `processes` table array
+  - Without the `slices` table array
+  - With an additional `args` table array with `name` and `value` fields that are provided as build args to `run.Dockerfile` or `Dockerfile`
+
 - Either `Dockerfile` or either or both of `build.Dockerfile` and `run.Dockerfile`
 
 Support for other instruction formats, e.g., LLB JSON files, could be added in the future.
 
 `build.Dockerfile`, `run.Dockerfile`, and `Dockerfile` target the builder image, runtime base image, or both base images, respectively.
 
-If no Dockerfiles are present, `/bin/build` may still consume build plan entries and add metadata to `build.toml`.
+If no Dockerfiles are present, `/bin/build` may still consume build plan entries and add metadata to `build.toml`/`launch.toml`.
 
 Dockerfiles are applied to their corresponding base images after all hooks are executed and before any regular buildpacks are executed.
 Dockerfiles are applied in the order determined during buildpack detection.
@@ -94,6 +100,9 @@ All Dockerfiles are provided with `base_image` and `build_id` args.
 The `base_image` arg allows the Dockerfile to reference the original base image.
 The `build_id` arg allows the Dockerfile to invalidate the cache after a certain layer and must be defaulted to `0`.
 When the `$build_id` arg is referenced in a `RUN` instruction, all subsequent layerrs will be rebuilt on the next build (as the value will change).
+
+Build args specified in `build.toml` are provided to `build.Dockerfile` or `Dockerfile` (when applied to the build-time base image).
+Build args specified in `launch.toml` are provided to `run.Dockerfile` or `Dockerfile` (when applied to the runtime base image).
 
 A runtime base image may indicate that it preserves ABI compatibility by adding the label `io.buildpacks.rebasable=true`. In the case of builder-specified Dockerfiles, `io.buildpacks.rebasable=false` is set automatically before a runtime Dockerfile is applied and must be explicitly set to `true` if desired. Rebasing an app without this label set to `true` requires passing a new `--force` flag to `pack rebase`.
 
