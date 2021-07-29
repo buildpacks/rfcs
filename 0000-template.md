@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: (fill in the feature name: My Feature)
+- Name: TEST
 - Start Date: (fill in today's date: YYYY-MM-DD)
 - Author(s): (Github usernames)
 - RFC Pull Request: (leave blank)
