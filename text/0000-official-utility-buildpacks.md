@@ -70,7 +70,7 @@ The criteria for accepting a utility buildpack into the project is as follows:
 - [inline-buildpack](https://registry.buildpacks.io/buildpacks/hone/inline)
 - [Procfile buildpack](https://registry.buildpacks.io/buildpacks/paketo-buildpacks/procfile)
 - [Paketo Image Labels Buildpack](https://github.com/paketo-buildpacks/image-labels)
-- [Paketo Environment Variables Buildpack)(https://github.com/paketo-buildpacks/environment-variables)
+- [Paketo Environment Variables Buildpack](https://github.com/paketo-buildpacks/environment-variables)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
