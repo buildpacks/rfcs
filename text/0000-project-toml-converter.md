@@ -16,7 +16,7 @@ The idea is to ship a binary with the lifecycle that would be responsible for tr
 # Definitions
 [definitions]: #definitions
 
-Make a list of the definitions that may be useful for those reviewing. Include phrases and words that buildpack authors or other interested parties may not be familiar with.
+* __project descriptor__ - the [`project.toml`](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md) extension specification
 
 # Motivation
 [motivation]: #motivation
@@ -29,13 +29,7 @@ Make a list of the definitions that may be useful for those reviewing. Include p
 # What it is
 [what-it-is]: #what-it-is
 
-This provides a high level overview of the feature.
-
-- Define any new terminology.
-- Define the target persona: buildpack author, buildpack user, platform operator, platform implementor, and/or project contributor.
-- Explaining the feature largely in terms of examples.
-- If applicable, provide sample error messages, deprecation warnings, or migration guidance.
-- If applicable, describe the differences between teaching this to existing users and new users.
+The Project TOML Converter is a CLI tool. seperated from pack and buildpack. It has only one responsibility, maintain project descriptor versions. support conversion between versions.
 
 # How it Works
 [how-it-works]: #how-it-works
