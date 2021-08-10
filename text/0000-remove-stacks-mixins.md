@@ -32,16 +32,18 @@ Summary of changes:
 
 ## Base Image Metadata
 
-Instead of a stack ID, runtime and build-time base images are labeled with the following canonicalized metadata:
-- OS (e.g., "linux", `$GOOS`)
-- Architecture (e.g., "x86_64", `$GOARCH`)
-- Distribution (optional) (e.g., "ubuntu", `$ID`)
-- Version (optional) (e.g., "18.04", `$VERSION_ID`)
+Instead of a stack ID, runtime and build-time base images must contain the following canonicalized metadata:
+- OS (e.g., "linux", `$GOOS`), specified as `os` in the base image `config` 
+- Architecture (e.g., "arm", `$GOARCH`), specified as `architecture` in the base image `config`
+- Architecture Variant (optional) (e.g., "v6", `$GOARM`), specified as `variant` in the base image `config`
+- Distribution (optional) (e.g., "ubuntu", `$ID`), specified as a label `io.buildpacks.distribution.name`
+- Version (optional) (e.g., "18.04", `$VERSION_ID`), specified as a label `io.buildpacks.distribution.version`
 
-OS and Architecture must be valid identifiers as defined [here](https://golang.org/doc/install/source#environment).
+OS, Architecture, and Architecture Variant must be valid identifiers as defined in the [OCI Image specification](https://github.com/opencontainers/image-spec/blob/main/config.md).
 For Linux-based images, each field should be canonicalized against values specified in `/etc/os-release` (`$ID` and `$VERSION_ID`).
+The `os.version` field in an base image `config` may contain combined distribution and version information, but it is not used by the lifecycle.
 
-The `stacks` list in `buildpack.toml` is replaced by a `targets` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS and Architecture.
+The `stacks` list in `buildpack.toml` is replaced by a `targets` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS, Architecture, and Variant.
 
 App image builds fail if the build image and selected run image have mismatched metadata. We may introduce flags or additional labels to skip this validation (e.g., for cross-compilation or minimal runtime base images). An image without a specified Distribution is compatible with images specifying any Distribution. An image specifying a Distribution without a Version is compatible with images specifying any Versions of that Distribution.
 
@@ -53,17 +55,36 @@ When an app image is rebased, `pack rebase` will fail if the new run image and p
 [[targets]]
 os = "linux"
 arch = "x86_64"
-[[targets.distros]]
+[[targets.distributions]]
 name = "ubuntu"
 versions = ["18.04", "20.04"]
 
 [[targets]]
 os = "linux"
 arch = "x86_64"
-[[targets.distros]]
+[[targets.distributions]]
+name = "ubuntu"
+versions = ["14.04", "16.04"]
+
+[[targets]]
+os = "linux"
+arch = "arm"
+variant = "v6"
+[[targets.distributions]]
 name = "ubuntu"
 versions = ["14.04", "16.04"]
 ```
+
+## Runtime Metadata
+
+To allow different runtime base images to be used, and to support cross-compilation in the future, buildpacks may need access to the runtime base image's target metadata.
+The following environment variables will be available to buildpacks directly in the build-time environment (not via `/platform/env`):
+- `CNB_TARGET_OS`
+- `CNB_TARGET_ARCH`
+- `CNB_TARGET_VARIANT`
+- `CNB_TARGET_DISTRO_NAME`
+- `CNB_TARGET_DISTRO_VERSION`
+- `CNB_TARGET_ID` (optional ID, if present on runtime base image `io.buildpacks.id` label)
 
 ## Mixins
 
@@ -104,10 +125,17 @@ If an SBoM is available, `pack rebase` will fail if packages are removed from th
 This check may be skipped by passing a new `--force` flag to `pack rebase`.
 However, this validation is not enforced by the specification.
 
+### Migration
+
+All existing labels and environment variables for stacks and mixins may be preserved on a base image until all users have migrated to the new format.
+These labels will be deprecated (but allowed) for the forseeable future.
+If the newly-specified field values are missing, the lifecycle and pack may used existing, standardized stack IDs (i.e., `io.buildpacks.stacks.*`) to determine the values of the missing fields, as long as the lifecycle and pack provide a warning for the user.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Involves breaking changes.
+- Involves breaking changes when existing metadata is removed.
+- `CNB_TARGET_*` env vars assume a single target -- may require more breaking changes to support parallel, single-container cross-compilation in the future.
 
 # Alternatives
 [alternatives]: #alternatives
