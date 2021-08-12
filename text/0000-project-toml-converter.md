@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-The idea is to ship a binary with the lifecycle that would be responsible for translating project.toml 0.2 into something that the lifecycle knows the platform can understand
+The idea is to ship a binary with the lifecycle that would be responsible for translating project.toml from the schema defined in the project descriptor extension spec into something that the lifecycle knows the platform can understand i.e., a schema defined in the platform spec.
 
 # Definitions
 [definitions]: #definitions
