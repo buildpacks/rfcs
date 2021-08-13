@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Project TOML Converter
 - Start Date: 10 Aug 2021
-- Author(s): haliliceylan
+- Author(s): haliliceylan, natalieparellano
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
