@@ -25,7 +25,7 @@ The idea is to ship a binary with the lifecycle that would be responsible for tr
 
 - This feature has similarities with the "prepare" phase that has been discussed previously (see #555). But it is much smaller in scope. Potentially, the binary described in this RFC could eventually take on more responsibilities and look more like "prepare". But that is out of scope for this RFC.
 
-- Sometimes Operators has some issues with different project.toml files. As you know system operator can not easily upgrade their system packages, pack and buildpacks. So with this feature we are giving to developers able to use always latest version of project.toml. In same time we are giving to operators able to stable update scheduling.
+- It is non-trivial for platform operators to upgrade support for different versions of project.toml. Project Descriptor is a file which describe behavior related to buildpacks. Platform operators need to give these behaviors according to developer app requests. So with this feature we are giving to developers the ability to use any version of project.toml knowing that the platform can always support it. At the same time we are giving to operators the convenience of only having to know about one schema at a time for project.toml.
 
 - What is the expected outcome?
 
@@ -66,7 +66,7 @@ Discuss prior art, both the good and bad.
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 
 # Spec. Changes (OPTIONAL)
-[spec-changes]: #spec-changes
+[spec-changes]: #spec-changesf
 Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
 Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fields, new fields in the buildpackage label, etc.
 This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are necessary, they should be documented here.
