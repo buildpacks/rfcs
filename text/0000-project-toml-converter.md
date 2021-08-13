@@ -16,7 +16,9 @@ The idea is to ship a binary with the lifecycle that would be responsible for tr
 # Definitions
 [definitions]: #definitions
 
-* __project descriptor__ - the [`project.toml`](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md) extension specification
+* __project descriptor__ - a file that is included in the application directory to configure various behavior related to buildpacks; for more information, see the [`project.toml`](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md) extension specification
+
+* __CNB_PLATFORM_API__ The Project TOML Converter will use the `CNB_PLATFORM_API` environment variable to decide which API to implement. For now, if `CNB_PLATFORM_API` is not supplied, platform API 0.3 (the currently implemented API) will be assumed, to avoid breaking existing platforms that do not currently set this environment variable.
 
 # Motivation
 [motivation]: #motivation
