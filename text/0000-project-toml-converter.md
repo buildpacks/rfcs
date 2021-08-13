@@ -23,7 +23,8 @@ The idea is to ship a binary with the lifecycle that would be responsible for tr
 # Motivation
 [motivation]: #motivation
 
-- Actually this feature, sounds like part of prepare-phase. But this is so simple and we can build fast.
+- This feature has similarities with the "prepare" phase that has been discussed previously (see #555). But it is much smaller in scope. Potentially, the binary described in this RFC could eventually take on more responsibilities and look more like "prepare". But that is out of scope for this RFC.
+
 - Sometimes Operators has some issues with different project.toml files. As you know system operator can not easily upgrade their system packages, pack and buildpacks. So with this feature we are giving to developers able to use always latest version of project.toml. In same time we are giving to operators able to stable update scheduling.
 
 - What is the expected outcome?
