@@ -37,9 +37,35 @@ The Project TOML Converter is a CLI tool that will ship alongside the lifecycle.
 # How it Works
 [how-it-works]: #how-it-works
 
-This is the technical portion of the RFC, where you explain the design in sufficient detail.
+Example Project.TOML
+```
+[project]
+id = "io.buildpacks.my-app"
+version = "0.1"
 
-The section should return to the examples given in the previous section, and explain more fully how the detailed proposal makes those examples work.
+[build]
+include = [
+    "cmd/",
+    "go.mod",
+    "go.sum",
+    "*.go"
+]
+
+[[build.buildpacks]]
+id = "io.buildpacks/java"
+version = "1.0"
+
+[[build.buildpacks]]
+id = "io.buildpacks/nodejs"
+version = "1.0"
+
+[metadata]
+foo = "bar"
+
+[metadata.fizz]
+buzz = ["a", "b", "c"]
+```
+TODO: Which keys are platform specific ? idk maybe metadata or buildpacks order. 
 
 # Drawbacks
 [drawbacks]: #drawbacks
