@@ -75,24 +75,20 @@ Why should we *not* do this?
 # Alternatives
 [alternatives]: #alternatives
 
-- What other designs have been considered?
-- Why is this proposal the best?
-- What is the impact of not doing this?
+- having the lifecycle process project.toml directly (like prepare phase see: #555). Prepare is not only for this problem, is kinda big and have a lot of responsibility. This RFC Topic is only focusing this problem so can be done quick and well tested.
+- do nothing, hope everything will be fine (We can leave as it is). We think it's too hard for platform operators to support multiple versions of project.toml. The platform API already represents the contract between the lifecycle and the platform, so it makes more sense than "project descriptor schema -> project descriptor schema" translation.
+- having the translator binary translate from e.g., project.toml schema 0.1 -> project.toml schema 0.2 (actually this RFC). 
 
 # Prior Art
-[prior-art]: #prior-art
+[prior-art]: #prior-art 
 
 Discuss prior art, both the good and bad.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What parts of the design do you expect to be resolved before this gets merged?
-- What parts of the design do you expect to be resolved through implementation of the feature?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+- What will the platform schema for project.toml look like?
+- Out of scope: parts of project.toml that aren't relevant to the platform api (like setting env vars)
 
 # Spec. Changes (OPTIONAL)
-[spec-changes]: #spec-changesf
-Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
-Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fields, new fields in the buildpackage label, etc.
-This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are necessary, they should be documented here.
+new platform schema look ?
