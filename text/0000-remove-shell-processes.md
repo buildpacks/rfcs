@@ -423,11 +423,9 @@ The Procfile interface is supported by Paketo, Heroku, and Google buildpacks, de
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-Should the buildpacks project provide buildpacks for things like user provided profile scripts to make consistency easy?
-
-Do we need to provide a mechanism for turning `${env}` interpolation off? E.g.
+Do we need to provide a mechanism for turning `$(env)` interpolation off? E.g.
 ```
-docker run --env "CNB_INTERPOLATE=false" --entrypoint launcher <image> echo hello '${WORLD}' # prints "hello '${WORLD}'"
+docker run --env "CNB_INTERPOLATE=false" --entrypoint launcher <image> echo hello '${WORLD}' # prints "hello '$(WORLD)'"
 ```
 
 
