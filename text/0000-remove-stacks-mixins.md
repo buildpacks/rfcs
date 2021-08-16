@@ -45,7 +45,9 @@ The `os.version` field in an base image `config` may contain combined distributi
 
 The `stacks` list in `buildpack.toml` is replaced by a `targets` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md).
 Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS, Architecture, and Variant.
-If the `targets` list is empty, a single target with `os = "linux"` and `arch = "x86_64"` is assumed by tools reading `buildpack.toml`.
+If the `targets` list is empty and `/bin/build` is present, a target with `os = "linux"` and `arch = "x86_64"` is assumed by tools reading `buildpack.toml`.
+If the `targets` list is empty and `/bin/build.bat` or `/bin/build.exe` is present, a target with `os = "windows"` and `arch = "x86_64"` is assumed by tools reading `buildpack.toml`.
+
 
 App image builds fail if the build image and selected run image have mismatched metadata. We may introduce flags or additional labels to skip this validation (e.g., for cross-compilation or minimal runtime base images).
 An image without a specified Distribution is compatible with images specifying any Distribution.
