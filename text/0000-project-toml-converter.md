@@ -75,7 +75,7 @@ Why should we *not* do this?
 # Alternatives
 [alternatives]: #alternatives
 
-- having the lifecycle process project.toml directly (like prepare phase see: #555). Prepare is not only for this problem, is kinda big and have a lot of responsibility. This RFC Topic is only focusing this problem so can be done quick and well tested.
+- Having the lifecycle process project.toml directly (like prepare phase see: #555). This RFC is only focusing on the upgrade problem so that it can be done quickly.
 - do nothing, hope everything will be fine (We can leave as it is). We think it's too hard for platform operators to support multiple versions of project.toml. The platform API already represents the contract between the lifecycle and the platform, so it makes more sense than "project descriptor schema -> project descriptor schema" translation.
 - having the translator binary translate from e.g., project.toml schema 0.1 -> project.toml schema 0.2 (actually this RFC). 
 
