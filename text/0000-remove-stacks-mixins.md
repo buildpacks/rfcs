@@ -43,9 +43,13 @@ OS, Architecture, and Architecture Variant must be valid identifiers as defined 
 For Linux-based images, each field should be canonicalized against values specified in `/etc/os-release` (`$ID` and `$VERSION_ID`).
 The `os.version` field in an base image `config` may contain combined distribution and version information, but it is not used by the lifecycle.
 
-The `stacks` list in `buildpack.toml` is replaced by a `targets` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS, Architecture, and Variant.
+The `stacks` list in `buildpack.toml` is replaced by a `targets` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md).
+Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS, Architecture, and Variant.
+If the `targets` list is empty, a single target with `os = "linux"` and `arch = "x86_64"` is assumed by tools reading `buildpack.toml`.
 
-App image builds fail if the build image and selected run image have mismatched metadata. We may introduce flags or additional labels to skip this validation (e.g., for cross-compilation or minimal runtime base images). An image without a specified Distribution is compatible with images specifying any Distribution. An image specifying a Distribution without a Version is compatible with images specifying any Versions of that Distribution.
+App image builds fail if the build image and selected run image have mismatched metadata. We may introduce flags or additional labels to skip this validation (e.g., for cross-compilation or minimal runtime base images).
+An image without a specified Distribution is compatible with images specifying any Distribution.
+An image specifying a Distribution without a Version is compatible with images specifying any Versions of that Distribution.
 
 When an app image is rebased, `pack rebase` will fail if the new run image and previous run image have mismatched metadata. This check may be skipped for Distribution and Version by passing a new `--force` flag to `pack rebase`.
 
