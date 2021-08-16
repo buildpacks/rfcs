@@ -110,7 +110,7 @@ Using the new API this process could look like:
 ```
 [[processes]]
 type = "web"
-command = ["dotnet", "my-app.dll", "--urls", "http://0.0.0.0:${PORT}"] # the default value of PORT would need to be provided in a layer
+command = ["dotnet", "my-app.dll", "--urls", "http://0.0.0.0:$(PORT)"] # the default value of PORT would need to be provided in a layer
 default = true
 ```
 Things to note:
