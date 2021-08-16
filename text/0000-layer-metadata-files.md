@@ -34,10 +34,15 @@ The current folder structure is -
 │   └── <creator/builder/etc>
 ├── order.toml
 └── stack.toml
+/platform (configurable with `CNB_PLATFORM_DIR`)
+├── env 
+└   └── <env>
 /layers (configurable with `CNB_LAYERS_DIR` or -layers)
+├── analyzed.toml
 ├── group.toml
 ├── plan.toml
-├── order.toml (written by a platform, optionally)
+├── order.toml (written by a platform, optionally - prior to `lifecycle` execution)
+├── project-metadata.toml (written by a platform, optionally - prior to `lifecycle` execution, configurable with `CNB_PROJECT_METADATA_PATH`)
 ├── report.toml
 ├── <escaped_buildpack_id> (buildpack arg `$1`)
 │   ├── build.toml
@@ -61,17 +66,14 @@ This proposal is to change this folder structure to -
 │   └── <creator/builder/etc>
 ├── order.toml
 └── stack.toml
+/platform (configurable with `CNB_PLATFORM_DIR`)
+├── env 
+└   └── <env>
 /workspace (configurable with `CNB_WORKSPACE_DIR`)
 ├── app (configurable with `CNB_APP_DIR ` or -app)
 │    └── <app source code to transform>
-├── platform-config (configurable with `CNB_PLATFORM_CONFIG_DIR`)
-│   └── order.toml (written by a platform, optionally - prior to `lifecycle` execution `platform/prepare`)
-├── lifecycle-config (configurable with `CNB_LIFECYCLE_CONFIG_DIR`)
-│   └── group.toml
-│   └── plan.toml
-│   └── report.toml
 ├── layers (configurable with `CNB_LAYERS_DIR` or -layers)
-│   └── new-buildpack (`CNB_BP_LAYERS_DIR`)
+│   └── new-buildpack (`CNB_BUILDPACK_LAYERS_DIR`)
 │       ├── <layer>.toml
 │       └── <layer>
 │   └── old-buildpack (buildpack arg `$1`)
@@ -80,12 +82,21 @@ This proposal is to change this folder structure to -
 │       ├── store.toml
 │       ├── <layer>.toml
 │       └── <layer>
-├── layers-config (configurable with `CNB_LAYERS_CONFIG_DIR`)
-│    ├── metadata.toml
-│    └── new-buildpack (`CNB_BP_CONFIG_DIR`)
+├── config
+│   └── layers (configurable with `CNB_LAYERS_CONFIG_DIR`)
+│       ├── metadata.toml
+│       └── new-buildpack (`CNB_BUILDPACK_CONFIG_DIR`)
 │        ├── build.toml
 │        ├── launch.toml
 │        └── store.toml
+│   └── lifecycle (configurable with `CNB_LIFECYCLE_CONFIG_DIR`)
+│       ├── analyzed.toml
+│       ├── group.toml
+│       ├── plan.toml
+│       └── report.toml
+│   └── platform (configurable with `CNB_PLATFORM_CONFIG_DIR`)
+│       ├── order.toml (written by a platform, optionally - prior to `lifecycle` execution)
+└       └── project-metadata.toml (written by a platform, optionally - prior to `lifecycle` execution, configurable with `CNB_PROJECT_METADATA_PATH`)
 ```
 
 # How it Works
