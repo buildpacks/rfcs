@@ -65,19 +65,20 @@ foo = "bar"
 [metadata.fizz]
 buzz = ["a", "b", "c"]
 ```
-TODO: Which keys are platform specific ? idk maybe metadata or buildpacks order. 
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 Why should we *not* do this?
 
+- Another binary to maintain
+
 # Alternatives
 [alternatives]: #alternatives
 
 - Having the lifecycle process project.toml directly (like prepare phase see: #555). This RFC is only focusing on the upgrade problem so that it can be done quickly.
 - Do nothing, hope everything will be fine (we can leave as it is). We think it's too hard for platform operators to support multiple versions of project.toml.
-- having the translator binary translate from e.g., project.toml schema 0.1 -> project.toml schema 0.2 (actually this RFC). 
+- Having the translator binary translate from e.g., project.toml schema 0.1 -> project.toml schema 0.2. The platform API already represents the contract between the lifecycle and the platform, so it makes more sense than "project descriptor schema -> project descriptor schema" translation.. 
 
 # Prior Art
 [prior-art]: #prior-art 
