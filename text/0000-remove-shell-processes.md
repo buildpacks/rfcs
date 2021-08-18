@@ -356,10 +356,12 @@ In exchange for a reduction in complexity and cognitive overhead buildpack-autho
 ## `$((<env>))` syntax
 
 We could use our own explicit syntax like `$((<env>))` or environment variable replacements instead of `$(<env>)`.
+
 pros:
 * Extremely explicit
 * There is never any need to escape values in k8s
 * Eliminates all conflicts or situations where the evaluation order must be explained
+
 cons:
 * A third syntax
 * A buildpack-specific syntax that users must learn about through documentation
@@ -370,14 +372,17 @@ We could use Bash-like `${<env>}` syntax for environment variable replacements i
 pros:
 * It might "just work" in a lot of cases
 * Familiar
+
 cons:
 * The launcher might evaluate env vars that were truly intended for Bash to evaluate (e.g. in a command like `["bash", "-c", "source foo-setter.sh && echo ${FOO}"]`)
 * Users might reasonably expect things like `$FOO` or `${FOO:-dafault-foo}` to work and discover the limitations only via trial and error or documentation.
 
 ## Lifecycle support for `<app>/.exec`
 When we remove support for `<app>/.profile` we could add support for `<app>/.exec` or similar where `<app>/.exec` must implement the `exec.d` interface.
+
 pros:
 * Users may still dynamically modify the runtime environment without requiring a specific buildpack
+
 cons:
 * The exec.d interface must be duplicated in both the buildpack and platform API
 * If we modify the interface the same app might behave differently or fail to run on specific platforms depending on which version of the platform API they are using
@@ -386,9 +391,11 @@ cons:
 ## Lifecycle support for `<app>.profile`
 We could consider having the lifecycle convert `<app>/.profile` files into exec.d  
 If we do not remove shell logic from the spec, users will continue to find the launcher behavior vexingly complex. Also, there will be no sane path forward for supporting overridable arguments.
+
 pros:
 * Fewer breaking changes
 * More consistency behavior across platforms/builders
+
 cons:
 * complexity in the launcher
 * launcher behavior that fails on certain stacks
@@ -429,7 +436,7 @@ docker run --env "CNB_INTERPOLATE=false" --entrypoint launcher <image> echo hell
 ```
 
 
-# Spec. Changes (OPTIONAL)
+# Spec. Changes
 [spec-changes]: #spec-changes
 
 ## Platform API
