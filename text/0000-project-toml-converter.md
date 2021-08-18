@@ -40,30 +40,29 @@ The Project TOML Converter is a CLI tool that will ship alongside the lifecycle.
 Example Project.TOML
 ```
 [project]
-id = "io.buildpacks.my-app"
-version = "0.1"
+id = "<string>" # machine readable
+name = "<string>" # human readable
+version = "<string>"
+authors = ["<string>"]
+documentation-url = "<url>"
+source-url = "<url>"
+
+[[project.licenses]]
+type = "<string>"
+uri = "<uri>"
 
 [build]
-include = [
-    "cmd/",
-    "go.mod",
-    "go.sum",
-    "*.go"
-]
-
+include = ["<string>"]
+exclude = ["<string>"]
 [[build.buildpacks]]
-id = "io.buildpacks/java"
-version = "1.0"
-
-[[build.buildpacks]]
-id = "io.buildpacks/nodejs"
-version = "1.0"
-
+id = "<string>"
+version = "<string>"
+uri = "<string>"
+[[build.env]]
+name = "<string>"
+value = "<string>"
 [metadata]
-foo = "bar"
-
-[metadata.fizz]
-buzz = ["a", "b", "c"]
+# additional arbitrary keys allowed
 ```
 
 # Drawbacks
