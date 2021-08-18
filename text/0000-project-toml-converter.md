@@ -91,4 +91,40 @@ Discuss prior art, both the good and bad.
 - Out of scope: parts of project.toml that aren't relevant to the platform api (like setting env vars)
 
 # Spec. Changes (OPTIONAL)
-new platform schema look ?
+new platform schema look something like that;
+```
+[project]
+id = "<string>"
+version = "<string>"
+
+[build]
+builder = "cnbs/sample-builder:bionic"
+include = ["<string>"]
+exclude = ["<string>"]
+
+[[build.buildpacks]]
+id = "io.buildpacks/java"
+version = "1.0"
+
+[metadata]
+# all metadatas here
+```
+
+*Here is the namespace conversions*
+
+For conversion to/from v0.1
+```
+project = project
+build = build
+build.buildpacks = build.buildpacks
+metadata = metadata
+```
+
+For conversion to/from v0.2:
+
+```
+project = _
+build = io.buildpacks
+build.buildpacks = io.buildpacks.group
+metadata = _.metadata
+```
