@@ -110,7 +110,7 @@ version = "1.0"
 # all metadatas here
 ```
 
-*Here is the namespace conversions*
+*Here are the namespace conversions*
 
 For conversion to/from v0.1
 ```
