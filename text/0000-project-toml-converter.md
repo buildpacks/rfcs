@@ -37,7 +37,7 @@ The Project TOML Converter is a CLI tool that will ship alongside the lifecycle.
 # How it Works
 [how-it-works]: #how-it-works
 
-Example Project.TOML
+Example Project.TOML with 0.1 schema
 ```
 [project]
 id = "<string>" # machine readable
