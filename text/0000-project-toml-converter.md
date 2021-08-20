@@ -91,7 +91,7 @@ Discuss prior art, both the good and bad.
 - Out of scope: parts of project.toml that aren't relevant to the platform api (like setting env vars)
 
 # Spec. Changes (OPTIONAL)
-new platform schema look something like that;
+The new platform schema could look something like:
 ```
 [project]
 id = "<string>"
