@@ -65,6 +65,47 @@ value = "<string>"
 # additional arbitrary keys allowed
 ```
 
+
+Example Project.TOML with 0.2 schema
+````
+[_]
+id = "io.buildpacks.my-app"
+version = "0.1"
+
+[_.metadata]
+cdn = "https://cdn.example.com"
+
+[[_.metadata.assets]]
+url = "https://cdn.example.com/assets/foo.jar"
+checksum = "3b1b39893d8e34a6d0bd44095afcd5c4"
+
+buzz = ["a", "b", "c"]
+
+[io.buildpacks]
+builder = "cnbs/sample-builder:bionic"
+include = [
+    "cmd/",
+    "go.mod",
+    "go.sum",
+    "*.go"
+]
+
+[[io.buildpacks.group]]
+id = "io.buildpacks/java"
+version = "1.0"
+
+[[io.buildpacks.group]]
+id = "io.buildpacks/nodejs"
+version = "1.0"
+
+[[io.buildpacks.group]]
+id = "example/post-build"
+  
+    [io.buildpacks.group.script]
+    api = "0.5"
+    inline = "./post-build.sh"
+```
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
