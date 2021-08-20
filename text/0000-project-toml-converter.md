@@ -67,7 +67,7 @@ value = "<string>"
 
 
 Example Project.TOML with 0.2 schema
-````
+```
 [_]
 id = "io.buildpacks.my-app"
 version = "0.1"
