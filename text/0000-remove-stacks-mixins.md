@@ -53,7 +53,7 @@ App image builds fail if the build image and selected run image have mismatched 
 An image without a specified Distribution is compatible with images specifying any Distribution.
 An image specifying a Distribution without a Version is compatible with images specifying any Versions of that Distribution.
 
-When an app image is rebased, `pack rebase` will fail if the new run image and previous run image have mismatched metadata. This check may be skipped for Distribution and Version by passing a new `--force` flag to `pack rebase`.
+When an app image is rebased, `rebaser` must fail if the new run image and previous run image have mismatched metadata. This check can be skipped for Distribution and Version by passing a new `--force` flag to `rebaser`.
 
 #### Example: buildpack.toml `targets` table
 
