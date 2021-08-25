@@ -127,7 +127,7 @@ Buildpack base image metadata specified in `buildpack.toml`'s `targets` list are
 
 Runtime and build-time base image packages are no longer validated against each other.
 
-If an SBoM is available, `pack rebase` will fail if packages are removed from the new runtime base image.
+Platforms may choose to add additional validation. For example, if an SBoM is available, `pack rebase` may fail if packages are removed from the new runtime base image.
 This check may be skipped by passing a new `--force` flag to `pack rebase`.
 However, this validation is not enforced by the specification.
 
