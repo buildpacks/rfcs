@@ -35,7 +35,7 @@ The current folder structure is -
 ├── order.toml
 └── stack.toml
 /platform (configurable with `CNB_PLATFORM_DIR`)
-├── env 
+├── env
 └   └── <env>
 /layers (configurable with `CNB_LAYERS_DIR` or -layers)
 ├── analyzed.toml
@@ -67,7 +67,7 @@ This proposal is to change this folder structure to -
 ├── order.toml
 └── stack.toml
 /platform (configurable with `CNB_PLATFORM_DIR`)
-├── env 
+├── env
 └   └── <env>
 /workspace (configurable with `CNB_WORKSPACE_DIR`)
 ├── app (configurable with `CNB_APP_DIR ` or -app)
@@ -103,6 +103,22 @@ This proposal is to change this folder structure to -
 [how-it-works]: #how-it-works
 
 The top-level `cnb` remains unchanged. The new `/workspace` purpose is a directory that holds all the files during a build. This directory is likely to be a volume mount on a platform. The platform may choose to use multiple mounts at any of the levels under `/workspace`. By locating files that are not layer specific in new sub-directories, we will gain the ability to add new directories and files to `/workspace` without name collisions.
+
+In addition to organization of the file system, the buildpack interfaces would be updated to remove all positional arguments. Buildpack authors would use env vars (like `CNB_BUILDPACK_CONFIG_DIR`, `CNB_APP_DIR`). This will allow for a more consistent API. Buildpack authors will no longer need to handle positional arguments and env vars depending on what they are trying to accomplish.
+
+Before:
+```
+/bin/detect <platform[AR]> <plan[E]>
+/bin/build <layers[EIC]> <platform[AR]> <plan[ER]>
+```
+
+After:
+```
+/bin/detect
+/bin/build
+```
+
+The positional argument for `<plan>` will replaced with `CNB_BUILDPACK_PLAN`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
