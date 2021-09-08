@@ -149,24 +149,30 @@ All existing labels and environment variables for stacks and mixins may be prese
 These labels will be deprecated (but allowed) for the forseeable future.
 If the newly-specified field values are missing, the lifecycle and pack may used existing, standardized stack IDs (i.e., `io.buildpacks.stacks.*`) to determine the values of the missing fields, as long as the lifecycle and pack provide a warning for the user. More concretely, when using a stack with `io.buildpacks.stacks.bionic` lifecycle will assume the following metadata is set if these fields are empty:
 
-config.os = Linux
-config.architecture = x86_64
+```
+config.os = "linux"
+config.architecture = "x86_64"
 io.buildpacks.distribution.name = "ubuntu"
 io.buildpacks.distribution.version = "18.04"
+```
 
 Moving forward it's encouraged for buildpack authors to support both `[[stacks]]` and `[[targets]]` sections in `buildpack.toml` for maximum compatibility. In order to ease this process for those using the `io.buildpacks.stacks.bionic`, lifecycle will translate any section that sets this as on of the `stacks`:
 
+```toml
 [[stacks]]
 id = "io.buildpacks.stacks.bionic
+```
 
 to 
 
+```toml
 [[targets]]
 os = "linux"
 arch = "x86_64"
 [[targets.distributions]]
 name = "ubuntu"
 versions = ["18.04"]
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
