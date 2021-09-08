@@ -13,11 +13,11 @@
 
 *NOTE: This proposal is part of a larger initiative to reduce complexity originally outlined in https://github.com/buildpacks/rfcs/pull/167*
 
-This RFC proposes that we remove the stack ID concept from the project and replace them with existing constructs in the container image ecosystem such as operating system name, operating system version and architecture.
+This RFC proposes that we remove the stack ID concept from the project and replace it with existing constructs in the container image ecosystem such as operating system name, operating system version, and architecture.
 
-This RFC also proposes that we remove the "mixin" concept from the project entirely, eliminating strict validation of all facets of base image, buildpack compatibility, in favor of a a more optimistic approach.
+This RFC also proposes that we remove the "mixin" concept from the project entirely, eliminating strict validation of all facets of base-image-to-buildpack compatibility in favor of a more optimistic approach.
 
-This proposal prioritizes simplicity and flexibility over the avoidance of all failure scenarios, by allowing more potentially successful build to execute.
+This proposal prioritizes simplicity and flexibility over the avoidance of all failure scenarios by allowing more potentially successful builds to execute.
 
 # Motivation
 [motivation]: #motivation
