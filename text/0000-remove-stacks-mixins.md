@@ -44,8 +44,11 @@ Instead of a stack ID, runtime and build-time base images must contain the follo
 - Version (optional) (e.g., "18.04", `$VERSION_ID`), specified as a label `io.buildpacks.distribution.version`
 
 OS, Architecture, and Architecture Variant must be valid identifiers as defined in the [OCI Image specification](https://github.com/opencontainers/image-spec/blob/main/config.md).
+
 For Linux-based images, each field should be canonicalized against values specified in `/etc/os-release` (`$ID` and `$VERSION_ID`).
 The `os.version` field in an base image `config` may contain combined distribution and version information, but it is not used by the lifecycle.
+
+For Windows-based images, Distribution should be empty. Version should be the [suggested value of `os.version`](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) in the OCI spec (e.g., `10.0.14393.1066`).
 
 The `stacks` list in `buildpack.toml` is replaced by a `targets` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md).
 Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS, Architecture, and Variant.
