@@ -43,7 +43,13 @@ Instead of a stack ID, runtime and build-time base images must contain the follo
 - Distribution (optional) (e.g., "ubuntu", `$ID`), specified as a label `io.buildpacks.distribution.name`
 - Version (optional) (e.g., "18.04", `$VERSION_ID`), specified as a label `io.buildpacks.distribution.version`
 
+Additionally, the runtime base may contain the following metadata:
+- Target ID (optional) (e.g., "minimal"), specified as a label `io.buildpacks.id`
+
 OS, Architecture, and Architecture Variant must be valid identifiers as defined in the [OCI Image specification](https://github.com/opencontainers/image-spec/blob/main/config.md).
+
+Target ID is an identifier specified on the runtime base image that must be provided to buildpacks as `CNB_TARGET_ID` during the build process.
+This allows buildpacks to change their behavior if a run image is selected (e.g., distroless) that has special properties outside of OS, architecture, etc.
 
 For Linux-based images, each field should be canonicalized against values specified in `/etc/os-release` (`$ID` and `$VERSION_ID`).
 The `os.version` field in an base image `config` may contain combined distribution and version information, but it is not used by the lifecycle.
@@ -54,7 +60,6 @@ The `stacks` list in `buildpack.toml` is replaced by a `targets` list, where eac
 Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS, Architecture, and Variant.
 If the `targets` list is empty and `/bin/build` is present, a target with `os = "linux"` and `arch = "x86_64"` is assumed by tools reading `buildpack.toml`.
 If the `targets` list is empty and `/bin/build.bat` or `/bin/build.exe` is present, a target with `os = "windows"` and `arch = "x86_64"` is assumed by tools reading `buildpack.toml`.
-
 
 App image builds fail if the build image and selected run image have mismatched metadata. We may introduce flags or additional labels to skip this validation (e.g., for cross-compilation or minimal runtime base images).
 An image without a specified Distribution is compatible with images specifying any Distribution.
