@@ -167,6 +167,7 @@ If the newly-specified field values are missing, the lifecycle and pack may used
 
 - How will migration work? Can we make new base images compatible with older buildpacks? Can we make newer buildpacks compatible with older stacks?
 - What should builder.toml (and similar stack-dependent config files) look like? What should assets look like? Note: these could be decided in subsequent subteam RFCs / spec PRs.
+- How will this affect the UX for pack buidpack package? For example package.toml contains a conflicting [platform table](https://buildpacks.io/docs/reference/config/package-config/#platform-_optional_). This should be resolved in a separate subteam RFC. 
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
