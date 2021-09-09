@@ -64,7 +64,7 @@ Unlike buildpacks,
 
 Hooks participate in the buildpack detection process, with the same interface for `/bin/detect`.
 However,
-- `/bin/detect` is optional for hooks, and they are assumed to pass detection when it is not presetn.
+- `/bin/detect` is optional for hooks, and they are assumed to pass detection when it is not present. Just like with buildpacks, a /bin/detect that exits with a 0 exit code passes detection, and fails otherwise.
 - Hooks may only output `provides` entries to the build plan. They must not output `requires`.
 - Hooks must all proceed regular buildpacks in `order` definitions (e.g., in `builder.toml`).
 - Hooks are always `optional`.
