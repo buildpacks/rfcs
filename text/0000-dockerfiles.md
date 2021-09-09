@@ -136,8 +136,8 @@ Note: The Dockerfiles referenced must disable rebasing, and build times will be 
 ##### `/cnb/hooks/com.example.rpmhook/bin/build`
 ```
 #!/bin/sh
-[ -f Gemfile.lock ] && cp "$BUILDPACK_DIR/Dockerfile-ruby" "$1/Dockerfile"
-[ -f package.json ] && cp "$BUILDPACK_DIR/Dockerfile-node" "$1/Dockerfile"
+[ -f Gemfile.lock ] && cp "$CNB_BUILDPACK_DIR/Dockerfile-ruby" "$1/Dockerfile"
+[ -f package.json ] && cp "$CNB_BUILDPACK_DIR/Dockerfile-node" "$1/Dockerfile"
 ```
 
 
