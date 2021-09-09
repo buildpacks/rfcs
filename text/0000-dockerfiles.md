@@ -99,7 +99,7 @@ Dockerfiles are applied in the order determined during buildpack detection.
 All Dockerfiles are provided with `base_image` and `build_id` args.
 The `base_image` arg allows the Dockerfile to reference the original base image.
 The `build_id` arg allows the Dockerfile to invalidate the cache after a certain layer and must be defaulted to `0`.
-When the `$build_id` arg is referenced in a `RUN` instruction, all subsequent layerrs will be rebuilt on the next build (as the value will change).
+When the `$build_id` arg is referenced in a `RUN` instruction, all subsequent layers will be rebuilt on the next build (as the value will change).
 
 Build args specified in `build.toml` are provided to `build.Dockerfile` or `Dockerfile` (when applied to the build-time base image).
 Build args specified in `launch.toml` are provided to `run.Dockerfile` or `Dockerfile` (when applied to the runtime base image).
