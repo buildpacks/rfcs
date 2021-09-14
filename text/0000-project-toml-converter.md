@@ -40,9 +40,9 @@ The Project TOML Converter is a CLI tool that will ship alongside the lifecycle.
 Example Project.TOML with 0.1 schema
 ```
 [project]
-id = "<string>" # machine readable
-name = "<string>" # human readable
-version = "<string>"
+id = "io.buildpacks.my-app" # machine readable
+name = "my app" # human readable
+version = "0.1"
 authors = ["<string>"]
 documentation-url = "<url>"
 source-url = "<url>"
@@ -63,6 +63,7 @@ name = "<string>"
 value = "<string>"
 [metadata]
 # additional arbitrary keys allowed
+cdn = "https://cdn.example.com"
 ```
 
 
