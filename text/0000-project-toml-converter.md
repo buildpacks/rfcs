@@ -32,7 +32,7 @@ The idea is to ship a binary with the lifecycle that would be responsible for tr
 # What it is
 [what-it-is]: #what-it-is
 
-The Project TOML Converter is a CLI tool that will ship alongside the lifecycle. It has only one responsibility at this time, to support conversion between schemas.
+The Project TOML Converter is a CLI tool that will ship alongside the lifecycle. It has only one responsibility at this time, to support conversion between schemas. The tool will not need to be executed in a containerized environment (similar to `rebase`). Though it can be invoked as a separate binary it may end up being part of the lifecycle which itself is a multi-call binary (see https://github.com/buildpacks/rfcs/blob/main/text/0024-lifecycle-multicall-binary-for-build.md). 
 
 # How it Works
 [how-it-works]: #how-it-works
