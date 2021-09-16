@@ -11,14 +11,12 @@
 # Summary
 [summary]: #summary
 
-Allow users to provide additional paths that can be exported similar to the application directory and allow easy configuration of the application directory. These paths are defined via the [`VOLUME`](https://docs.docker.com/engine/reference/builder/#volume) directive in `Dockerfile` and stored in the [`Volumes` object](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) in the image config.
+Allow users to provide additional paths that can be exported similar to the application directory and allow easy configuration of the application directory. These paths are defined via the `buildpack.export_dirs` by each buildpack.
 
 # Definitions
 [definitions]: #definitions
 
-- `Workspace`: The default application directory where the application source code is mounted and final build outputs are written. This directory is exported.
-- `Volume`: A set of directories describing where the buildpack process is likely to write data specific and should be exported alongside the application workspace. 
-- `WorkingDir`: The default working directory for a container.
+- `export_dirs`: A set of directories describing where the buildpack process is likely to write data specific and should be exported alongside the application workspace. 
 
 # Motivation
 [motivation]: #motivation
@@ -28,76 +26,42 @@ The main motivation behind this RFC is to unlock exporting application images th
 # What it is
 [what-it-is]: #what-it-is
 
-Users would be able to define stack images with `VOLUME` directives in Dockerfiles.
+Buildpack authors would be able to buildpacks with `buildpack.export_dirs` keys in their `buildpack.toml` files.
 
+For example a a buildpack may look like - 
 
-For example a build/run base image may look like - 
+```toml
+api = "<buildpack API version>"
 
-```Dockerfile
-# Set a common base
-FROM ubuntu:bionic as base
-
-# Set required CNB information
-ENV CNB_USER_ID=1000
-ENV CNB_GROUP_ID=1000
-ENV CNB_STACK_ID="io.buildpacks.samples.stacks.bionic"
-LABEL io.buildpacks.stack.id="io.buildpacks.samples.stacks.bionic"
-
-# Create the user
-RUN groupadd cnb --gid ${CNB_GROUP_ID} && \
-  useradd --uid ${CNB_USER_ID} --gid ${CNB_GROUP_ID} -m -s /bin/bash cnb
-
-# Start a new run stage
-FROM base as run
-
-# Volume instructions to identify paths that the lifecycle
-# may safely overlay on the run image.
-# This would ensure that these paths are rebase safe as
-# docker currently discards any changes made to directories
-# declared as volumes. See https://docs.docker.com/engine/reference/builder/#notes-about-specifying-volumes
-VOLUME ["/app", "/opt/extensions", "/home/cnb/.config"]
-
-# Set user and group (as declared in base image)
-USER ${CNB_USER_ID}:${CNB_GROUP_ID}
-
-# Start a new build stage
-FROM base as build
-
-# Volume instruction in the build image that the lifecycle
-# will export out. This must match the volumes declared in the run image.
-VOLUME ["/app", "/opt/extensions", "/home/cnb/.config"]
-
-# Optionally users can override the default application workspace
-# by specifying it through the WORKDIR directive in the build
-# and run images.
-WORKDIR /app
-
-# Set user and group (as declared in base image)
-USER ${CNB_USER_ID}:${CNB_GROUP_ID}
+[buildpack]
+id = "<buildpack ID>"
+name = "<buildpack name>"
+export_dirs = ["/opt", "/home/cnb/.config"]
 ```
 
-Buildpacks will be passed a list of volumes through the `CNB_EXPORT_VOLUMES` variable and this variable would be a JSON list. Buildpacks may read this environment variable during `detect` or `build`.
+The above would only be valid for normal buildpacks and not meta-buildpacks. Based on the `volumes` field, a platform would be responsible for validating that the `build` and `run` image do not have any content on these paths. Additionally, the builder image would be tagged with a label `io.buildpacks.export_dirs` with the list of paths that need to be exported. 
 
 # How it Works
 [how-it-works]: #how-it-works
 
 This RFC would require changes to the lifecycle and platform API.
 
-The platform would be responsible for mounting appropriate volumes based on the `Volumes` key in the OCI image config. For a platform like `pack` which relies on a daemon this should be fairly straight-forward to achieve since `docker run` automatically mounts appropriate volumes. For other platforms like `kpack` this would involve inspecting the builder image beforehand and modifying the build pod spec to accommodate the specified volumes.
+The platform would be responsible for mounting appropriate volumes based on the `io.buildpacks.export_dirs` label in the OCI image config. For a platform like `pack` which relies on a daemon this should be fairly straight-forward to achieve. For other platforms like `kpack` this would involve inspecting the builder image beforehand and modifying the build pod spec to accommodate the specified volumes.
 
 The lifecycle changes would involve exporting the files present in the above locations which should be similar to the logic that currently exists for exporting application workspace. Buildpacks could also take advantage of `slices` to specify paths in these additional directories that should exist as separate layers.
 
-Changes to the Buildpack API would be minimal and would mostly involve the Buildpacks being passed the additional `CNB_EXPORT_VOLUMES` variable for detection and build logic.
+The lifecycle `analysis` phase would also be responsible for validating that the above list of `export_dirs` is valid for the provided `run` image.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-N/A.
+- Additional complexity
+- Platforms like Tekton may not be able to implement something like this easily.
 
 # Alternatives
 [alternatives]: #alternatives
 
-This proposal is useful as it relies of existing OCI image/Docker conventions to add a much needed extension point to the API.
+TBD: Multiple App Directories proposal
 
 # Prior Art
 [prior-art]: #prior-art
@@ -109,7 +73,7 @@ This proposal is useful as it relies of existing OCI image/Docker conventions to
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-None.
+TBD.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
