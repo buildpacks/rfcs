@@ -3,10 +3,10 @@
 - Name: Add Status to RFC Metadata
 - Start Date: 2021-07-14
 - Author(s): @aemengo, @ekcasey
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Draft Approved
+- RFC Pull Request: [rfcs#177](https://github.com/buildpacks/rfcs/pull/177)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/rfcs#183](#https://github.com/buildpacks/rfcs/issues/183)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
