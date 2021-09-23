@@ -47,7 +47,7 @@ Examples of potential utility buildpacks include:
 The utility buildpacks will be owned, supported, and maintained by the [Implementation team](https://github.com/buildpacks/community/blob/main/TEAMS.md#implementation-team).
 
 The criteria for accepting a utility buildpack into the project is as follows:
-- The behavior provided by the buildpack MUST be defined in the spec or an extension spec.
+- The behavior provided by the buildpack MUST be defined in an API specification co-located with the buildpack
 - The buildpack MUST support arbitrary stacks
 - The buildpack MUST support the latest API version
 - The buildpack MUST include detection logic (i.e. it does not always pass)
