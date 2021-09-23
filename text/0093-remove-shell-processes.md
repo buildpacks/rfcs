@@ -7,7 +7,7 @@
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/spec#244](https://github.com/buildpacks/spec/issues/244), [buildpacks/spec#245](https://github.com/buildpacks/spec/issues/245), [buildpacks/lifecycle#693](https://github.com/buildpacks/lifecycle/issues/693), [buildpacks/pack#1260](https://github.com/buildpacks/pack/issues/1260), [buildpacks/docs#391](https://github.com/buildpacks/docs/issues/391), [buildpacks/libcnb#70](https://github.com/buildpacks/libcnb/issues/70)
 - Supersedes: [RFC 0045](https://github.com/buildpacks/rfcs/blob/main/text/0045-launcher-arguments.md)
-- Depends On: [RFC #175]
+- Depends On: [rfcs#175](https://github.com/buildpacks/rfcs/pull/175)
 
 # Summary
 [summary]: #summary
