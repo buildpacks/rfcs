@@ -193,6 +193,8 @@ versions = ["18.04"]
 - How will migration work? Can we make new base images compatible with older buildpacks? Can we make newer buildpacks compatible with older stacks?
 - What should builder.toml (and similar stack-dependent config files) look like? What should assets look like? Note: these could be decided in subsequent subteam RFCs / spec PRs.
 - How will this affect the UX for pack buidpack package? For example package.toml contains a conflicting [platform table](https://buildpacks.io/docs/reference/config/package-config/#platform-_optional_). This should be resolved in a separate subteam RFC. 
+- Are we planning to export an image for each target? Or does `pack buildpack package` require a target?
+  Suggestion: All targets will live in an immutable OCI Manifest Index, so all targets should be exported at the same time.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
