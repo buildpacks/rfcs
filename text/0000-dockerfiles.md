@@ -30,7 +30,15 @@ For a given application, a build that uses hooks could be optimized by creating 
 # How it Works
 [how-it-works]: #how-it-works
 
-Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to apply Dockerfiles at the platform's discretion. 
+Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to apply Dockerfiles at the platform's discretion. The order of operations would be something like the following:
+* analyze
+* detect
+* restore
+* <new lifecycle phase> run hooks' bin/build, output Dockerfiles are written to a volume
+* <new lifecycle phase OR platform> apply Dockerfiles to run image (could run in parallel with below two)
+* <new lifecycle phase OR platform> apply Dockerfiles to build image
+* build
+* export
 
 ### Dynamically-applied Dockerfiles
 
