@@ -22,10 +22,10 @@ This RFC introduces functionality for customizing base images, as an alternative
 # What it is
 [what-it-is]: #what-it-is
 
-This RFC proposes that we replace stackpacks with dynamically-generated build-time and runtime Dockerfiles that act as pre-build hooks.
-These hooks would participate in detection and execute before the buildpack build process.
+This RFC proposes that we replace stackpacks with dynamically-generated build-time and runtime Dockerfiles that act as pre-build base image extensions.
+These extensions would participate in detection and execute before the buildpack build process.
 
-For a given application, a build that uses hooks could be optimized by creating a more narrowly-scoped builder that does not contain hooks.
+For a given application, a build that uses extensions could be optimized by creating a more narrowly-scoped builder that does not contain extensions.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -34,7 +34,7 @@ Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to ap
 * analyze
 * detect
 * restore
-* <new lifecycle phase> run hooks' bin/build, output Dockerfiles are written to a volume
+* <new lifecycle phase> run extensions' bin/build, output Dockerfiles are written to a volume
 * <new lifecycle phase OR platform> apply Dockerfiles to run image (could run in parallel with below two)
 * <new lifecycle phase OR platform> apply Dockerfiles to build image
 * build
@@ -42,48 +42,48 @@ Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to ap
 
 ### Dynamically-applied Dockerfiles
 
-A builder image may include any number of "hook" directories in `/cnb/hooks/`.
+A builder image may include any number of "extensions" directories in `/cnb/ext/`.
 
-Hooks are similar to buildpacks: they have a `/bin/build` and `/bin/detect` executable.
-However, instead of a `buildpack.toml` file, hooks have a `hook.toml` file:
+Extensions are similar to buildpacks: they have a `/bin/build` and `/bin/detect` executable.
+However, instead of a `buildpack.toml` file, extensions have a `extension.toml` file:
 ```toml
 api = "<buildpack API version>"
 
-[hook]
-id = "<hook ID>"
-name = "<hook name>"
-version = "<hook version>"
-homepage = "<hook homepage>"
-description = "<hook description>"
+[extension]
+id = "<extension ID>"
+name = "<extension name>"
+version = "<extension version>"
+homepage = "<extension homepage>"
+description = "<extension description>"
 keywords = [ "<string>" ]
 
-[[hook.licenses]]
+[[extension.licenses]]
 type = "<string>"
 uri = "<uri>"
 ```
 
-Hooks may be packaged and examined similar to buildpacks, but with analogous `pack hook` subcommands.
+Extensions may be packaged and examined similar to buildpacks, but with analogous `pack extension` subcommands.
 
-Other pack CLI commands, such as `pack builder create`, will be extended to include support for hooks.
+Other pack CLI commands, such as `pack builder create`, will be extended to include support for extensions.
 
 Unlike buildpacks,
-- Hooks must not be included in a meta-buildpacks
-- Hooks must not have `order`/`group` definitions in `hook.toml`
+- Extensions must not be included in a meta-buildpacks
+- Extensions must not have `order`/`group` definitions in `extension.toml`
 
-Hooks participate in the buildpack detection process, with the same UID, GID, and interface for `/bin/detect`.
+Extensions participate in the buildpack detection process, with the same UID, GID, and interface for `/bin/detect`.
 However,
-- `/bin/detect` is optional for hooks, and they are assumed to pass detection when it is not present. Just like with buildpacks, a /bin/detect that exits with a 0 exit code passes detection, and fails otherwise.
-- Hooks may only output `provides` entries to the build plan. They must not output `requires`.
-- Hooks must all proceed regular buildpacks in `order` definitions (e.g., in `builder.toml`).
-- Hooks are always `optional`.
+- `/bin/detect` is optional for extensions, and they are assumed to pass detection when it is not present. Just like with buildpacks, a /bin/detect that exits with a 0 exit code passes detection, and fails otherwise.
+- Extensions may only output `provides` entries to the build plan. They must not output `requires`.
+- Extensions must all proceed regular buildpacks in `order` definitions (e.g., in `builder.toml`).
+- Extensions are always `optional`.
 
-Hooks generate Dockerfiles before the regular buildpack build phase.
-To generate these Dockerfiles, the lifecycle executes the hook's `/bin/build` executable with the same UID, GID, and interface as regular buildpacks.
+Extensions generate Dockerfiles before the regular buildpack build phase.
+To generate these Dockerfiles, the lifecycle executes the extension's `/bin/build` executable with the same UID, GID, and interface as regular buildpacks.
 However,
-- Hooks `/bin/build` must not write to the app directory.
-- Hooks `/bin/build` may be executed in parallel.
-- Hooks `<layers>` directory is replaced by an `<output>` directory.
-- If a hook is missing `/bin/build`, the hook root is treated as a pre-populated `<output>` directory.
+- Extensions `/bin/build` must not write to the app directory.
+- Extensions `/bin/build` may be executed in parallel.
+- Extensions `<layers>` directory is replaced by an `<output>` directory.
+- If an extension is missing `/bin/build`, the extension root is treated as a pre-populated `<output>` directory.
 
 After `/bin/build` executes, the `<output>` directory may contain
 - `build.toml`, with the same contents as a normal buildpack's `build.toml`, but
@@ -101,7 +101,7 @@ Support for other instruction formats, e.g., LLB JSON files, could be added in t
 
 If no Dockerfiles are present, `/bin/build` may still consume build plan entries and add metadata to `build.toml`/`launch.toml`.
 
-Dockerfiles are applied to their corresponding base images after all hooks are executed and before any regular buildpacks are executed.
+Dockerfiles are applied to their corresponding base images after all extensions are executed and before any regular buildpacks are executed.
 Dockerfiles are applied in the order determined during buildpack detection.
 
 All Dockerfiles are provided with `base_image` and `build_id` args.
@@ -118,30 +118,30 @@ Finally, base images may be statically labeled with any number of `provides` tha
 These `provides` may contain fields other than `name`, which, when mismatched with `requires`, mark the entry as `unmet` by the stack.
 This is important to ensure that:
 - Rebasing always remains an option for end users.
-- Buildpacks do not become dependent on hooks.
+- Buildpacks do not become dependent on extensions.
 - Builds can be time-optimized by creating base images ahead of time.
 
-NOTE: the above can be accomplished by a hook with a no-op `/bin/build` -- do we really need this?
+NOTE: the above can be accomplished by an extension with a no-op `/bin/build` -- do we really need this?
 
-#### Example: App-specified Dockerfile Hook
+#### Example: App-specified Dockerfile Extension
 
-This example hook would allow an app to provide runtime and build-time base image extensions as "run.Dockerfile" and "build.Dockerfile."
+This example extension would allow an app to provide runtime and build-time base image extensions as "run.Dockerfile" and "build.Dockerfile."
 The app developer can decide whether the extensions are rebasable.
 
-##### `/cnb/hooks/com.example.apphook/bin/build`
+##### `/cnb/ext/com.example.appext/bin/build`
 ```
 #!/bin/sh
 [ -f build.Dockerfile ] && cp build.Dockerfile "$1/"
 [ -f run.Dockerfile ] && cp run.Dockerfile "$1/"
 ```
 
-#### Example: RPM Dockerfile Hook (app-based)
+#### Example: RPM Dockerfile Extension (app-based)
 
-This example hook would allow a builder to install RPMs for each language runtime, based on the app directory.
+This example extension would allow a builder to install RPMs for each language runtime, based on the app directory.
 
 Note: The Dockerfiles referenced must disable rebasing, and build times will be slower compared to buildpack-provided runtimes.
 
-##### `/cnb/hooks/com.example.rpmhook/bin/build`
+##### `/cnb/ext/com.example.rpmext/bin/build`
 ```
 #!/bin/sh
 [ -f Gemfile.lock ] && cp "$CNB_BUILDPACK_DIR/Dockerfile-ruby" "$1/Dockerfile"
@@ -179,7 +179,7 @@ USER ${CNB_USER_ID}:${CNB_GROUP_ID}
 COPY genpkgs /cnb/image/genpkgs
 ```
 
-`run.Dockerfile` for use with the example `app.run.Dockerfile.out` hook that always installs the latest version of curl:
+`run.Dockerfile` for use with the example `app.run.Dockerfile.out` extension that always installs the latest version of curl:
 ```
 ARG base_image
 FROM ${base_image}
@@ -191,7 +191,7 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 ```
 (note: this Dockerfile disables rebasing, as OS package installation is not rebasable)
 
-`run.Dockerfile` for use with the example `app.run.Dockerfile.out` hook that installs a special package to /opt:
+`run.Dockerfile` for use with the example `app.run.Dockerfile.out` extension that installs a special package to /opt:
 ```
 ARG base_image
 FROM ${base_image}
