@@ -114,15 +114,6 @@ Build args specified in `launch.toml` are provided to `run.Dockerfile` or `Docke
 
 A runtime base image may indicate that it preserves ABI compatibility by adding the label `io.buildpacks.rebasable=true`. In the case of builder-specified Dockerfiles, `io.buildpacks.rebasable=false` is set automatically on the base image before a runtime Dockerfile is applied and must be explicitly set to `true` if desired. If multiple Dockerfiles are applied, all must set `io.buildpacks.rebasable=true` for the final value to be `true`. Rebasing an app without this label set to `true` requires passing a new `--force` flag to `pack rebase`.
 
-Finally, base images may be statically labeled with any number of `provides` that are treated as build plan entries.
-These `provides` may contain fields other than `name`, which, when mismatched with `requires`, mark the entry as `unmet` by the stack.
-This is important to ensure that:
-- Rebasing always remains an option for end users.
-- Buildpacks do not become dependent on extensions.
-- Builds can be time-optimized by creating base images ahead of time.
-
-NOTE: the above can be accomplished by an extension with a no-op `/bin/build` -- do we really need this?
-
 #### Example: App-specified Dockerfile Extension
 
 This example extension would allow an app to provide runtime and build-time base image extensions as "run.Dockerfile" and "build.Dockerfile."
@@ -219,6 +210,7 @@ RUN curl -L https://example.com/mypkg-install | sh # installs to /opt
 [unresolved-questions]: #unresolved-questions
 
 - Should `genpkgs` be part of this proposal? Opinion: Yes, otherwise it's difficult to maintain a valid SBoM.
+- Should we allow base images to provide build plan entries so that extensions aren't required to satisfy buildpacks? Opinion: Not yet, no-op extension can be used for now.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
