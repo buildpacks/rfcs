@@ -70,7 +70,7 @@ Unlike buildpacks,
 - Hooks must not be included in a meta-buildpacks
 - Hooks must not have `order`/`group` definitions in `hook.toml`
 
-Hooks participate in the buildpack detection process, with the same interface for `/bin/detect`.
+Hooks participate in the buildpack detection process, with the same UID, GID, and interface for `/bin/detect`.
 However,
 - `/bin/detect` is optional for hooks, and they are assumed to pass detection when it is not present. Just like with buildpacks, a /bin/detect that exits with a 0 exit code passes detection, and fails otherwise.
 - Hooks may only output `provides` entries to the build plan. They must not output `requires`.
@@ -78,7 +78,7 @@ However,
 - Hooks are always `optional`.
 
 Hooks generate Dockerfiles before the regular buildpack build phase.
-To generate these Dockerfiles, the lifecycle executes the hook's `/bin/build` executable with the same interface as regular buildpacks.
+To generate these Dockerfiles, the lifecycle executes the hook's `/bin/build` executable with the same UID, GID, and interface as regular buildpacks.
 However,
 - Hooks `/bin/build` must not write to the app directory.
 - Hooks `/bin/build` may be executed in parallel.
