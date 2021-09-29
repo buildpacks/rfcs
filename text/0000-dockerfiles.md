@@ -74,7 +74,7 @@ Extensions participate in the buildpack detection process, with the same UID, GI
 However,
 - `/bin/detect` is optional for extensions, and they are assumed to pass detection when it is not present. Just like with buildpacks, a /bin/detect that exits with a 0 exit code passes detection, and fails otherwise.
 - Extensions may only output `provides` entries to the build plan. They must not output `requires`.
-- Extensions must all proceed regular buildpacks in `order` definitions (e.g., in `builder.toml`).
+- Extensions must all precede regular buildpacks in `order` definitions (e.g., in `builder.toml`).
 - Extensions are always `optional`.
 
 Extensions generate Dockerfiles before the regular buildpack build phase.
