@@ -42,27 +42,43 @@ Example Project.TOML with 0.1 schema
 [project]
 id = "io.buildpacks.my-app" # machine readable
 name = "my app" # human readable
-version = "0.1"
-authors = ["<string>"]
-documentation-url = "<url>"
-source-url = "<url>"
+version = "1.2.3"
+authors = ["Great Developer"]
+documentation-url = "my-site.com/docs"
+source-url = "my-site.com/source"
 
 [[project.licenses]]
-type = "<string>"
-uri = "<uri>"
+type = "some-license-type"
+uri = "my-site.com/license"
+
 
 [build]
-include = ["<string>"]
-exclude = ["<string>"]
+include = [
+    "cmd/",
+    "go.mod",
+    "go.sum",
+    "*.go"
+]
+exclude = ["secrets.yaml"]
+
 [[build.buildpacks]]
-id = "<string>"
-version = "<string>"
-uri = "<string>"
+id = "io.buildpacks/java"
+version = "1.0"
+uri = "myreg.io/myspace/java"
+
+[[build.buildpacks]]
+id = "example/post-build"
+
+    [build.buildpacks.script] # does this make sense?
+    api = "0.5"
+    inline = "./post-build.sh"
+
 [[build.env]]
-name = "<string>"
-value = "<string>"
+name = "SOME_VAR"
+value = "some-val"
+
+
 [metadata]
-# additional arbitrary keys allowed
 cdn = "https://cdn.example.com"
 ```
 
@@ -70,34 +86,36 @@ cdn = "https://cdn.example.com"
 Example Project.TOML with 0.2 schema
 ```
 [_]
+schema-version = "0.2"
 id = "io.buildpacks.my-app"
-version = "0.1"
+name = "my app"
+version = "1.2.3"
+authors = ["Great Developer"]
+documentation-url = "my-site.com/docs"
+source-url = "my-site.com/source"
+
+[[_.licenses]]
+type = "some-license-type"
+uri = "my-site.com/license"
 
 [_.metadata]
 cdn = "https://cdn.example.com"
 
-[[_.metadata.assets]]
-url = "https://cdn.example.com/assets/foo.jar"
-checksum = "3b1b39893d8e34a6d0bd44095afcd5c4"
-
-buzz = ["a", "b", "c"]
 
 [io.buildpacks]
-builder = "cnbs/sample-builder:bionic"
+builder = "myreg.io/myspace/builder"
 include = [
     "cmd/",
     "go.mod",
     "go.sum",
     "*.go"
 ]
+exclude = ["secrets.yaml"]
 
 [[io.buildpacks.group]]
 id = "io.buildpacks/java"
 version = "1.0"
-
-[[io.buildpacks.group]]
-id = "io.buildpacks/nodejs"
-version = "1.0"
+uri = "myreg.io/myspace/java"
 
 [[io.buildpacks.group]]
 id = "example/post-build"
@@ -105,6 +123,14 @@ id = "example/post-build"
     [io.buildpacks.group.script]
     api = "0.5"
     inline = "./post-build.sh"
+
+[[io.buildpacks.build.env]]
+name = "SOME_VAR"
+value = "some-val"
+
+
+[com.fun-company]
+name = "I am missing in the 0.1 schema version"
 ```
 
 # Drawbacks
