@@ -27,7 +27,7 @@ The analyze phase will now run before the detect phase. The analyze phase will h
 
 ## New Responsibilities in analzyer
 
-* Stack validation, to ensure that a new run-image is campatible with the previous app image
+* Stack validation, to ensure that a new run-image is compatible with the previous app image
 * Retrieve identifier (imageID or digest), stack ID, and mixins, which will be used by subsequent phases
 * Validation of registry credentials, to avoid a long build that fails during export phase
 
