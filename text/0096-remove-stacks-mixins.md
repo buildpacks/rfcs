@@ -3,9 +3,9 @@
 - Name: Remove Stacks & Mixins
 - Start Date: 2021-06-30
 - Author(s): sclevine
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#172](https://github.com/buildpacks/rfcs/pull/172)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/pack#1301](https://github.com/buildpacks/pack/issues/1301), [buildpacks/spec#258](https://github.com/buildpacks/spec/issues/258), [buildpacks/samples#111](https://github.com/buildpacks/samples/issues/111), [buildpacks/docs#422](https://github.com/buildpacks/docs/issues/422), [buildpacks/spec#259](https://github.com/buildpacks/spec/issues/259), [buildpacks/spec#260](https://github.com/buildpacks/spec/issues/260), [buildpacks/lifecycle#742](https://github.com/buildpacks/lifecycle/issues/742), [buildpacks/lifecycle#743](https://github.com/buildpacks/lifecycle/issues/743), [buildpacks/lifecycle#744](https://github.com/buildpacks/lifecycle/issues/744), [buildpacks/pack#1302](https://github.com/buildpacks/pack/issues/1302), [buildpacks/pack#1303](https://github.com/buildpacks/pack/issues/1303), [buildpacks/pack#1304](https://github.com/buildpacks/pack/issues/1304)
 - Supersedes: [RFC0069](https://github.com/buildpacks/rfcs/blob/main/text/0069-stack-buildpacks.md), [RFC#167](https://github.com/buildpacks/rfcs/pull/167), many others
 
 # Summary
