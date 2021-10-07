@@ -62,12 +62,6 @@ fi
 # INPUTS / VALIDATION
 #
 
-shift $(($OPTIND - 1))
-if [[ $# != 1 ]]; then
-  usage
-fi
-
-PR_NUMBER="${1}"
 NO_ISSUES=false
 ISSUES_TEXT="N/A"
 
@@ -94,6 +88,12 @@ while getopts ":i:n" opt; do
   esac
 done
 
+shift $(($OPTIND - 1))
+if [[ $# != 1 ]]; then
+  usage
+fi
+PR_NUMBER="${1}"
+
 CURRENT_BRANCH=$(git branch --show-current)
 if [[ "${CURRENT_BRANCH}" != "${MAIN_BRANCH}" ]]; then
   echo -e "ERROR! Expected current branch to be '${MAIN_BRANCH}', currently in '${CURRENT_BRANCH}'!";
@@ -107,7 +107,7 @@ fi
 RFC_ID=$(generate_id)
 echo "> Generated RFC number: ${RFC_ID}"
 
-echo "> Creating issues..."
+echo "> Creating issues for PR#${PR_NUMBER}"
 export GITHUB_TOKEN
 
 issues-generation create --pr "${OWNER}/${REPO}#${PR_NUMBER}" --bot $BOT_USERNAME  --prepend "[RFC #${RFC_ID}] "
