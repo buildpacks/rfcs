@@ -31,15 +31,15 @@ We seek to reduce complexity in the lifecycle and provide well maintained utilit
 # What it is
 [what-it-is]: #what-it-is
 
-Reserve the `cnb` namespace for officially supported buildpacks. Then, on a case by case basis, we adopt utility buildpacks under this
+Reserve the `buildpacksio` namespace for officially supported buildpacks. Then, on a case by case basis, we adopt utility buildpacks under this
 
 Examples of potential utility buildpacks include:
 
-- `cnb/profile` - Evaluating `.profile` scripts in the app repo during launch
-- `cnb/inline` - Executing [Inline buildpacks](https://github.com/buildpacks/rfcs/blob/main/text/0048-inline-buildpack.md)
-- `cnb/processes` - Setting app specific process types from a configuration file like `project.toml`
-- `cnb/env` - Setting customer environment variables defined in a configuration file like `project.toml`
-- `cnb/purge` - Purging files from the app repo before export (similar to [`.slugignore`](https://devcenter.heroku.com/articles/slug-compiler#ignoring-files-with-slugignore))
+- `buildpacksio/profile` - Evaluating `.profile` scripts in the app repo during launch
+- `buildpacksio/inline` - Executing [Inline buildpacks](https://github.com/buildpacks/rfcs/blob/main/text/0048-inline-buildpack.md)
+- `buildpacksio/processes` - Setting app specific process types from a configuration file like `project.toml`
+- `buildpacksio/env` - Setting customer environment variables defined in a configuration file like `project.toml`
+- `buildpacksio/purge` - Purging files from the app repo before export (similar to [`.slugignore`](https://devcenter.heroku.com/articles/slug-compiler#ignoring-files-with-slugignore))
 
 # How it Works
 [how-it-works]: #how-it-works
