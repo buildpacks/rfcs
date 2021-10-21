@@ -50,7 +50,7 @@ The criteria for accepting a utility buildpack into the project is as follows:
 - The behavior provided by the buildpack MUST be defined in an API specification co-located with the buildpack
 - The buildpack MUST support arbitrary stacks
 - The buildpack MUST support the latest API version
-- The buildpack MUST include detection logic (i.e. it does not always pass)
+- The buildpack MUST include detection logic so it can be disabled.
 - The buildpack MUST NOT install any dependencies
 - The buildapck MUST NOT be specific to a language/framework/ecosystem/toolchain
 - The buildpack behavior MUST be well-documented on buildpacks.io
