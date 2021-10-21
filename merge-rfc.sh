@@ -62,12 +62,6 @@ fi
 # INPUTS / VALIDATION
 #
 
-shift $(($OPTIND - 1))
-if [[ $# != 1 ]]; then
-  usage
-fi
-
-PR_NUMBER="${1}"
 NO_ISSUES=false
 ISSUES_TEXT="N/A"
 
@@ -94,6 +88,12 @@ while getopts ":i:n" opt; do
   esac
 done
 
+shift $(($OPTIND - 1))
+if [[ $# != 1 ]]; then
+  usage
+fi
+PR_NUMBER="${1}"
+
 CURRENT_BRANCH=$(git branch --show-current)
 if [[ "${CURRENT_BRANCH}" != "${MAIN_BRANCH}" ]]; then
   echo -e "ERROR! Expected current branch to be '${MAIN_BRANCH}', currently in '${CURRENT_BRANCH}'!";
@@ -107,7 +107,7 @@ fi
 RFC_ID=$(generate_id)
 echo "> Generated RFC number: ${RFC_ID}"
 
-echo "> Creating issues..."
+echo "> Creating issues for PR#${PR_NUMBER}"
 export GITHUB_TOKEN
 
 issues-generation create --pr "${OWNER}/${REPO}#${PR_NUMBER}" --bot $BOT_USERNAME  --prepend "[RFC #${RFC_ID}] "
@@ -146,7 +146,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 sed $SEDOPTION "s|- RFC Pull Request:.*|- RFC Pull Request: [${REPO}#${PR_NUMBER}](https://github.com/${OWNER}/${REPO}/pull/${PR_NUMBER})|" "${SOURCE_DOC}"
 sed $SEDOPTION "s|- CNB Issue:.*|- CNB Issue: $ISSUES_TEXT|" "${SOURCE_DOC}"
-sed $SEDOPTION "s|- State:.*|- State: **Approved**|" "${SOURCE}"
+sed $SEDOPTION "s|- State:.*|- State: **Approved**|" "${SOURCE_DOC}"
 
 echo "> Moving ${SOURCE_DOC} to ${TARGET_DOC}..."
 git mv "${SOURCE_DOC}" "${TARGET_DOC}"
