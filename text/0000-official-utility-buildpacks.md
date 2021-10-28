@@ -44,10 +44,11 @@ Examples of potential utility buildpacks include:
 # How it Works
 [how-it-works]: #how-it-works
 
-The utility buildpacks will be owned, supported, and maintained by the [Implementation team](https://github.com/buildpacks/community/blob/main/TEAMS.md#implementation-team).
+The utility buildpacks will be owned, supported, and maintained by the [Buildpack Authors' Tooling Team](https://github.com/buildpacks/community/blob/main/TEAMS.md#buildpack-authors-tooling-team).
 
 The criteria for accepting a utility buildpack into the project is as follows:
-- The behavior provided by the buildpack MUST be defined in an API specification co-located with the buildpack
+- An [RFC](https://github.com/buildpacks/rfcs) describing the buildpack MUST be approved.
+- The behavior provided by the buildpack MUST be defined in an API specification
 - The buildpack MUST support arbitrary stacks
 - The buildpack MUST support the latest API version
 - The buildpack MUST include detection logic so it can be disabled.
