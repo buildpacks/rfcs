@@ -21,17 +21,30 @@ Add a new `images` key in the `project.toml` file.
 * **image**: the output of a running a buildpack(s) against a project
 * **image name**: fully qualified name of an OCI image in the form `<registry>/<name>:<tag>`.
 
-
 # Motivation
 [motivation]: #motivation
 
-Currently there is no support for specifying the output image in the `project.toml` although flags like `--tags` are already present.
+Currently, there is no support for specifying an output image in the `project.toml` although flags like `--tag` are already present.
 
 # What it is
 [what-it-is]: #what-it-is
 
-buildpack user will be able to specify the resulting images name in the `project.toml`
+We propose the following changes, so that buildpack user will be able to specify the resulting images in the `project.toml`:
 
+- Add an optional top level array of tables `[[images]]`, that describes resulting images.
+
+```toml
+[[images]]
+name = "<string>"
+registry = "<string>"
+tags = ["string"]
+```
+
+- `images.name`: mandatory.
+- `images.tags`: optional, defaults to `latest`.
+- `images.registry`: optional, defaults to `docker.io`.
+
+`pack`'s flag `--tag` should take precedence over `images` blocks specified in a `project.toml`.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -43,6 +56,8 @@ buildpack user will be able to specify the resulting images name in the `project
   - https://github.com/buildpacks/rfcs/blob/main/text/0084-project-descriptor-domains.md
   - Closed PR which includes some similar changes: https://github.com/buildpacks/rfcs/blob/project-descriptor-simple/text/0000-project-descriptor.md
 
+Example:
+
 ```toml
 [[images]]
 name = "spring-petclinic"
@@ -51,29 +66,29 @@ tags = ["latest", "v1"]
 
 [[images]]
 name = "spring-petclinic"
-registry = "hub.docker.com"
 tags = ["latest", "v1"]
+
+[[images]]
+name = "spring-petclinic"
+registry = ["private.registry.corp:8443"]
 ```
 
-- Tags:
-  - Could be read from the `--tags` flag
-  - Could be defaulted to `project.lversion` field of `project.toml`
-- Name: Could just be taken from `project.name` (if present)
+This example will produce the following images:
 
-# Drawbacks
-[drawbacks]: #drawbacks
-
-TBD
+- `gcr.io/spring-petclinic:latest`
+- `gcr.io/spring-petclinic:v1`
+- `docker.io/spring-petclinic:latest`
+- `docker.io/spring-petclinic:v1`
+- `private.registry.corp:8443/spring-petclinic:latest`
 
 # Alternatives
 [alternatives]: #alternatives
-
 
 - have `registries` as an array:
 
   ```toml
   [images]
-  registries = ["gcr.io", "hub.docker.com"]
+  registries = ["gcr.io", "docker.io"]
   name = "spring-petclinic"
   tags = ["latest", "v1"]
   ```
@@ -87,7 +102,7 @@ TBD
   tag = "latest"
 
   [[images]]
-  registry = "hub.docker.com"
+  registry = "docker.io"
   name = "spring-petclinic"
   tag = "v1"
 
@@ -100,8 +115,8 @@ TBD
   images = [
       "gcr.io/spring-petclinic:latest",
       "gcr.io/spring-petclinic:v1",
-      "hub.docker.com/spring-petclinic:latest",
-      "hub.docker.com/spring-petclinic:v1"
+      "docker.io/spring-petclinic:latest",
+      "docker.io/spring-petclinic:v1"
   ]
   ```
 
@@ -112,14 +127,10 @@ TBD
   images = [
       "gcr.io/{name}:latest",
       "gcr.io/{name}:v1",
-      "hub.docker.com/{name}:latest",
-      "hub.docker.com/{name}:v1"
+      "docker.io/{name}:latest",
+      "docker.io/{name}:v1"
   ]
   ```
-
-> Why is this proposal the best?
-
-Is it? Lets discuss.
 
 # Prior Art
 [prior-art]: #prior-art
@@ -130,9 +141,6 @@ Is it? Lets discuss.
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-Let us know.
-
-# Spec. Changes (OPTIONAL)
-[spec-changes]: #spec-changes
-
-TBD
+- Naming (`images` / `targets` / other)?
+- Should `project.name` be used instead of `images.name`?
+- Should `project.version` be used instead of `images.tags`?
