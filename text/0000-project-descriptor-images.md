@@ -144,3 +144,33 @@ This example will produce the following images:
 - Naming (`images` / `targets` / other)?
 - Should `project.name` be used instead of `images.name`?
 - Should `project.version` be used instead of `images.tags`?
+
+# Spec. Changes (OPTIONAL)
+[spec-changes]: #spec-changes
+
+The following will be added to the [Project Descriptor Extension Spec](https://github.com/buildpacks/spec/blob/extensions/project-descriptor%2F0.2/extensions/project-descriptor.md):
+
+### `io.buildpacks.images` (optional)
+
+This table MAY contain an array of image repository label definitions. The schema for this table is:
+
+```
+[[io.buildpacks.images]]
+name = "<string (optional, default=io.buildpacks.name)>"
+tags = ["<string (optional, default=latest)>"]
+registry = "<string (optional default=docker.io)"
+```
+
+* `name` - the name component of an image repository
+* `tags` - a list of tags used as the tag component of images in an image repository
+* `registry` - a registry server containing the image repository
+
+If no `name` component is provided, the default value MUST be derived from the `io.buildpacks.name` field.
+
+If no `tags` are provided, the default value MUST be `"latest"`.
+
+If no `registry` is provided, the default value MUST be `"docker.io"`.
+
+ALl of these values MAY be overridden by a platform (ex. `pack` may allow a `--tag` flag to overridden the provided `tag` value).
+
+Multiple `[[io.buildpacks.images]]` entries MUST result in the creation of multiple Docker image repositories. All images will have the same digest irrespective of the different names, tags, and registries that are provided.
