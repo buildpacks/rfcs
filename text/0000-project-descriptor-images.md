@@ -2,8 +2,7 @@
 [meta]: #meta
 - Name: Support specifying images in project descriptor
 - Start Date: 2021-10-26
-- Author(s): tbd
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
+- Author(s): [@phil9909](https://github.com/phil9909), [@modulo11](https://github.com/modulo11), [@pbusko](https://github.com/pbusko), [@jkutner](https://github.com/jkutner)
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -12,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-Add a new `images` key in the `project.toml` file.
+Add a new array of tables `[[images]]` to the `project.toml` file.
 
 # Definitions
 [definitions]: #definitions
@@ -29,22 +28,7 @@ Currently, there is no support for specifying an output image in the `project.to
 # What it is
 [what-it-is]: #what-it-is
 
-We propose the following changes, so that buildpack user will be able to specify the resulting images in the `project.toml`:
-
-- Add an optional top level array of tables `[[images]]`, that describes resulting images.
-
-```toml
-[[images]]
-name = "<string>"
-registry = "<string>"
-tags = ["string"]
-```
-
-- `images.name`: mandatory.
-- `images.tags`: optional, defaults to `latest`.
-- `images.registry`: optional, defaults to `docker.io`.
-
-`pack`'s flag `--tag` should take precedence over `images` blocks specified in a `project.toml`.
+Buildpack user will be able to specify the resulting images in the `project.toml`:
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -70,7 +54,7 @@ tags = ["latest", "v1"]
 
 [[images]]
 name = "spring-petclinic"
-registry = ["private.registry.corp:8443"]
+registry = "private.registry.corp:8443"
 ```
 
 This example will produce the following images:
@@ -142,10 +126,9 @@ This example will produce the following images:
 [unresolved-questions]: #unresolved-questions
 
 - Naming (`images` / `targets` / other)?
-- Should `project.name` be used instead of `images.name`?
-- Should `project.version` be used instead of `images.tags`?
+- Should `project.version` as the default value for `images.tags`?
 
-# Spec. Changes (OPTIONAL)
+# Spec. Changes
 [spec-changes]: #spec-changes
 
 The following will be added to the [Project Descriptor Extension Spec](https://github.com/buildpacks/spec/blob/extensions/project-descriptor%2F0.2/extensions/project-descriptor.md):
@@ -161,9 +144,9 @@ tags = ["<string (optional, default=latest)>"]
 registry = "<string (optional default=docker.io)"
 ```
 
-* `name` - the name component of an image repository
-* `tags` - a list of tags used as the tag component of images in an image repository
-* `registry` - a registry server containing the image repository
+-`name` - the name component of an image repository
+-`tags` - a list of tags used as the tag component of images in an image repository
+-`registry` - a registry server containing the image repository
 
 If no `name` component is provided, the default value MUST be derived from the `io.buildpacks.name` field.
 
