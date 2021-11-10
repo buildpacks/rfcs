@@ -55,7 +55,7 @@ The criteria for accepting a utility buildpack into the project is as follows:
 - The buildpack MUST NOT install any dependencies in the output image
 - The buildapck MUST NOT be specific to a language/framework/ecosystem/toolchain
 - The buildpack behavior MUST be well-documented on buildpacks.io
-- The buidpack SHOULD only provide functionality that we would added to `pack` or the platform API absent the existence of utility buildpacks
+- The buidpack SHOULD only provide functionality that we would have added to `pack` or the platform API absent the existence of utility buildpacks
 
 # Drawbacks
 [drawbacks]: #drawbacks
