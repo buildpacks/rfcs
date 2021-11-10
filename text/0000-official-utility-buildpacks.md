@@ -50,7 +50,7 @@ The criteria for accepting a utility buildpack into the project is as follows:
 - An [RFC](https://github.com/buildpacks/rfcs) describing the buildpack MUST be approved.
 - The behavior provided by the buildpack MUST be defined in an API specification
 - The buildpack MUST support arbitrary stacks
-- The buildpack MUST support the latest API version
+- The buildpack SHOULD support the latest API version
 - The buildpack MUST include detection logic so it can be disabled.
 - The buildpack MUST NOT install any dependencies in the output image
 - The buildapck MUST NOT be specific to a language/framework/ecosystem/toolchain
