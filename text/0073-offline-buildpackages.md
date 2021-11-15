@@ -3,10 +3,15 @@
 - Name: Asset Cache
 - Start Date: 2020-04-27
 - Author(s): dwillist
+- Status: On Hold
 - RFC Pull Request: [rfcs#81](https://github.com/buildpacks/rfcs/pull/81)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/spec#184](https://github.com/buildpacks/spec/issues/184), [buildpacks/pack#1055](https://github.com/buildpacks/pack/issues/1055), [buildpacks/lifecycle#521](https://github.com/buildpacks/lifecycle/issues/521)
 - Supersedes: NA
+
+# Notes
+## On Hold
+Since the approval of this RFC, additional concerns around multiple caching strategies within CNB has been raised. Solving this problem is still a priority for the project but the core team has decided to place this RFC on hold pending further discussion of a more holistic caching solution. If you are interested in this problem, please participate in any of our channels.
 
 # Summary
 [summary]: #summary

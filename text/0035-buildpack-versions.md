@@ -2,6 +2,7 @@
 [meta]: #meta
 - **Name:** Semantic Version Formats for Buildpack Versions
 - **Start Date:** 2020-03-11
+- **Status:** Approved
 - **Supersedes:** N/A
 
 # Summary

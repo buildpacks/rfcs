@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Process Specific Environment
 - Start Date: 2020-04-03
+- Status: Approved
 - CNB Pull Request: (https://github.com/buildpacks/rfcs/pull/72)
 - CNB Issue:
 - Supersedes: N/A

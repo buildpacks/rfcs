@@ -3,6 +3,7 @@
 - Name: RFC Issue Generation
 - Start Date: 2020-03-03
 - Author(s): @jromero
+- Status: Approved
 - RFC Pull Request: [rfcs#141](https://github.com/buildpacks/rfcs/pull/141)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/rfcs#158](https://github.com/buildpacks/rfcs/issues/158)

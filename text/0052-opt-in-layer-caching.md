@@ -3,6 +3,7 @@
 - Name: Opt-in Layer Caching
 - Start Date: 2020-07-26
 - Author(s): @sclevine
+- Status: Approved
 - RFC Pull Request: [rfcs#99](https://github.com/buildpacks/rfcs/pull/99)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
