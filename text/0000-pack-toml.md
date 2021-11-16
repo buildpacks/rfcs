@@ -1,8 +1,8 @@
 # Meta
 [meta]: #meta
-- Name: [Joe Kutner](http://github.com/jkutner)
+- Name: Support for `pack.toml`
 - Start Date: 2021-11-16
-- Author(s): @jkutner
+- Author(s): [jkutner](http://github.com/jkutner)
 - Status: Draft
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
@@ -23,12 +23,12 @@ This is a proposal for a `pack.toml` file that is a special case of the `project
 # Motivation
 [motivation]: #motivation
 
-The `project.toml` file has been a useful and essential tool for buildpack users who need to codify certain arguments of their builds. However, there has been much debate around how to handle configuration options that may not be supported by all platform.
+The `project.toml` file has been a useful and essential tool for buildpack users who need to codify certain arguments of their builds. However, there has been much debate around how to handle configuration options that may not be supported by all platforms.
 
 We desire a descriptor file that is:
 * specific to pack (i.e. not platform-neutral)
 * advertises that the repo containing the file can be built with pack
-* adheres to the best practices and learning of [`project.toml`](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md)
+* adheres to the best practices and learnings from [`project.toml`](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md)
 
 # What it is
 [what-it-is]: #what-it-is
@@ -38,7 +38,7 @@ The Pack CLI will support a new descriptor file, `pack.toml`, that is a superset
 * An app MAY have a `project.toml`
 * An app MAY have both a `pack.toml` and a `projec.toml`, in which case they will be merged.
 
-The `pack.toml` will support an additional `[io.buildpacks.pack]` that is not defined in the [project descriptor spec](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md). The `[io.buildpacks.pack]` table will have the following schema:
+The `pack.toml` will support an additional `[io.buildpacks.pack]` table that is NOT defined in the [project descriptor spec](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md). The `[io.buildpacks.pack]` table will have the following schema:
 
 ```toml
 [io.buildpacks.pack]
