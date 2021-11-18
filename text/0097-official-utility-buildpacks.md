@@ -3,9 +3,9 @@
 - Name: Officially supported utility buildpacks
 - Start Date: 2021-06-30
 - Author(s): [@jkutner](https://github.com/jkutner)
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#175](https://github.com/buildpacks/rfcs/pull/175)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: N/A
 
 # Summary
