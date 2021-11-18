@@ -58,17 +58,23 @@ Proposed supported extensions:
 
 ```toml
 [images]
-builder="cnbs/sample:builder"
 names=[
     "cnbs/sample-app",
     "cnbs/sample-app:v1",
     "grc.io/cnbs/sample-app:v1"
 ]
-previous.name="cnbs/sample-app"
+
+[images.builder]
+name="cnbs/sample:builder"
+trusted=true
+
+[images.previous]
+name="cnbs/sample-app"
+
 [images.run]
 name = "cnbs/sample-stack-run:bionic"
 mirrors = [
-	"cnbs/sample-stack-run:bionic"
+	"grc.io/cnbs/sample-stack-run:bionic",
 ]
 
 [[env]] # build-time env vars
@@ -87,6 +93,7 @@ version = "0.0.1"
 ###
 # Contents Configuration
 ###
+
 [source]
 workspace = "/workspace"
 # exclude = [] # mutially exclusive with 'include'
@@ -101,6 +108,7 @@ include = [
 # Caching
 # See https://github.com/buildpacks/rfcs/blob/main/text/0091-pack-cache-options.md
 ##
+
 [cache]
 format="image"
 name="cnbs/sample-app-cache:build"
@@ -118,6 +126,7 @@ name="cnbs/sample-app-cache:build"
 ###
 # Process Specific Configuration
 ###
+
 [process]
 default = "web"
 
@@ -131,17 +140,19 @@ operation="append" # default=override
 
 ```yaml
 images:
-  builder: 'cnbs/sample:builder'
   names:
     - cnbs/sample-app
     - 'cnbs/sample-app:v1'
     - 'grc.io/cnbs/sample-app:v1'
+  builder:
+    name: 'cnbs/sample:builder'
+    trusted: true
   previous:
     name: cnbs/sample-app
   run:
     name: 'cnbs/sample-stack-run:bionic'
     mirrors:
-      - 'cnbs/sample-stack-run:bionic'
+      - 'grc.io/cnbs/sample-stack-run:bionic'
 env:
   - name: ENV_1
     value: ENV_2
