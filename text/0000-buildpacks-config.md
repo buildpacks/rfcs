@@ -22,41 +22,103 @@ A configuration file intended for end-users to influence how a buildpack build o
 # Definitions
 [definitions]: #definitions
 
-Make a list of the definitions that may be useful for those reviewing. Include phrases and words that buildpack authors or other interested parties may not be familiar with.
+ - **Application API**: A new specification detail the contract and schema between the application, it's configuration, and the `lifecycle` components.
+ - **Platform API**: Existing specification detailing contract between the `platform` and `lifecycle`.
+ - **platform config**: A new file that provides a Platform API specific configuration to the platform from an Application API configuration.
+ - **project.toml (Project Descriptor)**: An existing configuration file created by this project with higher asperations of configuring not just buildpacks but other tools and platforms. See "Supersedes" meta issues above.
 
 # Motivation
 [motivation]: #motivation
 
-- Why should we do this?
-- What use cases does it support?
-- What is the expected outcome?
+The current use of the _project descriptor_ has a few issues:
+
+### Cross-Platform Support
+
+The current specification treats the _project descriptor_ as an "extension" specification meaning that it may only be optionally supported by platforms to be compliant.
+
+From a user's point-of-view, it's unexpected to have their application built one way locally via `pack` (which supports `project.toml`) and another way using another platform such as `Tekton` (which doesn't support `project.toml`) where both platforms natively support Cloud Native Buildpacks. See reported [issue][issue-tekton-33].
+
+### Obscure
+
+Due to the generic intent of `project.toml`, it is not inherently clear that a project is configured to be built by Cloud Native Buildpacks using a `project.toml`. Compare this to recognizing a platform or system specific configuration file such as `.github/`, `Dockerfile`, `travis.yml`, etc.
+
+```text
+.
+├── .git/
+├── .github/
+├── src/
+├── .gitignore
+├── .gitpod.yml
+├── README.md
+├── codecov.yml
+├── golangci.yaml
+├── Dockerfile
+└── project.toml
+```
+
+### Complex Syntax
+
+In trying to support multiple use cases in a single file, the syntax become slightly more complex by the use of ["reverse domain namespacing"][reverse-domain-namespacing].
+
+```toml
+[_]
+api = "0.2"
+id = "<string>" # machine readable
+name = "<string>" # human readable
+version = "<string>"
+authors = ["<string>"]
+documentation-url = "<url>"
+source-url = "<url>"
+
+[[_.licenses]]
+type = "<string>"
+uri = "<uri>"
+
+[io.buildpacks]
+api = "0.1"
+
+[io.buildpacks.build]
+include = ["<string>"]
+exclude = ["<string>"]
+
+[[io.buildpacks.build.buildpacks]]
+id = "<string>"
+version = "<string>"
+uri = "<string>"
+
+[[io.buildpacks.build.env]]
+name = "<string>"
+value = "<string>"
+```
+
+[reverse-domain-namespacing]: https://github.com/buildpacks/rfcs/blob/main/text/0084-project-descriptor-domains.md
+[issue-tekton-33]: https://github.com/buildpacks/tekton-integration/issues/33
 
 # What it is
 [what-it-is]: #what-it-is
-<!--
-This provides a high level overview of the feature.
 
-- Define any new terminology.
-- Define the target persona: buildpack author, buildpack user, platform operator, platform implementor, and/or project contributor.
-- Explaining the feature largely in terms of examples.
-- If applicable, provide sample error messages, deprecation warnings, or migration guidance.
-- If applicable, describe the differences between teaching this to existing users and new users.
--->
+The proposed solution to the issues listed in the [motivation](#motivation) is to create a **Cloud Native Buildpacks specific file** that **MUST be supported by platforms**.
 
-`./.buildpacks.<ext>`
+## File
+
+`buildpacks.<ext>` where `<ext>` corrolates to a supported format.
+
+By using the term "buildpacks" in the file name, it becomes immediately apparent that this project has custom configuration for Cloud Native Buildpacks.
 
 ### Supported Formats
 
-Proposed supported extensions:
+By supporting multiple file formats, we lower the barrier to entry and allow for the flexibility desired by some app developers.
+
+Proposed supported extensions (in order of precedence):
 
  - `toml` => TOML
  - `yaml`, `yml` => YAML
 
-> If multiple files exist, `toml` would be selected.
-
 #### TOML
 
 ```toml
+schema="0.1"
+
 [images]
 names=[
     "cnbs/sample-app",
@@ -139,6 +201,7 @@ operation="append" # default=override
 #### YAML
 
 ```yaml
+schema: "0.1"
 images:
   names:
     - cnbs/sample-app
@@ -184,9 +247,41 @@ process:
 # How it Works
 [how-it-works]: #how-it-works
 
-This is the technical portion of the RFC, where you explain the design in sufficient detail.
+### Configuration Properties
 
-The section should return to the examples given in the previous section, and explain more fully how the detailed proposal makes those examples work.
+To prevent unnecessary complexity for end-users (app developers), the `buildpacks.<ext>` file would only support properties associated with Cloud Native Buildpacks. See full list of properties in the [file](#file) section.
+
+### Cross-Platform Support
+
+Support for this configuration would be part of a _new_ specification (`Application API`). 
+
+Building upon [RFC PR#182][rfc-pr-182], the `buildpacks.<ext>` file would be part of a contract between the `application` -> `converter` -> `platform`. Platforms will be required to support the `buildpacks.<ext>` files through changes to the `Platform API` and use of an intermediate file named _platform config_ (`platform.toml`). The `platform.toml` will be a Platform API version specific configuration file which contains only properties the platform can handle. Any unsupported features should yield a warning. Platforms can additional opt-out of features but would also be requested to yield warnings or errors in such cases.
+
+```text
+                      Application API
+┌────────────────────────────────────────────────────────────────┐
+│                                                                │
+
+                         ┌───────┐
+                         │       │   buildpacks.*    ┌───────────┐
+┌────────┐               │   p   ├───────────────────►           │
+│        │ buildpacks.*  │   l   │                   │ converter │
+│ source ├───────────────►   a   │                   │           │
+│        │               │   t   │                   └──┬────────┘
+└────────┘               │   f   │                      │
+                         │   o   ◄──────────────────────┘
+                         │   r   │   platform.toml
+                         │   m   │
+                         │       │
+                         └───────┘
+
+                         │                                       │
+                         └───────────────────────────────────────┘
+                                       Platform API
+```
+
+
+[rfc-pr-182]: https://github.com/buildpacks/rfcs/pull/182
 
 # Drawbacks
 [drawbacks]: #drawbacks
