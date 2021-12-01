@@ -11,12 +11,12 @@
 # Summary
 [summary]: #summary
 
-Allow users to provide additional paths that can be exported similar to the application directory and allow easy configuration of the application directory. These paths are defined via the `buildpack.export_dirs` by each buildpack.
+Allow users to provide additional volumes that can be exported similar to the application directory and allow easy configuration of the application directory. These volumes are defined via the `buildpack.exportable-volumes` by each buildpack.
 
 # Definitions
 [definitions]: #definitions
 
-- `export_dirs`: A set of directories describing where the buildpack process is likely to write data specific and should be exported alongside the application workspace. 
+- `exportable-volumes`: A set of volumes describing where the buildpack process is likely to write data specific and should be exported alongside the application workspace.
 
 # Motivation
 [motivation]: #motivation
@@ -26,9 +26,9 @@ The main motivation behind this RFC is to unlock exporting application images th
 # What it is
 [what-it-is]: #what-it-is
 
-Buildpack authors would be able to buildpacks with `buildpack.export_dirs` keys in their `buildpack.toml` files.
+Buildpack authors would be able to buildpacks with `buildpack.exportable-volumes` keys in their `buildpack.toml` files.
 
-For example a a buildpack may look like - 
+For example a a buildpack may look like -
 
 ```toml
 api = "<buildpack API version>"
@@ -36,33 +36,38 @@ api = "<buildpack API version>"
 [buildpack]
 id = "<buildpack ID>"
 name = "<buildpack name>"
-export_dirs = ["/opt", "/home/cnb/.config"]
+exportable-volumes = ["aws-extensions", "user-config-dir"]
 ```
 
-The above would only be valid for normal buildpacks and not meta-buildpacks. Based on the `volumes` field, a platform would be responsible for validating that the `build` and `run` image do not have any content on these paths. Additionally, the builder image would be tagged with a label `io.buildpacks.export_dirs` with the list of paths that need to be exported. 
+The above would only be valid for normal buildpacks and not meta-buildpacks. Based on the `exportable-volumes` field, a platform would be responsible for validating that the `build` and `run` image do not have any content on these paths. By default these volume names will map to `/workspaces/<exportable-volume-name>` but a user may specify a label `io.buildpacks.exportable-volumes` on the `build` image to map a volume name to a different location. This label would look like -
+
+```json
+[
+    {"name": "user-config-dir", "value": "/home/cnb/.config"},
+    {"name": "aws-extensions", "value": "/opt"}
+]
+```
+
+For volumes defined by buildpacks but not in the `io.buildpacks.exportable-volumes` we will use a default `/workspaces/<exportable-volume-name>` directory.
 
 # How it Works
 [how-it-works]: #how-it-works
 
 This RFC would require changes to the lifecycle and platform API.
 
-The platform would be responsible for mounting appropriate volumes based on the `io.buildpacks.export_dirs` label in the OCI image config. For a platform like `pack` which relies on a daemon this should be fairly straight-forward to achieve. For other platforms like `kpack` this would involve inspecting the builder image beforehand and modifying the build pod spec to accommodate the specified volumes.
+The lifecycle would be responsible for creating symlinks from `/workspaces/<exportable-volume-name>` in the build image to the actual mapped directory and make these writable for buildpacks. It will also be responsible for exporting the content on these directories to the actual paths on the run-image.
 
-The lifecycle changes would involve exporting the files present in the above locations which should be similar to the logic that currently exists for exporting application workspace. Buildpacks could also take advantage of `slices` to specify paths in these additional directories that should exist as separate layers.
-
-The lifecycle `analysis` phase would also be responsible for validating that the above list of `export_dirs` is valid for the provided `run` image.
+The current default workspace directory would be moved to `/workspaces/default` but the lifecycle will symlink that directory back to `/workspace` for backwards compatibility.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 - Additional complexity
-- Platforms like Tekton may not be able to implement something like this easily.
 
 # Alternatives
 [alternatives]: #alternatives
 
-TBD: Multiple App Directories proposal
-
+N/A
 # Prior Art
 [prior-art]: #prior-art
 
