@@ -53,11 +53,11 @@ The `system.pre.buildpacks` will be transformed into a new table in `order.toml`
 
 ## Detection
 
-The results of detection by system buildpacks MUST NOT influence the selected buildpack group. If no system buildpacks pass detection, any buildpack group MAY pass detection. If a system buildpack pass detection and no buildpack groups pass detection, then detection MUST fail.
+The exit code of detection by system buildpacks MUST NOT influence the selected buildpack group. If no system buildpacks pass detection, any buildpack group MAY pass detection. If a system buildpack passes detection and no buildpack groups pass detection, then detection MUST fail.
 
 System buildpacks may require/provide in the build plan following standard buildpack API specification.
 
-A new flag to the lifecycle `detector`, `--disable-system-buildpacks`, will disable system buildpacks
+A new flag to the lifecycle `detector`, `--disable-system-buildpacks`, will disable system buildpacks.
 
 ## Build
 
@@ -65,12 +65,12 @@ System buildpacks that have passed detection will be executed during the build p
 
 If a system buildpack exits with a status of `100`, the build will fail.
 
-A new flag to the lifecycle `builder`, `--disable-system-buildpacks`, will disable system buildpacks
+A new flag to the lifecycle `builder`, `--disable-system-buildpacks`, will disable system buildpacks.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Default buildpacks are essentially hidden from the user and may be unexpected.
+- Default system buildpacks are hidden from the user before the build and their execution may be unexpected.
 
 # Alternatives
 [alternatives]: #alternatives
