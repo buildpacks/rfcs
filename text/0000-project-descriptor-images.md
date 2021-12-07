@@ -18,7 +18,7 @@ Add a new array of tables `[[images]]` to the `project.toml` file.
 
 * **project descriptor**: The `project.toml` file that describes a project.
 * **image**: the output of a running a buildpack(s) against a project
-* **image name**: fully qualified name of an OCI image in the form `<registry>/<name>:<tag>`.
+* **image name**: Global Unique Name (GUN) of an OCI image in the form `[REGISTRY_HOST[:REGISTRY_PORT]/]REPOSITORY[:TAG]`.
 
 # Motivation
 [motivation]: #motivation
@@ -44,17 +44,17 @@ Example:
 
 ```toml
 [[images]]
-name = "spring-petclinic"
 registry = "gcr.io"
+repository = "spring-petclinic"
 tags = ["latest", "v1"]
 
 [[images]]
-name = "spring-petclinic"
+repository = "spring-petclinic"
 tags = ["latest", "v1"]
 
 [[images]]
-name = "spring-petclinic"
 registry = "private.registry.corp:8443"
+repository = "spring-petclinic"
 ```
 
 This example will produce the following images:
@@ -73,7 +73,7 @@ This example will produce the following images:
   ```toml
   [images]
   registries = ["gcr.io", "docker.io"]
-  name = "spring-petclinic"
+  repository = "spring-petclinic"
   tags = ["latest", "v1"]
   ```
 
@@ -82,18 +82,18 @@ This example will produce the following images:
   ```toml
   [[images]]
   registry = "gcr.io"
-  name = "spring-petclinic"
+  repository = "spring-petclinic"
   tag = "latest"
 
   [[images]]
   registry = "docker.io"
-  name = "spring-petclinic"
+  repository = "spring-petclinic"
   tag = "v1"
 
   # ...
   ```
 
-- Simple array of strings containing all information i.e. `registry`, `name`, `tag`
+- Simple array of strings containing all information i.e. `registry`, `repository`, `tag`
 
   ```toml
   images = [
@@ -104,15 +104,15 @@ This example will produce the following images:
   ]
   ```
 
-- Simple array of images containing all information with `name` being a placeholder
+- Simple array of images containing all information with `repository` being a placeholder
 
   ```toml
-  name = "spring-petclinic"
+  repository = "spring-petclinic"
   images = [
-      "gcr.io/{name}:latest",
-      "gcr.io/{name}:v1",
-      "docker.io/{name}:latest",
-      "docker.io/{name}:v1"
+      "gcr.io/{repository}:latest",
+      "gcr.io/{repository}:v1",
+      "docker.io/{repository}:latest",
+      "docker.io/{repository}:v1"
   ]
   ```
 
@@ -139,21 +139,21 @@ This table MAY contain an array of image repository label definitions. The schem
 
 ```
 [[io.buildpacks.images]]
-name = "<string (optional, default=io.buildpacks.name)>"
-tags = ["<string (optional, default=latest)>"]
 registry = "<string (optional default=docker.io)"
+repository = "<string (optional, default=io.buildpacks.name)>"
+tags = ["<string (optional, default=latest)>"]
 ```
 
--`name` - the name component of an image repository
--`tags` - a list of tags used as the tag component of images in an image repository
--`registry` - a registry server containing the image repository
-
-If no `name` component is provided, the default value MUST be derived from the `io.buildpacks.name` field.
-
-If no `tags` are provided, the default value MUST be `"latest"`.
+- `registry` - a `REGISTRY_HOST[:REGISTRY_PORT]` component of the image name.
+- `repository` - a `REPOSITORY` component of the image name.
+- `tags` - a list of tags used as the `TAG` component of the image name.
 
 If no `registry` is provided, the default value MUST be `"docker.io"`.
 
-ALl of these values MAY be overridden by a platform (ex. `pack` may allow a `--tag` flag to overridden the provided `tag` value).
+If no `repository` component is provided, the default value MUST be derived from the `io.buildpacks.name` field.
+
+If no `tags` are provided, the default value MUST be `"latest"`.
+
+ALL of these values MAY be overridden by a platform (ex. `pack` may allow a `--tag` flag to overwrite the specified `images` value).
 
 Multiple `[[io.buildpacks.images]]` entries MUST result in the creation of multiple Docker image repositories. All images will have the same digest irrespective of the different names, tags, and registries that are provided.
