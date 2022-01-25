@@ -1,65 +1,105 @@
 # Meta
 [meta]: #meta
-- Name: (fill in the feature name: My Feature)
-- Start Date: (fill in today's date: YYYY-MM-DD)
-- Author(s): (Github usernames)
+- Name: `.profile` Utility Buildpack
+- Start Date: 2022-01-25
+- Author(s): mboldt
 - Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
-- Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
+- Supersedes: N/A
 
 # Summary
 [summary]: #summary
 
-One paragraph explanation of the feature.
+As part of RFC 93, [`.profile` scripts will cease to be supported by the platform API](https://github.com/buildpacks/rfcs/blob/main/text/0093-remove-shell-processes.md#appprofile).
+This RFC proposes developing a [utility buildpack](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-utility-buildpacks.md) to support `.profile` scripts to prevent regressions after RFC 93 is implemented.
 
 # Definitions
 [definitions]: #definitions
 
-Make a list of the definitions that may be useful for those reviewing. Include phrases and words that buildpack authors or other interested parties may not be familiar with.
+*utility buildpack*: A buildpack officially supported by the Buildpack Authors' Tooling Team per [RFC 97](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-utility-buildpacks.md).
 
 # Motivation
 [motivation]: #motivation
 
-- Why should we do this?
-- What use cases does it support?
-- What is the expected outcome?
+[RFC 93](https://github.com/buildpacks/rfcs/blob/main/text/0093-remove-shell-processes.md) resolves to remove shell-specific logic from the CNB Specification.
+Part of this includes removing support for `.profile` script in a future version of the Platform API.
+RFC 93 recommends supporting the `.profile` script functionality in a utility buildpack to avoid regressions.
+This proposal is to develop and support the `.profile` utility buildpack, allowing RFC 93 to be implemented without regression.
 
 # What it is
 [what-it-is]: #what-it-is
 
-This provides a high level overview of the feature.
+The target persona is a platofrm operator or implementor who wants to update to the latest platform API, while maintaining the `.profile` functionality for application developers.
 
-- Define any new terminology.
-- Define the target persona: buildpack author, buildpack user, platform operator, platform implementor, and/or project contributor.
-- Explaining the feature largely in terms of examples.
-- If applicable, provide sample error messages, deprecation warnings, or migration guidance.
-- If applicable, describe the differences between teaching this to existing users and new users.
+We propose developing and supporting a buildpack to provide an identical interface to the existing `.profile` functionality.
+It will:
+
+- Detect a `.profile` file in the app dir
+- Wrap the `.profile` file so that it implements the `exec.d` interface
+- Add the `exec.d` executable to the `<layer>/exec.d` directory so the launcher will apply it
+
+## Example 1 (environment variables)
+
+Here is an example of a `.profile` script, inspired by paketo-buidpacks/node-engine:
+
+```
+memory_in_bytes="$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)"
+MEMORY_AVAILABLE="$(( $memory_in_bytes / ( 1024 * 1024 ) ))"
+export MEMORY_AVAILABLE
+```
+
+The wrapper should ensure that the `MEMORY_AVAILABLE` environment variable is set in the environment with the proper value.
+
+## Example 2 (file system side effects)
+
+With this contrived `.profile` script:
+
+```
+echo 'hello' >> "$HOME/hello"
+```
+
+The wrapper would not need to set any environment varibales, but should maintain the side effect of creating the `$HOME/hello` file.
+
 
 # How it Works
 [how-it-works]: #how-it-works
 
-This is the technical portion of the RFC, where you explain the design in sufficient detail.
+In short, the wrapper should do:
 
-The section should return to the examples given in the previous section, and explain more fully how the detailed proposal makes those examples work.
+```
+#!/bin/bash
+set -eo
+source .profile
+env >&3
+```
+
+This will write the environment, including any variables set in `.profile`, to the [`exec.d` output TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#execd-output-toml).
+Since it also executes the `.profile` script, any side effects will happen.
+This will solve for both of the simple examples above.
 
 # Migration
 [migration]: #migration
 
-This section should document breaks to public API and breaks in compatibility due to this RFC's proposed changes. In addition, it should document the proposed steps that one would need to take to work through these changes. Care should be give to include all applicable personas, such as platform developers, buildpack developers, buildpack users and consumers of buildpack images.
+This buildpack is net new, so has no inherent migration considerations.
+
+For the realted migration concerns for removing shell functionality in general, see the [Migration Path section of RFC 93](https://github.com/buildpacks/rfcs/blob/main/text/0093-remove-shell-processes.md#migration-path).
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this?
+This is a new component to maintain and support.
+That being said, this will enable spec and lifecycle simplifications noted in [RFC 93](https://github.com/buildpacks/rfcs/blob/main/text/0093-remove-shell-processes.md) (where this approach was first suggested).
+Also, [RFC 97](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-utility-buildpacks.md) resolves to support and maintain utility buidpacks.
 
 # Alternatives
 [alternatives]: #alternatives
 
+If we do nothing, we introduce a regression in functionality, and force application developers to rework their `.profile` scripts.
+
 - What other designs have been considered?
 - Why is this proposal the best?
-- What is the impact of not doing this?
 
 # Prior Art
 [prior-art]: #prior-art
@@ -69,12 +109,11 @@ Discuss prior art, both the good and bad.
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What parts of the design do you expect to be resolved before this gets merged?
-- What parts of the design do you expect to be resolved through implementation of the feature?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+- Are there things that `.profile` scripts do that will not be covered by the exec.d interface?
+  For example, defining environment variables and side effects like writing files should be supported.
+  But, something like defining a bash function will not be supported.
 
-# Spec. Changes (OPTIONAL)
+# Spec. Changes
 [spec-changes]: #spec-changes
-Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
-Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fields, new fields in the buildpackage label, etc.
-This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are necessary, they should be documented here.
+
+None.
