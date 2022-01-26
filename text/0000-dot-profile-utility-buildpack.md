@@ -79,6 +79,13 @@ This will write the environment, including any variables set in `.profile`, to t
 Since it also executes the `.profile` script, any side effects will happen.
 This will solve for both of the simple examples above.
 
+On Windows, for `.profile.bat` scripts, we can take the same approach of wrapping the script like:
+
+```
+call .profile.bat
+set >&%CNB_EXEC_D_HANDLE%
+```
+
 # Migration
 [migration]: #migration
 
