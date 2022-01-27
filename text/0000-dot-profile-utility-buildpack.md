@@ -31,7 +31,7 @@ This proposal is to develop and support the `.profile` utility buildpack, allowi
 # What it is
 [what-it-is]: #what-it-is
 
-The target persona is a platofrm operator or implementor who wants to update to the latest platform API, while maintaining the `.profile` functionality for application developers.
+The target persona is a platform operator or implementor who wants to update to the latest platform API, while maintaining the `.profile` functionality for application developers.
 
 We propose developing and supporting a buildpack to provide an identical interface to the existing `.profile` functionality.
 It will:
@@ -93,7 +93,7 @@ set >&%CNB_EXEC_D_HANDLE%
 
 This buildpack is net new, so has no inherent migration considerations.
 
-For the realted migration concerns for removing shell functionality in general, see the [Migration Path section of RFC 93](https://github.com/buildpacks/rfcs/blob/main/text/0093-remove-shell-processes.md#migration-path).
+For the related migration concerns for removing shell functionality in general, see the [Migration Path section of RFC 93](https://github.com/buildpacks/rfcs/blob/main/text/0093-remove-shell-processes.md#migration-path).
 
 # Drawbacks
 [drawbacks]: #drawbacks
