@@ -40,6 +40,8 @@ It will:
 - Wrap the `.profile` file so that it implements the `exec.d` interface
 - Add the `exec.d` executable to the `<layer>/exec.d` directory so the launcher will apply it
 
+We propose the ID `buildpacksio/profie` for this buildpack (cf. [RFC 97](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-utility-buildpacks.md#what-it-is)).
+
 ## Example 1 (environment variables)
 
 Here is an example of a `.profile` script, inspired by paketo-buidpacks/node-engine:
