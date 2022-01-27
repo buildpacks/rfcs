@@ -77,6 +77,9 @@ source .profile
 env >&3
 ```
 
+We acknoledge that the `env` output will need to be properly quoted to be valid TOML.
+We will use or create a tool to handle that formatting.
+
 This will write the environment, including any variables set in `.profile`, to the [`exec.d` output TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#execd-output-toml).
 Since it also executes the `.profile` script, any side effects will happen.
 This will solve for both of the simple examples above.
