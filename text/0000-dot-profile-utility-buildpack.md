@@ -70,7 +70,7 @@ In short, the wrapper should do:
 
 ```
 #!/bin/bash
-set -eo
+set -euo pipefail
 source .profile
 env >&3
 ```
