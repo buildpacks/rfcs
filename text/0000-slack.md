@@ -80,7 +80,25 @@ The following channels will not be migrated -
 - summit-2021 (inactive)
 - user-research (inactive)
 - wg-chat (inactive)
+## Migration Steps
+* [ ] once RFC finalizes, announce migration in slack and mailing list with move over date and a 1 hour maintenance window where chat will be down during the migration.
+* [ ] before Feb 2, get slack backup of history
+* [ ] on date move over
+  * [ ] setup final announcement in slack and set all channels as read-only.
+  * [ ] backup history merge with previous backup, give to CNCF for migration
+  * [ ] merge docs PR pointing to the new slack.
 
+### Backups
+Slack backups are a zip file that have this layout:
+```
+<channel>/YYYY-MM-DD.json
+...
+channels.json
+integration_logs.json
+users.json
+```
+
+The plan is to take an initial dump on Feb 1 of all the history up to that point. The second backup will contain the history from Jan 31 up to the the cut off time. The Feb 1->cut off dates will be copied into the original zip and the `channels.json`, `integration_logs.json`, and `users.json` will be copied over as well into the root.
 
 # Drawbacks
 [drawbacks]: #drawbacks
