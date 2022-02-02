@@ -44,7 +44,7 @@ We propose the ID `buildpacksio/profie` for this buildpack (cf. [RFC 97](https:/
 
 ## Example 1 (environment variables)
 
-Here is an example of a `.profile` script, inspired by paketo-buidpacks/node-engine:
+Here is an example of a `.profile` script, inspired by paketo-buildpacks/node-engine:
 
 ```
 memory_in_bytes="$(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)"
