@@ -56,7 +56,7 @@ The wrapper should ensure that the `MEMORY_AVAILABLE` environment variable is se
 
 ## Example 2 (file system side effects)
 
-With this contrived `.profile` script:
+With this `.profile` script:
 
 ```
 echo 'hello' >> "$HOME/hello"
