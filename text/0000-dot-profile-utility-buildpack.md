@@ -94,7 +94,7 @@ set >&%CNB_EXEC_D_HANDLE%
 # Migration
 [migration]: #migration
 
-This buildpack is net new, so has no inherent migration considerations.
+This buildpack is new, so has no inherent migration considerations.
 
 For the related migration concerns for removing shell functionality in general, see the [Migration Path section of RFC 93](https://github.com/buildpacks/rfcs/blob/main/text/0093-remove-shell-processes.md#migration-path).
 
