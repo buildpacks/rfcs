@@ -103,7 +103,7 @@ For the related migration concerns for removing shell functionality in general, 
 
 This is a new component to maintain and support.
 That being said, this will enable spec and lifecycle simplifications noted in [RFC 93](https://github.com/buildpacks/rfcs/blob/main/text/0093-remove-shell-processes.md) (where this approach was first suggested).
-Also, [RFC 97](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-utility-buildpacks.md) resolves to support and maintain utility buidpacks.
+Also, [RFC 97](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-utility-buildpacks.md) resolves to support and maintain utility buildpacks.
 
 # Alternatives
 [alternatives]: #alternatives
