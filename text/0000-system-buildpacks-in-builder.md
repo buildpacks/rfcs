@@ -32,15 +32,15 @@ We introduce a `[system]` table in the `builder.toml` schema with the following 
 [[system.pre.buildpacks]]
   id = "<buildpack ID>"
   version = "<buildpack version>"
-  optional = false
+  optional = true
 
 [[system.post.buildpacks]]
   id = "<buildpack ID>"
   version = "<buildpack version>"
-  optional = false
+  optional = true
 ```
 
-The fields in the `system.pre.buildpacks` table and `system.post.buildpacks` table match the fields in the existing [`order.group` table](https://buildpacks.io/docs/reference/config/builder-config/#order-_list-required_).
+The fields in the `system.pre.buildpacks` table and `system.post.buildpacks` table match the fields in the existing [`order.group` table](https://buildpacks.io/docs/reference/config/builder-config/#order-_list-required_). However, `optional` in this case is required and the only acceptable value is `true`. Non-optional buildpacks will cause the builder creation to fail.
 
 When a builder includes one or more `system.*.buildpacks` entry, each build phase that uses the builder will run the `pre` buildpacks before ALL other buildpacks (whether they are defined by a default `order.group` or if they are provided as an explicit order to the lifecycle) and the `post` buildpack after ALL other buildpacks.
 
@@ -109,47 +109,26 @@ Instead of a new `[system]` table, we could put `pre` and `post` in the `[[order
 [unresolved-questions]: #unresolved-questions
 
 - Should the system buildpacks that pass detection be added to the buildpack group? This might make it difficult to hide them.
+    - disposition: yes. hiding is optional and up to the platform
 - Should the system buildpacks output to stdout/stderr and should that be displayed?
+    - disposition: it may be
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
 ## `detector` in Platform specifiction
 
-This proposal introduces a `--disable-system-buildpacks` flag on the `detector`.
+This proposal introduces a `--pre-buildpacks` and `--post-buildpacks` option on the `detector`.
 
 ```
 /cnb/lifecycle/detector \
-  [--disable-system-buildpacks] \
+  [--pre-buildpacks <group>]\
+  [--post-buildpacks <group>]\
 ```
 
-## `builder` in Platform specifiction
+The lifecycle:
 
-This proposal introduces a `--disable-system-buildpacks` flag on the `builder`.
-
-```
-/cnb/lifecycle/builder \
-  [--disable-system-buildpacks] \
-```
-
-## `[[order.toml]]` in Platform specifiction
-
-This proposal requires changes to the [`order.toml` schema](https://github.com/buildpacks/spec/blob/main/platform.md#ordertoml-toml).
-
-```
-[[system.pre.buildpacks]]
-  id = "<buildpack ID>"
-  version = "<buildpack version>"
-  optional = false
-
-[[system.post.buildpacks]]
-  id = "<buildpack ID>"
-  version = "<buildpack version>"
-  optional = false
-```
-
-Where:
-* Both `id` and `version` MUST be present for each buildpack object in a group.
-* The value of `optional` MUST default to false if not specified.
+* SHALL merge the `<pre-buildpacks>` group with each group from `<order>` such that the `pre` buildpacks are placed at the beginning of each group before running detection.
+* SHALL merge the `<post-buildpacks>` group with each group from `<order>` such that the `post` buildpacks are placed at the end of each group before running detection.
 
 
