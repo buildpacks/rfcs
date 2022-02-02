@@ -110,8 +110,6 @@ Also, [RFC 97](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-u
 
 If we do nothing, we introduce a regression in functionality, and force application developers to rework their `.profile` scripts.
 
-- What other designs have been considered?
-- Why is this proposal the best?
 
 # Prior Art
 [prior-art]: #prior-art
