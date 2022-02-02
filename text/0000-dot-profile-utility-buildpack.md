@@ -18,7 +18,7 @@ This RFC proposes developing a [utility buildpack](https://github.com/buildpacks
 # Definitions
 [definitions]: #definitions
 
-*utility buildpack*: A buildpack officially supported by the Buildpack Authors' Tooling Team per [RFC 97](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-utility-buildpacks.md).
+*utility buildpack*: A buildpack officially supported by the Buildpack Authors' Tooling Team per [RFC 97](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-utility-buildpacks.md) that provides a generic capability.
 
 # Motivation
 [motivation]: #motivation
