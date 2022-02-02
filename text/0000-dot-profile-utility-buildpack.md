@@ -116,7 +116,7 @@ If we do nothing, we introduce a regression in functionality, and force applicat
 # Prior Art
 [prior-art]: #prior-art
 
-Discuss prior art, both the good and bad.
+-
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
