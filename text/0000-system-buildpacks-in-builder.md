@@ -49,15 +49,13 @@ When a builder includes one or more `system.*.buildpacks` entry, the detect phas
 
 Unless otherwise stated, system buildpacks conform to the [buildpack API](https://github.com/buildpacks/spec/blob/main/buildpack.md).
 
-The `system.pre.buildpacks` will be transformed into a new table in `order.toml`. The `[system]` table in `order.toml` will be processed by the lifecycle, and each `pre`/`post` buildpack will run during the detect phase. Those that pass detection will run during the build phase.
+The `system.*pre*.buildpacks` will be provided to the lifecycle into a new file, `system.toml`. The `[system]` table in `system.toml` will be processed by the lifecycle, and each `pre`/`post` buildpack will run during the detect phase. Those that pass detection will run during the build phase.
 
 ## Detection
 
 The exit code of detection by system buildpacks MUST NOT influence the selected buildpack group. If no system buildpacks pass detection, any buildpack group MAY pass detection. If a system buildpack passes detection and no buildpack groups pass detection, then detection MUST fail.
 
 System buildpacks may require/provide in the build plan following standard buildpack API specification.
-
-A new flag to the lifecycle `detector`, `--disable-system-buildpacks`, will disable system buildpacks.
 
 ## Build
 
@@ -120,13 +118,26 @@ This proposal introduces a `--pre-buildpacks` and `--post-buildpacks` option on 
 
 ```
 /cnb/lifecycle/detector \
-  [--pre-buildpacks <group>]\
-  [--post-buildpacks <group>]\
+  [--system <system>]\
 ```
 
-The lifecycle:
+Where:
 
-* SHALL merge the `<pre-buildpacks>` group with each group from `<order>` such that the `pre` buildpacks are placed at the beginning of each group before running detection.
-* SHALL merge the `<post-buildpacks>` group with each group from `<order>` such that the `post` buildpacks are placed at the end of each group before running detection.
+* the lifecycle SHALL merge the `pre` group with each group from `<system>` such that the `pre` buildpacks are placed at the beginning of each order group before running detection.
+* SHALL merge the `post` group with each group from `<system>` such that the `post` buildpacks are placed at the end of each order group before running detection.
+
+#### `system.toml` (TOML)
+
+```toml
+[[system.pre.buildpacks]]
+  id = "<buildpack ID>"
+  version = "<buildpack version>"
+  optional = true
+
+[[system.post.buildpacks]]
+  id = "<buildpack ID>"
+  version = "<buildpack version>"
+  optional = true
+```
 
 
