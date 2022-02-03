@@ -65,8 +65,6 @@ System buildpacks that have passed detection will be added to `group.toml` and t
 
 If a system buildpack exits with a status of `100`, the build will fail.
 
-A new flag to the lifecycle `builder`, `--disable-system-buildpacks`, will disable system buildpacks.
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
