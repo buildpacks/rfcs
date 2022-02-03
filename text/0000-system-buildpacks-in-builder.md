@@ -11,7 +11,7 @@
 # Summary
 [summary]: #summary
 
-This is a proposal for a mechanism that would allow a builder to contain a default set of buildpacks that run on every build, independent of which buildpack group passes detection.
+This is a proposal for a mechanism that would allow a builder to contain a default set of buildpacks that participate in every detection group, regardless of the buildpack order passed by the platform.
 
 # Definitions
 [definitions]: #definitions
