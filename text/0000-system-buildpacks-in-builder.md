@@ -42,7 +42,7 @@ We introduce a `[system]` table in the `builder.toml` schema with the following 
 
 The fields in the `system.pre.buildpacks` table and `system.post.buildpacks` table match the fields in the existing [`order.group` table](https://buildpacks.io/docs/reference/config/builder-config/#order-_list-required_). However, `optional` in this case is required and the only acceptable value is `true`. Non-optional buildpacks will cause the builder creation to fail.
 
-When a builder includes one or more `system.*.buildpacks` entry, each build phase that uses the builder will run the `pre` buildpacks before ALL other buildpacks (whether they are defined by a default `order.group` or if they are provided as an explicit order to the lifecycle) and the `post` buildpack after ALL other buildpacks.
+When a builder includes one or more `system.*.buildpacks` entry, the detect phase will prepend and append all `pre` and `post` buildpacks to each detection group in the provided order, respectively.
 
 # How it Works
 [how-it-works]: #how-it-works
