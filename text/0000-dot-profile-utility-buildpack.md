@@ -116,7 +116,18 @@ If we do nothing, we introduce a regression in functionality, and force applicat
 # Prior Art
 [prior-art]: #prior-art
 
--
+- Current CNB spec:
+  - `.profile` scripts are part of the buildpack app interface ([spec](https://github.com/buildpacks/spec/blob/main/buildpack.md#app-interface))
+  - `.profile.d/` scripts are part of the buildpack build phase output ([spec](https://github.com/buildpacks/spec/blob/main/buildpack.md#build)).
+
+- Profile scripts:
+  - Heroku supports [`.profile` scripts](https://devcenter.heroku.com/articles/dynos#the-profile-file) and [`.profile.d/` scripts](https://devcenter.heroku.com/articles/buildpack-api#profile-d-scripts).
+  - Cloud Foundry supports [`.profile and .profile.d/ scripts](https://docs.cloudfoundry.org/devguide/deploy-apps/deploy-app.html#profile).
+
+- Prior related RFCs:
+  - [Officially Supported Utility Buildpacks](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-utility-buildpacks.md)
+  - [Remove Shell Processes](https://github.com/buildpacks/rfcs/blob/main/text/0093-remove-shell-processes.md)
+  - [Exec.d - Shell-Free Profile.d](https://github.com/buildpacks/rfcs/blob/main/text/0057-exec.d-shell-free-profile-d.md)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
