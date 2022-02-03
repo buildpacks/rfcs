@@ -62,7 +62,7 @@ With this `.profile` script:
 echo 'hello' >> "$HOME/hello"
 ```
 
-The wrapper would not need to set any environment varibales, but should maintain the side effect of creating the `$HOME/hello` file.
+The wrapper would not need to set any environment variables, but should maintain the side effect of creating the `$HOME/hello` file.
 
 
 # How it Works
