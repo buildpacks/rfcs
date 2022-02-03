@@ -136,6 +136,9 @@ If we do nothing, we introduce a regression in functionality, and force applicat
   For example, defining environment variables and side effects like writing files should be supported.
   But, something like defining a bash function will not be supported.
 
+- What if the run image does not contain bash (e.g., `FROM scratch`)?
+  Should it error, no-op, should this buildpack add a layer with bash?
+
 # Spec. Changes
 [spec-changes]: #spec-changes
 
