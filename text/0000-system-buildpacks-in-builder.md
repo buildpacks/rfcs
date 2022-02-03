@@ -61,7 +61,7 @@ A new flag to the lifecycle `detector`, `--disable-system-buildpacks`, will disa
 
 ## Build
 
-System buildpacks that have passed detection will be executed during the build phase. All `pre` buildpacks must execute before the detected buildpack group. All `post` buildpacks must execute after the detected buildpack group. However, the system buildpacks MUST NOT be added to the buildpack group, and their execution may be hidden from the end user.
+System buildpacks that have passed detection will be added to `group.toml` and treated like any other buildpack for the remainder of the build.
 
 If a system buildpack exits with a status of `100`, the build will fail.
 
