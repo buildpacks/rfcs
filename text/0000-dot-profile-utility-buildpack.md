@@ -91,6 +91,8 @@ call .profile.bat
 set >&%CNB_EXEC_D_HANDLE%
 ```
 
+Per the [Operating System Conventions in the CNB spec](https://github.com/buildpacks/spec#operating-system-conventions), this buildpack will support scripts compatible with bash version 3 or greater on Linux, and cmd.exe on Windows.
+
 # Migration
 [migration]: #migration
 
