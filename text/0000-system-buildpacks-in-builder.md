@@ -16,7 +16,7 @@ This is a proposal for a mechanism that would allow a builder to contain a defau
 # Definitions
 [definitions]: #definitions
 
-* _system buildpacks_ - a standard buildpack, conforming to the Buildpack API, but which runs outside of normal groups
+* _system buildpacks_ - a standard buildpack, conforming to the Buildpack API, which participate in all groups
 
 # Motivation
 [motivation]: #motivation
