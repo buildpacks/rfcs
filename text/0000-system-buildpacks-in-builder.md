@@ -108,8 +108,6 @@ Instead of a new `[system]` table, we could put `pre` and `post` in the `[[order
 
 - Should the system buildpacks that pass detection be added to the buildpack group? This might make it difficult to hide them.
     - disposition: yes. hiding is optional and up to the platform
-- Should the system buildpacks output to stdout/stderr and should that be displayed?
-    - disposition: it may be
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
