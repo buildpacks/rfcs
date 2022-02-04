@@ -3,6 +3,7 @@
 - Name: Move layer types to new table in layer.toml
 - Start Date: 2021-01-05
 - Author(s): natalieparellano
+- Status: Approved
 - RFC Pull Request: [rfcs#132](https://github.com/buildpacks/rfcs/pull/132)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/spec#185](https://github.com/buildpacks/spec/issues/185), [buildpacks/lifecycle#522](https://github.com/buildpacks/lifecycle/issues/522), [buildpacks/docs#296](https://github.com/buildpacks/docs/issues/296)

@@ -3,7 +3,7 @@
 - Name: Add Status to RFC Metadata
 - Start Date: 2021-07-14
 - Author(s): @aemengo, @ekcasey
-- Status: Draft Approved
+- Status: Approved
 - RFC Pull Request: [rfcs#177](https://github.com/buildpacks/rfcs/pull/177)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/rfcs#183](#https://github.com/buildpacks/rfcs/issues/183)

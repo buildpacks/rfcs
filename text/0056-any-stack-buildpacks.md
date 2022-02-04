@@ -3,6 +3,7 @@
 - Name: Stackless Buildpacks
 - Start Date: 2020-07-26
 - Author(s): @sclevine
+- Status: Approved
 - RFC Pull Request: [rfcs#97](https://github.com/buildpacks/rfcs/pull/97)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

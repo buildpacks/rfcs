@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Support a CircleCI Orb
 - Start Date: 2019-12-15
+- Status: Approved
 - CNB Pull Request: [rfcs#39](https://github.com/buildpacks/rfcs/pull/39)
 - CNB Issue: (leave blank)
 - Supersedes: N/A

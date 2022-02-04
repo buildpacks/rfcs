@@ -3,6 +3,7 @@
 - Name: Read-Write Volume Mount in Pack
 - Start Date: 2020-06-02
 - Author(s): nebhale
+- Status: Approved
 - RFC Pull Request: [rfcs#85](https://github.com/buildpacks/rfcs/pull/85)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

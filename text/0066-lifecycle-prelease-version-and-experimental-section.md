@@ -3,6 +3,7 @@
 - Name: Prelease APIs and Experimental Features
 - Start Date: 2020-08-25
 - Author(s): @hone
+- Status: Approved
 - RFC Pull Request: [rfcs#115](https://github.com/buildpacks/rfcs/pull/115)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/spec#161](https://github.com/buildpacks/spec/issues/161), [buildpacks/lifecycle#459](https://github.com/buildpacks/lifecycle/issues/459), [buildpacks/lifecycle#460](https://github.com/buildpacks/lifecycle/issues/460), [buildpacks/pack#947](https://github.com/buildpacks/pack/issues/947)

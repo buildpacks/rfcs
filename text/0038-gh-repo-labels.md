@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: GitHub repo labels
 - Start Date: 02/03/2020
+- Status: Approved
 - CNB Pull Request: [rfcs#53](https://github.com/buildpacks/rfcs/pull/53)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
