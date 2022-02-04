@@ -49,7 +49,7 @@ When a builder includes one or more `system.*.buildpacks` entry, the detect phas
 # How it Works
 [how-it-works]: #how-it-works
 
-Unless otherwise stated, system buildpacks conform to the [buildpack API](https://github.com/buildpacks/spec/blob/main/buildpack.md).
+System buildpacks conform to the [buildpack API](https://github.com/buildpacks/spec/blob/main/buildpack.md).
 
 The `system.*pre*.buildpacks` will be provided to the lifecycle into a new file, `system.toml`. The `[system]` table in `system.toml` will be processed by the lifecycle, and each `pre`/`post` buildpack will run during the detect phase. Those that pass detection will run during the build phase.
 
