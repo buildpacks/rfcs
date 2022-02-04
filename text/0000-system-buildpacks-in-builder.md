@@ -106,8 +106,6 @@ Instead of a new `[system]` table, we could put `pre` and `post` in the `[[order
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Should the system buildpacks that pass detection be added to the buildpack group? This might make it difficult to hide them.
-    - disposition: yes. hiding is optional and up to the platform
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
