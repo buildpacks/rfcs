@@ -68,7 +68,7 @@ If a system buildpack exits with a status of `100`, the build will fail.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Default system buildpacks are hidden from the user before the build and their execution may be unexpected.
+- If system buildpacks are hidden from the user before the build, their execution may be unexpected.
 
 # Alternatives
 [alternatives]: #alternatives
