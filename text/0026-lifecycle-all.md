@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Lifecycle All Binary
 - Start Date: 2020-01-21
+- Status: Approved
 - CNB Pull Request: [rfcs#46](https://github.com/buildpacks/rfcs/pull/46)
 - CNB Issue: (leave blank)
 - Supersedes: N/A

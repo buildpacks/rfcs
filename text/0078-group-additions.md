@@ -3,6 +3,7 @@
 - Name: Group additions to Builder order
 - Start Date: 2020-12-23
 - Author(s): [jkutner](@jkutner)
+- Status: Approved
 - RFC Pull Request: [rfcs#129](https://github.com/buildpacks/rfcs/pull/129)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/docs#319](https://github.com/buildpacks/docs/issues/319), [buildpacks/pack#1099](https://github.com/buildpacks/pack/issues/1099), [buildpacks/pack#1100](https://github.com/buildpacks/pack/issues/1100), [buildpacks/spec#195](https://github.com/buildpacks/spec/issues/195)

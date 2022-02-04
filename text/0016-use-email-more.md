@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Use Email More
 - Start Date: 2019-12-05
+- Status: Approved
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)

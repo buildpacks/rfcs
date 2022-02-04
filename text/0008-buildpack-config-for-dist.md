@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Buildpack Configuration for Distribution
 - Start Date: July 22, 2019
+- Status: Approved
 - CNB Pull Request: [rfcs#15](https://github.com/buildpacks/rfcs/pull/15)
 - CNB Issue: (leave blank)
 - Supersedes: N/A

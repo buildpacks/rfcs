@@ -3,6 +3,7 @@
 - Name: Buildpack Authors' Tooling Sub-Team
 - Start Date: 2021-05-11
 - Author(s): [@ekcasey](https://github.com/ekcasey), [@hone](https://github.com/hone), [@samj1912](https://github.com/samj1912)
+- Status: Approved
 - RFC Pull Request: [rfcs#159](https://github.com/buildpacks/rfcs/pull/159)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/community#102](https://github.com/buildpacks/community/issues/102)

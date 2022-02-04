@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Lifecycle Compatibility Verification
 - Start Date: 2019-12-06
+- Status: Approved
 - CNB Pull Request: [rfcs#34](https://github.com/buildpacks/rfcs/pull/34)
 - CNB Issue: (leave blank)
 - Supersedes: N/A

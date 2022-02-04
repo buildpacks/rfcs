@@ -3,6 +3,7 @@
 - Name: Use Security Identifiers for Windows User/Group IDs
 - Start Date: 2021-01-25
 - Author(s): micahyoung
+- Status: Approved
 - RFC Pull Request: [rfcs#133](https://github.com/buildpacks/rfcs/pull/133)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/spec#129](https://github.com/buildpacks/spec/issues/129), [buildpacks/lifecycle#343](https://github.com/buildpacks/lifecycle/issues/343), [buildpacks/pack#1079](https://github.com/buildpacks/pack/issues/1079), [buildpacks/docs#303](https://github.com/buildpacks/docs/issues/303)

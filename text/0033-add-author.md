@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Add Author to RFC Metadata
 - Start Date: 2020-03-14
+- Status: Approved
 - CNB Pull Request: https://github.com/buildpacks/rfcs/pull/64
 - CNB Issue: (leave blank)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
