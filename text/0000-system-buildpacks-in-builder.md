@@ -32,17 +32,19 @@ We introduce a `[system]` table in the `builder.toml` schema with the following 
 [[system.pre.buildpacks]]
   id = "<buildpack ID>"
   version = "<buildpack version>"
-  optional = true
+  optional = false
 
 [[system.post.buildpacks]]
   id = "<buildpack ID>"
   version = "<buildpack version>"
-  optional = true
+  optional = false
 ```
 
-The fields in the `system.pre.buildpacks` table and `system.post.buildpacks` table match the fields in the existing [`order.group` table](https://buildpacks.io/docs/reference/config/builder-config/#order-_list-required_). However, `optional` in this case is required and the only acceptable value is `true`. Non-optional buildpacks will cause the builder creation to fail.
+The fields in the `system.pre.buildpacks` table and `system.post.buildpacks` table match the fields in the existing [`order.group` table](https://buildpacks.io/docs/reference/config/builder-config/#order-_list-required_).
 
 When a builder includes one or more `system.*.buildpacks` entry, the detect phase will prepend and append all `pre` and `post` buildpacks to each detection group in the provided order, respectively.
+
+**Note:** A non-`optional` system buildpack creates the possibility that a user provided group with all optional buildpacks could pass detection when it otherwise would not. We leave that up to the platform/builder owner. As long as the platform has a mechanism to disable system buildpacks (and `pack` will), then there is an escape valve for this situation.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -53,7 +55,7 @@ The `system.*pre*.buildpacks` will be provided to the lifecycle into a new file,
 
 ## Detection
 
-The exit code of detection by system buildpacks MUST NOT influence the selected buildpack group. If no system buildpacks pass detection, any buildpack group MAY pass detection. If a system buildpack passes detection and no buildpack groups pass detection, then detection MUST fail.
+The exit code of detection by system buildpacks MUST influence the selected buildpack group. If a system buildpack is non-optional and fails detection, then detection MUST for that group fail. If a system buildpack is optional and passes detection, then detection MAY pass for that group.
 
 System buildpacks may require/provide in the build plan following standard buildpack API specification.
 
