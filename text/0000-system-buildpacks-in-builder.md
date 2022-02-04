@@ -116,7 +116,7 @@ Instead of a new `[system]` table, we could put `pre` and `post` in the `[[order
 
 ## `detector` in Platform specifiction
 
-This proposal introduces a `--pre-buildpacks` and `--post-buildpacks` option on the `detector`.
+This proposal introduces a `--system` option on the `detector`.
 
 ```
 /cnb/lifecycle/detector \
