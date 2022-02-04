@@ -43,7 +43,7 @@ We will deprecate the positional arguments to `bin/detect` and `bin/build` with 
 
 ### bin/build
 
-* `CNB_LAYERS_DIR` - replaces the first positional argument to `bin/build`. **Note:** `CNB_LAYERS_DIR` conflicts with the platform spec, which will beupdated to rename its `CNB_LAYERS_DIR` to `CNB_PARENT_LAYERS_DIR`.
+* `CNB_LAYERS_DIR` - replaces the first positional argument to `bin/build`. **Note:** `CNB_LAYERS_DIR` conflicts with the platform spec, which will be updated to rename its `CNB_LAYERS_DIR` to `CNB_PARENT_LAYERS_DIR`.
 * `CNB_PLATFORM_DIR` - replaces the second positional argument to `bin/build`. Uses the same env var name as the Platform spec.
 * `CNB_PLAN_PATH` - replaces the third positional argument to `bin/build`. Uses the same env var name as the Platform spec.
 
