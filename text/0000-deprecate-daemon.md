@@ -297,6 +297,10 @@ Could the platform be responsible for outputting the base image + lifecycle outp
 
 ### Drawbacks
 
+* On simple platforms like Tekton. How might they produce this final image? Given a layout or tar of the Top Layers from a build and the ref of the run image, could they use an existing tool to stitch that together?
+
+* Another drawback is probably somewhat related. Signing images would not be possible inside of lifecycle if it doesn't end up creating the final image.
+
 # Prior Art
 [prior-art]: #prior-art
 
