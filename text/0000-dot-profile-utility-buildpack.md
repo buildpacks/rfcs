@@ -132,12 +132,19 @@ If we do nothing, we introduce a regression in functionality, and force applicat
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Are there things that `.profile` scripts do that will not be covered by the exec.d interface?
+- **Are there things that `.profile` scripts do that will not be covered by the exec.d interface?**
   For example, defining environment variables and side effects like writing files should be supported.
   But, something like defining a bash function will not be supported.
 
-- What if the run image does not contain bash (e.g., `FROM scratch`)?
+- **What if the run image does not contain bash (e.g., `FROM scratch`)?**
   Should it error, no-op, should this buildpack add a layer with bash?
+
+  Per discussion, we will document that this buildpack requires bash to be in the run image, and this buildpack will not add bash.
+  If bash is not in the run image, the exec.d wrapper will error out.
+
+  We may consider developing another buildpack to install bash in the future, but that is out of scope for this RFC.
+  We have done a proof-of-concept of [running a statically linked bash on scratch](https://github.com/mboldt/scratch-play/tree/main/bash), using the [bash-static Debian package](https://packages.debian.org/unstable/bash-static).
+  We have also found some prior art if we need to [compile our own static bash](https://github.com/robxu9/bash-static).
 
 # Spec. Changes
 [spec-changes]: #spec-changes
