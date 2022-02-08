@@ -248,7 +248,7 @@ In this solution the *Lifecycle* ONLY interacts with a registry for pull/push th
 ![](https://i.imgur.com/P0NxdMw.png)
 
 ### Drawbacks
-*
+*  The biggest downside of this is probably how a platform like pack makes this work. It can stand up a registry - but I'm not sure how reliable this would be to expose to the containers running on docker without additional configuration in the Docker preferences to allow insecureRegistries, for instance. Or it would need to create a cert and have that trusted when containers boot.
 
 ## Lifecycle pluggable architecture approach
 Based on the PoC results, the hard work to enable the feature for exporting images to OCI layout format was done implementing the [Image interface](https://github.com/buildpacks/imgutil/blob/main/image.go) in imgUtil. The idea is use [Go plugins](https://pkg.go.dev/plugin) concepts and convert the implementation of this interface in an external module that will be injected at runtime in the *Lifecycle*.
