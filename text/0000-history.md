@@ -22,36 +22,38 @@ Add layer history metadata to the output image for buildpack and app layers to i
 # Motivation
 [motivation]: #motivation
 
-This will allow Buildpack built images to be better visualized by common container visualization and debuggin tools.
+This will allow Buildpack built images to be better visualized by common container visualization and debugging tools.
 
 # What it is
 [what-it-is]: #what-it-is
 
-The following keys will be added to the following files - 
+Various container image introspection tools look at `history.created_by` for each layer to visualize the layer. We should populate this key with a value that describes where a layer came from, for buildpacks this can be -
 
-## launch.toml
-
-```
-[[slices]]
-# name is a new key which uniquely identitifies the app slice
-# required key
-name = "<name-of-the-slice>" # max 255 chars
-```
-
-All these tools look at `history.created_by` for each layer to visualize the layer. We should populate this key with a value that describes where a layer came from, for buildpacks this can be -
-
-- `{{ buildpack.id }}: Buildpack: {{ buildpack.name }} Layer: {{ buildpack.layer.name }}`
+- `Layer: {{ buildpack.layer.name }}, Created by: {{ buildpack.id }}`
 
 for app layers, this can be - 
 
-- `Application Slice: Name {{ slices.name }}, Created by: {{ buildpack.id }}`
+- `Application Slice: {{ slice_number }} Created by: {{ buildpack.id }}@{{ buildpack.version }}`
 
-Where `slice.name` comes from `slices.name` and the `buildpack.id` is the id of the buildpack that specified the application slice.
+Where `slice_number` is just an integer number starting with `1` and the `buildpack.id` is the id of the buildpack that specified the application slice.
 
-For the leftover, generic app layer, the `history.created_by` will be set to `Application Workspace`.
+for config layer, this can be -
 
-The above application slice name should also be added to `io.buildpacks.lifecycle.metadata.app` struct.
+- `Buildpacks Launcher Config`
 
+for SBOM layer, this can be - 
+
+- `Software Bill-of-Materials`
+
+for launcher this can be - 
+
+- `Buildpacks Application Launcher`
+
+for the process types layer this can be -
+
+- `Buildpacks Process Types`
+
+For the base image, the lifecycle should copy the existing history to the output image.
 # How it Works
 [how-it-works]: #how-it-works
 
@@ -65,7 +67,7 @@ More complexity?
 # Alternatives
 [alternatives]: #alternatives
 
-N/A
+Allow buildpacks to create image history metadata.
 
 # Prior Art
 [prior-art]: #prior-art
