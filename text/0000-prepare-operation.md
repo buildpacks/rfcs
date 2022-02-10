@@ -12,6 +12,7 @@
 # Summary
 [summary]: #summary
 
+It is common for platform to execute common operations before executing the lifecycle. These sort of operations include, downloading buildpacks, making changes the the `order.toml`, cleaning up the workspace, and more. These operations are typically influenced by configuration. One of those common configuration inputs is the `project.toml` (aka Project Descriptor). This RFC, proposes a contractual interface for a Prepare operation that is executed before the Build operation. The benefits for doing so are it enables common functionality to be made portable. Additionally, it allows the project to provide guidance on what the expected behaviour is regarding input configuration such as the `project.toml`.
 
 # Definitions
 [definitions]: #definitions
@@ -63,12 +64,11 @@ Therefore the following changes have been made from the [latest schema][pd-02]:
 
 ### Version `io.buildpacks` namespace
 
-Given that the project descriptor's `io.buildpacks` namespace is directly tied to the platform by the fact that it's the platform that needs to consume and parse it, it makes sense to unify the version of the schema with that of the platform API.
-
+The `io.buildpacks` namespace schema should be able to change without changing the Project Descriptor spec. For this reason, the namespace should define a `schema-version`.
 
 ### Schema
 
-See [Platform Spec changes](#Platform-Spec).
+See [`io.buildpacks` Namespace Schema](#io-buildpacks-Namespace-Schema) section below.
 
 #### Usages Examples
 
@@ -166,7 +166,6 @@ The default implementation COULD take care of applying the following configurati
     - This is mitigated by providing [utilities](#Cloud-Native-Buildpacks-utilities) and the fact that the prepare phase is an independant and swappable.
 2. Executing the Prepare operation may require an additional container to be spun up in some platforms; this would effectively increase the overall build process.
 
-
 # Alternatives
 [alternatives]: #alternatives
 
@@ -205,6 +204,8 @@ The idea of a buildpack that can apply configuration from `project.toml` has bee
 - Should arbitrary properties be allowed in `io.buildpacks.defaults`?
 - How does the Prepare operation make changes to non-filesystem options such as `tags`, `run-image`, etc?
     - Ideally, the lifecycle would have a filesystem based interface that we can leverage. This would prevent the preparer from having it's own independant mechanism. A prior RFC for something similar has existed (see [Add Lifecycle Config File RFC][lifecycle-config-rfc]). It may be worth revisiting.
+- Where do we define the `io.buildpacks` namespace if we want to keep it seperate from the Project Descriptor Spec?
+    - We've been wanting to restructure our spec repo to include other schemas, in JSON format, as well. Maybe this is an opportunity to rethink our repo structure.
 
 [lifecycle-config-rfc]: https://github.com/buildpacks/rfcs/pull/128
 
@@ -217,7 +218,7 @@ No changes necessary.
 
 ## Platform Spec
 
-### Add Project Descriptor `io.buildpacks` namespace
+### Add Project Descriptor
 
 ---
 
@@ -226,72 +227,6 @@ No changes necessary.
 The format of `project.toml` MUST adhere to version `0.2` of the [project descriptor specification][project-descriptor-spec]. Within the `project.toml` file the `io.buildpacks` namespace MAY be defined.
 
 [project-descriptor-spec]: https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md
-
-##### `io.buildpacks` namespace
-
-```toml
-[io.buildpacks]
-schema-version = "<platform API version>"
-
-[io.buildpacks.defaults]
-include = ["<.gitignore pattern>"]
-exclude = ["<.gitignore pattern>"]
-
-[[io.buildpacks.defaults.pre.group]]
-id = "<buildpack ID>"
-version = "<buildpack version>"
-uri = "<url or path to the buildpack"
-
-  [io.buildpacks.defaults.pre.group.script]
-  api = "<buildpack API version>"
-  shell = "<string>"
-  inline = "<script contents>"
-
-[[io.buildpacks.defaults.group]]
-id = "<buildpack ID>"
-version = "<buildpack version>"
-uri = "<url or path to the buildpack"
-
-  [io.buildpacks.defaults.group.script]
-  api = "<buildpack API version>"
-  shell = "<string>"
-  inline = "<script contents>"
-
-[[io.buildpacks.defaults.post.group]]
-id = "<buildpack ID>"
-version = "<buildpack version>"
-uri = "<url or path to the buildpack"
-
-  [io.buildpacks.defaults.post.group.script]
-  api = "<buildpack API version>"
-  shell = "<string>"
-  inline = "<script contents>"
-
-[[io.buildpacks.defaults.build.env]]
-name = "<name>"
-value = "<value>"
-```
-
-Where:
-
- - `schema-version` (required): is the version of the schema which correlates with the platform API.
- - `defaults` (optional): is a table of default properties that all platforms should apply.
-    _`include` and `exclude` are mutually exclusive. If both are present the build process MUST result in an error._
-     - `include` (optional): is an array of `.gitignore` pattern-based paths to include during the build operation.
-     - `exclude` (optional): is an array of `.gitignore` pattern-based paths to exclude from the build operation and thereby produced image.
-     - `group` (optional): is an array of buildpacks.
-       _Either a `version`, `uri`, or `script` table MUST be included, but MUST NOT include any combination of these elements._
-         - `id` (optional): is the ID of the buildpack.
-         - `version` (optional, default=`latest`): is the version of the buildpack.
-         - `uri` (optional, default=`urn:buildpack:<id>`): is the URI to the buildpack.
-         - `script` (optional): defines an inline buildpack.
-             - `api` (required): is the api key defines its Buildpack API compatibility.
-             - `shell` (optional, default=`/bin/sh`): defines the shell used to execute the inline script.
-             - `inline` (required): is the build script for the inline buildpack.
-     - `build` (optional):
-         - `env` (optional): an array table that defines environment variables to be applied during the `build` phase.
-             - `name` (required): is the name of the environment variable.
-             - `value` (required): is the value of the environment variable.
 
 ---
 
@@ -372,3 +307,79 @@ A `preparer` may make general changes to the file system, modify input files, or
 #### Remove `io.buildpacks` namespace
 
 We'll want to remove the `io.buildpacks` namespace since it will now be defined in the Platform spec.
+
+---
+
+## `io.buildpacks` Namespace Schema
+
+> NOTE: This is expected to live in a seperate file.
+
+---
+
+##### `io.buildpacks` namespace
+
+```toml
+[io.buildpacks]
+schema-version = "0.2"
+
+[io.buildpacks.defaults]
+include = ["<.gitignore pattern>"]
+exclude = ["<.gitignore pattern>"]
+
+[[io.buildpacks.defaults.pre.group]]
+id = "<buildpack ID>"
+version = "<buildpack version>"
+uri = "<url or path to the buildpack"
+
+  [io.buildpacks.defaults.pre.group.script]
+  api = "<buildpack API version>"
+  shell = "<string>"
+  inline = "<script contents>"
+
+[[io.buildpacks.defaults.group]]
+id = "<buildpack ID>"
+version = "<buildpack version>"
+uri = "<url or path to the buildpack"
+
+  [io.buildpacks.defaults.group.script]
+  api = "<buildpack API version>"
+  shell = "<string>"
+  inline = "<script contents>"
+
+[[io.buildpacks.defaults.post.group]]
+id = "<buildpack ID>"
+version = "<buildpack version>"
+uri = "<url or path to the buildpack"
+
+  [io.buildpacks.defaults.post.group.script]
+  api = "<buildpack API version>"
+  shell = "<string>"
+  inline = "<script contents>"
+
+[[io.buildpacks.defaults.build.env]]
+name = "<name>"
+value = "<value>"
+```
+
+Where:
+
+ - `schema-version` (required): is the version of the schema.
+ - `defaults` (optional): is a table of default properties that all platforms should apply.
+    _`include` and `exclude` are mutually exclusive. If both are present the build process MUST result in an error._
+     - `include` (optional): is an array of `.gitignore` pattern-based paths to include during the build operation.
+     - `exclude` (optional): is an array of `.gitignore` pattern-based paths to exclude from the build operation and thereby produced image.
+     - `group` (optional): is an array of buildpacks.
+       _Either a `version`, `uri`, or `script` table MUST be included, but MUST NOT include any combination of these elements._
+         - `id` (optional): is the ID of the buildpack.
+         - `version` (optional, default=`latest`): is the version of the buildpack.
+         - `uri` (optional, default=`urn:buildpack:<id>`): is the URI to the buildpack.
+         - `script` (optional): defines an inline buildpack.
+             - `api` (required): is the api key defines its Buildpack API compatibility.
+             - `shell` (optional, default=`/bin/sh`): defines the shell used to execute the inline script.
+             - `inline` (required): is the build script for the inline buildpack.
+     - `build` (optional):
+         - `env` (optional): an array table that defines environment variables to be applied during the `build` phase.
+             - `name` (required): is the name of the environment variable.
+             - `value` (required): is the value of the environment variable.
+
+---
