@@ -43,9 +43,9 @@ We will deprecate the positional arguments to `bin/detect` and `bin/build` with 
 
 ### bin/build
 
-* `CNB_LAYERS_DIR` - replaces the first positional argument to `bin/build`. **Note:** `CNB_LAYERS_DIR` conflicts with the platform spec, which will be updated to rename its `CNB_LAYERS_DIR` to `CNB_PARENT_LAYERS_DIR`.
+* `CNB_LAYERS_DIR` - replaces the first positional argument to `bin/build`. **Note:** Uses the same env var name as the Platform spec, but refers to a different location.
 * `CNB_PLATFORM_DIR` - replaces the second positional argument to `bin/build`. Uses the same env var name as the Platform spec.
-* `CNB_PLAN_PATH` - replaces the third positional argument to `bin/build`. Uses the same env var name as the Platform spec.
+* `CNB_PLAN_PATH` - replaces the third positional argument to `bin/build`. **Note:** Uses the same env var name as the Platform spec, but refers to a different file.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -58,10 +58,17 @@ cmd.Env = append(cmd.Env, EnvPlatformDir+"="+b.Dir)
 
 The positional arguments will be deprecated, but no warnings will be emitted if they are consumed. The lifecycle will continue to provide them to buildpack executable indefinitely, with no plan to remove them.
 
+## Renaming Platform Env Vars
+
+Because some of the new buildpack input vars conflict with platform env var names, we intend to rename the platform env vars as part of a larger effort to refactor the platform spec. That will be convered in a future RFC.
+
+The conflict of env var names is strictly an experience problem. Because the env vars are used in different contexts, there is little risk that they will be reused by the internals of lifecycle or pack.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
 - People have been using positional arguments to buildpacks for literally a decade
+- New env var names conflict with platform env vars
 
 # Alternatives
 [alternatives]: #alternatives
@@ -80,10 +87,6 @@ N/A
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
-
-## Platform Spec
-
-Rename `CNB_LAYERS_DIR` to `CNB_PARENT_LAYERS_DIR`.
 
 ## Buildpack spec
 
