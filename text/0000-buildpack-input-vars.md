@@ -45,7 +45,7 @@ We will deprecate the positional arguments to `bin/detect` and `bin/build` with 
 
 * `CNB_LAYERS_DIR` - replaces the first positional argument to `bin/build`. **Note:** Uses the same env var name as the Platform spec, but refers to a different location.
 * `CNB_PLATFORM_DIR` - replaces the second positional argument to `bin/build`. Uses the same env var name as the Platform spec.
-* `CNB_PLAN_PATH` - replaces the third positional argument to `bin/build`. **Note:** Uses the same env var name as the Platform spec, but refers to a different file.
+* `CNB_BP_PLAN_PATH` - replaces the third positional argument to `bin/build`.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -60,7 +60,7 @@ The positional arguments will be deprecated, but no warnings will be emitted if 
 
 ## Renaming Platform Env Vars
 
-Because some of the new buildpack input vars conflict with platform env var names, we intend to rename the platform env vars as part of a larger effort to refactor the platform spec. That will be convered in a future RFC.
+Because `CNB_LAYERS_DIR` in the new input vars conflicts with a platform env var name, we intend to rename the platform env var as part of a larger effort to refactor the platform spec. That will be convered in a future RFC.
 
 The conflict of env var names is strictly an experience problem. Because the env vars are used in different contexts, there is little risk that they will be reused by the internals of lifecycle or pack.
 
@@ -97,7 +97,7 @@ Executable: `/bin/detect`, Working Dir: `<app[AR]>`
 | Input                     | Attributes | Description
 |---------------------------|------------|----------------------------------------------
 | `$0`                      |            | Absolute path of `/bin/detect` executable
-| `$CNB_PLAN_PATH`          | E          | Absolute path to the build plan
+| `$CNB_BUILD_PLAN_PATH`    | E          | Absolute path to the build plan
 | `$CNB_PLATFORM_DIR`       | AR         | Absolute path to the platform directory
 | `$CNB_PLATFORM_DIR/env/`  |            | User-provided environment variables for build
 | `$CNB_PLATFORM_DIR/#`     |            | Platform-specific extensions
@@ -107,7 +107,7 @@ Executable: `/bin/detect`, Working Dir: `<app[AR]>`
 | [exit status]      | Pass (0), fail (100), or error (1-99, 101+)
 | Standard output    | Logs (info)
 | Standard error     | Logs (warnings, errors)
-| `$CNB_PLAN_PATH`   | Contributions to the the Build Plan (TOML)
+| `$CNB_BUILD_PLAN_PATH`   | Contributions to the the Build Plan (TOML)
 
 ###  Build
 
@@ -116,8 +116,8 @@ Executable: `/bin/build`, Working Dir: `<app[AI]>`
 | Input                     | Attributes | Description
 |---------------------------|------------|----------------------------------
 | `$0`                      |            | Absolute path of `/bin/build` executable
-| `$CNB_LAYERS_DIR`      | EIC        | Absolute path to the buildpack layers directory
-| `$CNB_PLAN_PATH`          | ER         | Relevant [Buildpack Plan entries](#buildpack-plan-toml) from detection (TOML)
+| `$CNB_LAYERS_DIR`         | EIC        | Absolute path to the buildpack layers directory
+| `$CNB_BP_PLAN_PATH`       | ER         | Relevant [Buildpack Plan entries](#buildpack-plan-toml) from detection (TOML)
 | `$CNB_PLATFORM_DIR`       | AR         | Absolute path to the platform directory
 | `$CNB_PLATFORM_DIR/env/`  |            | User-provided environment variables for build
 | `$CNB_PLATFORM_DIR/#`     |            | Platform-specific extensions
