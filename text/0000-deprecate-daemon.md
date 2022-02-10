@@ -227,6 +227,7 @@ In the following gift we can see the output image exported to the filesystem in 
 
 - A major drawback is look-ups. All known and anticipated images must be available on disk since there's no registry or daemon to do further look-ups against during the build process.
 - Exploding the images into disk could affect the performance and be very costly
+- This approach could have conflicts with the implementation of the Dockerfile [RFC](https://github.com/buildpacks/rfcs/blob/dockerfiles/text/0000-dockerfiles.md). If we try to customize a base image using a Dockerfile there is no way for Platform to know that it needs to pull an image declare in a `FROM` statement and save it into the filesystem storage.
 
 # Alternatives
 [alternatives]: #alternatives
