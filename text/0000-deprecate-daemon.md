@@ -251,6 +251,22 @@ In this solution the *Lifecycle* ONLY interacts with a registry for pull/push th
 ### Drawbacks
 *  The biggest downside of this is probably how a platform like pack makes this work. It can stand up a registry - but I'm not sure how reliable this would be to expose to the containers running on docker without additional configuration in the Docker preferences to allow insecureRegistries, for instance. Or it would need to create a cert and have that trusted when containers boot.
 
+## Lifecycle daemon wrapper approach
+
+This solution is a variant of the registry only approach but instead on delegating all the responsibility to *Platform* a new system called *Wrapper Registry* is created, this component is responsable of exposing an Registry API but also to synchronise the data from this registry into the daemon.
+
+The high level idea is summarize in the following landscape diagram
+
+![](https://i.imgur.com/dpbDSpg.png)
+
+If we zoom in into the *Wrapper Registry* component
+
+![](https://i.imgur.com/qilyDoe.png)
+
+The *Daemon Sync* component must take care of handling the synchronization of the data saved in the ephemeral registry and the daemon. Thinking on some implementation, there is a suggestion of considering [lazy image distribution](https://github.com/containerd/stargz-snapshotter) to avoid affecting the performance
+
+### Drawbacks    
+
 ## Lifecycle pluggable architecture approach
 Based on the PoC results, the hard work to enable the feature for exporting images to OCI layout format was done implementing the [Image interface](https://github.com/buildpacks/imgutil/blob/main/image.go) in imgUtil. The idea is use [Go plugins](https://pkg.go.dev/plugin) concepts and convert the implementation of this interface in an external module that will be injected at runtime in the *Lifecycle*.
 
