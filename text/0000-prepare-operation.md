@@ -203,6 +203,7 @@ The idea of a buildpack that can apply configuration from `project.toml` has bee
 [unresolved-questions]: #unresolved-questions
 
 - Should arbitrary properties be allowed in `io.buildpacks`?
+  - Yes. By allowing for arbitrary properties we enable unforseen use cases. The only drawback being potential forward compatibility issues but given that the schema is versioned, it can be handled when a user wants to "upgrade".
 - How does the Prepare operation make changes to non-filesystem options such as `tags`, `run-image`, etc?
     - Ideally, the lifecycle would have a filesystem based interface that we can leverage. This would prevent the preparer from having it's own independant mechanism. A prior RFC for something similar has existed (see [Add Lifecycle Config File RFC][lifecycle-config-rfc]). It may be worth revisiting.
 - Where do we define the `io.buildpacks` namespace if we want to keep it seperate from the Project Descriptor Spec?
