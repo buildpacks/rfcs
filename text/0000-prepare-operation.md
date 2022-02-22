@@ -35,7 +35,7 @@ The motiviation for this change was to enable the following goals from being ach
   - **Goal 3: Platform recognition of project.toml**
     > As a user, I would like to ensure that my configuration in `project.toml` is being used.
 
-NOTE: This RFC directly solves for Goal 3, while enabling the solutions for Goals 1 and 2 via a supplimental RFC ([Support for pack.toml][rfc-pr-189]).
+**This RFC directly solves for Goal 3**, while enabling the solutions for Goals 1 and 2 via a supplimental RFC ([Support for pack.toml][rfc-pr-189]).
 
 [rfc-pr-189]: https://github.com/buildpacks/rfcs/pull/189
 
@@ -44,13 +44,15 @@ NOTE: This RFC directly solves for Goal 3, while enabling the solutions for Goal
 
 The proposal is composed of following changes:
 
-1. [Moving `io.buildpacks` properties to `io.buildpacks.defaults`.](#Namespace-iobuildpacksdefaults)
-2. [A replaceable new phase `prepare` that applies platform configuration.](#Preparer)
-3. [Supporting Cloud Native Buildpack utilities.](#Cloud-Native-Buildpacks-utilities)
+- [Changes to `io.buildpacks` namespace.](#changes-to-iobuildpacks-namespace)
+  - [Define criteria for properties in namespace.](#criteria-for-properties)
+  - [Version `io.buildpacks` namespace.](#version-iobuildpacks-namespace)
+- [A replaceable new phase `prepare` that applies platform configuration.](#prepare-phase)
+- [Supporting Cloud Native Buildpack utilities.](#cloud-native-buildpacks-utilities)
 
 ## Changes to `io.buildpacks` namespace
 
-### Namespace `io.buildpacks.defaults`
+### Criteria for properties
 
 This namespace declares default values that platforms should acknowledge. A majority of properties should be spec'd but we would allow for unspec'd additional properties.
 
@@ -58,7 +60,7 @@ The criteria for spec'd properties in this namespace would be based on whether t
 
 Therefore the following changes have been made from the [latest schema][pd-02]:
 
- - Remove `builder`
+ - **Remove `builder` from `io.buildpacks` namespace**
 
 [pd-02]: https://github.com/buildpacks/spec/blob/extensions/project-descriptor/0.2/extensions/project-descriptor.md#iobuildpacks-optional
 
@@ -74,7 +76,7 @@ See [`io.buildpacks` Namespace Schema](#io-buildpacks-Namespace-Schema) section 
 
 ###### Multi-Platform (pack + kpack)
 
-In the following example we show how various platform namespaces can have their own configuration but properties can be promoted to `io.buildpacks.defaults` if the user's intent is to apply it to all platforms.
+In the following example we show how various platform namespaces can have their own configuration but properties can be promoted to `io.buildpacks` if the user's intent is to apply it to all platforms.
 
 ```toml
 [io.buildpacks]
@@ -84,7 +86,7 @@ schema-version = "0.2"
 # common buildpacks config
 ##
 
-[io.buildpacks.defaults]
+[io.buildpacks]
 exclude = ["some-files/**"]
 
 ##
@@ -94,8 +96,7 @@ exclude = ["some-files/**"]
 [io.buildpacks.pack]
 schema-version = "0.1"
 builder = "cnbs/sample-builder:bionic"
-image = "my-app"                        # (example only)
-run-image = "my-run-image:latest"       # (example only)
+cache-volume = "my-app-cache"           # (example only)
 
 ##
 # kpack config
@@ -111,7 +112,7 @@ value="SOME_VALUE"
 
 Notice:
 
-1. Both `pack` and `kpack` are expected to apply `io.buildpacks.defaults.exclude`.
+1. Both `pack` and `kpack` are expected to apply `io.buildpacks.exclude`.
 2. `io.buildpacks.pack` has additional properties that are specific to `pack` only.
 
 ## Prepare phase
@@ -152,12 +153,12 @@ The Cloud Native Buildpacks project will have a `preparer` it ships along with t
 
 The default implementation COULD take care of applying the following configuration:
 
-- `io.buildpacks.defaults.group` →
+- `io.buildpacks.group` →
     - Download buildpacks
     - Update `order.toml`
-- `io.buildpacks.defaults.build.env` →
+- `io.buildpacks.build.env` →
     - Set build env vars in `<platform>/env`
-- Notify users of any other properties in `io.buildpacks.defaults`
+- Notify users of any other properties in `io.buildpacks`
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -201,7 +202,7 @@ The idea of a buildpack that can apply configuration from `project.toml` has bee
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Should arbitrary properties be allowed in `io.buildpacks.defaults`?
+- Should arbitrary properties be allowed in `io.buildpacks`?
 - How does the Prepare operation make changes to non-filesystem options such as `tags`, `run-image`, etc?
     - Ideally, the lifecycle would have a filesystem based interface that we can leverage. This would prevent the preparer from having it's own independant mechanism. A prior RFC for something similar has existed (see [Add Lifecycle Config File RFC][lifecycle-config-rfc]). It may be worth revisiting.
 - Where do we define the `io.buildpacks` namespace if we want to keep it seperate from the Project Descriptor Spec?
@@ -241,7 +242,7 @@ Before the [Build](#Build) operation is executed, a platform MUST prepare the bu
 During, the Prepare phase, the platform:
 
   - SHOULD apply provided [Project Descriptor][project-descriptor] configuration is present.
-      - SHOULD generate a warning for any `io.buildpacks.defaults` property not applied.
+      - SHOULD generate a warning for any `io.buildpacks` property not applied.
   - MAY make changes to any path in the filesystem.
 
 [project-descriptor]: https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md
@@ -306,7 +307,7 @@ A `preparer` may make general changes to the file system, modify input files, or
 
 #### Remove `io.buildpacks` namespace
 
-We'll want to remove the `io.buildpacks` namespace since it will now be defined in the Platform spec.
+We'll want to remove the `io.buildpacks` namespace since it will be versioned seperate from the project descriptor.
 
 ---
 
@@ -322,41 +323,41 @@ We'll want to remove the `io.buildpacks` namespace since it will now be defined 
 [io.buildpacks]
 schema-version = "0.2"
 
-[io.buildpacks.defaults]
+[io.buildpacks]
 include = ["<.gitignore pattern>"]
 exclude = ["<.gitignore pattern>"]
 
-[[io.buildpacks.defaults.pre.group]]
+[[io.buildpacks.pre.group]]
 id = "<buildpack ID>"
 version = "<buildpack version>"
 uri = "<url or path to the buildpack"
 
-  [io.buildpacks.defaults.pre.group.script]
+  [io.buildpacks.pre.group.script]
   api = "<buildpack API version>"
   shell = "<string>"
   inline = "<script contents>"
 
-[[io.buildpacks.defaults.group]]
+[[io.buildpacks.group]]
 id = "<buildpack ID>"
 version = "<buildpack version>"
 uri = "<url or path to the buildpack"
 
-  [io.buildpacks.defaults.group.script]
+  [io.buildpacks.group.script]
   api = "<buildpack API version>"
   shell = "<string>"
   inline = "<script contents>"
 
-[[io.buildpacks.defaults.post.group]]
+[[io.buildpacks.post.group]]
 id = "<buildpack ID>"
 version = "<buildpack version>"
 uri = "<url or path to the buildpack"
 
-  [io.buildpacks.defaults.post.group.script]
+  [io.buildpacks.post.group.script]
   api = "<buildpack API version>"
   shell = "<string>"
   inline = "<script contents>"
 
-[[io.buildpacks.defaults.build.env]]
+[[io.buildpacks.build.env]]
 name = "<name>"
 value = "<value>"
 ```
