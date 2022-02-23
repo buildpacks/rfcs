@@ -3,10 +3,10 @@
 - Name: Replace positional args to Buildpack executables with env vars
 - Start Date: 2021-11-18
 - Author(s): [jkutner](https://github.com/jkutner)
-- Status: Draft Draft
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#190](https://github.com/buildpacks/rfcs/pull/190)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/lifecycle#806](https://github.com/buildpacks/lifecycle/issues/806), [buildpacks/lifecycle#807](https://github.com/buildpacks/lifecycle/issues/807)
 - Supersedes: N/A
 
 # Summary
