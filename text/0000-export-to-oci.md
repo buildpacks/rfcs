@@ -82,6 +82,12 @@ Attempts to use this feature when the `-daemon` flag is not used could be ignore
 
 The lifecycle phases affected by this new behavior is: [Export](https://buildpacks.io/docs/concepts/components/lifecycle/export/)
 
+At high level view of the propose solution can be summarize with the following container diagram from the C4 model
+
+![](https://i.imgur.com/XhtvT9j.png)
+
+Notice that we are relying on the OCI format Specification to expose the data for `Platforms`
+
 The following new input is proposed to be added to this phase
 
 | Input             | Environment Variable  | Default Value            | Description
@@ -96,6 +102,8 @@ The following new input is proposed to be added to this phase
   - It will calculate the digest of the manifest of the compressed layers and write that value into the report.toml file
   - It will update the report.toml file with all the tags and require information to verify the image once it is pushed into a registry
 - OTHERWISE it will behave as it is right now
+
+
 
 # Migration
 [migration]: #migration
@@ -113,7 +121,13 @@ This section should document breaks to public API and breaks in compatibility du
 
 ## Redesign the current Cache
 
-Another potential solution could be to export the OCI image along with the current Cache implementation. The current implementation when the Daemon is enable can be describe with the following class diagram
+Another potential solution could be to export the OCI image along with the current Cache concept and expose some contract for `Platform` to interact with this Cache and extract the final OCI image. At high level, the solution can be represented with the following container diagram from C4 model
+
+![](https://i.imgur.com/xl4gL1G.png)
+
+Notice that on this solution, because the Cache is an internal component from the Lifecycle implementation we will have to expose some kind of specification for `Platforms` to understand its format and been able to read the OCI image.
+
+The current implementation when the Daemon is enable can be describe with the following class diagram
 
 ```mermaid
 classDiagram
