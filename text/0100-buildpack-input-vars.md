@@ -38,8 +38,8 @@ We will deprecate the positional arguments to `bin/detect` and `bin/build` with 
 
 ### bin/detect
 
-* `CNB_PLATFORM_DIR` - replaces the first positional argument to `bin/build`. Uses the same env var name as the Platform spec.
-* `CNB_BUILD_PLAN_PATH` - replaces the second positional argument to `bin/build`. Uses the same env var name as the Platform spec.
+* `CNB_PLATFORM_DIR` - replaces the first positional argument to `bin/detect`. Uses the same env var name as the Platform spec.
+* `CNB_BUILD_PLAN_PATH` - replaces the second positional argument to `bin/detect`. Uses the same env var name as the Platform spec.
 
 ### bin/build
 
