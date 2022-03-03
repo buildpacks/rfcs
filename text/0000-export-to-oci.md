@@ -103,7 +103,28 @@ The following new input is proposed to be added to this phase
   - It will update the report.toml file with all the tags and require information to verify the image once it is pushed into a registry
 - OTHERWISE it will behave as it is right now
 
+#### `report.toml` (TOML)
 
+The new information to be  added into the `report.toml` file can be summarize as follows:
+
+```toml
+[export]
+[[export.oci]]
+digest = "<image digest>"
+manifest-size = "<manifest size in bytes>"
+compression-algorithm = "<used by gcr>"
+library-url = "https://github.com/google/go-containerregistry/"
+library-language="go"
+```
+Where:
+- **If** the app image was exported using the `-layer` flag, the export section will be added to the report
+  - `digest` MUST contain the image digest calculated based on compressed layers
+  - `manifest-size` MUST contain the manifest size in bytes
+  - `compression-algorithm` MUST contain the information of the algorithm used by GCR to compute the digest
+  - `library-url` MUST contain the url of the library used to export the image
+  - `library-language` MUST contain the client's library programming language used to export the image
+
+The main idea of this new section in the `report.toml` file is to provide the information of the **expected** digest of the image if it is exported to a registry using a particular implementation. This information can be used by other tools (like publish) to complete the operation and verify the consistency of the image.
 
 # Migration
 [migration]: #migration
