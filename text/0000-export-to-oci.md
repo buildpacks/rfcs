@@ -140,13 +140,13 @@ This section should document breaks to public API and breaks in compatibility du
 # Alternatives
 [alternatives]: #alternatives
 
-## Redesign the current Cache
+## Redesign the current Launch Cache
 
-Another potential solution could be to export the OCI image along with the current Cache concept and expose some contract for `Platform` to interact with this Cache and extract the final OCI image. At high level, the solution can be represented with the following container diagram from C4 model
+Another potential solution could be to export the OCI image along with the current Launch Cache concept and expose some contract for `Platform` to interact with this Cache and extract the final OCI image. At high level, the solution can be represented with the following container diagram from C4 model
 
 ![](https://i.imgur.com/xl4gL1G.png)
 
-Notice that on this solution, because the Cache is an internal component from the Lifecycle implementation we will have to expose some kind of specification for `Platforms` to understand its format and been able to read the OCI image.
+Notice that on this solution, because the Launch Cache is an internal component from the Lifecycle implementation we will have to expose some kind of specification for `Platforms` to understand its format and been able to read the OCI image.
 
 The current implementation when the Daemon is enable can be describe with the following class diagram
 
