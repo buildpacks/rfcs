@@ -185,7 +185,7 @@ class Image {
 ```
 ### Drawbacks
 
-- We will have to expose Cache implementation details to the outside world, probably spec those details, for other tools to interact with this exported data
+- We will have to expose Launch Cache implementation details to the outside world, probably spec those details, for other tools to interact with this exported data
 
 <!--
 - Why is this proposal the best?
