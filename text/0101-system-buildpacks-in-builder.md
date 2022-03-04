@@ -3,9 +3,9 @@
 - Name: System Buildpacks in Builder Images
 - Start Date: 2021-07-24
 - Author(s): [@jkutner](https://github.com/jkutner)
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#179](https://github.com/buildpacks/rfcs/pull/179)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/rfcs#209](https://github.com/buildpacks/rfcs/issues/209)
 - Supersedes: N/A
 
 # Summary
