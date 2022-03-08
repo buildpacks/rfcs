@@ -68,27 +68,29 @@ The wrapper would not need to set any environment variables, but should maintain
 # How it Works
 [how-it-works]: #how-it-works
 
-In short, the wrapper should do:
+The `.profile` wrapper will:
+
+1. Source the `.profile` script.
+1. Write the environment variables to the [`exec.d` output TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#execd-output-toml).
+
+We will write a small program, `write-env-toml`, to write all environment variables in the `exec.d` output TOML format.
+
 
 ```
 #!/bin/bash
-set -euo pipefail
 source .profile
-env >&3
+write-env-toml >&3
 ```
 
-We acknowledge that the `env` output will need to be properly quoted to be valid TOML.
-We will use or create a tool to handle that formatting.
-
-This will write the environment, including any variables set in `.profile`, to the [`exec.d` output TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#execd-output-toml).
-Since it also executes the `.profile` script, any side effects will happen.
-This will solve for both of the simple examples above.
+Sourcing the `.profile` script will execute any side effects.
+Writing the `exec.d` output TOML will ensure that all environment variables will be set.
+So, this will solve for both of the simple examples above.
 
 On Windows, for `.profile.bat` scripts, we can take the same approach of wrapping the script like:
 
 ```
 call .profile.bat
-set >&%CNB_EXEC_D_HANDLE%
+write-env-toml >&%CNB_EXEC_D_HANDLE%
 ```
 
 Per the [Operating System Conventions in the CNB spec](https://github.com/buildpacks/spec#operating-system-conventions), this buildpack will support scripts compatible with bash version 3 or greater on Linux, and cmd.exe on Windows.
