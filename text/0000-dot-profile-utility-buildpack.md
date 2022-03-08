@@ -141,11 +141,9 @@ If we do nothing, we introduce a regression in functionality, and force applicat
 
   Note that the [utility buildpacks RFC](https://github.com/buildpacks/rfcs/blob/main/text/0097-official-utility-buildpacks.md#how-it-works) states:
   > The buildpack MUST NOT install any dependencies in the output image
-  which precludes this buildpack from adding bash to the run image.
+  which precludes this buildpack (or any CNB utility buildpack) from adding bash to the run image.
 
-  That said, if another person or project creates a bash buildpack, it could be combined with this buildpack.
-  We have done a proof-of-concept of [running a statically linked bash on scratch](https://github.com/mboldt/scratch-play/tree/main/bash), using the [bash-static Debian package](https://packages.debian.org/unstable/bash-static).
-  We have also found some prior art about [creating a statically linked bash](https://github.com/robxu9/bash-static).
+  While one can imagine a buildpack to add bash, we would like to see the community move to more secure run images that don't include bash.
 
   We will document that this buildpack requires bash to be in the run image, and this buildpack will not add bash.
   If bash is not in the run image, the exec.d wrapper will error out.
