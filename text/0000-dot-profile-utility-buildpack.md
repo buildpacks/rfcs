@@ -68,30 +68,28 @@ The wrapper would not need to set any environment variables, but should maintain
 # How it Works
 [how-it-works]: #how-it-works
 
-The `.profile` wrapper will:
+We will write two small programs to implement the buildpack.
 
-1. Source the `.profile` script.
-1. Write the environment variables to the [`exec.d` output TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#execd-output-toml).
+- `dot-profile-wrapper` will be the main entry point.
+- `write-env-toml` will write all environment variables to the [`exec.d` output TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#execd-output-toml).
 
-We will write a small program, `write-env-toml`, to write all environment variables in the `exec.d` output TOML format.
+On Linux, `dot-profile-wrapper` will:
 
+1. Ensure `bash` exists on the run image, and error if it does not.
+1. Launch a `bash` shell to:
+  1. Source the `.profile` script, which may set environment variables and/or have other side effects.
+  1. Call `write-env-toml` to capture the environment variables.
 
-```
-#!/bin/bash
-source .profile
-write-env-toml >&3
-```
+Likewise on Windows, `dot-profile-wrapper` will:
 
-Sourcing the `.profile` script will execute any side effects.
+1. Ensure `cmd.exe` exists on the run image, and error if it does not.
+1. Launch a `cmd.exe` shell to:
+  1. Source the `.profile.bat` script, which may set environment variables and/or have other side effects.
+  1. Call `write-env-toml` to capture the environment variables.
+
+Sourcing the `.profile`/`.profile.bat` script will execute any side effects.
 Writing the `exec.d` output TOML will ensure that all environment variables will be set.
 So, this will solve for both of the simple examples above.
-
-On Windows, for `.profile.bat` scripts, we can take the same approach of wrapping the script like:
-
-```
-call .profile.bat
-write-env-toml >&%CNB_EXEC_D_HANDLE%
-```
 
 Per the [Operating System Conventions in the CNB spec](https://github.com/buildpacks/spec#operating-system-conventions), this buildpack will support scripts compatible with bash version 3 or greater on Linux, and cmd.exe on Windows.
 
