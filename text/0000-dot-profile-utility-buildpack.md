@@ -136,6 +136,13 @@ If we do nothing, we introduce a regression in functionality, and force applicat
   For example, defining environment variables and side effects like writing files should be supported.
   But, something like defining a bash function will not be supported.
 
+  This is definitely an edge case.
+  The app profile runs after the buildpack provided profiles and just before the process type is executed so the only thing that could depend on one of the functions in the process.
+  This will almost certainly never happen with a buildpack-provided process (the buildpack depending on the app to define a bash function would be very weird and brittle).
+
+  If the user provides the process definition (e.g. with a procfile) this is slightly more plausible.
+  But in this case there is a very easy workaround - source a script containing the functions as part of the command provided in the procfile.
+
 - **What if the run image does not contain bash (e.g., `FROM scratch`)?**
   Should it error, no-op, should this buildpack add a layer with bash?
 
