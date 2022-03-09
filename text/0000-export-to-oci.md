@@ -12,7 +12,7 @@
 # Summary
 [summary]: #summary
 
-When the `Exporter` phase is invoked passing the `-daemon` flag  besides writing into the Daemon also save the image to disk in [OCI Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format updating the [report.toml](https://github.com/buildpacks/spec/blob/main/platform.md#reporttoml-toml) file with all the metadata require to validate the consistency of the image when it is published to a Registry.
+When the `Exporter` phase is invoked besides writing into the Daemon or a Registry add the capability (enable explicitly by the user) to save the image to disk in [OCI Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
 # Definitions
 [definitions]: #definitions
@@ -37,54 +37,126 @@ This feature will help to unblock uses cases like
 # What it is
 [what-it-is]: #what-it-is
 
-Currently the *Exporter*  writes either in an OCI image registry or a docker daemon, the idea is to add the capability to write into disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format only when the `-daemon` flag is used as argument AND the feature is enable using a new flag `-layout` or the default environment variable `CNB_LAYOUT_DIR`.
+Currently the *Exporter*  writes either in an OCI image registry or a docker daemon, the idea is to add the capability to write into disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format when the new flag `-layout` or the default environment variable `CNB_LAYOUT_DIR` is set.
+
+Let's see some examples for the propose behavior
 
 ## Examples
 
-### Exporting using the environment variable
+For each case, I will present two ways of invoking the new feature:
+
+- Using the environment Variable
+- Using the new flag
+
+For both ways the expected output is the same
+
+### Exporting to Daemon with launch cache enabled
 
 ```=shell
-> export CNB_LAYOUT_DIR=oci
->  /cnb/lifecycle/exporter -daemon my-app-image
-> tree /oci
+> export CNB_LAYOUT=oci
+> /cnb/lifecycle/exporter -daemon -launch-cache /launch-cache my-app-image
+```
+
+Or
+
+```=shell
+> /cnb/lifecycle/exporter -daemon -launch-cache /launch-cache -layout /oci my-app-image
+```
+
+The expected output is the `my-app-image` exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format into the `/launch-cache/my-app-image/` folder. 
+
+```=shell
+> cd /launch-cache
+> tree .
 .
-└── oci/
+└── launch-cache/
+    ├── committed/
+    │   ├── io.buildpacks.lifecycle.cache.metadata
+    │   ├── sha256:65d9067f915e01...tar
+    │   ├── sha256:6905011516dcf4...tar
+    │   └── sha256:83d85471d9f8a3...tar
+    ├── staging
     └── my-app-image/
         ├── blobs/
         │   └── sha256/
-        │       └── 01..
+        │       ├── 65d9067f915e01...tar -> /launch-cache/committed/sha256:65d9067f915e01...tar
+        │       ├── 6905011516dcf4...tar -> /launch-cache/committed/sha256:6905011516dcf4...tar
+        │       └── 83d85471d9f8a3...tar -> /launch-cache/committed/sha256:83d85471d9f8a3...tar
         ├── index.json
         └── oci-layout
 
 ```
 
-### Exporting using the command line flag
+### Exporting to Daemon without launch cache enabled
+
+```=shell
+> export CNB_LAYOUT=oci
+> /cnb/lifecycle/exporter -daemon my-app-image
+```
+
+Or
 
 ```=shell
 >  /cnb/lifecycle/exporter -daemon -layout oci my-app-image
-> tree /oci
+```
+
+The expected output is the `my-app-image` exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format into the `/oci/` folder
+
+```=shell
+cd oci
+> tree .
 .
 └── oci/
     └── my-app-image/
         ├── blobs/
         │   └── sha256/
-        │       └── 01..
+        │       ├── 65d9067f915e01...tar
+        │       ├── 6905011516dcf4...tar
+        │       └── 83d85471d9f8a3...tar
+        ├── index.json
+        └── oci-layout
+```
+
+### Exporting to a Registry
+
+```=shell
+> export CNB_LAYOUT=oci
+> /cnb/lifecycle/exporter gcr.io/my-repo/my-app-image
+```
+
+Or
+
+```=shell
+>  /cnb/lifecycle/exporter -layout oci gcr.io/my-repo/my-app-image
+```
+
+The expected output is the `my-app-image` exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format into the `/oci/` folder
+
+```=shell
+cd oci
+> tree .
+.
+└── oci/
+    └── my-app-image/
+        ├── blobs/
+        │   └── sha256/
+        │       ├── 65d9067f915e01...tar
+        │       ├── 6905011516dcf4...tar
+        │       └── 83d85471d9f8a3...tar
         ├── index.json
         └── oci-layout
 
 ```
-As we can see there is a new folder called `oci` and inside that folder we can find our application image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format
-
-Attempts to use this feature when the `-daemon` flag is not used could be ignore or show some warnings messages.
 
 # How it Works
 [how-it-works]: #how-it-works
 
 The lifecycle phases affected by this new behavior is: [Export](https://buildpacks.io/docs/concepts/components/lifecycle/export/)
 
-At high level view of the propose solution can be summarize with the following container diagram from the C4 model
+At high level view the propose solution can be summarize with the following container diagram from the C4 model
 
-![](https://i.imgur.com/XhtvT9j.png)
+![](https://i.imgur.com/0OLSK8o.png)
+
 
 Notice that we are relying on the OCI format Specification to expose the data for `Platforms`
 
@@ -95,13 +167,19 @@ The following new input is proposed to be added to this phase
 | `<layout>`      |  `CNB_LAYOUT_DIR` | "" | The root directory where the OCI image will be written. The presence of a none empty value for this environment variable will enable the feature. |
 
 
-- When the exporter is executed WITH the flag `daemon` it will check for the presence of the flag `layout` or the environment variable `CNB_LAYOUT_DIR`
+- When the exporter is executed it will check for the presence of the flag `layout` or the environment variable `CNB_LAYOUT_DIR`. Let's reference this value as `<layout-dir>`
 - IF any of the values are present THEN
-  - It will create a folder name `<image>` located at the path defined `<layout>` or `CNB_LAYOUT_DIR`
-  - In parallel of exporting the Image to the Daemon it will save the final Image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format in the directory created before. The image will be saved using **uncompressed** layers
+  - IF `-launch-cache` IS defined
+    - Show a **warning** message: `Ignoring -layout directory. When -launch-cache flag is defined image will be exported at <launch-cache>/<image>`
+    - Create a folder name `<image>` located at the path `<launch-cache>/<image>`
+    - In parallel of exporting the Image to the Daemon it will save the final Image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format in the directory created before.
+      - The content of `blobs/<alg>/<encoded>` MAY contain symbolic links to content saved in the launch cache to avoid duplicating files.  
+      - The content of the launch cache MAY be saved in **uncompressed** format
+  - IF `-launch-cache` IS NOT defined
+    - Create a folder name `<image>` located at `<layout-dir>/<image>`
+    - In parallel of exporting the Image to the Daemon or a Registry it will save the final Image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format in the directory created before.
+        - The content of `blobs/<alg>/<encoded>` will be saved in **compressed** format
   - It will calculate the digest of the manifest of the compressed layers and write that value into the report.toml file
-  - It will update the report.toml file with all the tags and require information to verify the image once it is pushed into a registry
-- OTHERWISE it will behave as it is right now
 
 #### `report.toml` (TOML)
 
@@ -112,19 +190,11 @@ The new information to be  added into the `report.toml` file can be summarize as
 [[export.oci]]
 digest = "<image digest>"
 manifest-size = "<manifest size in bytes>"
-compression-algorithm = "<used by gcr>"
-library-url = "https://github.com/google/go-containerregistry/"
-library-language="go"
 ```
 Where:
 - **If** the app image was exported using the `-layer` flag, the export section will be added to the report
   - `digest` MUST contain the image digest calculated based on compressed layers
   - `manifest-size` MUST contain the manifest size in bytes
-  - `compression-algorithm` MUST contain the information of the algorithm used by GCR to compute the digest
-  - `library-url` MUST contain the url of the library used to export the image
-  - `library-language` MUST contain the client's library programming language used to export the image
-
-The main idea of this new section in the `report.toml` file is to provide the information of the **expected** digest of the image if it is exported to a registry using a particular implementation. This information can be used by other tools (like publish) to complete the operation and verify the consistency of the image.
 
 # Migration
 [migration]: #migration
@@ -140,52 +210,6 @@ This section should document breaks to public API and breaks in compatibility du
 # Alternatives
 [alternatives]: #alternatives
 
-## Redesign the current Launch Cache
-
-Another potential solution could be to export the OCI image along with the current Launch Cache concept and expose some contract for `Platform` to interact with this Cache and extract the final OCI image. At high level, the solution can be represented with the following container diagram from C4 model
-
-![](https://i.imgur.com/xl4gL1G.png)
-
-Notice that on this solution, because the Launch Cache is an internal component from the Lifecycle implementation we will have to expose some kind of specification for `Platforms` to understand its format and been able to read the OCI image.
-
-The current implementation when the Daemon is enable can be describe with the following class diagram
-
-```mermaid
-classDiagram
-  Cache <|-- VolumeCache
-  Image <|-- LocalImage
-  LocalImage <|-- CachingImage
-  CachingImage .. VolumeCache
-class Cache {
-    <<interface>>
-}
-
-class Image {
-    <<interface>>
-}
-```
-
-When the Daemon is enabled, a `CachingImage` is created, this image implementation saves the layers tarballs in a `VolumeCache` to reuse them and increase the speed of the process. The idea could be to redesign this `Cache` implementation (VolumeCache) with a new one, maybe a `OCICache` which handles the details to avoid saving the layers tarballs duplicated.
-
-```mermaid
-classDiagram
-  Cache <|-- OCICache
-  Image <|-- LocalImage
-  LocalImage <|-- CachingImage
-  CachingImage .. OCICache
-class Cache {
-    <<interface>>
-
-}
-
-class Image {
-    <<interface>>
-
-}
-```
-### Drawbacks
-
-- We will have to expose Launch Cache implementation details to the outside world, probably spec those details, for other tools to interact with this exported data
 
 <!--
 - Why is this proposal the best?
