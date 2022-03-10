@@ -75,7 +75,7 @@ Why should we *not* do this? Leaving the location of the run image sbom unspec'd
 [unresolved-questions]: #unresolved-questions
 
 - What should be the path of the run image sbom within the image?
-- Should the run image sbom be part of the layer containing the buildpack-provided launch sboms? This layer is referenced in the `io.buildpacks.lifecycle.metadata` label with key `sbom`. Is there a better layer / label?
+- How should the layer containing the run image sbom be designated? This layer containing the buildpack-provided sbom is referenced in the `io.buildpacks.lifecycle.metadata` label with key `sbom`.
 - What should be all the accepted media types / extensions?
 
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
@@ -83,4 +83,4 @@ Why should we *not* do this? Leaving the location of the run image sbom unspec'd
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
-Does this RFC entail any proposed changes to the core specifications or extensions? New field on the exporter. Potentially a new label.
+Does this RFC entail any proposed changes to the core specifications or extensions? New fields on the exporter and rebaser. A new label on the app image to designate the layer containing the run image sbom.
