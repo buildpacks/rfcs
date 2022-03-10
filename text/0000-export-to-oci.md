@@ -166,22 +166,28 @@ The following new input is proposed to be added to this phase
 |-------------------|-----------------------|--------------------------|----------------------
 | `<layout>`      |  `CNB_LAYOUT_DIR` | "" | The root directory where the OCI image will be written. The presence of a none empty value for this environment variable will enable the feature. |
 
-
-The following flowchart explains the flow proposed
+Let's see the propose flow
 
 ```mermaid
 flowchart
-  A{IS -layout OR CNB_LAYOUT_DIR defined?} -->|Yes| B
+  A{"IS -layout OR
+  CNB_LAYOUT_DIR
+  defined?"} -->|Yes| B
   A -->|No| END
-  B{IS -launch-cache defined?} -->|Yes|D
+  B{"IS -launch-cache
+  defined?"} -->|Yes|D
   B -->|No| E
-  E{DOES layout-dir/image exists?} --> |Yes| L
+  E{"DOES
+  layout-dir/image
+  exist?"} --> |Yes| L
   L[...]
   E --> |No| M
   M[Create layout-dir/image directory] --> O[export-dir = layout-dir/image]
   O --> I
   D[/Warn: will export to launch cache dir/] --> F
-  F{DOES launch-cache/image dir exists?} -->|Yes| G
+  F{"DOES
+  launch-cache/image
+  dir exist?"} -->|Yes| G
   G[ ...]
   F -->|No| H
   H[Create launch-cache/image directory] --> N[export-dir = launch-cache/image]
@@ -189,7 +195,6 @@ flowchart
   I --> J[Calculate manifest's digest]
   J --> K[/Write digest into report.toml/]
   K -->END((End))
-
 ```
 
 Notes:
