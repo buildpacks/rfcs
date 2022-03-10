@@ -63,7 +63,7 @@ Or
 > /cnb/lifecycle/exporter -daemon -launch-cache /launch-cache -layout /oci my-app-image
 ```
 
-The expected output is the `my-app-image` exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format into the `/launch-cache/my-app-image/` folder. 
+The expected output is the `my-app-image` exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format into the `/launch-cache/my-app-image/` folder.
 
 ```=shell
 > cd /launch-cache
@@ -167,19 +167,38 @@ The following new input is proposed to be added to this phase
 | `<layout>`      |  `CNB_LAYOUT_DIR` | "" | The root directory where the OCI image will be written. The presence of a none empty value for this environment variable will enable the feature. |
 
 
-- When the exporter is executed it will check for the presence of the flag `layout` or the environment variable `CNB_LAYOUT_DIR`. Let's reference this value as `<layout-dir>`
-- IF any of the values are present THEN
-  - IF `-launch-cache` IS defined
-    - Show a **warning** message: `Ignoring -layout directory. When -launch-cache flag is defined image will be exported at <launch-cache>/<image>`
-    - Create a folder name `<image>` located at the path `<launch-cache>/<image>`
-    - In parallel of exporting the Image to the Daemon it will save the final Image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format in the directory created before.
-      - The content of `blobs/<alg>/<encoded>` MAY contain symbolic links to content saved in the launch cache to avoid duplicating files.  
-      - The content of the launch cache MAY be saved in **uncompressed** format
-  - IF `-launch-cache` IS NOT defined
-    - Create a folder name `<image>` located at `<layout-dir>/<image>`
-    - In parallel of exporting the Image to the Daemon or a Registry it will save the final Image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format in the directory created before.
-        - The content of `blobs/<alg>/<encoded>` will be saved in **compressed** format
-  - It will calculate the digest of the manifest of the compressed layers and write that value into the report.toml file
+The following flowchart explains the flow proposed
+
+```mermaid
+flowchart
+  A{IS -layout OR CNB_LAYOUT_DIR defined?} -->|Yes| B
+  A -->|No| END
+  B{IS -launch-cache defined?} -->|Yes|D
+  B -->|No| E
+  E{DOES layout-dir/image exists?} --> |Yes| L
+  L[...]
+  E --> |No| M
+  M[Create layout-dir/image directory] --> O[export-dir = layout-dir/image]
+  O --> I
+  D[/Warn: will export to launch cache dir/] --> F
+  F{DOES launch-cache/image dir exists?} -->|Yes| G
+  G[ ...]
+  F -->|No| H
+  H[Create launch-cache/image directory] --> N[export-dir = launch-cache/image]
+  N --> I[Write image to $export-dir in OCI format **]
+  I --> J[Calculate manifest's digest]
+  J --> K[/Write digest into report.toml/]
+  K -->END((End))
+
+```
+
+Notes:
+  - WHEN `-launch-cache` flow is executed
+    - The content of `blobs/<alg>/<encoded>` MAY contain symbolic links to content saved in the launch cache to avoid duplicating files.  
+    - The content of `blobs/<alg>/<encoded>` MAY reference tar files in **uncompressed** format because that's how they are saved in the cache
+  - WHEN `-launch-cache` IS NOT defined
+    - The content of `blobs/<alg>/<encoded>` MAY be saved in **compressed** format
+
 
 #### `report.toml` (TOML)
 
