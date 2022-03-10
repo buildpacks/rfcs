@@ -50,7 +50,7 @@ This [PR](https://github.com/buildpacks/imgutil/pull/137) to imgutil would read 
 
 Why should we *not* do this?
 
-It breaks build reproducibility. However platforms must explicitly opt-in to this feature.
+Platforms that choose to set SOURCE_DATE_EPOCH to real creation time will not have 100% reproducible builds.
 
 # Alternatives
 [alternatives]: #alternatives
