@@ -63,7 +63,7 @@ Or
 > /cnb/lifecycle/exporter -daemon -launch-cache /launch-cache -layout /oci my-app-image
 ```
 
-The expected output is the `my-app-image` exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format into the `/launch-cache/my-app-image/` folder.
+The expected output is the `my-app-image` exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format into the `/launch-cache/oci/my-app-image/` folder.
 
 ```=shell
 > cd /launch-cache
@@ -76,14 +76,15 @@ The expected output is the `my-app-image` exported in [OCI Image Layout](https:/
     │   ├── sha256:6905011516dcf4...tar
     │   └── sha256:83d85471d9f8a3...tar
     ├── staging
-    └── my-app-image/
-        ├── blobs/
-        │   └── sha256/
-        │       ├── 65d9067f915e01...tar -> /launch-cache/committed/sha256:65d9067f915e01...tar
-        │       ├── 6905011516dcf4...tar -> /launch-cache/committed/sha256:6905011516dcf4...tar
-        │       └── 83d85471d9f8a3...tar -> /launch-cache/committed/sha256:83d85471d9f8a3...tar
-        ├── index.json
-        └── oci-layout
+    └── oci/
+        └── my-app-image/
+            ├── blobs/
+            │   └── sha256/
+            │       ├── 65d9067f915e01...tar -> /launch-cache/committed/sha256:65d9067f915e01...tar
+            │       ├── 6905011516dcf4...tar -> /launch-cache/committed/sha256:6905011516dcf4...tar
+            │       └── 83d85471d9f8a3...tar -> /launch-cache/committed/sha256:83d85471d9f8a3...tar
+            ├── index.json
+            └── oci-layout
 
 ```
 
@@ -172,38 +173,39 @@ Let's see the propose flow
 flowchart
   A{"IS -layout OR
   CNB_LAYOUT_DIR
-  defined?"} -->|Yes| B
+  defined?"} -->|Yes| BB
   A -->|No| END
+  BB["root = "]
+  BB --> B
   B{"IS -launch-cache
   defined?"} -->|Yes|D
-  B -->|No| E
-  E{"DOES
-  layout-dir/image
-  exist?"} --> |Yes| L
-  L[...]
-  E --> |No| M
-  M[Create layout-dir/image directory] --> O[export-dir = layout-dir/image]
-  O --> I
-  D[/Warn: will export to launch cache dir/] --> F
+  B -->|No| GG
+  D[/Warn: will export to launch cache dir/] --> FF
+  FF["root = $launch-cache"] --> GG
+  GG["export-dir = $root/$layout-dir/$image"] --> F
   F{"DOES
-  launch-cache/image
-  dir exist?"} -->|Yes| G
-  G[ ...]
+     $export-dir
+      exist?"} -->|Yes| P
+  P["Replace image at $export-dir ‡"]
+  P --> J
   F -->|No| H
-  H[Create launch-cache/image directory] --> N[export-dir = launch-cache/image]
-  N --> I[Write image to $export-dir in OCI format **]
+  H[Create $export-dir directory] --> I["Write image to $export-dir †"]
   I --> J[Calculate manifest's digest]
   J --> K[/Write digest into report.toml/]
   K -->END((End))
 ```
 
-Notes:
+Notes **†**:
   - WHEN `-launch-cache` flow is executed
     - The content of `blobs/<alg>/<encoded>` MAY contain symbolic links to content saved in the launch cache to avoid duplicating files.  
     - The content of `blobs/<alg>/<encoded>` MAY reference tar files in **uncompressed** format because that's how they are saved in the cache
   - WHEN `-launch-cache` IS NOT defined
     - The content of `blobs/<alg>/<encoded>` MAY be saved in **compressed** format
 
+Notes **‡**:
+  - WHEN `the image exists in the file system`
+    - The idea is to use [ReplaceImage](https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/layout#Path.ReplaceImage) internally this method uses [WriteImage](https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/layout#Path.WriteImage) which will skip to write blobs that already exits. It means the `blobs` folder MAY contain the blobs directory MAY contain blobs which are not referenced by any of the refs, which is valid according to the OCI image specification. 
+  - `Platforms` could include a flag to clean the directory if the user desires it
 
 #### `report.toml` (TOML)
 
