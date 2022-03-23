@@ -3,10 +3,10 @@
 - Name: Buildpack layer metadata
 - Start Date: 2021-12-02
 - Author(s): [@samj1912](https://github.com/samj1912)
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#194](https://github.com/buildpacks/rfcs/pull/194)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
