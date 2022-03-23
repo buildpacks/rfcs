@@ -3,10 +3,10 @@
 - Name: Use SOURCE_DATE_EPOCH to configure image create time
 - Start Date: 2022-02-24
 - Author(s): natalieparellano
-- Status: Draft
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#204](https://github.com/buildpacks/rfcs/pull/204)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/lifecycle#809](https://github.com/buildpacks/lifecycle/issues/809)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
