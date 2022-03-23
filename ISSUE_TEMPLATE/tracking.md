@@ -23,3 +23,7 @@ Pack:
 
 Documentation:
 - [ ] https://github.com/buildpacks/docs/issues/<INSERT ISSUE NUMBER>
+
+<INSERT OTHER REPO>:
+- [ ] <INSERT ISSUE URL>
+- [ ] Released in <INSERT COMPONENT> version `<placeholder>`
