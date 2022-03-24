@@ -30,9 +30,6 @@ This RFC serves as an addendum to [#RFC 95: Structured SBOMs](https://github.com
 # What it is
 [what-it-is]: #what-it-is
 
-```suggestion
-# What it is
-
 This RFC proposes a mechanism for platforms to supply the SBOM for a run image at build time, leaving the method of storing and associating the SBOM to the run image unspec'd. The lifecycle would ingest the provided SBOM and place it in a spec'd location in the final app image. A label would be used to designate the layer containing the SBOM for the run image.
 
 - Define the target persona: platform operator, platform implementor, end user.
