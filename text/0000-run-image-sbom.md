@@ -36,16 +36,22 @@ This RFC proposes a mechanism for platforms to supply the SBOM for a run image a
 - If applicable, provide sample error messages, deprecation warnings, or migration guidance.
   - The lifecycle could warn if a usable run image sbom is not provided.
 
-Example invocation: `/cnb/lifecycle/exporter -run-image my-run-image -run-image-sbom <path or directory - e.g., ./my-run-image-sbom.json> my-app-image`
+Example invocation:
+* build: `/cnb/lifecycle/exporter -run-image my-run-image -run-image-sbom <path or directory - e.g., ./my-run-image-sbom.json> my-app-image`
+* rebase: `/cnb/lifecycle/rebaser -run-image my-new-run-image -run-image-sbom <path or directory - e.g., ./my-new-run-image-sbom.json> my-app-image`
 
 # How it Works
 [how-it-works]: #how-it-works
 
-Following the invocation above, the exported app image would contain:
+## Build
+
+Following the build invocation above, the exported app image would contain:
 * `my-run-image-sbom.json` somewhere in `/layers/sbom`; suggestions:
+  * `/layers/sbom/launch/base/sbom.<ext>` (this would make `base` a reserved buildpack id)
   * `/layers/sbom/launch/run-image/sbom.<ext>` (this would make `run-image` a reserved buildpack id)
   * `/layers/sbom/run-image/sbom.<ext>`
   * ?
+* An `io.buildpacks.sbom.base` label containing the diffID of the layer containing the run image sbom
 
 The accepted media types would be:
 * `application/vnd.cyclonedx+json` with ext `cdx.json`
@@ -53,11 +59,39 @@ The accepted media types would be:
 * `application/vnd.syft+json` with ext `syft.json`
 * others?
 
+## Rebase
+
+Following the rebase invocation above, the exported app image would contain:
+* `my-new-run-image-sbom.json` somewhere in `/layers/sbom`
+* The layer containing the old run image sbom would be removed
+* The `io.buildpacks.sbom.base` label would be updated to contain the diffID of the layer containing the new run image sbom
+
+## When a run image has an sbom baked in
+
+A platform could provide a run image that already has an sbom baked in - i.e., has a layer containing an sbom that is advertised in `io.buildpacks.sbom.base`. In this case, the lifecycle could just do nothing, and the final app image would contain an sbom in the expected location with the expected label. This (as in #186) runs the risk that the sbom baked into the run image has fallen out of date.
+
+If a platform provided a run image with a baked in sbom and also supplied the `-run-image-sbom` argument, the lifecycle could replace the baked in sbom with the new sbom, much like rebase.
+
+## With Dockerfiles
+
+https://github.com/buildpacks/rfcs/pull/173 proposes allowing the run image to be extended or swapped using Dockerfiles. There are a few scenarios that could occur:
+* The run image is extended - the lifecycle would need to run a `genpkgs` executable after Dockerfiles have been applied. The result of this invocation would replace the `io.buildpacks.sbom.base` label on the extended run image. In this scenario, the build would proceed according to the process outlined in "When a run image has an sbom baked in".
+* The run image is swapped for a new run image that already has a `io.buildpacks.sbom.base` label. In this scenario, the lifecycle would NOT run `genpkgs`, and the build would proceed according to the process outlined in "When a run image has an sbom baked in".
+* The run image is swapped for a new run image that does not have a `io.buildpacks.sbom.base` label. In this scenario, there are a couple things that could occur:
+  * The lifecycle could run `genpkgs` to produce a run image sbom for use during export
+  * The lifecycle could return the new run image reference to the platform, expecting the platform to locate an sbom
+
+## With pack
+
+`pack` could make use of the preparer binary described below to download a run image sbom prior to running the exporter. When Dockerfiles are supported, the preparer invocation would need to happen after the `extender` has run to cover the case where a new run image is selected.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this? Leaving the location of the run image sbom unspec'd (as opposed to baking it into the run image at a specific location) could make it harder for logic-less platforms like Tekton to use the creator. 
-* Possible mitigation: a CNB-provided "prepare" operation ([currently under discussion](https://github.com/buildpacks/rfcs/pull/202)) could make this easier. For example, a preparer could look for a run image sbom in a file, attestation, attachment, or layer (picking the first one it finds) and provide the data as a file to the creator. The Tekton task that uses the creator currently already has a ["prepare" step](https://github.com/tektoncd/catalog/blob/4bf8b57aa105f0c7ce05fc122a11b1b0d5822fcd/task/buildpacks/0.3/buildpacks.yaml#L70-L121) which could be modified to invoke a preparer binary.
+Why should we *not* do this? Leaving the location of the run image sbom unspec'd (as opposed to baking it into the run image at a specific location) could make it harder for logic-less platforms like Tekton to use the creator.
+
+## preparer binary
+* A possible mitigation to the drawback noted above would be a CNB-provided "prepare" operation ([currently under discussion](https://github.com/buildpacks/rfcs/pull/202)) could make this easier. For example, a preparer could look for a run image sbom in a file, attestation, attachment, or layer (picking the first one it finds) and provide the data as a file to the creator. The Tekton task that uses the creator currently already has a ["prepare" step](https://github.com/tektoncd/catalog/blob/4bf8b57aa105f0c7ce05fc122a11b1b0d5822fcd/task/buildpacks/0.3/buildpacks.yaml#L70-L121) which could be modified to invoke a preparer binary.
 
 # Alternatives
 [alternatives]: #alternatives
