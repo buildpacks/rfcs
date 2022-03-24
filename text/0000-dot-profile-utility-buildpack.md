@@ -68,24 +68,19 @@ The wrapper would not need to set any environment variables, but should maintain
 # How it Works
 [how-it-works]: #how-it-works
 
-We will write two small programs to implement the buildpack.
-
-- `dot-profile-wrapper` will be the main entry point.
-- `write-env-toml` will write all environment variables to the [`exec.d` output TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#execd-output-toml).
-
-On Linux, `dot-profile-wrapper` will:
+On Linux, the wrapper will:
 
 1. Ensure `bash` exists on the run image, and error if it does not.
 1. Launch a `bash` shell to:
   1. Source the `.profile` script, which may set environment variables and/or have other side effects.
-  1. Call `write-env-toml` to capture the environment variables.
+  1. Write the environment variables to the [`exec.d` output TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#execd-output-toml).
 
-Likewise on Windows, `dot-profile-wrapper` will:
+Likewise on Windows, the wrapper will:
 
 1. Ensure `cmd.exe` exists on the run image, and error if it does not.
 1. Launch a `cmd.exe` shell to:
   1. Source the `.profile.bat` script, which may set environment variables and/or have other side effects.
-  1. Call `write-env-toml` to capture the environment variables.
+  1. Write the environment variables to the [`exec.d` output TOML](https://github.com/buildpacks/spec/blob/main/buildpack.md#execd-output-toml).
 
 Sourcing the `.profile`/`.profile.bat` script will execute any side effects.
 Writing the `exec.d` output TOML will ensure that all environment variables will be set.
@@ -154,6 +149,15 @@ If we do nothing, we introduce a regression in functionality, and force applicat
 
   We will document that this buildpack requires bash to be in the run image, and this buildpack will not add bash.
   If bash is not in the run image, the exec.d wrapper will error out.
+
+- **How should we implement the buildpack?**
+  Should it be a bash script?
+  A Go binary (or two)?
+  What should we use for CI, frameworks, etc.?
+
+  We will leave these implementation details to the Buildpack Authors' Tooling sub-team.
+  We can finalize these details after the RFC is approved.
+  We have captured some initial ideas for the [project plumbing](https://github.com/mboldt/utility-buildpack-plumbing) and had some discussion about [implementation details](https://github.com/buildpacks/rfcs/pull/200#discussion_r828063918) to seed those conversations.
 
 # Spec. Changes
 [spec-changes]: #spec-changes
