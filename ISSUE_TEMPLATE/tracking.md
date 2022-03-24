@@ -17,6 +17,10 @@ Lifecycle:
 - [ ] https://github.com/buildpacks/lifecycle/issues/<INSERT ISSUE NUMBER>
 - [ ] Released in lifecycle version `<placeholder>`
 
+Libcnb:
+- [ ] https://github.com/buildpacks/libcnb/issues/<INSERT ISSUE NUMBER>
+- [ ] Released in libcnb version `<placeholder>`
+
 Pack:
 - [ ] https://github.com/buildpacks/pack/issues/<INSERT ISSUE NUMBER>
 - [ ] Released in pack version `<placeholder>`
