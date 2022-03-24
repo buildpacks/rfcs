@@ -30,11 +30,16 @@ This RFC serves as an addendum to [#RFC 95: Structured SBOMs](https://github.com
 # What it is
 [what-it-is]: #what-it-is
 
+```suggestion
+# What it is
+
+This RFC proposes a mechanism for platforms to supply the SBOM for a run image at build time, leaving the method of storing and associating the SBOM to the run image unspec'd. The lifecycle would ingest the provided SBOM and place it in a spec'd location in the final app image. A label would be used to designate the layer containing the SBOM for the run image.
+
 - Define the target persona: platform operator, platform implementor, end user.
 - If applicable, provide sample error messages, deprecation warnings, or migration guidance.
   - The lifecycle could warn if a usable run image sbom is not provided.
 
-Example invocation: `/cnb/lifecycle/exporter -run-image my-run-image -run-image-sbom my-run-image-sbom.json my-app-image`
+Example invocation: `/cnb/lifecycle/exporter -run-image my-run-image -run-image-sbom <path or directory - e.g., ./my-run-image-sbom.json> my-app-image`
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -54,7 +59,8 @@ The accepted media types would be:
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this? Leaving the location of the run image sbom unspec'd could make it harder for logic-less platforms like Tekton to use the creator. However, a CNB-provided "prepare" operation ([currently under discussion](https://github.com/buildpacks/rfcs/pull/202)) could make this easier. For example, a preparer could look for a run image sbom in a file, attestation, attachment, or layer (picking the first one it finds) and provide the data as a file to the creator. The Tekton task that uses the creator currently already has a ["prepare" step](https://github.com/tektoncd/catalog/blob/4bf8b57aa105f0c7ce05fc122a11b1b0d5822fcd/task/buildpacks/0.3/buildpacks.yaml#L70-L121) which could be modified to invoke a preparer binary.
+Why should we *not* do this? Leaving the location of the run image sbom unspec'd (as opposed to baking it into the run image at a specific location) could make it harder for logic-less platforms like Tekton to use the creator. 
+* Possible mitigation: a CNB-provided "prepare" operation ([currently under discussion](https://github.com/buildpacks/rfcs/pull/202)) could make this easier. For example, a preparer could look for a run image sbom in a file, attestation, attachment, or layer (picking the first one it finds) and provide the data as a file to the creator. The Tekton task that uses the creator currently already has a ["prepare" step](https://github.com/tektoncd/catalog/blob/4bf8b57aa105f0c7ce05fc122a11b1b0d5822fcd/task/buildpacks/0.3/buildpacks.yaml#L70-L121) which could be modified to invoke a preparer binary.
 
 # Alternatives
 [alternatives]: #alternatives
