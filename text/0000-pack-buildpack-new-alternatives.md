@@ -22,7 +22,7 @@ The `pack buildpack new` subcommand creates a new buildpack based on a shell-scr
 
 The creation of buildpacks in languages other than `bash` is undocumented in the [Buildpack Author Guide](https://buildpacks.io/docs/buildpack-author-guide).  In particular, creating a buildpack using `libcnb` is undocumented because there is no mechanism to generate a scaffolded project.  This proposal adds a minimal `libcnb` project template to `pack` and allows 3d parties to provide templates to create buildpacks for their chosen technology stack.
 
-Extending `pack buildpack new` with a `--libcnb` flag supports buildpack creation using the existing documented workflow.  This results easier on-boarding of buildpack authors into the `libcnb` ecosystem.  Additionally extending `pack buildpack new` with `--target URL` allows other projects to re-use `pack` as their scaffolding tool.
+Extending `pack buildpack new` with a `--libcnb` flag supports buildpack creation using the existing documented workflow.  This results easier on-boarding of buildpack authors into the `libcnb` ecosystem.  Additionally extending `pack buildpack new` with `--template URL` allows other projects to re-use `pack` as their scaffolding tool.
 
 `pack buildpack new --libcnb` supports end-users who wish to scaffold a new `libcnb`-based buildpack.  The operation of `pack buildpack new --libcnb` does not require internet access to succeed.  `pack buildpack new --template URL` allows projects (such as Paketo, Heroku and others) to define skeleton projects for new buildpacks.
 
