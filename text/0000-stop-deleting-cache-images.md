@@ -52,7 +52,7 @@ Lifecycle will document this behavior change in Release Notes/Changelog along wi
 
 Why should we *not* do this?
 
-Platform authors relying on this behavior will need to take additional measures to ensure cache image cleanup.
+Platform authors relying on this behavior will need to take additional measures to ensure cache image cleanup or the destination registry will continue to grow.
 
 # Alternatives
 [alternatives]: #alternatives
