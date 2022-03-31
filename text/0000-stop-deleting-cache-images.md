@@ -59,6 +59,7 @@ Platform authors relying on this behavior will need to take additional measures 
 
 - What other designs have been considered?
   * Add regex or configuration to drive registry hosts to ignore during DELETE  *
+  * Stop deleting cache images by default in newer platform API versions, but add a platform-level configuration to enable previous behavior.
 - Why is this proposal the best?
   * Lifecycle is not currently cleaning up any other resources
   * Deleting the cache images can hurt reproducibility
