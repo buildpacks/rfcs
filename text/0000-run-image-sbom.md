@@ -115,7 +115,8 @@ Why should we *not* do this? Leaving the location of the run image sbom unspec'd
 [unresolved-questions]: #unresolved-questions
 
 - Should the lifecycle run `genpkgs` if no run image SBOM is provided?
-- Do the SBOM formats need to be communicated in a label?
+- Do the available SBOM formats need to be communicated in a label?
+- How should `genpkgs` behave? Should it also attempt to locate a pre-existing SBOM?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
