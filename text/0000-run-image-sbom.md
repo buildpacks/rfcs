@@ -63,7 +63,9 @@ If `-run-image-sbom` is provided as a directory:
 
 ## Buildpack-provided SBOMs
 
-SBOM files output by buildpacks are currently exported in `/layers/sbom/launch/<buildpack id>`. The layer containing the buildpack-provided SBOM files is referenced in the `io.buildpacks.lifecycle.metadata` label with key `sbom`. For parity with `io.buildpacks.base.sbom`, a `io.buildpacks.app.sbom` label will also be added.
+SBOM files output by buildpacks are currently exported in `/layers/sbom/launch/<buildpack id>`, and the diffID of the layer containing the buildpack-provided SBOM files is referenced in the `io.buildpacks.lifecycle.metadata` label with key `sbom`.
+
+For parity with `io.buildpacks.base.sbom`, a `io.buildpacks.app.sbom` label will also be added containing the diffID of the layer containing the buildpack-provided SBOM files. This will duplicate information but will make the lifecycle implementation easier to manage.
 
 ## Rebase
 
@@ -74,18 +76,13 @@ Following the rebase invocation above, the exported app image would contain:
 
 ## When a run image has an sbom baked in
 
-A platform could provide a run image that already has an sbom baked in - i.e., has a layer containing an sbom that is advertised in `io.buildpacks.base.sbom`. In this case, the lifecycle could just do nothing, and the final app image would contain an sbom in the expected location with the expected label. This (as in #186) runs the risk that the sbom baked into the run image has fallen out of date.
-
-If a platform provided a run image with a baked in sbom and also supplied the `-run-image-sbom` argument, the lifecycle could replace the baked in sbom with the new sbom, much like rebase.
+Though a platform could theoretically provide a run image that already has an SBOM baked in (i.e., has a layer containing an sbom that is advertised in `io.buildpacks.base.sbom`), this would be discouraged. Platforms should use an industry standard method of associating a run image with an SBOM.
 
 ## With Dockerfiles
 
 https://github.com/buildpacks/rfcs/pull/173 proposes allowing the run image to be extended or swapped using Dockerfiles. There are a few scenarios that could occur:
-* The run image is extended - the lifecycle would need to run a `genpkgs` executable after Dockerfiles have been applied. The result of this invocation would replace the `io.buildpacks.base.sbom` label on the extended run image. In this scenario, the build would proceed according to the process outlined in "When a run image has an sbom baked in".
-* The run image is swapped for a new run image that already has a `io.buildpacks.base.sbom` label. In this scenario, the lifecycle would NOT run `genpkgs`, and the build would proceed according to the process outlined in "When a run image has an sbom baked in".
-* The run image is swapped for a new run image that does not have a `io.buildpacks.base.sbom` label. In this scenario, there are a couple things that could occur:
-  * The lifecycle could run `genpkgs` to produce a run image sbom for use during export
-  * The lifecycle could return the new run image reference to the platform, expecting the platform to locate an sbom
+* The run image is extended - the lifecycle would need to run a `genpkgs` executable after Dockerfiles have been applied. The result of this invocation would be provided to the platform so that the platform can provide it as an input to the exporter.
+* The run image is swapped for a new run image that already exists. In this scenario, the lifecycle could return the run image reference to the platform, so that the platform could attempt to locate an SBOM. Alternatively, `genpkgs` could be overloaded to first attempt to locate an SBOM and only scan the image if a pre-existing SBOM cannot be found.
 
 ## With pack
 
@@ -119,9 +116,6 @@ Why should we *not* do this? Leaving the location of the run image sbom unspec'd
 
 - Should the lifecycle run `genpkgs` if no run image SBOM is provided?
 - Do the SBOM formats need to be communicated in a label?
-
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
-  - The existence or behavior of a preparer binary that knows how to download run image sboms.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
