@@ -48,7 +48,7 @@ Example invocation:
 Following the build invocation above, the exported app image would contain:
 * `my-run-image-sbom.cdx.json` at `/layers/sbom/launch/base-image/sbom.cdx.json`. Note that this would make `base-image` a reserved buildpack ID.
 
-* An `io.buildpacks.sbom.base` label with the following schema:
+* An `io.buildpacks.base.sbom` label with the following schema:
 ```json
 {
   "sha": "run-image-layer-diffID",
@@ -74,20 +74,20 @@ If `-run-image-sbom` is provided as a directory:
 Following the rebase invocation above, the exported app image would contain:
 * `my-new-run-image-sbom.cdx.json` at `/layers/sbom/launch/base-image/sbom.cdx.json`
 * The layer containing the old run image sbom would be removed
-* The `io.buildpacks.sbom.base` label would be updated to contain the diffID of the layer containing the new run image sbom and to ensure that `formats` is accurate for the new file
+* The `io.buildpacks.base.sbom` label would be updated to contain the diffID of the layer containing the new run image sbom and to ensure that `formats` is accurate for the new file
 
 ## When a run image has an sbom baked in
 
-A platform could provide a run image that already has an sbom baked in - i.e., has a layer containing an sbom that is advertised in `io.buildpacks.sbom.base`. In this case, the lifecycle could just do nothing, and the final app image would contain an sbom in the expected location with the expected label. This (as in #186) runs the risk that the sbom baked into the run image has fallen out of date.
+A platform could provide a run image that already has an sbom baked in - i.e., has a layer containing an sbom that is advertised in `io.buildpacks.base.sbom`. In this case, the lifecycle could just do nothing, and the final app image would contain an sbom in the expected location with the expected label. This (as in #186) runs the risk that the sbom baked into the run image has fallen out of date.
 
 If a platform provided a run image with a baked in sbom and also supplied the `-run-image-sbom` argument, the lifecycle could replace the baked in sbom with the new sbom, much like rebase.
 
 ## With Dockerfiles
 
 https://github.com/buildpacks/rfcs/pull/173 proposes allowing the run image to be extended or swapped using Dockerfiles. There are a few scenarios that could occur:
-* The run image is extended - the lifecycle would need to run a `genpkgs` executable after Dockerfiles have been applied. The result of this invocation would replace the `io.buildpacks.sbom.base` label on the extended run image. In this scenario, the build would proceed according to the process outlined in "When a run image has an sbom baked in".
-* The run image is swapped for a new run image that already has a `io.buildpacks.sbom.base` label. In this scenario, the lifecycle would NOT run `genpkgs`, and the build would proceed according to the process outlined in "When a run image has an sbom baked in".
-* The run image is swapped for a new run image that does not have a `io.buildpacks.sbom.base` label. In this scenario, there are a couple things that could occur:
+* The run image is extended - the lifecycle would need to run a `genpkgs` executable after Dockerfiles have been applied. The result of this invocation would replace the `io.buildpacks.base.sbom` label on the extended run image. In this scenario, the build would proceed according to the process outlined in "When a run image has an sbom baked in".
+* The run image is swapped for a new run image that already has a `io.buildpacks.base.sbom` label. In this scenario, the lifecycle would NOT run `genpkgs`, and the build would proceed according to the process outlined in "When a run image has an sbom baked in".
+* The run image is swapped for a new run image that does not have a `io.buildpacks.base.sbom` label. In this scenario, there are a couple things that could occur:
   * The lifecycle could run `genpkgs` to produce a run image sbom for use during export
   * The lifecycle could return the new run image reference to the platform, expecting the platform to locate an sbom
 
