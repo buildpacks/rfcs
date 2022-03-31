@@ -48,13 +48,7 @@ Example invocation:
 Following the build invocation above, the exported app image would contain:
 * `my-run-image-sbom.cdx.json` at `/layers/sbom/launch/base-image/sbom.cdx.json`. Note that this would make `base-image` a reserved buildpack ID.
 
-* An `io.buildpacks.base.sbom` label with the following schema:
-```json
-{
-  "sha": "run-image-layer-diffID",
-  "formats": [ "<string>" ]
-}
-```
+* An `io.buildpacks.base.sbom` label containing the diffID of the layer containing the run image SBOM.
 
 The accepted SBOM media types would be:
 * `application/vnd.cyclonedx+json` for files with extension `cdx.json`
@@ -63,18 +57,20 @@ The accepted SBOM media types would be:
 
 If `-run-image-sbom` is provided as a file:
 * The lifecycle will ensure that the file has a supported extension
-* The lifecycle will add the appropriate media type to `formats`
 
 If `-run-image-sbom` is provided as a directory:
 * The lifecycle will ensure that all files within the directory have supported extensions
-* The lifecycle will add the appropriate media type for each file to `formats`
+
+## Buildpack-provided SBOMs
+
+SBOM files output by buildpacks are currently exported in `/layers/sbom/launch/<buildpack id>`. The layer containing the buildpack-provided SBOM files is referenced in the `io.buildpacks.lifecycle.metadata` label with key `sbom`. For parity with `io.buildpacks.base.sbom`, a `io.buildpacks.app.sbom` label will also be added.
 
 ## Rebase
 
 Following the rebase invocation above, the exported app image would contain:
 * `my-new-run-image-sbom.cdx.json` at `/layers/sbom/launch/base-image/sbom.cdx.json`
 * The layer containing the old run image sbom would be removed
-* The `io.buildpacks.base.sbom` label would be updated to contain the diffID of the layer containing the new run image sbom and to ensure that `formats` is accurate for the new file
+* The `io.buildpacks.base.sbom` label would be updated to contain the diffID of the layer containing the new run image sbom
 
 ## When a run image has an sbom baked in
 
@@ -121,8 +117,8 @@ Why should we *not* do this? Leaving the location of the run image sbom unspec'd
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What should be the path of the run image sbom within the image?
-- How should the layer containing the run image sbom be designated? This layer containing the buildpack-provided sbom is referenced in the `io.buildpacks.lifecycle.metadata` label with key `sbom`. #186 proposed `io.buildpacks.base.sbom` for the layer containing the run image sbom, and `io.buildpacks.app.sbom` for the layer containing the buildpack-provided sbom (in addition to `io.buildpacks.lifecycle.metadata`). Should we "future proof" the label name in case we might eventually want to attach build SBOMs to application images?
+- Should the lifecycle run `genpkgs` if no run image SBOM is provided?
+- Do the SBOM formats need to be communicated in a label?
 
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
   - The existence or behavior of a preparer binary that knows how to download run image sboms.
