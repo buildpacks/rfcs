@@ -249,7 +249,8 @@ Discuss prior art, both the good and bad.
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Should be this change included on a previous RFC to handle multiple export targets int the Lifecycle?
+- Should this change be included on a previous RFC to handle multiple export targets int the Lifecycle?
+- Currently the *Launch Cache* saves uncompressed tarballs. Is this by design? Is there any reason for those tarballs to do not be saved compressed?
 
 <!--
 - What parts of the design do you expect to be resolved before this gets merged?
