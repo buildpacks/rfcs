@@ -39,7 +39,7 @@ This feature will help to unblock uses cases like
 
 Currently the *Exporter*  writes either in an OCI image registry or a docker daemon, the idea is to add the capability to write into disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format when the new flag `-layout` or the default environment variable `CNB_LAYOUT_DIR` is set.
 
-Let's see some examples for the propose behavior
+Let's see some examples of the proposed behavior
 
 ## Examples
 
@@ -152,9 +152,9 @@ cd oci
 # How it Works
 [how-it-works]: #how-it-works
 
-The lifecycle phases affected by this new behavior is: [Export](https://buildpacks.io/docs/concepts/components/lifecycle/export/)
+The lifecycle phase affected by this new behavior is: [Export](https://buildpacks.io/docs/concepts/components/lifecycle/export/)
 
-At high level view the propose solution can be summarize with the following container diagram from the C4 model
+At high level view the proposed solution can be summarize with the following container diagram from the C4 model
 
 ![](https://i.imgur.com/0OLSK8o.png)
 
@@ -204,8 +204,8 @@ Notes **†**:
 
 Notes **‡**:
   - WHEN `the image exists in the file system`
-    - The idea is to use [ReplaceImage](https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/layout#Path.ReplaceImage) internally this method uses [WriteImage](https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/layout#Path.WriteImage) which will skip to write blobs that already exits. It means the `blobs` folder MAY contain the blobs directory MAY contain blobs which are not referenced by any of the refs, which is valid according to the OCI image specification. 
-  - `Platforms` could include a flag to clean the directory if the user desires it
+    - The idea is to use the method [ReplaceImage](https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/layout#Path.ReplaceImage). Internally this method uses [WriteImage](https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/layout#Path.WriteImage) which will skip to write blobs that already exits. It means the `blobs` directory MAY contain blobs which are not referenced by any of the refs, which is valid according to the OCI image specification.
+    - `Platforms` could include a flag to clean the directory if the user desires it
 
 #### `report.toml` (TOML)
 
@@ -225,13 +225,13 @@ Where:
 # Migration
 [migration]: #migration
 
-<!--
-This section should document breaks to public API and breaks in compatibility due to this RFC's proposed changes. In addition, it should document the proposed steps that one would need to take to work through these changes. Care should be give to include all applicable personas, such as platform developers, buildpack developers, buildpack users and consumers of buildpack images.
--->
+- No breaking changes were identified
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- We could increase the disk space if we not managed the duplication of saving the layers on disk. Currently the Cache implementation (used when daemon is ON) saved the layers tarballs on disk, because the current proposal is exporting the whole image on disk it will also require more space to save the layers for the OCI format in the `blobs` folder.
+- We could increase the disk space if we do not managed the duplication of saving the layers on disk. Currently the Cache implementation (used when daemon is ON) saved the layers tarballs on disk, the proposal is to references those layers in the image exporting on disk to avoid duplication.
+
 
 # Alternatives
 [alternatives]: #alternatives
@@ -248,6 +248,8 @@ Discuss prior art, both the good and bad.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
+
+- Should be this change included on a previous RFC to handle multiple export targets int the Lifecycle?
 
 <!--
 - What parts of the design do you expect to be resolved before this gets merged?
