@@ -167,7 +167,7 @@ The following new input is proposed to be added to this phase
 |-------------------|-----------------------|--------------------------|----------------------
 | `<layout>`      |  `CNB_LAYOUT_DIR` | "" | The root directory where the OCI image will be written. The presence of a none empty value for this environment variable will enable the feature. |
 
-Let's see the propose flow
+Let's see the proposed flow
 
 ```mermaid
 flowchart
@@ -195,17 +195,17 @@ flowchart
   K -->END((End))
 ```
 
+Notes **‡**:
+  - WHEN `the image exists in the file system`
+    - The idea is to use the method [ReplaceImage](https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/layout#Path.ReplaceImage). Internally this method uses [WriteImage](https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/layout#Path.WriteImage) which will skip to write blobs that already exists. It means the `blobs` directory MAY contain blobs which are not referenced by any of the refs, which is valid according to the OCI image specification.
+    - `Platforms` could include a flag to clean the directory if the user desires it
+
 Notes **†**:
   - WHEN `-launch-cache` flow is executed
     - The content of `blobs/<alg>/<encoded>` MAY contain symbolic links to content saved in the launch cache to avoid duplicating files.  
     - The content of `blobs/<alg>/<encoded>` MAY reference tar files in **uncompressed** format because that's how they are saved in the cache
   - WHEN `-launch-cache` IS NOT defined
     - The content of `blobs/<alg>/<encoded>` MAY be saved in **compressed** format
-
-Notes **‡**:
-  - WHEN `the image exists in the file system`
-    - The idea is to use the method [ReplaceImage](https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/layout#Path.ReplaceImage). Internally this method uses [WriteImage](https://pkg.go.dev/github.com/google/go-containerregistry/pkg/v1/layout#Path.WriteImage) which will skip to write blobs that already exits. It means the `blobs` directory MAY contain blobs which are not referenced by any of the refs, which is valid according to the OCI image specification.
-    - `Platforms` could include a flag to clean the directory if the user desires it
 
 #### `report.toml` (TOML)
 
