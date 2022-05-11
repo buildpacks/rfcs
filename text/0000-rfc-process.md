@@ -19,16 +19,17 @@ The RFC process:
 * ensures the motivation for a change is clear.
 * ensures the impact of a change on users is clear and migration path and backwards compatibility are considered.
 * aligns stakeholders on any changes to the user interface(s) and/or APIs (e.g. pack user interface, platform API, buildpack API).
-* aligns stakeholders on any substantive architectural decision changes
-* Aligns stakeholders on any processes or workflows adopted by the project.
-* provides visibility to the community regarding on-going work and upcoming changes.
+* aligns stakeholders on any substantive architectural changes.
+* aligns stakeholders on any processes or workflows adopted by the project.
+* provides visibility to the community regarding ongoing work and upcoming changes.
 * provides a mechanism by which any interested party can provide early feedback on an upcoming change.
+* provides a version controlled record of our decisions and the thought-process behind them.
 * is open to anyone! We enthusiastically welcome RFCs from authors that have no formal role in project governance (yet ;p).
 
 The RFC process **is not**:
-* A replacement for high-quality user-facing documentation.
-* A transaction log of changes. Readers should be able to understand the change proposed without undue reference to previous RFCs.
-* A feature request process. RFCs require a level of design and implementation detail that goes beyond a feature request. Pure feature requests should instead be initiated as discussions on the community repo, issues on this repo, or issues on component repos. These requests may serve as the motivation for future RFCs.
+* a replacement for high-quality user-facing documentation(although high-quality RFCs enable the creation of high-quality documentation).
+* a transaction log of changes. Readers should be able to understand the change proposed without undue reference to previous RFCs.
+* a feature request process. RFCs require a level of design and implementation detail that goes beyond a feature request. Pure feature requests should instead be initiated as discussions on the community repo, issues on this repo, or issues on component repos. These requests may serve as the motivation for future RFCs.
 
 
 # Definitions
@@ -44,11 +45,17 @@ The RFC process **is not**:
 
 **Project RFC**: An RFC with cross-cutting implications, requiring collaboration between multiple teams or affecting multiple personas.
 
-**Team RFC**: An RFC with narrower implication in comparison to a project RFC, with work scoped to a single team and implications for a narrower set of personas.  
+**Team RFC**: An RFC with narrower implication in comparison to a project RFC, with work scoped to a single team and implications for a narrower set of personas.
+
+**Author**: The author or authors of an RFC are responsible for producing the draft RFC and updating it to incorporate feedback. Changes should not be made to a draft RFC without the author's consent.
+
+**Steward**: The steward of an RFC is responsible for shepherding an RFC through the process, including working with the author to ensure RFC completeness and quality, and building consensus among stakeholders.
 
 **Call for Votes**: When an RFC is deemed ready by a team lead, that team lead initiates the voting process with a call for votes. At this point the RFC is closed to modification.
 
 **End Date**: When a call for votes is initiated, an end date for voting is set. Any person wishing to vote on an RFC must do so by the end date.
+
+**Voting Window**: The time period between a call for votes and the voting end date is referred to as the voting window.
 
 **Lazy Consensus**: Voting on project level RFCs is done by lazy consensus. Any project member with a binding vote who has not voted by the end date is assumed to assent to the RFC.
 
@@ -60,14 +67,40 @@ The RFC process **is not**:
 # Motivation
 [motivation]: #motivation
 
-This RFC process is an evolution of our [previous process](0004-rfc-process.md). In comparison to the previous process this proposal makes two substantive cha 
+This RFC process is an evolution of our [previous process](0004-rfc-process.md).
+
+TODO
 
 # What it is
 [what-it-is]: #what-it-is
 
 ### What Types of Changes Require an RFC?
 
+Any "substantive" change to the project requires an RFC. substantive includes but is not limited to:
+* changes to the specification.
+* the adoption, creation, or deprecation of a component (e.g. a new platform implementation, a new shared library, a new system buildpack). 
+* new features (e.g. a new pack command, a new flag on an existing pack command, an addition to the buildpack API)
+* any major refactor that affects consumers of our libraries or materially impacts contribution.
+* any major re-architecture especially if it has noteworthy implications for security or performance.
+* introduction of new processes or changes to our existing processes including the RFC process.
+
+If there is any doubt, maintainers should prefer opening an "unecessary" RFC to surprising users was unexpectedly impactful changes.
+
 #### Project vs Team RFCs
+
+An RFC should be a project RFC if:
+* it impacts the spec.
+* it introduces a new component.
+* its implementation necessitates coordination across multiple team.
+* it meaningfully impacts multiple personas (e.g. buildpack authors and platform authors).
+* the TOC requests that it be a project RFC.
+
+Given the nature of our project many RFCs will happen at the project level. However, some types of changes are more appropriately scoped to the team level. Some examples include:
+* Platform example: additions to or modification of the pack CLI interface (e.g. [pack pull policy](0046-pack-pull-policy.md)) or library interface (e.g. [pack logging refactor](0002-pack-logging-refactor.md)), provided these changes do not require changes to components external to the platform team.
+* BAT example: a new major version of the libcnb API.
+* Implementation example: [Layer history](0102-history.md) or the lifecycle [multicall binary](0024-lifecycle-multicall-binary-for-build.md).
+* Distribution example: [Update CNB Registry JSON Schema](https://github.com/buildpacks/rfcs/pull/45).
+* Learning example: [intro video](0090-intro-video-script.md).
 
 ### Process
 
@@ -80,44 +113,56 @@ All RFCs begin life as a draft. Anyone wishing to propose a change to the projec
 - Submit a pull request.
 
 #### Finding a Steward
-All RFCs, even project RFCs "belong" to a team. The team lead of the responsible team is the steward of the RFC. The author and the steward of an RFC may, at times, be the same person.
+All RFCs, even project RFCs "belong" to a team. For project RFCs, The team lead of the responsible team is the steward of the RFC. For team RFCs any maintainer may be the steward. The author and the steward of an RFC may, at times, be the same person.
 
-In many but not all cases the appropriate team to steward an RFC will be obvious. When the appropriate steward is not obvious the author should work with the community to find a home within one of the teams. Factors to consider when finding home include:
+In many but not all cases the appropriate team to own an RFC will be obvious. When the appropriate team is not obvious, the author should work with the community to find a home within one of the teams. Factors to consider when finding home include:
 * Which team has the most relevant technical context?
 * Which team has the deepest understanding of the use-case and the needs of impacted personas?
 * Which team is responsible for the components most impacted by the proposed change?
 * Which team is enthusiastic about supporting the change?
 
-If a home cannot be found for a draft RFC it remains in draft until one can be found. This does not necessary mean that the RFC is not a good idea or not something the project will take up eventually. It may simply be that the project does not have the bandwidth to prioritize this particular time.
+If a home cannot be found for a draft RFC it remains in draft until one can be found. This does not necessary mean that the RFC is not a good idea or isn't something the project will take up eventually. It may simply be that the project does not have the bandwidth to prioritize this particular change at this particular time.
 
 #### Stewardship
 
 The steward and their team should:
  * work with the author of the RFC to ensure that the RFC is complete and implementable contingent upon approval. This can happen synchronously at team working groups or asynchronously via github and slack.
- * raise visibility to and solicit feedback from other stakeholders including the TOC, other teams, and the community at large. This can happen synchronously at the project working group and asynchronously vai github and slack.
+ * raise visibility to and solicit feedback from other stakeholders including the TOC, other teams, and the community at large. This can happen synchronously at the project working group and asynchronously via github and slack.
  * drive consensus for the RFC by incorporating feedback from stakeholders so that the RFC has the best possible chance of approval during the voting process.
- * ensure there is a plan in place to implement the RFC in a reasonable time frame, contingent upon approval. The team itself need not implement the RFC but we should not approve RFC for which we have no concrete plan to implement.
+ * ensure there is a plan in place to implement the RFC in a reasonable time frame, contingent upon approval. The team itself need not implement the RFC but we should not approve RFCs for which we have no concrete plan to implement.
  * in the case of complicated or risky RFCs, a POC should be developed at this stage to validate and de-risk the proposed design.
 
 #### Voting
 
 Ideally the voting should be a formality and not a moment to discover new disagreement, consensus already haven been driven by the steward.
 
-When the steward deems the RFC ready and likely to be accepted they should formally call for votes and set an end date for voting. This process does not prescribe a length for the voting window, but stewards should make a good faith effort to ensure that all interested parties, and in particular those with binding votes, have adequate opportunity to read and cast votes.
+When the steward deems the RFC ready and likely to be accepted they should formally call for votes and set an end date for voting. This process does not prescribe a length for the voting window, but stewards should make a good faith effort to ensure that all interested parties, and in particular those with binding votes, have adequate opportunity to review the finalized RFC and cast votes.
+
+The RFC may not be edited during the voting window.
 
 For project RFCs, all TOC members and all team leads are given a binding vote.
 
 For team RFCs, all team maintainers are given a binding vote.
 
-Votes are cast via reviews on the RFC PR. Accepting the PR is interpreted as a yes vote while a request for changes is interpreted as a no vote.
+Votes are cast via reviews on the RFC PR. Accepting the PR signifies a yes vote while a request for changes signifies a no vote. If all members with a binding vote vote in the affirmative, the voting window may close early.
 
 ##### Acceptance
 
-If the end date of the vote arrives without a no vote from a member with binding vote, the RFC is accepted. It will be merged into the repo and assigned a number. Implementation can begin.
+If the end date of the vote arrives without a no vote from a member with binding vote, the RFC is accepted. It will be merged into the repo and assigned a number. The steward should create a tracking issue to coordinate implementation and link the tracking issue in the RFC header. When this is complete, implementation can begin.
 
 ##### Rejection
 
-If a single no vote is cast before the arrival of the end date the RFC is immediately rejected. The same RFC may be brought to a vote again in the future assuming the concerns that lead to the no vote are addressed.
+If a single no vote is cast before the arrival of the end date the RFC is immediately rejected and the PR should be closed.
+
+The same RFC may be re-opened and brought to a vote again in the future assuming the concerns that lead to the no vote are addressed.
+
+### Amending an RFC
+
+TODO
+
+### Amending the RFC Process
+
+The RFC process should be amended through the RFC process. However, the TOC reserves the right to change the process via a super-majority vote in the unlikely even that the process prove so irreparably flawed as to preclude its amendment via the process.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -136,6 +181,8 @@ This RFC should be accepted via the existing RFC process. The new process will t
 
 Why should we *not* do this?
 
+TODO
+
 # Alternatives
 [alternatives]: #alternatives
 
@@ -143,20 +190,21 @@ Why should we *not* do this?
 - Why is this proposal the best?
 - What is the impact of not doing this?
 
+TODO
+
 # Prior Art
 [prior-art]: #prior-art
 
-Discuss prior art, both the good and bad.
+TODO
+
+* Borrows heavily from TEP and KEP processes
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What parts of the design do you expect to be resolved before this gets merged?
-- What parts of the design do you expect to be resolved through implementation of the feature?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+TODO
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
-Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
-Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fields, new fields in the buildpackage label, etc.
-This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are necessary, they should be documented here.
+
+N/A
