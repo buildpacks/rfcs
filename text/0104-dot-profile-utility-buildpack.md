@@ -3,10 +3,10 @@
 - Name: `.profile` Utility Buildpack
 - Start Date: 2022-01-25
 - Author(s): mboldt
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#200](https://github.com/buildpacks/rfcs/pull/200)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: N/A
 
 # Summary
