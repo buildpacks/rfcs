@@ -45,7 +45,7 @@ The target persona affected by this change are:
 - **Platform implementors**: they will have to take care of the responsibility of:
   - Pull the require dependencies (runtime image for example) and pass it through the lifecycle
 
-The general idea is to produce an [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) and save it in a file system accesible from the lifecycle execution.
+The general idea is to produce an image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format and save it in a file system accesible from the lifecycle execution.
 
 Let's see some examples of the proposed behavior
 
@@ -77,7 +77,7 @@ oci
        └── oci-layout
 ```
 
-And the exporter is invoked as follows
+And the analyzer is invoked as follows
 
 ```=shell
 > export CNB_USE_OCI=true
@@ -203,10 +203,11 @@ The image look up will be done following this rules:
     - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<oci-dir>/<registry>/<repo>/<tag>`
   - WHEN `the image points to a digest reference`
     - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<oci-dir>/<registry>/<repo>/<digest>`
+  - A part from the look up, the logic for each phase should remain the same
 
 #### `report.toml` (TOML)
 
-The new information to be  added into the `report.toml` file can be summarize as follows:
+The new information to be added into the `report.toml` file can be summarize as follows:
 
 ```toml
 [export]
@@ -227,27 +228,24 @@ Where:
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- We could increase the disk space if we do not managed the duplication of saving the layers on disk. Currently the Cache implementation (used when daemon is ON) saved the layers tarballs on disk, the proposal is to references those layers in the image exporting on disk to avoid duplication.
-
+- We could increase the disk space if we do not managed the duplication of saving the layers on disk. The proposal suggest to use symbolic links to reference layers on disk and avoid duplication.
 
 # Alternatives
 [alternatives]: #alternatives
 
-
-<!--
-- Why is this proposal the best?
-- What is the impact of not doing this? -->
+- What other designs have been considered?
+  - Doing nothing, just keep exporting only to Daemon or Registry
+- Why is this proposal the best? [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format is an standard from which other tools can create a [OCI Runtime Specification bundle](https://github.com/opencontainers/runtime-spec/blob/v1.0.0/bundle.md) exporting to this format enables Platforms to implement any feature in the top of this format
+- What is the impact of not doing this? Probably will never remove the Daemon support in the Lifecycle
 
 # Prior Art
 [prior-art]: #prior-art
 
-Discuss prior art, both the good and bad.
+- Discussion around removing the Daemon support [RFC](https://github.com/buildpacks/rfcs/blob/jjbustamante/feature/deprecate-daemon/text/0000-deprecate-daemon.md)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Should this change be included on a previous RFC to handle multiple export targets int the Lifecycle?
-- Currently the *Launch Cache* saves uncompressed tarballs. Is this by design? Is there any reason for those tarballs to do not be saved compressed?
 
 <!--
 - What parts of the design do you expect to be resolved before this gets merged?
