@@ -19,10 +19,12 @@ Add the capability to the `Exporter` phase to save the image to disk in [OCI Lay
 
 - A [Platform](https://buildpacks.io/docs/concepts/components/platform/) uses a lifecycle, Buildpacks (packaged in a builder), and application source code to produce an OCI image.
 - A [Lifecycle](https://buildpacks.io/docs/concepts/components/lifecycle/) orchestrates Buildpacks execution, then assembles the resulting artifacts into a final app image.
-- A Daemon is a service, popularized by Docker, for downloading container images, and executing and managing containers from those images.
-- A Registry is a long-running service used for storing and retrieving container images.
-- A digest reference refers to a [content addressable](https://en.wikipedia.org/wiki/Content-addressable_storage) identifier of form <registry>/<repo>@<digest> which locates an image manifest in an [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/master/spec.md) compliant registry.
-- A Image Manifest provides a configuration and set of layers for a single container image for a specific architecture and operating system.
+- A **Daemon** is a service, popularized by Docker, for downloading container images, and executing and managing containers from those images.
+- A **Registry** is a long-running service used for storing and retrieving container images.
+- An **image reference** refers to either a tag reference or digest reference.
+- A **tag reference** refers to an identifier of form `<registry>/<repo>:<tag>` which locates an image manifest in an [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/master/spec.md) compliant registry.
+- A **digest reference** refers to a [content addressable](https://en.wikipedia.org/wiki/Content-addressable_storage) identifier of form `<registry>/<repo>@<digest>` which locates an image manifest in an [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/master/spec.md) compliant registry.
+- A **image Manifest** provides a configuration and set of layers for a single container image for a specific architecture and operating system.
 - An [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) is the directory structure for OCI content-addressable blobs and location-addressable references.
 
 # Motivation
@@ -40,11 +42,10 @@ Exporting to [OCI Image Layout](https://github.com/opencontainers/image-spec/blo
 
 The target persona affected by this change are:
 
-- Platform implementors: because they want to offer this feature, they will have to take care of the responsibility of:
+- **Platform implementors**: they will have to take care of the responsibility of:
   - Pull the require dependencies (runtime image for example) and pass it through the lifecycle
-  - Save the resulting image to the daemon
 
-The general idea is to produce an  [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) and save it in a file system accesible from the lifecycle execution.
+The general idea is to produce an [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) and save it in a file system accesible from the lifecycle execution.
 
 Let's see some examples of the proposed behavior
 
@@ -177,14 +178,6 @@ ERROR: exporting to multiples target is not allowed
 
 # How it Works
 [how-it-works]: #how-it-works
-
-Before defining the detail behavior, lets remember some required terminology
-
-**Terminology**
-
-- An **image reference** refers to either a tag reference or digest reference.
-- A **tag reference** refers to an identifier of form `<registry>/<repo>:<tag>` which locates an image manifest in an [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/master/spec.md) compliant registry.
-- A **digest reference** refers to a [content addressable](https://en.wikipedia.org/wiki/Content-addressable_storage) identifier of form `<registry>/<repo>@<digest>` which locates an image manifest in an [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/master/spec.md) compliant registry.
 
 The lifecycle phases affected by this new behavior are:
  - [Analyze](https://buildpacks.io/docs/concepts/components/lifecycle/analyze/)
