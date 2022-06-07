@@ -225,6 +225,45 @@ The following Dynamic Diagram from the C4 model, can give a little idea of the p
 
 ![](https://i.imgur.com/SkY3l62.png)
 
+### Measuring of performance impact
+
+In order to have an idea on how much is affected the performance of exporting to the Daemon using the OCI layout format, the following metrics were took.
+
+Using a local workstation with the following specifications:
+- **(MacOS 12.3.1 / 2,4 GHz 8-Core Intel Core i9 / 32 GB 2667 MHz DDR4)**
+
+**Base line**
+
+We built twice the samples codes from our [repository](https://github.com/buildpacks/samples/tree/main/apps)
+
+| Sample  | Image size (MB)|  First Build |  Second Build |
+|---|---|---|---|
+| Java  | 238.1  | 4.29s | 3.20s  |
+| Kotlin  | 305.98 |  4.27 | 3.17  |
+| Ruby  | 100.52  | 1.15s  | 0.68s  |
+
+**Best results**
+
+I tried different approaches, the best results were found when using the [stream.Layer](https://godoc.org/github.com/google/go-containerregistry/pkg/v1/stream#Layer) library from GGCR.  
+
+| Sample  | Image size (MB)|  First Build |  Second Build |
+|---|---|---|---|
+| Java  | 238.1  | 2.41s † <br> 4.76s ‡ (+10.96%) <br> 3.21 ⁜ <br> =10.38s | - |
+| Kotlin  | 305.98 | 2.39s † <br> 4.73s ‡ (+10.77%) <br> 3.38s ⁜ <br> =10.5s  | -  |
+| Ruby  | 100.52  |  2.59s † <br> 1.31s ‡ (+13.91%) <br> 0.89s ⁜ <br> =4.79s  | -  |
+
+Legend:
+- † Exporting run-image from Daemon to disk in OCI layout format
+- ‡ Exporting application image to disk in OCI layout format
+- ⁜ Exporting application image from disk to Daemon
+
+Notes:
+- I had some issues with the second build, that's why I couldn't take any measure
+- We divide the results in two sections:
+  - Pre/Post Lifecycle execution: As mentioned, skopeo tool was used here and most of the time spent goes into this category. Open to optimal implementations here.
+  - Lifecycle execution: We can see there is an increment of +10%, but probably this can be improve during the formal implementation
+
+
 # Migration
 [migration]: #migration
 
