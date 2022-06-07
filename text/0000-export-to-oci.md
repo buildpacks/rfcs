@@ -198,27 +198,12 @@ The following new input are proposed to be added to these phases
  | `<oci-dir>` | `CNB_OCI_PATH` | /oci | Path to oci directory where the images are saved |
 
 - WHEN `the new flag -oci or the default environment variable CNB_USE_OCI are set to true` during the phase invocation THEN the feature will be enabled.
-The image look up will be done following this rules:
+The image look up will be done following these rules:
   - WHEN `the image points to a tag reference`
     - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<oci-dir>/<registry>/<repo>/<tag>`
   - WHEN `the image points to a digest reference`
     - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<oci-dir>/<registry>/<repo>/<digest>`
   - A part from the look up, the logic for each phase should remain the same
-
-#### `report.toml` (TOML)
-
-The new information to be added into the `report.toml` file can be summarize as follows:
-
-```toml
-[export]
-[[export.oci]]
-digest = "<image digest>"
-manifest-size = "<manifest size in bytes>"
-```
-Where:
-- **If** the app image was exported to OCI format on disk, the export section will be added to the report
-  - `digest` MUST contain the image digest calculated based on compressed layers
-  - `manifest-size` MUST contain the manifest size in bytes
 
 # Migration
 [migration]: #migration
