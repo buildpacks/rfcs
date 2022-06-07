@@ -242,7 +242,7 @@ I propose the following high level strategy to accomplish the goal
   - Collect feedback about it
   - Correct issues until we feel confortable
 - Turn off the actual `-daemon` implementation and replace it with the `-oci` by default in Pack
-  - Maybe we can also add a new flag to `re-use the old implementation` in case the user needs it
+  - Maybe we can also add a new flag to **re-use the old implementation** in case the user needs it
   - Keep doing noise in the community
   - Collect feedback about it
   - Correct issues until we feel confortable
