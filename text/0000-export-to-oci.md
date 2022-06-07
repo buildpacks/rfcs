@@ -213,9 +213,11 @@ As mentioned earlier, if we want to remove the daemon support in the Lifecycle, 
 - Pull the require dependencies (runtime image for example), save them on disk in OCI layout format and pass it through the lifecycle using the `<oci-dir>` parameter
 - Push the application image (exported in OCI layout format) into the Daemon, because that is what users are expecting.
 
-During the proof of concept implementation I worked in the following workflow:
-- Pack download the [skopeo](https://github.com/containers/skopeo) image, similar as it is downloading the other dependencies (Lifecycle, Buildpacks)
-- Pack executes [skopeo](https://github.com/containers/skopeo) copy command in a container, similar as it is invoking the Lifecycle.
+During the proof of concept implementation I choose to use [skopeo](https://github.com/containers/skopeo) tool solve problem interacting with the Daemon. The reason to do it was **simplicity** for the PoC developed but we believe this is a good subject to talk about with the community.
+
+The following workflow was developed:
+- Pack download the [skopeo image](https://github.com/containers/skopeo/blob/main/install.md#container-images), similar as it is downloading the other dependencies (Lifecycle, Buildpacks)
+- Pack executes [skopeo copy](https://github.com/containers/skopeo/blob/main/docs/skopeo-copy.1.md)  command in a container
   - Copy image from the Daemon into the filesystem, in OCI layout format, before running Lifecycle
   - Copy image from filesystem into the Daemon after the export phase was executed
 
