@@ -122,7 +122,7 @@ oci
 And the exporter is invoked as follows
 
 ```=shell
-> export CNB_LAYOUT=oci
+> export CNB_OCI_PATH=true
 > /cnb/lifecycle/exporter -run-image cnbs/sample-stack-run:bionic my-app-image
 ```
 
