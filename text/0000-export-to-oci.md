@@ -225,12 +225,29 @@ The following Dynamic Diagram from the C4 model, can give a little idea of the p
 
 ![](https://i.imgur.com/SkY3l62.png)
 
-
-
 # Migration
 [migration]: #migration
 
+## For the scope of this RFC
+
 - No breaking changes were identified
+
+## For removing Daemon support in near future
+
+I propose the following high level strategy to accomplish the goal
+
+- Approve this RFC and add the export to OCI layout format feature in Lifecycle
+- Implement in Pack a new workflow when the `-daemon` flag is enabled based on what we did with the PoC. The workflow could be enabled by the user in **experimental mode**
+  - Make noise in the community so people can help us using it
+  - Collect feedback about it
+  - Correct issues until we feel confortable
+- Turn off the actual `-daemon` implementation and replace it with the `-oci` by default in Pack
+  - Maybe we can also add a new flag to `re-use the old implementation` in case the user needs it
+  - Keep doing noise in the community
+  - Collect feedback about it
+  - Correct issues until we feel confortable
+- Schedule the removal of the Daemon support in Lifecycle version X.Y.Z.
+- Remove the actual daemon support from the code base for Lifecycle version X.Y.Z
 
 # Drawbacks
 [drawbacks]: #drawbacks
