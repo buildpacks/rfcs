@@ -205,6 +205,27 @@ The image look up will be done following these rules:
     - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<oci-dir>/<registry>/<repo>/<digest>`
   - Apart from the look up, the logic for each phase should remain the same
 
+## Proof of concept
+
+In order to validate the feasibility of the proposed feature, we developed a proof of concept with one of the most important side effects this capability can add into the project: **Removing the Daemon Support**
+
+As mentioned earlier, if we want to remove the daemon support in the Lifecycle, then all the responsibility to deal with it goes into the platforms implementors, that means, for example:
+- Pull the require dependencies (runtime image for example), save them on disk in OCI layout format and pass it through the lifecycle using the `<oci-dir>` parameter
+- Push the application image (exported in OCI layout format) into the Daemon, because that is what users are expecting.
+
+During the proof of concept implementation I worked in the following workflow:
+- Pack download the [skopeo](https://github.com/containers/skopeo) image, similar as it is downloading the other dependencies (Lifecycle, Buildpacks)
+- Pack executes [skopeo](https://github.com/containers/skopeo) copy command in a container, similar as it is invoking the Lifecycle.
+  - Copy image from the Daemon into the filesystem, in OCI layout format, before running Lifecycle
+  - Copy image from filesystem into the Daemon after the export phase was executed
+
+The following Dynamic Diagram from the C4 model, can give a little idea of the pieces implemented during the Poc
+
+![](https://i.imgur.com/SkY3l62.png)
+
+You can also check a demo recording in the following [link](https://drive.google.com/file/d/1W1125OHuyUlx88BRroUTLBfrFHhFM5A9/view?usp=sharing)
+
+
 # Migration
 [migration]: #migration
 
