@@ -207,7 +207,7 @@ The image look up will be done following these rules:
 
 ## Proof of concept
 
-In order to validate the feasibility of the proposed feature, we developed a proof of concept with one of the most important side effects this capability can add into the project: **Removing the Daemon Support**
+In order to validate the feasibility of the proposed feature, we developed a proof of concept with one of the most important side effects this capability can add into the project: **Removing the Daemon Support**. You can also check a recording with the demo in the following [link](https://drive.google.com/file/d/1W1125OHuyUlx88BRroUTLBfrFHhFM5A9/view?usp=sharing)
 
 As mentioned earlier, if we want to remove the daemon support in the Lifecycle, then all the responsibility to deal with it goes into the platforms implementors, that means, for example:
 - Pull the require dependencies (runtime image for example), save them on disk in OCI layout format and pass it through the lifecycle using the `<oci-dir>` parameter
@@ -225,7 +225,6 @@ The following Dynamic Diagram from the C4 model, can give a little idea of the p
 
 ![](https://i.imgur.com/SkY3l62.png)
 
-You can also check a demo recording in the following [link](https://drive.google.com/file/d/1W1125OHuyUlx88BRroUTLBfrFHhFM5A9/view?usp=sharing)
 
 
 # Migration
