@@ -227,7 +227,7 @@ The following Dynamic Diagram from the C4 model, can give a little idea of the p
 
 ### Measuring of performance impact
 
-In order to have an idea on how much is affected the performance of exporting to the Daemon using the OCI layout format, the following metrics were took.
+In order to have an idea on how much is affected the performance of exporting to the Daemon using the OCI layout format, the following metrics were taken.
 
 Using a local workstation with the following specifications:
 - **(MacOS 12.3.1 / 2,4 GHz 8-Core Intel Core i9 / 32 GB 2667 MHz DDR4)**
@@ -261,7 +261,7 @@ Notes:
 - I had some issues with the second build, that's why I couldn't take any measure
 - We divide the results in two sections:
   - Pre/Post Lifecycle execution: As mentioned, skopeo tool was used here and most of the time spent goes into this category. Open to optimal implementations here.
-  - Lifecycle execution: We can see there is an increment of +10%, but probably this can be improve during the formal implementation
+  - Lifecycle execution: We can see there is an increment of +10%, but probably this can be improved during the formal implementation
 
 
 # Migration
