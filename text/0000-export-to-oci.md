@@ -181,6 +181,7 @@ ERROR: exporting to multiples target is not allowed
 
 The lifecycle phases affected by this new behavior are:
  - [Analyze](https://buildpacks.io/docs/concepts/components/lifecycle/analyze/)
+ - [Restore](https://buildpacks.io/docs/concepts/components/lifecycle/restore/)
  - [Export](https://buildpacks.io/docs/concepts/components/lifecycle/export/)  
  - [Create](https://buildpacks.io/docs/concepts/components/lifecycle/create/)
 
@@ -259,8 +260,13 @@ Legend:
 
 Notes:
 - I had some issues with the second build, that's why I couldn't take any measure
+  - This an example of the second build error
+    ```=bash
+    [exporter] ERROR: failed to export: saving image: creating layer from /oci/sample-ruby-app/blobs/sha256:0d1ae00330e04bac2e7f6da6dadc8d234198a3422b6e3412103c8b379e00eaad: open /oci/sample-ruby-app/blobs/sha256:0d1ae00330e04bac2e7f6da6dadc8d234198a3422b6e3412103c8b379e00eaad: no such file or directory
+    ```
+    The problem seems to be that when the layers are added into the image we have the *diffID* reference, but after it was exported to OCI we have the *digest* inside the `blobs` folder. Maybe we need to store some kind of mapping: `diffID -> digest` to solve it.
 - We divide the results in two sections:
-  - Pre/Post Lifecycle execution: As mentioned, skopeo tool was used here and most of the time spent goes into this category. Open to optimal implementations here.
+  - Pre/Post Lifecycle execution: As mentioned, [skopeo](https://github.com/containers/skopeo) tool was used here and most of the time spent goes into this category. Open to optimal implementations here, maybe, one option could be to use [imgutil](https://github.com/buildpacks/imgutil) instead of [skopeo](https://github.com/containers/skopeo) and take advantage of the optimization to avoid re-uploading base layers.
   - Lifecycle execution: We can see there is an increment of +10%, but probably this can be improved during the formal implementation
 
 
