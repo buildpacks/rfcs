@@ -25,6 +25,8 @@ Add the capability to the `Exporter` phase to save the image to disk in [OCI Lay
 - A **tag reference** refers to an identifier of form `<registry>/<repo>:<tag>` which locates an image manifest in an [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/master/spec.md) compliant registry.
 - A **digest reference** refers to a [content addressable](https://en.wikipedia.org/wiki/Content-addressable_storage) identifier of form `<registry>/<repo>@<digest>` which locates an image manifest in an [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec/blob/master/spec.md) compliant registry.
 - A **image Manifest** provides a configuration and set of layers for a single container image for a specific architecture and operating system.
+- The **layer diffID** is the hash of the uncompressed layer
+- The **layer digest** is the hash of the compressed layer.
 - An [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) is the directory structure for OCI content-addressable blobs and location-addressable references.
 
 # Motivation
@@ -264,7 +266,7 @@ Notes:
     ```=bash
     [exporter] ERROR: failed to export: saving image: creating layer from /oci/sample-ruby-app/blobs/sha256:0d1ae00330e04bac2e7f6da6dadc8d234198a3422b6e3412103c8b379e00eaad: open /oci/sample-ruby-app/blobs/sha256:0d1ae00330e04bac2e7f6da6dadc8d234198a3422b6e3412103c8b379e00eaad: no such file or directory
     ```
-    The problem seems to be that when the layers are added into the image we have the *diffID* reference, but after it was exported to OCI we have the *digest* inside the `blobs` folder. Maybe we need to store some kind of mapping: `diffID -> digest` to solve it.
+    The problem seems to be that when the layers are added into the image we have the *layer diffID* reference, but after it was exported to OCI we have the *layer digest* inside the `blobs` folder. Maybe we need to store some kind of mapping: `layer diffID -> layer digest` to solve it.
 - We divide the results in two sections:
   - Pre/Post Lifecycle execution: As mentioned, [skopeo](https://github.com/containers/skopeo) tool was used here and most of the time spent goes into this category. Open to optimal implementations here, maybe, one option could be to use [imgutil](https://github.com/buildpacks/imgutil) instead of [skopeo](https://github.com/containers/skopeo) and take advantage of the optimization to avoid re-uploading base layers.
   - Lifecycle execution: We can see there is an increment of +10%, but probably this can be improved during the formal implementation
