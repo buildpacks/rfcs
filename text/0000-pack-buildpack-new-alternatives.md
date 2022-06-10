@@ -199,9 +199,6 @@ There are many, many competing implementations of project scaffolding tools.
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- What parts of the design do you expect to be resolved before this gets merged?
-- What parts of the design do you expect to be resolved through implementation of the feature?
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
