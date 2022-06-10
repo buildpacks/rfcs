@@ -52,7 +52,7 @@ This approach is not opinionated on topics such as which testing framework to us
 # How it Works
 [how-it-works]: #how-it-works
 
-The design is modeled on [cookiecutter](https://cookiecutter.readthedocs.io/en/1.7.2/) with reference to [springerle](https://github.com/carlmjohnson/springerle) -- a similar implementation in golang -- and [create-go-app](https://github.com/create-go-app/).  We explicitly do not want to re-implement cookiecutter in golang due to the scope of such an implementation.  Nor do we want to `os.Exec` a python subprocess to run cookiecutter as this would require availability of a python runtime environment.  Instead we propose to borrow heavily from create-go-app, and generate the default shell and libcnb skeletons from a cloned git repoistory.
+The design is modeled on [cookiecutter](https://cookiecutter.readthedocs.io/en/1.7.2/) with reference to [springerle](https://github.com/carlmjohnson/springerle) -- a similar implementation in golang -- and [create-go-app](https://github.com/create-go-app/).  We do we want to `os.Exec` a python subprocess to run cookiecutter as this would require availability of a python runtime environment.  Instead we propose to borrow heavily from create-go-app, and generate the default shell and libcnb skeletons from a cloned git repoistory.
 
 A full invocation to generate `bash` scaffolding prompts for the values [currently documented as flags](https://buildpacks.io/docs/buildpack-author-guide/create-buildpack/building-blocks-cnb/#using-the-pack-cli).
 
@@ -146,15 +146,8 @@ Template variables introduced in `prompts.yaml` are required to have a name uniq
 Answers to prompts can be provided in a toml file.  This supports programmatic use of `pack`:
 
 ```
-pack buildpack create --overrides overrides.toml
+pack buildpack create --override 'ProjectDirectory="test_example"' --overrride='ModuleName="github.com/test/test"'
 Created project in bash_buildpack
-```
-
-The format of `--overrides` parallels the `prompts.toml` format.  An example of which is:
-
-```toml
-ProjectDirectory="test_example"
-ModuleName="github.com/test/test"
 ```
 
 All input files are expected to be normalized to Unix line endings.
