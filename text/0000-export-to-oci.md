@@ -137,33 +137,34 @@ Or
 The expected output is the application `<image>` exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format
 
 ```=shell
+oci
 ├── cnbs
-│   └── sample-stack-run
-│       ├── blobs
-│       │   └── sha256
-│       │       ├── 1f59171fcf9a8c2a78192d4dfbf88e6f0258e24f21798ffe015c07682d3a944a
-│       │       ├── 219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e
-│       │       ├── 63882e64890d1adea5824dbb9bc6a812140d6b85752bf74a0a26fca78e1baf5a
-│       │       ├── 63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa
-│       │       └── 6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941
-│       ├── index.json
-│       └── oci-layout
-└── my-app-image
-    ├── blobs
-    │   └── sha256
-    │       ├── 14eaea7168b1fc4b8b30f7a20f7609335cc3dbcfb6d4c1afeb1e5daefd26cdf9
-    │       ├── 219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e -> ../../../cnbs/sample-stack-run/blobs/sha256/219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e
-    │       ├── 410ce2030625414163d565a56bddc6587dbc49fa2a815af5e26bb08968dec7d2
-    │       ├── 54890b0245f8b234be46817f731b7b981d9ee2ea8d5a76380d91bb9abb001cdb
-    │       ├── 58b81a67d77e732ef07c4b995b6a7e099e5aa772d1805da7cf929d80a3fa044e
-    │       ├── 63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa -> ../../../cnbs/sample-stack-run/blobs/sha256/63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa
-    │       ├── 68224c8aa806b9ec8cecf2282b7b10cdf1c615785652bcc85f3a79bd06e60384
-    │       ├── 6977801a3b8ac0c4a76ea22fa4dc0541fe8fc6ba964883ee0a21b5736f8acee9
-    │       ├── 6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941 -> ../../../cnbs/sample-stack-run/blobs/sha256/6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941
-    │       ├── 7c83d7d24ac43dbdd419d15abb849b6d155d0bc361eca0908a8ae5aefcd55557
-    │       └── addd2357f3a0175410ab8f9303e747cc72af9aaeb0e7402d3fd3f144adb29db5
-    ├── index.json
-    └── oci-layout
+  │   └── sample-stack-run
+  │       ├── blobs
+  │       │   └── sha256
+  │       │       ├── 1f59171fcf9a8c2a78192d4dfbf88e6f0258e24f21798ffe015c07682d3a944a
+  │       │       ├── 219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e
+  │       │       ├── 63882e64890d1adea5824dbb9bc6a812140d6b85752bf74a0a26fca78e1baf5a
+  │       │       ├── 63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa
+  │       │       └── 6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941
+  │       ├── index.json
+  │       └── oci-layout
+  └── my-app-image
+      ├── blobs
+      │   └── sha256
+      │       ├── 14eaea7168b1fc4b8b30f7a20f7609335cc3dbcfb6d4c1afeb1e5daefd26cdf9
+      │       ├── 219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e -> ../../../cnbs/sample-stack-run/blobs/sha256/219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e
+      │       ├── 410ce2030625414163d565a56bddc6587dbc49fa2a815af5e26bb08968dec7d2
+      │       ├── 54890b0245f8b234be46817f731b7b981d9ee2ea8d5a76380d91bb9abb001cdb
+      │       ├── 58b81a67d77e732ef07c4b995b6a7e099e5aa772d1805da7cf929d80a3fa044e
+      │       ├── 63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa -> ../../../cnbs/sample-stack-run/blobs/sha256/63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa
+      │       ├── 68224c8aa806b9ec8cecf2282b7b10cdf1c615785652bcc85f3a79bd06e60384
+      │       ├── 6977801a3b8ac0c4a76ea22fa4dc0541fe8fc6ba964883ee0a21b5736f8acee9
+      │       ├── 6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941 -> ../../../cnbs/sample-stack-run/blobs/sha256/6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941
+      │       ├── 7c83d7d24ac43dbdd419d15abb849b6d155d0bc361eca0908a8ae5aefcd55557
+      │       └── addd2357f3a0175410ab8f9303e747cc72af9aaeb0e7402d3fd3f144adb29db5
+      ├── index.json
+      └── oci-layout
 ```
 
 Also, we are proposing to use symbolic links to reference the blobs from the `run-image` as this will help to save some hard drive space for the end user.
