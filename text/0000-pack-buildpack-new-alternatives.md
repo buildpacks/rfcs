@@ -52,7 +52,7 @@ This approach is not opinionated on topics such as which testing framework to us
 # How it Works
 [how-it-works]: #how-it-works
 
-The design is modeled on [cookiecutter](https://cookiecutter.readthedocs.io/en/1.7.2/) with reference to [springerle](https://github.com/carlmjohnson/springerle) -- a similar implementation in golang -- and [create-go-app](https://github.com/create-go-app/).  We do we want to `os.Exec` a python subprocess to run cookiecutter as this would require availability of a python runtime environment.  Instead we propose to borrow heavily from create-go-app, and generate the default shell and libcnb skeletons from a cloned git repoistory.
+The design is modeled on [cookiecutter](https://cookiecutter.readthedocs.io/en/1.7.2/) with reference to [springerle](https://github.com/carlmjohnson/springerle) -- a similar implementation in golang -- and [create-go-app](https://github.com/create-go-app/).  We do not we want to `os.Exec` a python subprocess to run cookiecutter as this would require availability of a python runtime environment.  Instead we propose to borrow heavily from create-go-app, and generate the default shell and libcnb skeletons from a cloned git repoistory.
 
 A full invocation to generate `bash` scaffolding prompts for the values [currently documented as flags](https://buildpacks.io/docs/buildpack-author-guide/create-buildpack/building-blocks-cnb/#using-the-pack-cli).
 
