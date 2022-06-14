@@ -263,7 +263,7 @@ Legend:
 
 Notes:
 - I had some issues with the second build, that's why I couldn't take any measure
-  - This an example of the second build error
+  - This is an example of the second build error
     ```=bash
     [exporter] ERROR: failed to export: saving image: creating layer from /oci/sample-ruby-app/blobs/sha256:0d1ae00330e04bac2e7f6da6dadc8d234198a3422b6e3412103c8b379e00eaad: open /oci/sample-ruby-app/blobs/sha256:0d1ae00330e04bac2e7f6da6dadc8d234198a3422b6e3412103c8b379e00eaad: no such file or directory
     ```
