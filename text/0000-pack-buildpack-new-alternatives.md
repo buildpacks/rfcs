@@ -68,7 +68,7 @@ Use the arrow keys to navigate: ↓ ↑ → ←
 A full session includes the terminal prompts that the project scaffolding tool asks of the end user:
 
 ```bash
-pack buildpack new
+pack buildpack create
 Use the arrow keys to navigate: ↓ ↑ → ←
 ? Choose a project template:
   ▸ bash
