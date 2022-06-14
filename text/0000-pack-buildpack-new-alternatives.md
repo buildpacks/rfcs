@@ -57,7 +57,7 @@ The design is modeled on [cookiecutter](https://cookiecutter.readthedocs.io/en/1
 A full invocation to generate `bash` scaffolding prompts for the values [currently documented as flags](https://buildpacks.io/docs/buildpack-author-guide/create-buildpack/building-blocks-cnb/#using-the-pack-cli).
 
 ```bash
-pack buildpack new
+pack buildpack create
 Use the arrow keys to navigate: ↓ ↑ → ←
 ? Choose a project template:
   ▸ bash
