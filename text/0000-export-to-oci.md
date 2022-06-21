@@ -252,9 +252,9 @@ I tried different approaches, the best results were found when using the [stream
 
 | Sample  | Image size (MB)|  First Build |  Second Build |
 |---|---|---|---|
-| Java  | 238.1  | 2.41s † <br> 4.76s ‡ (+10.96%) <br> 3.21 ⁜ <br> =10.38s | - |
-| Kotlin  | 305.98 | 2.39s † <br> 4.73s ‡ (+10.77%) <br> 3.38s ⁜ <br> =10.5s  | -  |
-| Ruby  | 100.52  |  2.59s † <br> 1.31s ‡ (+13.91%) <br> 0.89s ⁜ <br> =4.79s  | -  |
+| Java  | 238.1  | 2.41s † <br> 4.76s ‡ (+10.96%) <br> 3.21 ⁜ <br> =10.38s | 3.47s † <br> 4.98s ‡ (+55.63%) <br> 3.02 ⁜ <br> = 11.47s|
+| Kotlin  | 305.98 | 2.39s † <br> 4.73s ‡ (+10.77%) <br> 3.38s ⁜ <br> =10.5s  | 3.47s † <br> 5.11s ‡ (+61.20%) <br> 3.22s ⁜ <br> = 11.8s  |
+| Ruby  | 100.52  |  2.59s † <br> 1.31s ‡ (+13.91%) <br> 0.89s ⁜ <br> =4.79s  | 2.44s † <br> 1.51s ‡ (+122.06%) <br> 1.13s ⁜ <br> = 5.08s  |
 
 Legend:
 - † Exporting run-image from Daemon to disk in OCI layout format
@@ -262,12 +262,6 @@ Legend:
 - ⁜ Exporting application image from disk to Daemon
 
 Notes:
-- I had some issues with the second build, that's why I couldn't take any measure
-  - This is an example of the second build error
-    ```=bash
-    [exporter] ERROR: failed to export: saving image: creating layer from /oci/sample-ruby-app/blobs/sha256:0d1ae00330e04bac2e7f6da6dadc8d234198a3422b6e3412103c8b379e00eaad: open /oci/sample-ruby-app/blobs/sha256:0d1ae00330e04bac2e7f6da6dadc8d234198a3422b6e3412103c8b379e00eaad: no such file or directory
-    ```
-    The problem seems to be that when the layers are added into the image we have the *layer diffID* reference, but after it was exported to OCI we have the *layer digest* inside the `blobs` folder. Maybe we need to store some kind of mapping: `layer diffID -> layer digest` to solve it.
 - We divide the results in two sections:
   - Pre/Post Lifecycle execution: As mentioned, [skopeo](https://github.com/containers/skopeo) tool was used here and most of the time spent goes into this category. Open to optimal implementations here, maybe, one option could be to use [imgutil](https://github.com/buildpacks/imgutil) instead of [skopeo](https://github.com/containers/skopeo) and take advantage of the optimization to avoid re-uploading base layers.
   - Lifecycle execution: We can see there is an increment of +10%, but probably this can be improved during the formal implementation
