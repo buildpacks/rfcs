@@ -259,7 +259,7 @@ I tried different approaches, the best results were found when using the [stream
 Legend:
 - † Exporting run-image from Daemon to disk in OCI layout format
 - ‡ Exporting application image to disk in OCI layout format
-- ⁜ Exporting application image from disk to Daemon
+- ⁜ Exporting application image from disk in OCI layout format to Daemon
 
 Notes:
 - We divide the results in two sections:
