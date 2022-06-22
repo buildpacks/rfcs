@@ -81,7 +81,7 @@ However,
 Extensions generate Dockerfiles before the regular buildpack build phase.
 To generate these Dockerfiles, the lifecycle executes the extension's `/bin/build` executable with the same UID, GID, and interface as regular buildpacks.
 However,
-- Extensions `/bin/build` must not write to the app directory.
+- Extensions `/bin/generate` must not write to the app directory.
 - Extensions `/bin/build` may be executed in parallel.
 - Extensions `<layers>` directory is replaced by an `<output>` directory.
 - If an extension is missing `/bin/build`, the extension root is treated as a pre-populated `<output>` directory.
