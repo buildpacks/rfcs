@@ -144,7 +144,7 @@ Note: The Dockerfiles referenced must disable rebasing, and build times will be 
 
 The same Dockerfile format may be used to create new base images or modify existing base images outside of the app build process (e.g., before creating a builder). Any specified labels override existing values.
 
-Dockerfiles that are used to create a base image must create a `/cnb/image/genpkgs` executable that outputs a [CycloneDX](https://cyclonedx.org)-formatted list of packages in the image with PURL IDs when invoked. This executable is executed after all Dockerfiles are applied, and the output replaces the label `io.buildpacks.sbom`. This label doubles as a Software Bill-of-Materials for the base image. In the future, this label will serve as a starting point for the application SBoM.
+The project will provide tooling that can be used to scan the extended run image. For more information, see https://github.com/buildpacks/rfcs/pull/195.
 
 ### Example Dockerfiles
 
