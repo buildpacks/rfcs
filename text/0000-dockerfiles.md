@@ -33,10 +33,10 @@ For a given application, a build that uses extensions could be optimized by crea
 Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to apply Dockerfiles at the platform's discretion. The order of operations would be something like the following:
 * analyze
 * detect
-* restore
-* <new lifecycle phase> run extensions' bin/build, output Dockerfiles are written to a volume
-* <new lifecycle phase OR platform> apply Dockerfiles to run image (could run in parallel with below two)
+* <new lifecycle phase> run extensions' bin/generate, output Dockerfiles are written to a volume
+* <new lifecycle phase OR platform> apply Dockerfiles to run image (could run in parallel with build image extension)
 * <new lifecycle phase OR platform> apply Dockerfiles to build image
+* restore
 * build
 * export
 
