@@ -85,7 +85,7 @@ However,
 - Extensions `<layers>` directory is replaced by an `<output>` directory.
 - If an extension is missing `/bin/build`, the extension root is treated as a pre-populated `<output>` directory.
 
-After `/bin/build` executes, the `<output>` directory may contain
+After `/bin/generate` executes, the `<output>` directory may contain
 - `build.toml`, with the same contents as a normal buildpack's `build.toml`, but
   - With an additional `args` table array with `name` and `value` fields that are provided as build args to `build.Dockerfile` or `Dockerfile`
 - `launch.toml`, with the same contents as a normal buildpack's `launch.toml`, but
