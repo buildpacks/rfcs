@@ -44,7 +44,7 @@ Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to ap
 
 A builder image may include any number of "extensions" directories in `/cnb/ext/`.
 
-Extensions are similar to buildpacks: they have a `/bin/build` and `/bin/detect` executable.
+Extensions are similar to buildpacks: they have two executables: `/bin/detect` and `/bin/generate`. The interface for these executables is similar to a buildpack's `/bin/detect` and `/bin/build`.
 However, instead of a `buildpack.toml` file, extensions have a `extension.toml` file:
 ```toml
 api = "<buildpack API version>"
