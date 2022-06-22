@@ -132,7 +132,7 @@ This example extension would allow a builder to install RPMs for each language r
 
 Note: The Dockerfiles referenced must disable rebasing, and build times will be slower compared to buildpack-provided runtimes.
 
-##### `/cnb/ext/com.example.rpmext/bin/build`
+##### `/cnb/ext/com.example.rpmext/bin/generate`
 ```
 #!/bin/sh
 [ -f Gemfile.lock ] && cp "$CNB_BUILDPACK_DIR/Dockerfile-ruby" "$1/Dockerfile"
