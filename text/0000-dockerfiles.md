@@ -166,8 +166,6 @@ RUN groupadd cnb --gid ${CNB_GROUP_ID} && \
   useradd --uid ${CNB_USER_ID} --gid ${CNB_GROUP_ID} -m -s /bin/bash cnb
 
 USER ${CNB_USER_ID}:${CNB_GROUP_ID}
-
-COPY genpkgs /cnb/image/genpkgs
 ```
 
 `run.Dockerfile` for use with the example `app.run.Dockerfile.out` extension that always installs the latest version of curl:
