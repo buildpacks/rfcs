@@ -83,7 +83,7 @@ To generate these Dockerfiles, the lifecycle executes the extension's `/bin/gene
 However,
 - Extensions `/bin/generate` must not write to the app directory.
 - Extensions `<layers>` directory is replaced by an `<output>` directory.
-- If an extension is missing `/bin/build`, the extension root is treated as a pre-populated `<output>` directory.
+- If an extension is missing `/bin/generate`, the extension root is treated as a pre-populated `<output>` directory.
 
 After `/bin/generate` executes, the `<output>` directory may contain
 - `build.toml`, with the same contents as a normal buildpack's `build.toml`, but
