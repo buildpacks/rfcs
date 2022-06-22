@@ -207,7 +207,6 @@ RUN curl -L https://example.com/mypkg-install | sh # installs to /opt
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Should `genpkgs` be part of this proposal? Opinion: Yes, otherwise it's difficult to maintain a valid SBoM.
 - Should we allow base images to provide build plan entries so that extensions aren't required to satisfy buildpacks? Opinion: Not yet, no-op extension can be used for now.
 
 # Spec. Changes (OPTIONAL)
