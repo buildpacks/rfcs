@@ -99,7 +99,7 @@ Support for other instruction formats, e.g., LLB JSON files, could be added in t
 
 `build.Dockerfile`, `run.Dockerfile`, and `Dockerfile` target the builder image, runtime base image, or both base images, respectively.
 
-If no Dockerfiles are present, `/bin/build` may still consume build plan entries and add metadata to `build.toml`/`launch.toml`.
+If no Dockerfiles are present, `/bin/generate` may still consume build plan entries and add metadata to `build.toml`/`launch.toml`.
 
 Dockerfiles are applied to their corresponding base images after all extensions are executed and before any regular buildpacks are executed.
 Dockerfiles are applied in the order determined during buildpack detection. When multiple Dockerfiles are applied, the intermediate image generated from the application of the current Dockerfile will be provided as the `base_image` ARG to the next Dockerfile. Dockerfiles that target the run image (only) may ignore the provided `base_image` (e.g., `FROM some-other-image`). Dockerfiles that change the runtime base image may still use `COPY --from=${base_image}`.
