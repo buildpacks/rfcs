@@ -79,7 +79,7 @@ However,
 - Extensions are always `optional`.
 
 Extensions generate Dockerfiles before the regular buildpack build phase.
-To generate these Dockerfiles, the lifecycle executes the extension's `/bin/build` executable with the same UID, GID, and interface as regular buildpacks.
+To generate these Dockerfiles, the lifecycle executes the extension's `/bin/generate` executable with the same UID, GID, and interface as regular buildpacks.
 However,
 - Extensions `/bin/generate` must not write to the app directory.
 - Extensions `<layers>` directory is replaced by an `<output>` directory.
