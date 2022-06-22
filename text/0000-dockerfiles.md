@@ -119,7 +119,7 @@ A runtime base image may indicate that it preserves ABI compatibility by adding 
 This example extension would allow an app to provide runtime and build-time base image extensions as "run.Dockerfile" and "build.Dockerfile."
 The app developer can decide whether the extensions are rebasable.
 
-##### `/cnb/ext/com.example.appext/bin/build`
+##### `/cnb/ext/com.example.appext/bin/generate`
 ```
 #!/bin/sh
 [ -f build.Dockerfile ] && cp build.Dockerfile "$1/"
