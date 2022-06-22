@@ -213,3 +213,14 @@ RUN curl -L https://example.com/mypkg-install | sh # installs to /opt
 [spec-changes]: #spec-changes
 
 This RFC requires extensive changes to all specifications.
+
+To deliver incremental value and gather feedback as we implement this large feature, a phased implementation is proposed:
+* Phase 1: run.Dockerfiles can be used to switch the runtime base image
+* Phase 2: build.Dockerfiles can be used to extend the build time base image
+  * 2a: `pack` applies the build.Dockerfiles
+  * 2b: the lifecycle applies the build.Dockerfiles using kaniko
+* Phase 3: Dockerfiles and / or run.Dockerfiles can be used to extend the runtime base image
+  * 3a: `pack` applies the run.Dockerfiles
+  * 3b: the lifecycle applies the run.Dockerfiles using kaniko
+  
+https://github.com/buildpacks/spec/pull/307 and https://github.com/buildpacks/spec/pull/308 describe the spec changes needed for phase 1. https://github.com/buildpacks/spec/pull/298 approximately describes the spec changes needed for all phases.
