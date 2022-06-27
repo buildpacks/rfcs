@@ -20,7 +20,8 @@ Allow buildpack authors to specify additional artifacts from their buildpacks to
 Make a list of the definitions that may be useful for those reviewing. Include phrases and words that buildpack authors or other interested parties may not be familiar with.
 
 - WebAssembly (WASM) -- Portable binaries to be run with a WebAssembly virtual machine.
-- OCI Artifact -- Any blob of data that can be stored in an OCI registry
+- [OCI Artifact](https://github.com/opencontainers/artifacts/blob/main/definitions-terms.md#media-type) -- Any blob of data that can be stored in an OCI registry. From the spec: 
+> An artifact has a type, which has a collection of layers. The Artifact is defined as unique by its `manifest.config.mediaType`. Layers are defined by their `layer.config.mediaType`.
 
 # Motivation
 [motivation]: #motivation
