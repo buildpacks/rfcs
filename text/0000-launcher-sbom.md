@@ -92,9 +92,9 @@ The SBOM for a CNB-built image could be broken down as follows:
 
 * If no SBOM files are found in `/cnb` (e.g., if the builder author did not include them), the lifecycle will warn and
   continue. Alternatively, the lifecycle could generate the files on the fly, but this would increase build times.
-    * If there is a previous image, `<layers>/sbom/run/cnb_lifecycle` may contain SBOM files - but these should
-      be deleted before `export` as there is no guarantee that the lifecycle that created the previous image is the same
-      as the current lifecycle.
+    * If there is a previous image, `<layers>/sbom/run/cnb_lifecycle` may contain SBOM files - but these should be
+      deleted before `export` as there is no guarantee that the lifecycle that created the previous image is the same as
+      the current lifecycle.
 
 * In theory, there should be no changes needed for end-users to consume the new SBOM files, as the files will be placed
   in the same directory, with the same structure, as SBOM files for buildpack-provided dependencies.
@@ -109,11 +109,16 @@ Why should we *not* do this? More work for the lifecycle.
 
 [alternatives]: #alternatives
 
-- What other designs have been considered? In theory, we don't actually need the files to be
-  in `<layers>/sbom/<build|run>/cnb_lifecycle` - because any files restored from a previous build will be ignored (see
-  above). They could be annotations or attestations on the image instead (
-  see https://github.com/buildpacks/rfcs/pull/195) - but this would require platforms to keep track of the files as
-  inputs to the signer binary.
+- What other designs have been considered?
+    - This could all be implemented with a buildpack - e.g., a `cnb/lifecycle` utility buildpack whose sole
+      responsibility would be to copy the SBOM files from `/cnb/lifecycle` to `<layers>/sbom`. However, this would
+      introduce quite a bit of complexity and overhead for what is ultimately a very simple operation. A potential
+      benefit is that platforms using Platform API `0.8` and higher wouldn't need to upgrade - but they would need to
+      add the new utility buildpack to builders, which is probably just as much work.
+    - In theory, we don't actually need the files to be in `<layers>/sbom/<build|run>/cnb_lifecycle` - because any files
+      restored from a previous build will be ignored (see above). They could be annotations or attestations on the image
+      instead (see https://github.com/buildpacks/rfcs/pull/195) - but this would require platforms to keep track of the
+      files as inputs to the signer binary.
 
 - Why is this proposal the best? It is easy and straightforward for the lifecycle to copy pre-generated files
   to `<layers>/sbom/<build|run>/cnb_lifecycle`.
