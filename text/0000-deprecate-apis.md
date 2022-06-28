@@ -15,9 +15,10 @@
 
 [summary]: #summary
 
-Today, the CNB project defines 7 buildpack APIs and 7 platform APIs. The CNB lifecycle, for backwards compatibility and
-in order to enable buildpacks and platforms to upgrade their respective APIs independently, currently supports all 14
-APIs and all 49 combinations of buildpack and platform APIs. This is a maintenance burden.
+Today, the CNB project [defines](https://github.com/buildpacks/spec/releases) 7 buildpack APIs and 7 platform APIs. The
+CNB lifecycle, for backwards compatibility and in order to enable buildpacks and platforms to upgrade their respective
+APIs independently, currently supports all 14 APIs and all 49 combinations of buildpack and platform APIs. This is a
+maintenance burden.
 
 Additionally, as we've talked about adding new features to the project, it has become difficult to determine how these
 additions might be compatible with older APIs. This has slowed down progress within the project.
@@ -36,7 +37,7 @@ This RFC proposes:
 
 [definitions]: #definitions
 
-**lifecycle**: software that orchestrates a CNB build; it executes in a series of phases that each have a distinct
+[**lifecycle**](https://github.com/buildpacks/lifecycle): software that orchestrates a CNB build; it executes in a series of phases that each have a distinct
 responsibility
 
 The CNB project distributes the lifecycle in two ways:
@@ -53,9 +54,9 @@ and `io.buildpacks.lifecycle.version` labels on lifecycle images, and the `lifec
 
 **platform**: system or software that orchestrates the lifecycle by invoking each lifecycle phase in order
 
-**Buildpack API**: specifies the interface between a lifecycle program and one or more buildpacks
+[**Buildpack API**](https://github.com/buildpacks/spec/blob/main/buildpack.md): specifies the interface between a lifecycle program and one or more buildpacks
 
-**Platform API**: specifies the interface between a lifecycle program and a platform
+[**Platform API**](https://github.com/buildpacks/spec/blob/main/platform.md): specifies the interface between a lifecycle program and a platform
 
 # Motivation
 
@@ -77,7 +78,7 @@ and `io.buildpacks.lifecycle.version` labels on lifecycle images, and the `lifec
       supports this), but if not...
     - We will have socialized this change appropriately (e.g., in Slack, through the mailing list, GitHub, etc.)
     - The `CNB_DEPRECATION_MODE` setting will have alerted them that upgrading is necessary
-    - We will have published migration guides to help them upgrade
+    - We will have published [migration guides](https://buildpacks.io/docs/reference/spec/migration/) to help them upgrade
     - 6 months is a reasonable amount of time to complete this process
 
 # What it is
