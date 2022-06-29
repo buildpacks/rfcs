@@ -89,7 +89,7 @@ Template variables introduced in `prompts.yaml` are required to have a name uniq
 Answers to prompts can be provided in a toml file.  This supports programmatic use of `pack`.  Alternatively, variables specified in `prompts.toml` may have values provided as command line flags.  When an override is provided in the CLI or `overrides.toml` file, then the end-user is not prompted to provide the value.
 
 ```
-pack buildpack create --override 'ProjectDirectory="test_example"' --override='BuildpackApi=0.8'
+pack buildpack create example/bash --override 'ProjectDirectory="test_example"' --override='BuildpackApi=0.8'
 ✔ Enter a stack this buildpack will support by default: io.buildpacks.samples.stacks.bionic
 Created project in bash_buildpack
 ```
@@ -97,7 +97,7 @@ Created project in bash_buildpack
 The above overrides are equivalent to:
 
 ```
-pack buildpack create --path test_example --api 0.8
+pack buildpack create example/bash --path test_example --api 0.8
 ✔ Enter a stack this buildpack will support by default: io.buildpacks.samples.stacks.bionic
 Created project in bash_buildpack
 ```
