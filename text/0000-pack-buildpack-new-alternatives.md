@@ -198,7 +198,10 @@ There are many, many competing implementations of project scaffolding tools.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-
+* Where do the template repositories live for `bash` and `golang`?
+  * 
+* What team maintains template repositories?
+  * Buildpack Author Tooling team
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
