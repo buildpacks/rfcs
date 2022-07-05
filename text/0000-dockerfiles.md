@@ -40,6 +40,8 @@ Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to ap
 * build
 * export
 
+When Dockerfiles are used to update the run image, care should be taken to ensure registry access prior to the `build` phase, to avoid long builds that fail due to incorrect credentials.
+
 ### Dynamically-applied Dockerfiles
 
 A builder image may include any number of "extensions" directories in `/cnb/extensions/`.
