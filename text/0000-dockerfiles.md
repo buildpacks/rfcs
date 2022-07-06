@@ -32,10 +32,9 @@ For a given application, a build that uses extensions could be optimized by crea
 
 Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to apply Dockerfiles at the platform's discretion. The order of operations would be something like the following:
 * analyze
-* detect
-* <new lifecycle phase> run extensions' bin/generate, output Dockerfiles are written to a volume
-* <new lifecycle phase OR platform> apply Dockerfiles to run image (could run in parallel with build image extension)
-* <new lifecycle phase OR platform> apply Dockerfiles to build image
+* detect - after standard detection detect will also run extensions' bin/generate, output Dockerfiles are written to a volume
+* <new lifecycle phase OR platform> apply Dockerfiles to run image (could run in parallel with builder image extension)
+* <new lifecycle phase OR platform> apply Dockerfiles to builder image
 * restore
 * build
 * export
@@ -88,9 +87,10 @@ However,
 - If an extension is missing `/bin/generate`, the extension root is treated as a pre-populated `<output>` directory.
 
 After `/bin/generate` executes, the `<output>` directory may contain
-- `build.toml`, with the same contents as a normal buildpack's `build.toml`, but
+- `build.toml`, with the same contents as a normal buildpack's `build.toml` (the `unmet` table array), but
   - With an additional `args` table array with `name` and `value` fields that are provided as build args to `build.Dockerfile` or `Dockerfile`
-- `launch.toml`, with the same contents as a normal buildpack's `launch.toml`, but
+- `launch.toml`,
+  - Without the `labels` table array
   - Without the `processes` table array
   - Without the `slices` table array
   - With an additional `args` table array with `name` and `value` fields that are provided as build args to `run.Dockerfile` or `Dockerfile`
@@ -101,7 +101,7 @@ Support for other instruction formats, e.g., LLB JSON files, could be added in t
 
 `build.Dockerfile`, `run.Dockerfile`, and `Dockerfile` target the builder image, runtime base image, or both base images, respectively.
 
-If no Dockerfiles are present, `/bin/generate` may still consume build plan entries and add metadata to `build.toml`/`launch.toml`.
+If no Dockerfiles are present, `/bin/generate` may still consume build plan entries.
 
 Dockerfiles are applied to their corresponding base images after all extensions are executed and before any regular buildpacks are executed.
 Dockerfiles are applied in the order determined during buildpack detection. When multiple Dockerfiles are applied, the intermediate image generated from the application of the current Dockerfile will be provided as the `base_image` ARG to the next Dockerfile. Dockerfiles that target the run image (only) may ignore the provided `base_image` (e.g., `FROM some-other-image`). Dockerfiles that change the runtime base image may still use `COPY --from=${base_image}`.
