@@ -154,3 +154,7 @@ Does this RFC entail any proposed changes to the core specifications or extensio
 
 The platform spec should make mention of the new SBOM files. The buildpack spec should note
 that `buildpacksio_lifecycle` is a reserved buildpack ID.
+
+The `exporter` and the `creator` will accept a new flag, `-launcher-sbom`, for a directory containing SBOM files for a
+provided `-launcher`. The lifecycle will warn if `-launcher` is provided without `-launcher-sbom`. The lifecycle will
+ignore `-launcher-sbom` if no `-launcher` is provided.
