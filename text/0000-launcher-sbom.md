@@ -95,7 +95,7 @@ The SBOM for a CNB-built image could be broken down as follows:
     * SBOM files in `<layers>/sbom/build` may be saved off by the platform before the build container exits (no changes
       to the existing workflow).
 
-* If no SBOM files are found in `/cnb` (e.g., if the builder author did not include them), the lifecycle will warn and
+* If no SBOM files are found in `/cnb/lifecycle` (e.g., if the builder author did not include them), the lifecycle will warn and
   continue. Alternatively, the lifecycle could generate the files on the fly, but this would increase build times.
     * If there is a previous image, `<layers>/sbom/launch/buildpacksio_lifecycle` may contain SBOM files - but these
       should be deleted before `export` as there is no guarantee that the lifecycle that created the previous image is
