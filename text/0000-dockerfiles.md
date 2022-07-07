@@ -17,7 +17,7 @@ This RFC introduces functionality for customizing base images, as an alternative
 # Motivation
 [motivation]: #motivation
 
-[RFC0069](https://github.com/buildpacks/rfcs/blob/main/text/0069-stack-buildpacks.md) introduces complexity by defining an API that allows buildpacks to modify base images. To avoid this complexity, we could rely on generated Dockerfiles for base image manipulation. This would simplify the original proposal by, e.g., only requiring a copy of the buildpack on the build-time base image.
+[RFC0069](https://github.com/buildpacks/rfcs/blob/main/text/0069-stack-buildpacks.md) introduces complexity by defining an API that allows buildpacks to modify base images. To avoid this complexity, we could rely on generated Dockerfiles for base image manipulation. This would simplify the original proposal by, e.g., only requiring a copy of the extension on the build-time base image.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -31,13 +31,13 @@ For a given application, a build that uses extensions could be optimized by crea
 [how-it-works]: #how-it-works
 
 Note: kaniko, buildah, BuildKit, or the original Docker daemon may be used to apply Dockerfiles at the platform's discretion. The order of operations would be something like the following:
-* analyze
-* detect - after standard detection detect will also run extensions' bin/generate, output Dockerfiles are written to a volume
-* <new lifecycle phase OR platform> apply Dockerfiles to run image (could run in parallel with builder image extension)
-* <new lifecycle phase OR platform> apply Dockerfiles to builder image
-* restore
-* build
-* export
+* `analyze`
+* `detect` - after standard detection detect will also run extensions' bin/generate, output Dockerfiles are written to a volume
+* `extend` - applies run.Dockerfiles to run image (could run in parallel with builder image extension)
+* `extend` - applies build.Dockerfiles to builder image
+* `restore`
+* `build`
+* `export`
 
 When Dockerfiles are used to update the run image, care should be taken to ensure registry access prior to the `build` phase, to avoid long builds that fail due to incorrect credentials.
 
@@ -74,7 +74,7 @@ Unlike buildpacks,
 Extensions participate in the buildpack detection process, with the same UID, GID, and interface for `/bin/detect`.
 However,
 - `/bin/detect` is optional for extensions, and they are assumed to pass detection when it is not present. Just like with buildpacks, a /bin/detect that exits with a 0 exit code passes detection, and fails otherwise.
-- If an extension is missing `/bin/detect`, the extension root is treated as a pre-populated output directory (i.e., extensions can include a static build plan).
+- If an extension is missing `/bin/detect`, the extension root `./detect` directory is treated as a pre-populated output directory (i.e., extensions can include a static build plan).
 - Extensions may only output `provides` entries to the build plan. They must not output `requires`.
 - Extensions are not included in `order` definitions (e.g., in `builder.toml`); instead, a separate `order-extensions` table should be used. The `order-extensions` table will be prepended to each group in the provided `order` (as if `order-extensions` were a composite buildpack).
 - Extensions are always `optional`.
@@ -84,22 +84,18 @@ To generate these Dockerfiles, the lifecycle executes the extension's `/bin/gene
 However,
 - Extensions `/bin/generate` must not write to the app directory.
 - Extensions `<layers>` directory is replaced by an `<output>` directory.
-- If an extension is missing `/bin/generate`, the extension root is treated as a pre-populated `<output>` directory.
+- If an extension is missing `/bin/generate`, the extension root `./generate` directory is treated as a pre-populated `<output>` directory.
 
 After `/bin/generate` executes, the `<output>` directory may contain
 - `build.toml`, with the same contents as a normal buildpack's `build.toml` (the `unmet` table array), but
-  - With an additional `args` table array with `name` and `value` fields that are provided as build args to `build.Dockerfile` or `Dockerfile`
-- `launch.toml`,
-  - Without the `labels` table array
-  - Without the `processes` table array
-  - Without the `slices` table array
-  - With an additional `args` table array with `name` and `value` fields that are provided as build args to `run.Dockerfile` or `Dockerfile`
-
-- Either `Dockerfile` or either or both of `build.Dockerfile` and `run.Dockerfile`
+  - With an additional `args` table array with `name` and `value` fields that are provided as build args to `build.Dockerfile`
+- `run.toml`,
+  - With an `args` table array with `name` and `value` fields that are provided as build args to `run.Dockerfile`
+- Either or both of `build.Dockerfile` and `run.Dockerfile`
 
 Support for other instruction formats, e.g., LLB JSON files, could be added in the future.
 
-`build.Dockerfile`, `run.Dockerfile`, and `Dockerfile` target the builder image, runtime base image, or both base images, respectively.
+`build.Dockerfile` and `run.Dockerfile`target the builder image or runtime base image, respectively.
 
 If no Dockerfiles are present, `/bin/generate` may still consume build plan entries.
 
@@ -108,13 +104,13 @@ Dockerfiles are applied in the order determined during buildpack detection. When
 
 All Dockerfiles are provided with `base_image` and `build_id` args.
 The `base_image` arg allows the Dockerfile to reference the original base image.
-The `build_id` arg allows the Dockerfile to invalidate the cache after a certain layer and must be defaulted to `0`. The executor of the Dockerfile will provide the `build_id` as a UUID (this eliminates the need to track this variable). 
+The `build_id` arg allows the Dockerfile to invalidate the cache after a certain layer and should be defaulted to `0`. The executor of the Dockerfile will provide the `build_id` as a UUID (this eliminates the need to track this variable).
 When the `$build_id` arg is referenced in a `RUN` instruction, all subsequent layers will be rebuilt on the next build (as the value will change).
 
-Build args specified in `build.toml` are provided to `build.Dockerfile` or `Dockerfile` (when applied to the build-time base image).
-Build args specified in `launch.toml` are provided to `run.Dockerfile` or `Dockerfile` (when applied to the runtime base image).
+Build args specified in `build.toml` are provided to `build.Dockerfile` (when applied to the build-time base image).
+Build args specified in `run.toml` are provided to `run.Dockerfile` (when applied to the runtime base image).
 
-A runtime base image may indicate that it preserves ABI compatibility by adding the label `io.buildpacks.rebasable=true`. In the case of builder-specified Dockerfiles, `io.buildpacks.rebasable=false` is set automatically on the base image before a runtime Dockerfile is applied and must be explicitly set to `true` if desired. If multiple Dockerfiles are applied, all must set `io.buildpacks.rebasable=true` for the final value to be `true`. Rebasing an app without this label set to `true` requires passing a new `--force` flag to `pack rebase`.
+A runtime base image may indicate that it preserves ABI compatibility by adding the label `io.buildpacks.rebasable=true`. In the case of builder-specified Dockerfiles, `io.buildpacks.rebasable=false` is set automatically on the base image before a runtime Dockerfile is applied and must be explicitly set to `true` if desired. If multiple Dockerfiles are applied, all must set `io.buildpacks.rebasable=true` for the final value to be `true`. Rebasing an app without this label set to `true` requires passing a new `--force` flag to `pack rebase`. When the run image is extended and `io.buildpacks.rebasable=true`, the `extend` phase will communicate to the `export` phase the top layer of the run image (prior to extension) so that the exporter can set the appropriate value of `io.buildpacks.lifecycle.metadata` `runImage.topLayer`.
 
 #### Example: App-specified Dockerfile Extension
 
@@ -137,8 +133,8 @@ Note: The Dockerfiles referenced must disable rebasing, and build times will be 
 ##### `/cnb/ext/com.example.rpmext/bin/generate`
 ```
 #!/bin/sh
-[ -f Gemfile.lock ] && cp "$CNB_BUILDPACK_DIR/Dockerfile-ruby" "$1/Dockerfile"
-[ -f package.json ] && cp "$CNB_BUILDPACK_DIR/Dockerfile-node" "$1/Dockerfile"
+[ -f Gemfile.lock ] && cp "$CNB_BUILDPACK_DIR/Dockerfile-ruby" "$1/build.Dockerfile"
+[ -f package.json ] && cp "$CNB_BUILDPACK_DIR/Dockerfile-node" "$1/build.Dockerfile"
 ```
 
 
@@ -170,7 +166,7 @@ RUN groupadd cnb --gid ${CNB_GROUP_ID} && \
 USER ${CNB_USER_ID}:${CNB_GROUP_ID}
 ```
 
-`run.Dockerfile` for use with the example `app.run.Dockerfile.out` extension that always installs the latest version of curl:
+`run.Dockerfile` that always installs the latest version of curl:
 ```
 ARG base_image
 FROM ${base_image}
@@ -182,7 +178,7 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 ```
 (note: this Dockerfile disables rebasing, as OS package installation is not rebasable)
 
-`run.Dockerfile` for use with the example `app.run.Dockerfile.out` extension that installs a special package to /opt:
+`run.Dockerfile` that installs a special package to /opt:
 ```
 ARG base_image
 FROM ${base_image}
@@ -221,7 +217,7 @@ To deliver incremental value and gather feedback as we implement this large feat
 * Phase 2: build.Dockerfiles can be used to extend the build time base image
   * 2a: `pack` applies the build.Dockerfiles
   * 2b: the lifecycle applies the build.Dockerfiles using kaniko
-* Phase 3: Dockerfiles and / or run.Dockerfiles can be used to extend the runtime base image
+* Phase 3: run.Dockerfiles can be used to extend the runtime base image
   * 3a: `pack` applies the run.Dockerfiles
   * 3b: the lifecycle applies the run.Dockerfiles using kaniko
   
