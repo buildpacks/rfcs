@@ -70,7 +70,7 @@ buildpacks will act as if there is no previous image - i.e., they will create la
 
 Why should we *not* do this?
 
-* This proposal results in a one-time penalty per-image of a slow re-build due to busting the cache. However, sometimes
+* This proposal results in a one-time penalty per-image of a slow rebuild due to busting the cache. However, sometimes
   it is safe to re-use layers across stacks. Not all users may appreciate this behavior.
 * If either of `io.buildpacks.stack.id` or `CNB_STACK_ID` is unset, this effectively disables caching.
 
@@ -103,7 +103,7 @@ Discuss prior art, both the good and bad.
 
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of
   the solution that comes out of this RFC? When we
-  implement https://github.com/buildpacks/rfcs/blob/main/text/0096-remove-stacks-mixins.md the check using stack ID can
+  implement [RFC to remove stacks](https://github.com/buildpacks/rfcs/blob/main/text/0096-remove-stacks-mixins.md) the check using stack ID can
   be expanded to look at OS, architecture, architecture variant, distribution, and version. However, that should be
   considered out of scope for this RFC.
 
