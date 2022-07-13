@@ -45,7 +45,7 @@ When Dockerfiles are used to update the run image, care should be taken to ensur
 
 A builder image may include any number of "extensions" directories in `/cnb/extensions/`.
 
-Extensions are similar to buildpacks: they have two executables: `/bin/detect` and `/bin/generate`. The interface for these executables is similar to a buildpack's `/bin/detect` and `/bin/build`.
+Extensions are similar to buildpacks: they have two executables: `./bin/detect` and `./bin/generate`. The interface for these executables is similar to a buildpack's `./bin/detect` and `./bin/build`.
 However, instead of a `buildpack.toml` file, extensions have a `extension.toml` file:
 ```toml
 api = "<buildpack API version>"
@@ -71,22 +71,22 @@ Unlike buildpacks,
 - Extensions must not be included in a meta-buildpacks
 - Extensions must not have `order`/`group` definitions in `extension.toml`
 
-Extensions participate in the buildpack detection process, with the same UID, GID, and interface for `/bin/detect`.
+Extensions participate in the buildpack detection process, with the same UID, GID, and interface for `./bin/detect`.
 However,
-- `/bin/detect` is optional for extensions, and they are assumed to pass detection when it is not present. Just like with buildpacks, a /bin/detect that exits with a 0 exit code passes detection, and fails otherwise.
-- If an extension is missing `/bin/detect`, the extension root `./detect` directory is treated as a pre-populated output directory (i.e., extensions can include a static build plan).
+- `./bin/detect` is optional for extensions, and they are assumed to pass detection when it is not present. Just like with buildpacks, a `./bin/detect` that exits with a 0 exit code passes detection, and fails otherwise.
+- If an extension is missing `./bin/detect`, the extension root `./detect` directory is treated as a pre-populated output directory (i.e., extensions can include a static build plan).
 - Extensions may only output `provides` entries to the build plan. They must not output `requires`.
 - Extensions are not included in `order` definitions (e.g., in `builder.toml`); instead, a separate `order-extensions` table should be used. The `order-extensions` table will be prepended to each group in the provided `order` (as if `order-extensions` were a composite buildpack).
 - Extensions are always `optional`.
 
 Extensions generate Dockerfiles before the regular buildpack build phase.
-To generate these Dockerfiles, the lifecycle executes the extension's `/bin/generate` executable with the same UID, GID, and interface as regular buildpacks.
+To generate these Dockerfiles, the lifecycle executes the extension's `./bin/generate` executable with the same UID, GID, and interface as regular buildpacks.
 However,
-- Extensions `/bin/generate` must not write to the app directory.
+- Extensions `./bin/generate` must not write to the app directory.
 - Extensions `<layers>` directory is replaced by an `<output>` directory.
-- If an extension is missing `/bin/generate`, the extension root `./generate` directory is treated as a pre-populated `<output>` directory.
+- If an extension is missing `./bin/generate`, the extension root `./generate` directory is treated as a pre-populated `<output>` directory.
 
-After `/bin/generate` executes, the `<output>` directory may contain
+After `./bin/generate` executes, the `<output>` directory may contain
 - `build.toml`, with the same contents as a normal buildpack's `build.toml` (the `unmet` table array), but
   - With an additional `args` table array with `name` and `value` fields that are provided as build args to `build.Dockerfile`
 - `run.toml`,
@@ -97,7 +97,7 @@ Support for other instruction formats, e.g., LLB JSON files, could be added in t
 
 `build.Dockerfile` and `run.Dockerfile`target the builder image or runtime base image, respectively.
 
-If no Dockerfiles are present, `/bin/generate` may still consume build plan entries.
+If no Dockerfiles are present, `./bin/generate` may still consume build plan entries.
 
 Dockerfiles are applied to their corresponding base images after all extensions are executed and before any regular buildpacks are executed.
 Dockerfiles are applied in the order determined during buildpack detection. When multiple Dockerfiles are applied, the intermediate image generated from the application of the current Dockerfile will be provided as the `base_image` ARG to the next Dockerfile. Dockerfiles that target the run image (only) may ignore the provided `base_image` (e.g., `FROM some-other-image`). Dockerfiles that change the runtime base image may still use `COPY --from=${base_image}`.
