@@ -101,11 +101,8 @@ Discuss prior art, both the good and bad.
 
 [unresolved-questions]: #unresolved-questions
 
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of
-  the solution that comes out of this RFC? When we
-  implement [RFC to remove stacks](https://github.com/buildpacks/rfcs/blob/main/text/0096-remove-stacks-mixins.md) the check using stack ID can
-  be expanded to look at OS, architecture, architecture variant, distribution, and version. However, that should be
-  considered out of scope for this RFC.
+- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
+    * When we implement [RFC to remove stacks](https://github.com/buildpacks/rfcs/blob/main/text/0096-remove-stacks-mixins.md) the check using stack ID can be expanded to look at OS, architecture, architecture variant, distribution, and version. However, that should be considered out of scope for this RFC.
 
 # Spec. Changes (OPTIONAL)
 
