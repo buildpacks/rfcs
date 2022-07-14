@@ -75,7 +75,8 @@ buildpacks may be okay with having layer metadata and/or cache contents restored
 already have the appropriate logic in place to determine when a layer is safe to re-use. We could introduce a
 new `buildpack.force-restore` field in buildpack.toml that when `true` would cause the lifecycle ignore a stack ID
 change for that buildpack. If a buildpack is on an older api that doesn't support this field, the lifecycle will do the
-safe thing and skip layer restoration.
+safe thing and skip layer restoration. This would entail adding a `-buildpacks` flag to the restorer (so that it can
+read each buildpack's descriptor).
 
 # Migration
 
@@ -141,4 +142,10 @@ Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fi
 label, etc. This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are
 necessary, they should be documented here.
 
-No spec changes necessary, this can be done at the lifecycle level.
+Platform:
+* Add run image stack ID to analyzed.toml
+* Add `-buildpacks` flag to `restorer`
+* Note that cache metadata is not spec'd
+
+Buildpack:
+* Add `force-restore` field to buildpack.toml
