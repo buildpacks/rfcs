@@ -87,8 +87,8 @@ However,
 - If an extension is missing `./bin/generate`, the extension root `./generate` directory is treated as a pre-populated `<output>` directory.
 
 After `./bin/generate` executes, the `<output>` directory may contain
-- `build.toml`, with the same contents as a normal buildpack's `build.toml` (the `unmet` table array), but
-  - With an additional `args` table array with `name` and `value` fields that are provided as build args to `build.Dockerfile`
+- `build.toml`,
+  - With an `args` table array with `name` and `value` fields that are provided as build args to `build.Dockerfile`
 - `run.toml`,
   - With an `args` table array with `name` and `value` fields that are provided as build args to `run.Dockerfile`
 - Either or both of `build.Dockerfile` and `run.Dockerfile`
@@ -97,7 +97,7 @@ Support for other instruction formats, e.g., LLB JSON files, could be added in t
 
 `build.Dockerfile` and `run.Dockerfile`target the builder image or runtime base image, respectively.
 
-If no Dockerfiles are present, `./bin/generate` may still consume build plan entries.
+If no Dockerfiles are present, `./bin/generate` may still consume build plan entries. Unlike buildpacks, extensions must consume all entries in the provided plan (they cannot designate any entries as "unmet").
 
 Dockerfiles are applied to their corresponding base images after all extensions are executed and before any regular buildpacks are executed.
 Dockerfiles are applied in the order determined during buildpack detection. When multiple Dockerfiles are applied, the intermediate image generated from the application of the current Dockerfile will be provided as the `base_image` ARG to the next Dockerfile. Dockerfiles that target the run image (only) may ignore the provided `base_image` (e.g., `FROM some-other-image`). Dockerfiles that change the runtime base image may still use `COPY --from=${base_image}`.
@@ -136,7 +136,6 @@ Note: The Dockerfiles referenced must disable rebasing, and build times will be 
 [ -f Gemfile.lock ] && cp "$CNB_BUILDPACK_DIR/Dockerfile-ruby" "$1/build.Dockerfile"
 [ -f package.json ] && cp "$CNB_BUILDPACK_DIR/Dockerfile-node" "$1/build.Dockerfile"
 ```
-
 
 ### Dockerfiles for Base Images
 
