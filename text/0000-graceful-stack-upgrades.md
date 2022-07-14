@@ -41,18 +41,41 @@ Beaver) [exiting the free initial five-year maintenance period](https://ubuntu.c
 other Ubuntu versions - such as 20.04 LTS (Focal Fossa) and 22.04 LTS (Jammy Jellyfish) will become more prevalent in
 the CNB ecosystem. Accordingly, the risk is greater that some CNB-built images could break.
 
-Use case: as a platform operator, I want to be able to upgrade my stack to a newer Ubuntu release without worrying that
-my images will break.
+Use case: as a platform operator, I want to be able to upgrade my stack without worrying that my images will break.
 
 # How it Works
 
 [how-it-works]: #how-it-works
 
-The lifecycle when reading the previous image metadata will inspect the value of `io.buildpacks.stack.id`. If the value
-does not match the value of `CNB_STACK_ID` in the lifecycle's execution environment, the lifecycle will warn and skip
-writing previous image metadata. During the `restore` phase, seeing no metadata for `cache=true` layers, the lifecycle
-will skip copying layer contents from the cache. During the `build` phase, seeing no metadata for `launch=true` layers,
-buildpacks will act as if there is no previous image - i.e., they will create layer contents if necessary.
+* The lifecycle needs to know the "previous" stack ID as well as the "current" stack ID to know if they are different.
+  The previous stack ID can be read from the previous image, whereas the current stack ID can be read from the run
+  image.
+    * The current stack ID could also be read from `CNB_STACK_ID` in the lifecycle's execution environment, but this is
+      not guaranteed to be set if the lifecycle is running in a lifecycle image (versus a trusted builder).
+* The `analyzer` has access to both the previous image and the run image. It will read the value of
+  the `io.buildpacks.stack.id` label for each image and compare them - if they are different, it will skip writing
+  previous image metadata for `launch=true` layers in analyzed.toml. It will also write the run image stack ID in
+  analyzed.toml so that the `restorer` can access it (the `restorer` does not have daemon access currently and therefore
+  cannot read the run image when exporting to a daemon).
+    * If the run image is switched as an output of image extensions during the detect/generate phase,
+      the `io.buildpacks.stack.id` label would need to be re-read prior to cache restoration (by either the extender or
+      the restorer). This should probably be out of scope for this RFC since image extensions / Dockerfiles are
+      considered experimental.
+* The `restorer` will read the run image stack ID from analyzed.toml and compare it to the stack ID in the cache
+  metadata (more on that later), and skip copying layer contents from the cache if the stack has changed.
+* During the `build` phase, seeing no metadata for `launch=true` layers, buildpacks will act as if there is no previous
+  image - i.e., they will create layer contents if necessary. Buildpacks will also find no data for previously cached
+  layers.
+* The `exporter` currently writes cache metadata as an `io.buildpacks.lifecycle.cache.metadata` label on the cache
+  image (or an equivalent file, for a cache volume). The cache metadata can be expanded to include the run image stack
+  ID from analyzed.toml.
+
+Some buildpacks may already be recording information about the stack used to create layers in layer metadata. These
+buildpacks may be okay with having layer metadata and/or cache contents restored when the stack changes, because they
+already have the appropriate logic in place to determine when a layer is safe to re-use. We could introduce a
+new `buildpack.force-restore` field in buildpack.toml that when `true` would cause the lifecycle ignore a stack ID
+change for that buildpack. If a buildpack is on an older api that doesn't support this field, the lifecycle will do the
+safe thing and skip layer restoration.
 
 # Migration
 
@@ -84,8 +107,10 @@ Why should we *not* do this?
       for buildpack authors to think about, and may be hard to get right.
     * Putting the onus on platforms to inspect the previous image and pass `-skip-restore` (or the equivalent) to the
       lifecycle when the stack changes. However, it may be more convenient to implement this at the lifecycle level.
+    * Instead of writing the run image stack ID in analyzed.toml, give the restorer daemon access so that it can read
+      the `io.buildpacks.stack.id` label itself.
 - Why is this proposal the best?
-    * Easy to understand, easy to implement.
+    * Consolidates logic that could be spread across buildpacks and/or platforms in the lifecycle.
 - What is the impact of not doing this?
     * Potentially, broken images.
 
@@ -101,8 +126,12 @@ Discuss prior art, both the good and bad.
 
 [unresolved-questions]: #unresolved-questions
 
-- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
-    * When we implement [RFC to remove stacks](https://github.com/buildpacks/rfcs/blob/main/text/0096-remove-stacks-mixins.md) the check using stack ID can be expanded to look at OS, architecture, architecture variant, distribution, and version. However, that should be considered out of scope for this RFC.
+- What related issues do you consider out of scope for this RFC that could be addressed in the future independently of
+  the solution that comes out of this RFC?
+    * When we
+      implement [RFC to remove stacks](https://github.com/buildpacks/rfcs/blob/main/text/0096-remove-stacks-mixins.md)
+      the check using stack ID can be expanded to look at OS, architecture, architecture variant, distribution, and
+      version. However, that should be considered out of scope for this RFC.
 
 # Spec. Changes (OPTIONAL)
 
