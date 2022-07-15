@@ -75,8 +75,8 @@ buildpacks may be okay with having layer metadata and/or cache contents restored
 already have the appropriate logic in place to determine when a layer is safe to re-use. We could introduce a
 new `buildpack.force-restore` field in buildpack.toml that when `true` would cause the lifecycle ignore a stack ID
 change for that buildpack. If a buildpack is on an older api that doesn't support this field, the lifecycle will do the
-safe thing and skip layer restoration. This may entail adding a `-buildpacks` flag to the restorer (so that it can
-read each buildpack's descriptor).
+safe thing and skip layer restoration. This may entail adding a `-buildpacks` flag to the restorer (so that it can read
+each buildpack's descriptor).
 
 # Migration
 
@@ -84,7 +84,8 @@ read each buildpack's descriptor).
 
 * platform developers: should ensure `io.buildpacks.stack.id` is present on the run image and `CNB_STACK_ID` is set on
   the build image
-* buildpack developers: no change
+* buildpack developers: should add `force-restore=true` to buildpack.toml if they are already accounting for stack ID
+  changes
 * buildpack users: must endure one slow rebuild per-image when the stack changes
 * consumers of buildpack images: no change (though hopefully spared broken images)
 
@@ -143,9 +144,12 @@ label, etc. This section is not intended to be binding, but as discussion of an 
 necessary, they should be documented here.
 
 Platform:
+
 * Add run image stack ID to analyzed.toml
-* Add `-buildpacks` flag to `restorer` (platforms would also need to mount the buildpacks directory in untrusted workflows)
+* Add `-buildpacks` flag to `restorer` (platforms would also need to mount the buildpacks directory in untrusted
+  workflows)
 * Note that cache metadata is not spec'd
 
 Buildpack:
+
 * Add `force-restore` field to buildpack.toml
