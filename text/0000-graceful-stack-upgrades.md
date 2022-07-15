@@ -83,7 +83,8 @@ each buildpack's descriptor).
 [migration]: #migration
 
 * platform developers: should ensure `io.buildpacks.stack.id` is present on the run image and `CNB_STACK_ID` is set on
-  the build image
+  the build image; must now provide the buildpacks directory to the `restore` phase (for platforms that use a lifecycle
+  image for registry-authenticated phases this is an additional step)
 * buildpack developers: should add `force-restore=true` to buildpack.toml if they are already accounting for stack ID
   changes
 * buildpack users: must endure one slow rebuild per-image when the stack changes
