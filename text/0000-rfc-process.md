@@ -108,7 +108,10 @@ Given the nature of our project many RFCs will happen at the project level. Howe
 
 ### Process
 
-#### Drafting
+#### Requesting an RFC
+If you believe an RFC should be written but are either not prepared to author it personally or not prepared to do it _now_, please open an issue on this repo with a high level description of the desired change. This helps us keep track of good ideas and match make ambitious contributors with appropriately sized challenges.
+
+#### Drafting an RFC
 All RFCs begin life as a draft. Anyone wishing to propose a change to the project should create a draft RFC by:
 
 - Fork the RFC repo: <https://github.com/buildpacks/rfcs>
