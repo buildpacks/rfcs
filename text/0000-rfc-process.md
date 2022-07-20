@@ -69,7 +69,11 @@ The RFC process **is not**:
 
 This RFC process is an evolution of our [previous process](0004-rfc-process.md).
 
-TODO
+As the project grows our process needs to grow with it. Compared to the previous iteration, this new process should:
+1. **Re-balance responsibilities**. We wish to empower team leads to take ownership of the future of the project and transition the TOC into an oversight role.
+2. **Favor action**. By moving from a super-majority vote to a lazy-consensus we remove the ability to block change through inaction. It is now the responsibility of those with concerns to raise them in a timely fashion.
+3. **Manage our bandwidth**. Sometimes we need to say "not now" to a good idea to manage the number of large changes proceeding simultaneously. This new process should help the project focus on shipping high-quality enhancements by managing the number of in-flight RFCs, and ensuring each approved RFC has an implementer.
+4. **Improve Readability**. By allowing amendments to RFCs we make life easier for anyone wishing to understand a change by ensuring they can find the full plan in a single document.
 
 # What it is
 [what-it-is]: #what-it-is
