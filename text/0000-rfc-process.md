@@ -95,12 +95,12 @@ If there is any doubt, maintainers should prefer opening an "unecessary" RFC to 
 An RFC should be a project RFC if:
 * it impacts the spec.
 * it introduces a new component.
-* its implementation necessitates coordination across multiple team.
+* its implementation necessitates coordination across multiple teams.
 * it meaningfully impacts multiple personas (e.g. buildpack authors and platform authors).
 * the TOC requests that it be a project RFC.
 
 Given the nature of our project many RFCs will happen at the project level. However, some types of changes are more appropriately scoped to the team level. Some examples include:
-* Platform example: additions to or modification of the pack CLI interface (e.g. [pack pull policy](0046-pack-pull-policy.md)) or library interface (e.g. [pack logging refactor](0002-pack-logging-refactor.md)), provided these changes do not require changes to components external to the platform team.
+* Platform example: additions to or modification of the pack CLI interface (e.g. [pack pull policy](0046-pack-pull-policy.md)) or library interface (e.g. [pack logging refactor](0002-pack-logging-refactor.md)).
 * BAT example: a new major version of the libcnb API.
 * Implementation example: [Layer history](0102-history.md) or the lifecycle [multicall binary](0024-lifecycle-multicall-binary-for-build.md).
 * Distribution example: [Update CNB Registry JSON Schema](https://github.com/buildpacks/rfcs/pull/45).
