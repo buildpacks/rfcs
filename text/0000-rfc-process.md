@@ -163,7 +163,9 @@ If a single no vote is cast before the arrival of the end date the RFC is immedi
 
 The same RFC may be re-opened and brought to a vote again in the future assuming the concerns that lead to the no vote are addressed.
 
-### Amending an RFC
+##### Implementation
+
+##### Amending an RFC
 
 While we should strive to get the details right the first time, by doing our due diligence including a proof of concept implementation for larger/riskier RFCs, there will be times when we discover during the process of implementation that something about the original plan was incomplete or needs adjustment. Small changes may be PR'ed by the implementer and merged upon approval by the steward. It is the responsibility of the Steward to determine what changes are minor enough to qualify as an amendment and which are fundamental and/or controversial enough to require a new superseding RFC.
 
@@ -180,9 +182,22 @@ The RFC process should be amended through the RFC process. However, the TOC rese
 # How it Works
 [how-it-works]: #how-it-works
 
-### Amending the RFC Process
+### Labels
 
-The RFC process should be amended through the RFC process. However, the TOC reserves the right to change the process via a super-majority vote in the unlikely even that the process prove so irreparably flawed as to preclude its amendment via the process.
+| name                      | purpose
+|---------------------------|--------
+| `type/idea`               | An Issues requesting an RFC
+| `type/rfc`                | A PR containing a new RFC
+| `type/tracking`           | An issue tracking the implementation of an RFC
+| `type/ammendment`         | A PR containing an ammendment to an existing RFC
+| `scope/project`           | Applied to project-level RFCs
+| `scope/team`              | Applied to team-level RFCs.
+| `team/<team name>`        | E.g `team/platform`. Designates the team that "owns" an RFC. Applies to both team-level and project-level RFCs. For project-level RFCs the lead of this team is the steward.
+| `status/needs-steward`    | Applied to all new RFCs. Removed once the RFC is accepted by a steward or closed.
+| `status/ready-for-review` | The Steward applies this to an RFC when they deem it ready for review by a broader audience.
+| `status/voting`           | The Steward applies this label when the voting window opens
+| `status/accepted`         | The Steward applies this label to accepted RFCs.
+| `status/rejected`         | The Steard applies this label to a rejected RFCs.
 
 # Migration
 [migration]: #migration
