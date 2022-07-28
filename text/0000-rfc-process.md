@@ -165,7 +165,13 @@ The same RFC may be re-opened and brought to a vote again in the future assuming
 
 ### Amending an RFC
 
-TODO
+While we should strive to get the details right the first time, by doing our due diligence including a proof of concept implementation for larger/riskier RFCs, there will be times when we discover during the process of implementation that something about the original plan was incomplete or needs adjustment. Small changes may be PR'ed by the implementer and merged upon approval by the steward. It is the responsibility of the Steward to determine what changes are minor enough to qualify as an amendment and which are fundamental and/or controversial enough to require a new superseding RFC.
+
+PRs that amend an RFC should add an amendment to the [History](../0000-template.md#history) section of the RFC document with:
+1. Amendment Metadata
+2. A summary of the changes
+3. The motivation for the changes
+
 
 ### Amending the RFC Process
 
