@@ -234,29 +234,30 @@ The following Dynamic Diagram from the C4 model, can give a little idea of the p
 In order to have an idea on how much is affected the performance of exporting to the Daemon using the OCI layout format, the following metrics were taken.
 
 Using a local workstation with the following specifications:
-- **(MacOS 12.3.1 / 2,4 GHz 8-Core Intel Core i9 / 32 GB 2667 MHz DDR4)**]
+- **(MacOS 12.3.1 / 2,4 GHz 8-Core Intel Core i9 / 32 GB 2667 MHz DDR4)**
 
 We built 5 times the Java, Kotlin and Ruby samples codes from our [repository](https://github.com/buildpacks/samples/tree/main/apps) and took the building's average time using the Daemon and the OCI layout format approaches.
 
 The table above summarized the results we got.
 
-![](https://i.imgur.com/CJmTs5R.png)
+![](https://i.imgur.com/zuPZ6Xk.png)
 
-Times are expressed in **seconds** and the first time we noticed was that for Java and Kotlin the `build time` can be affected by the network and the availability of maven repositories, so I decided to take the same build time to compare both approaches.
+Times are expressed in **seconds** and the first thing we noticed is for Java and Kotlin the `build time` can be affected by the network and the availability of maven repositories, so I decided to take the `same build time` to compare both approaches.
 
 Here are my thoughts about these results:
-- Java and Kotlin behavior are very similar, exporting only to OCI format increases 5% the time that exporting to Daemon, and from user perspective it represents a 5 seconds increase of time.
-- On the other hand from Ruby side the increase, only exporting to OCI format was 20% but from user perspective was 1.5 seconds which is probably difficult to notice for a User.
-- When we added the time spent for Pack to prepare the environment for the lifecycle execution (downloading the run-image from a registry to OCI format) and loading the OCI image from disk to the Daemon (which is the expected behavior from Users) then for the Java and Kotlin applications the increase of the time was **13%** and from users side an **increase of 13 seconds**. But from the Ruby application the percentage increases **89%** but from user's side is **7 seconds**
+- Java and Kotlin behavior are very similar, exporting only to OCI format increases 5% the time compared to Daemon approach, and from user perspective it represents a 5 seconds increase of time.
+- On the other hand for the Ruby application, exporting to OCI format represents a  20% increase of the time but from user perspective it is only 1.5 seconds which is probably difficult to notice from user perspective.
+- When the time spent for Pack to prepare the environment for the lifecycle execution (downloading the run-image from a registry to OCI format) and loading the OCI image from disk to the Daemon (which is the expected behavior from Users) is added, then:
+  - The Java and Kotlin applications time increases was **13%**, representing **+13 seconds** from user perspective
+  - The Ruby application increases **82%** but from user's side it represents **7 seconds**
 
 Let's take a look on what happened when we execute a build for the second time, the table below summarized the results
 
-![](https://i.imgur.com/73mnpwM.png)
+![](https://i.imgur.com/zDAOZU6.png)
 
-On these cases we can see the behavior is consistent compared with the previous case, Java and Kotlin application shows a **5% increase** of time and the Ruby application, because it's process time is smaller the sensibility to variation are bigger (19%) but in reality it represents a **+1 second** of difference for the User. Also, when the pre and post processing time is added the variations are bigger for all the applications. As mentioned, [skopeo](https://github.com/containers/skopeo) tool was used here and most of the time spent goes into this category.
+On these cases we can see the behavior is consistent compared with the previous case, Java and Kotlin application shows a **5% increase** of time but Ruby application, because it's process time is smaller the sensibility to variation is bigger (23%) but in reality it represents a **+1 second** of difference for the User. Also, when the pre and post processing time is added the variations are bigger for all the applications. As mentioned, [skopeo](https://github.com/containers/skopeo) tool was used here and most of the time spent goes into this category.
 
-I think, this PoC demonstrate that adding the exporting to OCI layout format is a valuable feature for the project, it opens the door to deprecate the use of Daemon but it will requires that platform can prepare and process the output on disk on a smart way to reduce the performance penalties to users.
-
+I think, this PoC demonstrate that adding the exporting to OCI layout format is a valuable feature for the project, it opens the door to deprecate the use of Daemon but it will requires that platform implementors to prepare and post-process the output on disk on a smart way to reduce the performance penalties to users.
 
 # Migration
 [migration]: #migration
@@ -292,6 +293,26 @@ I propose the following high level strategy to accomplish the goal
 
 - What other designs have been considered?
   - Doing nothing, just keep exporting only to Daemon or Registry
+
+- What other designs have been considered for removing the Daemon support?
+  - Instead of exporting to OCI layout format, the other approach considered is exporting to [registry only](https://github.com/buildpacks/rfcs/blob/jjbustamante/feature/deprecate-daemon/text/0000-deprecate-daemon.md#lifecycle-registry-only-approach). In this case, the Lifecycle only interacts with registries.
+   As part of the PoC, I took some metrics to compare impact of using a ephemeral registry to publish the application image. The strategy done to capture the metrics was:
+    - I used a script to set up a local [container registry](https://hub.docker.com/_/registry) before executing the `pack build` command
+    - For the **first build** metrics, the registry was destroyed/re-created before each execution
+    - `pack build` command was configure to `--publish` in the local registry
+    - I didn't use the [skopeo]() in these cases to complete the pushing into the Daemon
+
+  Here are the results
+
+  ![](https://i.imgur.com/vtOjxJP.png)
+
+   -  The results are actually very similar to exporting to OCI layout format for Java and Kotlin, but Ruby application is actually worst.
+
+  ![](https://i.imgur.com/FfbqfF6.png)
+
+   - Second build is actually better compared with the export to OCI in disk, Java and Kotlin increases the time just by **2%**, but Ruby again is worst
+
+
 - Why is this proposal the best? [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format is a standard from which other tools can create a [OCI Runtime Specification bundle](https://github.com/opencontainers/runtime-spec/blob/v1.0.0/bundle.md) exporting to this format enables Platforms to implement any feature in the top of this format
 - What is the impact of not doing this? Probably will never remove the Daemon support in the Lifecycle
 
