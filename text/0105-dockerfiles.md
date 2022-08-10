@@ -3,9 +3,9 @@
 - Name: Support Dockerfiles
 - Start Date: 2021-06-30
 - Author(s): sclevine
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: [rfcs#173](https://github.com/buildpacks/rfcs/pull/173)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/lifecycle#890](https://github.com/buildpacks/lifecycle/issues/890), [buildpacks/lifecycle#891](https://github.com/buildpacks/lifecycle/issues/891), [buildpacks/lifecycle#892](https://github.com/buildpacks/lifecycle/issues/892), [buildpacks/lifecycle#893](https://github.com/buildpacks/lifecycle/issues/893), [buildpacks/lifecycle#894](https://github.com/buildpacks/lifecycle/issues/894)
 - Supersedes: [RFC0069](https://github.com/buildpacks/rfcs/blob/main/text/0069-stack-buildpacks.md), [RFC#167](https://github.com/buildpacks/rfcs/pull/167)
 - Depends on: [RFC#172](https://github.com/buildpacks/rfcs/pull/172)
 
