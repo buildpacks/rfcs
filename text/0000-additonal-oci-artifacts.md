@@ -31,33 +31,32 @@ Cloud Native Buildpacks are awesome for building container images but come with 
 # What it is
 [what-it-is]: #what-it-is
 
-This change allows for additional flexibility in what buildpack authors and platforms can build on top of buildpacks. Two initial use cases are WebAssembly and Helm.
+This change allows for additional flexibility in what buildpack authors and platforms can build on top of buildpacks. Three initial use cases are WebAssembly, test output, and Helm charts.
 
 For the first, a buildpack would be able to also generate a wasm bundle that can be used by a downstream platform (such as the Krustlet or runwasi). 
 
 Similarly, by allowing the buildpack to produce a helm chart, you could integrate in logic about how to set up an application into the build pipeline where you are able to do bits of code analysis. (NetworkPolicies that lock down an app, sidecars that need to be run, ConfigMaps to pass around out-of-band, etc...)
 
+Lastly, it may be advantageous to allow a buildpack to produce the results of unit tests and publish alongside the container itself. Then a tool (such as Kubewarden) could gate running of the container based on the passing tests. 
+
 # How it Works
 [how-it-works]: #how-it-works
 
-Add a field in the `layer.toml` spec called `additionalArtifact` that tells lifecycle to publish the specified file(s) in the layer to an OCI registry in the publish step. It also needs to allow for setting labels and the tag to publish with. 
+Add an optional file per layer called `artifacts.toml` that tells lifecycle to publish the specified file(s) in the layer to an OCI registry in the publish step. It also needs to allow for setting labels and the tag to publish with. 
 
-For the WASM usecase, a buildpack author looking to also publish a node.js WASM bundle would write the build logic like any other buildpack. Create a directory in $LAYERS_DIR with the following `layer.toml`:
+For the WASM use-case, a buildpack author looking to also publish a node.js WASM bundle would write the build logic like any other buildpack. Create a directory in $LAYERS_DIR with the following `artifacts.toml`:
 
 ```
-[types]
-publish = false
-cache = false
-
-[[additionalArtifact]]
+[[artifact]]
 tag = "wasm"
-file = "mywasmprogram.wasm"    # Should be a file in $LAYERS_DIR
+file = "mywasmprogram.wasm"    # Should be a file relative to the current $LAYERS_DIR
 
-[[additionalArtifact.labels]]
+[[artifact.labels]]
 ConfigMediaType       = "application/vnd.wasm.config.v1+json"
 ContentLayerMediaType = "application/vnd.wasm.content.layer.v1+wasm"
 ```
 
+As a note: to keep this generic to any potential OCI artifact, it seems best to provide a labelling mechanism instead of prescribing certain fields.
 
 # Migration
 [migration]: #migration
@@ -67,7 +66,7 @@ This functionality should be purely additive and not break existing buildpacks.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-This does bring in additional scope to the project and could potentially lead to confusion around what OCI image that got published should be used. I think this can be mitigated with good docs and platform output. 
+This does bring in additional scope to the project and could potentially lead to confusion around what OCI image that got published should be used. This can be mitigated with good docs and platform output. Adding a change to make the standard image output optional seems like a larger change than is appropriate at the moment. 
 
 # Alternatives
 [alternatives]: #alternatives
@@ -88,5 +87,5 @@ None that I'm aware of.
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-The main addition to the spec is the addition of the fields in layer.toml as well as the changes to lifecycle to see them.
+The only addition to the spec is the addition of the artifacts.toml as well as the changes to lifecycle to parse and act on the new config.
 
