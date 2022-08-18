@@ -249,7 +249,7 @@ Here are my thoughts about these results:
 - On the other hand for the Ruby application, exporting to OCI format represents a  20% increase of the time but from user perspective it is only 1.5 seconds which is probably difficult to notice from user perspective.
 - When the time spent for Pack to prepare the environment for the lifecycle execution (downloading the run-image from a registry to OCI format) and loading the OCI image from disk to the Daemon (which is the expected behavior from Users) is added, then:
   - The Java and Kotlin applications time increases was **13%**, representing **+13 seconds** from user perspective
-  - The Ruby application increases **82%** but from user's side it represents **7 seconds**
+  - The Ruby application increases **82%** but from user's side it represents **+7 seconds**
 
 Let's take a look on what happened when we execute a build for the second time, the table below summarized the results
 
@@ -302,16 +302,20 @@ I propose the following high level strategy to accomplish the goal
     - `pack build` command was configure to `--publish` in the local registry
     - I didn't use the [skopeo]() in these cases to complete the pushing into the Daemon
 
-  Here are the results
+  Here are the results:
 
-  ![](https://i.imgur.com/vtOjxJP.png)
+    ![](https://i.imgur.com/vtOjxJP.png)
 
-   -  The results are actually very similar to exporting to OCI layout format for Java and Kotlin, but Ruby application is actually worst.
+     -  The results are actually very similar to exporting to OCI layout format for Java and Kotlin, but Ruby application is actually worst.
 
-  ![](https://i.imgur.com/FfbqfF6.png)
+    ![](https://i.imgur.com/FfbqfF6.png)
 
-   - Second build is actually better compared with the export to OCI in disk, Java and Kotlin increases the time just by **2%**, but Ruby again is worst
+     - Second build is actually better compared with the export to OCI in disk, Java and Kotlin increases the time just by **2%**, but Ruby again is worst
 
+  Some thoughts about this approaches
+
+    - **Process Management:** Platforms must now manage a parallel process (registry in the daemon). This would entail ensuring that the registry is started and cleaned up appropriately.
+    - **Networking:** There are additional network complications in order to route images to the ephemeral registry. For example, [network drivers](https://docs.docker.com/network/#network-drivers), [proxy](https://docs.docker.com/desktop/networking/#httphttps-proxy-support) and [DNS configuration](https://docs.docker.com/config/containers/container-networking/#dns-services), [host name resolution](https://docs.docker.com/desktop/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host), and [TLS certificates](https://betterprogramming.pub/deploy-a-docker-registry-using-tls-and-htpasswd-56dd57a1215a) to name a few.
 
 - Why is this proposal the best? [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format is a standard from which other tools can create a [OCI Runtime Specification bundle](https://github.com/opencontainers/runtime-spec/blob/v1.0.0/bundle.md) exporting to this format enables Platforms to implement any feature in the top of this format
 - What is the impact of not doing this? Probably will never remove the Daemon support in the Lifecycle
