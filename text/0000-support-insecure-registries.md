@@ -12,17 +12,19 @@
 # Summary
 [summary]: #summary
 
-This RFC describes how to pull images form or push images to insecure image registries when build images using buildpacks.
+This RFC describes how to pull images from or push images to insecure image registries when building images using buildpacks.
 
 # Definitions
 [definitions]: #definitions
 
-Insecure image registry - The insecure image registry mentioned in this RFC refers to the image registry using the http protocol, and with a non-internal ip or a domain name. Because currently buildpacks can access inecure image registries using internal ip.
+Insecure image registry - The insecure image registry mentioned in this RFC refers to the image registry using the http protocol, and with a non-internal ip or a domain name. Because currently buildpacks can access insecure image registries using internal ip.
 
 # Motivation
 [motivation]: #motivation
 
 To fix issue [Support insecure registries in non-daemon case](https://github.com/buildpacks/lifecycle/issues/524).
+
+To pull images from insecure image registries when building images using buildpacks, and push target images to insecure image registries after the build is complete.
 
 # What it is
 [what-it-is]: #what-it-is
