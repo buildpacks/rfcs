@@ -35,7 +35,7 @@ With this RFC, user can use images in insecure image registries to build image, 
 creator --run-image=develoment-registry.com/run-java:v16 --insecure-registry=develoment-registry.com --insecure-registry=testing-registry.com testing-registry.com/java-sample:latest
 ```
 
-The flag `--insecure-registry` will add to analyzer, export, restor, rebaser and image tool too.
+The flag `--insecure-registry` will be added to analyzer, export, restorer, rebaser and image tool too.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -71,4 +71,4 @@ N/A
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-A new flag `--insecure-registry` will add to analyzer, creator, export, restor, rebaser and image tool.
+A new flag `--insecure-registry` will add to analyzer, creator, export, restorer, rebaser and image tool.
