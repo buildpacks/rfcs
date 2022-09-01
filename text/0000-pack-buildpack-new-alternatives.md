@@ -40,12 +40,13 @@ Project scaffolding is [very](https://cookiecutter.readthedocs.io/) [popular](ht
 
 The design is modeled on [cookiecutter](https://cookiecutter.readthedocs.io/en/1.7.2/) with reference to [springerle](https://github.com/carlmjohnson/springerle) -- a similar implementation in golang -- and [create-go-app](https://github.com/create-go-app/).  We do not want to `os.Exec` a python subprocess to run cookiecutter as this would require availability of a python runtime environment.  Instead we propose to borrow heavily from create-go-app, and generate the default shell scaffolding from a cloned git repoistory.
 
-The `pack buildpack new` project scaffolding accepts `--api`, `--path` and `--stacks` command line flags.  These command line flags will be preserved in `pack buildpack create`.  However, where a flag is omitted, the end-user will be prompted to provide an appropriate value.
+The `pack buildpack new` project scaffolding accepts `--api`, `--path` and `--stacks` command line flags and the buildpack id as a positional argument.  These command line flags and positional arguments will be replaced with user prompts `pack buildpack create`.
 
 A full session includes the terminal prompts that the project scaffolding tool asks of the end user:
 
 ```command
-$ pack buildpack create example/bash
+$ pack buildpack create
+✔ Enter an ID for this buildpack: example/bash
 ✔ Enter a directory in which to scaffold the project: bash_buildpack
 Use the arrow keys to navigate: ↓ ↑ → ←
 ? Choose the buildpack API version (use the default if you are unsure):
@@ -56,16 +57,15 @@ Use the arrow keys to navigate: ↓ ↑ → ←
 Created project in bash_buildpack
 ```
 
-The user can skip common prompts by providing `--api`, `--path` or `--stacks`  as command line flags.  Running the same example as above, but providing both `--api` and `--stacks`, but not `--path`, results in the user being prompted only to provide the output directory.  We provide more detail on how flags override prompts in a subsection below.
+The user can skip prompts by providing `--arg key=value` as command line flags. Each of the prompts from the previous interactive invocation can be skipped by providing appropriate pairs of key and value.
 
 ```command
-$ pack buildpack create example/bash --api 0.8 --stacks io.buildpacks.samples.stacks.bionic
-✔ Enter a directory in which to scaffold the project: bash_buildpack
+$ pack buildpack create --arg ProjectDirectory=bash_buildpack --arg BuildpackApi=0.8 --arg BuildpackID=example/bash --arg BuildpakStacks=io.buildpacks.samples.stacks.bionic
 
 Created project in bash_buildpack
 ```
 
-Templates are provided as a file tree.  A root-level `prompts.toml` file contains prompts for the end-user.  For example the current `bash` scaffolding would be structured as follows, a full specification of `prompts.toml` is provided in the following subsection.
+Templates are provided as a file tree.  A root-level `prompts.toml` file contains prompts for the end-user.  For example the current `bash` scaffolding could be structured as follows, a full specification of `prompts.toml` is provided in the following subsection.
 
 ```bash
 .
@@ -93,21 +93,7 @@ choices=["0.7", "0.8"]
 ...
 ```
 
-Answers to prompts can be provided in an `overrides.toml` file.  This supports programmatic use of `pack`.  Alternatively, variables specified in `prompts.toml` may have values provided as command line flags.  When an override is provided in the CLI or `overrides.toml` file, then the end-user is not prompted to provide the value.
-
-```command
-$ pack buildpack create example/bash --override='ProjectDirectory="test_example"' --override='BuildpackApi=0.8'
-✔ Enter a stack this buildpack will support by default: io.buildpacks.samples.stacks.bionic
-Created project in bash_buildpack
-```
-
-The above overrides are equivalent to:
-
-```command
-$ pack buildpack create example/bash --path test_example --api 0.8
-✔ Enter a stack this buildpack will support by default: io.buildpacks.samples.stacks.bionic
-Created project in bash_buildpack
-```
+A specification of `prompts.toml` is provided below.
 
 Multiple templates can be managed in a single repository, referred to as a **template colleciton**.
 
@@ -143,11 +129,12 @@ Created project in go_buildpack
 A user may specify the choice of template from a template collection via a `--sub-path` flag.  A user may choose a `bash` template from a template collection and provide the api, output directory and stacks as command line flags:
 
 ```command
-$ pack buildpack create example/golang --template https://github.com/AidanDelaney/cnb-buildpack-templates \
+$ pack buildpack create --template https://github.com/AidanDelaney/cnb-buildpack-templates \
   --sub-path Go \
-  --api 0.8 \
-  --path go_buildpack \
-  --stacks io.buildpacks.samples.stacks.bionic
+  --arg BuildpackID=example/golang \
+  --arg BuildpackAPI=0.8 \
+  --arg ProjectDirectory=go_buildpack \
+  --arg BuildpackStacks=io.buildpacks.samples.stacks.bionic
 Created project in go_buildpack
 ```
 
@@ -195,7 +182,7 @@ name="ProjectDirectory"
 prompt="Enter a directory"
 ```
 
-The following `prompts.toml` is invalid as the `default` and `choices` fields are mutually excusive:
+The following `prompts.toml` is invalid as the `default` and `choices` fields are mutually exclusive:
 
 ```toml
 [[prompt]]
@@ -205,50 +192,32 @@ default="/tmp"
 choices=["/tmp", "/home"]
 ```
 
-### Overrides
+## Arguments
 
-If a template contains both a `prompts.toml` file and an `overrides.toml` file, then the `overrides.toml` file provides values for variables introduced in `prompts.toml`.
+Arguments may be provided as command line arguments.  For example `pack buildpack create --arg ProjectDirectory=/tmp` provides a value, `/tmp`, for the variable identified by the name `ProjectDirectory`.
 
-Given a `prompts.toml` file
+When an argument, `key=value`, is provided then `pack buildpack create` must not prompt the user with the prompt identified by `name=key`.
 
-```toml
+Where an `--arg key=value` is provided and no prompt identified by `name=key` exists in `prompts.toml`, then the provided argument is ignored.
+
+Choices constrain values for a given variable.  Where a provided `value` does not match one of the `choices` then an error is returned.   That is to say, given
+
+```
 [[prompt]]
-name="ProjectDirectory"
-prompt="Enter a directory in which to scaffold the project"
+name="BuildpackApi"
+prompt="Choose the buildpack API version (use the default if you are unsure)"
+choices=["0.7", "0.8"]
 ```
 
-And an `overrides.toml` file
-
-```toml
-ProjectDirectory="/tmp"
-```
-
-Then the value "/tmp" is interpreted as the value of the variable identified by `ProjectDirectory`.
-
-
-Overrides may also be provided as command line arguments.  For example `pack buildpack create --overrides ProjectDirectory=/tmp` provides a value, `/tmp`, for the variable identified by the name `ProjectDirectory`.
-
-Overrides provided as command line flags have **higher precedence** than overrides provided in `overrides.toml`.
-
-When an override is provided `pack buildpack create` must not prompt the user for overriden values.
-
-## `pack buildpack create` flags as prompts variables
-
-If specified, the following `pack buildpack create` flags override the value of variables with the listed identifier:
-
-| command line flag | variable name      |
-|-------------------|--------------------|
-| `--path`          | `ProjectDirectory` |
-| `--api`           | `BuildpackApi`     |
-| `--stacks`        | `BuildpackStacks` |
-
-In addition, the required positional argument to `pack buildpack create`, eg: `pack buildpack create example/bash`, overrides the variable identified by `BuildpackID`.
+and given a CLI invocation `pack buildpack create --arg BuildpackApi=0.6` the choices are restricted to `["0.7", "0.8"]`.  Therefore, `0.6` is an invalid argument and an error is returned to the end-user.
 
 ## `pack buildpack create` Substitutions
 
 The operation of variable substitution follows the operation of Go [`text/template`](https://pkg.go.dev/text/template).  Prompts defined in `prompts.toml` are interpreted, the user may be prompted and set of variables is generated.  The identifiers of variables are replaced with the value of the variable.
 
 Variables may be used in files, for example where a `prompts.toml` defines a variable with identifier `ProjectDirectory` then the expression `{{.ProjectDirectory}}` in files is replaced with the value of the variable identified by `ProjectDirectory`.  In addition, the expression `{{.ProjectDirectory}}` may be used in template file paths.  The generated project substitutes file paths with variable expressions with the value of the variable.
+
+When a source file contains a Go `text/template` style expression and the variable name does not appear in `prompts.toml`, then the `text/template` style expression is not replaced.  For example, if a `README.md` file contains the expression `{{.Example}}` and `Example` is not a variable defined in `prompts.toml`, then the string `{{.Example}}` is not replaced in `README.md`.
 
 # Migration
 [migration]: #migration
@@ -297,8 +266,6 @@ There are many, many competing implementations of project scaffolding tools.
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
-* Where do the template repositories live for `bash` and `golang`?
-  * 
 * What team maintains template repositories?
   * Buildpack Author Tooling team
 
