@@ -12,7 +12,7 @@
 # Summary
 [summary]: #summary
 
-The "RFC" (request for comments) process provide a consistent and controlled path for new features and other substantive changes to enter the project.
+The "RFC" (request for comments) process provides a consistent and controlled path for new features and other substantive changes to enter the project.
 
 The RFC process:
 * provides a set of checkpoints that ensure changes align with the overall technical and strategic vision for the process.
@@ -57,7 +57,7 @@ The RFC process **is not**:
 
 **Voting Window**: The time period between a call for votes and the voting end date is referred to as the voting window.
 
-**Lazy Consensus**: Voting on project level RFCs is done by lazy consensus. Any project member with a binding vote who has not voted by the end date is assumed to assent to the RFC.
+**Lazy Consensus**: Voting on RFCs is done by lazy consensus. Any project member with a binding vote who has not voted by the end date is assumed to assent to the RFC.
 
 **Binding Vote**: Binding Votes have formal power within the RFC process. A single no vote by a project member with a binding vote is sufficient to reject an RFC.
 
@@ -80,7 +80,7 @@ As the project grows our process needs to grow with it. Compared to the previous
 
 ### What Types of Changes Require an RFC?
 
-Any "substantive" change to the project requires an RFC. substantive includes but is not limited to:
+Any "substantive" change to the project should require an RFC. substantive includes but is not limited to:
 * changes to the specification.
 * the adoption, creation, or deprecation of a component (e.g. a new platform implementation, a new shared library, a new system buildpack). 
 * new features (e.g. a new pack command, a new flag on an existing pack command, an addition to the buildpack API)
@@ -88,7 +88,7 @@ Any "substantive" change to the project requires an RFC. substantive includes bu
 * any major re-architecture especially if it has noteworthy implications for security or performance.
 * introduction of new processes or changes to our existing processes including the RFC process.
 
-If there is any doubt, maintainers should prefer opening an "unecessary" RFC to surprising users was unexpectedly impactful changes.
+If there is any doubt, maintainers should prefer opening an "unnecessary" RFC over surprising users with unexpectedly impactful changes.
 
 #### Project vs Team RFCs
 
@@ -128,7 +128,7 @@ In many but not all cases the appropriate team to own an RFC will be obvious. Wh
 * Which team is responsible for the components most impacted by the proposed change?
 * Which team is enthusiastic about supporting the change?
 
-If a home cannot be found for a draft RFC it remains in draft until one can be found. This does not necessary mean that the RFC is not a good idea or isn't something the project will take up eventually. It may simply be that the project does not have the bandwidth to prioritize this particular change at this particular time.
+If a home cannot be found for a draft RFC it remains in draft until one can be found. This does not necessarily mean that the RFC is not a good idea or isn't something the project will take up eventually. It may simply be that the project does not have the bandwidth to prioritize this particular change at this particular time.
 
 #### Stewardship
 
@@ -149,7 +149,7 @@ The RFC may not be edited during the voting window.
 
 For project RFCs, all TOC members and all team leads are given a binding vote.
 
-For team RFCs, all team maintainers are given a binding vote.
+Additionally, for team RFCs, all team maintainers are given a binding vote.
 
 Votes are cast via reviews on the RFC PR. Accepting the PR signifies a yes vote while a request for changes signifies a no vote. If all members with a binding vote vote in the affirmative, the voting window may close early.
 
@@ -159,7 +159,7 @@ If the end date of the vote arrives without a no vote from a member with binding
 
 ##### Rejection
 
-If a single no vote is cast before the arrival of the end date the RFC is immediately rejected and the PR should be closed.
+If a single no vote from a member with binding vote is cast before the arrival of the end date the RFC is immediately rejected and the PR should be closed.
 
 The same RFC may be re-opened and brought to a vote again in the future assuming the concerns that lead to the no vote are addressed.
 
@@ -197,7 +197,7 @@ The RFC process should be amended through the RFC process. However, the TOC rese
 | `status/ready-for-review` | The Steward applies this to an RFC when they deem it ready for review by a broader audience.
 | `status/voting`           | The Steward applies this label when the voting window opens
 | `status/accepted`         | The Steward applies this label to accepted RFCs.
-| `status/rejected`         | The Steard applies this label to a rejected RFCs.
+| `status/rejected`         | The Steward applies this label to rejected RFCs.
 
 # Migration
 [migration]: #migration
@@ -207,30 +207,25 @@ This RFC should be accepted via the existing RFC process. The new process will t
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this?
-
-TODO
+None
 
 # Alternatives
 [alternatives]: #alternatives
 
-- What other designs have been considered?
-- Why is this proposal the best?
-- What is the impact of not doing this?
-
-TODO
+None
 
 # Prior Art
 [prior-art]: #prior-art
 
 TODO
 
-* Borrows heavily from TEP and KEP processes
+* [Tekton Enhancement Proposal Process (TEP)](https://github.com/tektoncd/community/blob/main/teps/0001-tekton-enhancement-proposal-process.md)
+* [Kubernetes Enhancement Proposals (KEP)](https://github.com/kubernetes/enhancements/blob/master/keps/README.md)
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-TODO
+None
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
