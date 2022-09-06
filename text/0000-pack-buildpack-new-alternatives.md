@@ -148,12 +148,9 @@ The prompts are contained in a TOML file.  The `prompts.toml` file contains an a
 |---------------|----------|------------------------------------------------------------------------------------------------------------------------------------------|----------------|
 | name          | Yes      | The variable identifier.  Must be unique within the `prompts.toml` file.                                                                 | string         |
 | prompt        | Yes      | The default prompt question to ask the user                                                                                              | string         |
-| prompt.locale | No       | A translation of the default prompt into the locale specified.                                                                           |                |
 | required      | No       | Evaluates to `false` if not provided.  Specifies whether the user **must** provide a value for the variable identified by `name`.        | boolean        |
 | default       | No       | A default value for the variable identified by `name`.  Mutually exclusive to `choices`                                                  | string         |
 | choices       | No       | A list of default values from which the user may choose a value for the variable identified by `name`.  Mutually exclusive to `default`. | list of stings |
-
-Prompt locales are specified following [IETF BCP 47](https://tools.ietf.org/rfc/bcp/bcp47.txt).  As such `prompt.en-US` is the translation of `prompt` into US English and `prompt.es-MX` is the translation of `prompt` into Mexican Spanish.
 
 For example, the following is a valid `prompts.toml` file:
 
