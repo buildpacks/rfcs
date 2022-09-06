@@ -55,7 +55,7 @@ require_command issues-generation
 if [[ -z "${GITHUB_TOKEN:-}" ]]; then
   require_command op
   echo "> Pulling GitHub token from vault..."
-  GITHUB_TOKEN=$(op get item 7xorpxvz3je3vozqg3fy3wrcg4 --vault "Shared" --account buildpacks | jq -r '.details.sections[] | select(.fields).fields[] | select(.t == "credential").v')
+  GITHUB_TOKEN=$(op read op://Shared/7xorpxvz3je3vozqg3fy3wrcg4/credential --account buildpacks)
 fi
 
 ####
