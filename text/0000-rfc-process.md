@@ -217,7 +217,6 @@ None
 # Prior Art
 [prior-art]: #prior-art
 
-TODO
 
 * [Tekton Enhancement Proposal Process (TEP)](https://github.com/tektoncd/community/blob/main/teps/0001-tekton-enhancement-proposal-process.md)
 * [Kubernetes Enhancement Proposals (KEP)](https://github.com/kubernetes/enhancements/blob/master/keps/README.md)
