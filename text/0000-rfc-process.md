@@ -80,7 +80,7 @@ As the project grows our process needs to grow with it. Compared to the previous
 
 ### What Types of Changes Require an RFC?
 
-Any "substantive" change to the project should require an RFC. substantive includes but is not limited to:
+Any "substantive" change to the project should require an RFC. Substantive includes but is not limited to:
 * changes to the specification.
 * the adoption, creation, or deprecation of a component (e.g. a new platform implementation, a new shared library, a new system buildpack). 
 * new features (e.g. a new pack command, a new flag on an existing pack command, an addition to the buildpack API)
