@@ -51,7 +51,7 @@ The RFC process **is not**:
 
 **Steward**: The steward of an RFC is responsible for shepherding an RFC through the process, including working with the author to ensure RFC completeness and quality, and building consensus among stakeholders.
 
-**Call for Votes**: When an RFC is deemed ready by a team lead, that team lead initiates the voting process with a call for votes. At this point the RFC is closed to modification.
+**Call for Votes**: When an RFC is deemed ready by its steward, the steward initiates the voting process with a call for votes. At this point the RFC is closed to modification.
 
 **End Date**: When a call for votes is initiated, an end date for voting is set. Any person wishing to vote on an RFC must do so by the end date.
 
@@ -82,7 +82,7 @@ As the project grows our process needs to grow with it. Compared to the previous
 
 Any "substantive" change to the project should require an RFC. Substantive includes but is not limited to:
 * changes to the specification.
-* the adoption, creation, or deprecation of a component (e.g. a new platform implementation, a new shared library, a new system buildpack). 
+* the adoption, creation, or deprecation of a component (e.g. a new platform implementation, a new shared library, a new system buildpack).
 * new features (e.g. a new pack command, a new flag on an existing pack command, an addition to the buildpack API)
 * any major refactor that affects consumers of our libraries or materially impacts contribution.
 * any major re-architecture especially if it has noteworthy implications for security or performance.
@@ -112,7 +112,7 @@ Given the nature of our project many RFCs will happen at the project level. Howe
 If you believe an RFC should be written but are either not prepared to author it personally or not prepared to do it _now_, please open an issue on this repo with a high level description of the desired change. This helps us keep track of good ideas and match make ambitious contributors with appropriately sized challenges.
 
 #### Drafting an RFC
-All RFCs begin life as a draft. Anyone wishing to propose a change to the project should create a draft RFC by:
+All RFCs begin life as a pull request. Anyone wishing to propose a change to the project should create an RFC pull request by:
 
 - Fork the RFC repo: <https://github.com/buildpacks/rfcs>
 - Copy `0000-template.md` to `text/0000-my-feature.md` (where 'my-feature' is descriptive. don't assign an RFC number yet).
@@ -143,7 +143,7 @@ The steward and their team should:
 
 Ideally the voting should be a formality and not a moment to discover new disagreement, consensus already haven been driven by the steward.
 
-When the steward deems the RFC ready and likely to be accepted they should formally call for votes and set an end date for voting. This process does not prescribe a length for the voting window, but stewards should make a good faith effort to ensure that all interested parties, and in particular those with binding votes, have adequate opportunity to review the finalized RFC and cast votes.
+When the steward deems the RFC ready and likely to be accepted they should formally call for votes and set an end date for voting. Stewards should make a good faith effort to ensure that all interested parties, and in particular those with binding votes, have adequate opportunity to review the finalized RFC and cast votes. A minimum time period of a week (unless all of the binding votes are cast) is a good guideline.
 
 The RFC may not be edited during the voting window.
 
@@ -151,7 +151,7 @@ For project RFCs, all TOC members and all team leads are given a binding vote.
 
 Additionally, for team RFCs, all team maintainers are given a binding vote.
 
-Votes are cast via reviews on the RFC PR. Accepting the PR signifies a yes vote while a request for changes signifies a no vote. If all members with a binding vote vote in the affirmative, the voting window may close early.
+Votes are cast via reviews on the RFC PR. Accepting the PR signifies a yes vote while a request for changes signifies a no vote. If all members with a binding vote vote in the affirmative, the voting window may close early. In order for a RFC to be approved, at least 1 yes vote. In the rare case there are no votes, the Calling for Votes process may be followed again or the RFC may be closed.
 
 ##### Acceptance
 
@@ -165,6 +165,8 @@ The same RFC may be re-opened and brought to a vote again in the future assuming
 
 ##### Implementation
 
+After the RFC has been accepted, any team or individual may begin implementing the changes it defines.
+
 ##### Amending an RFC
 
 While we should strive to get the details right the first time, by doing our due diligence including a proof of concept implementation for larger/riskier RFCs, there will be times when we discover during the process of implementation that something about the original plan was incomplete or needs adjustment. Small changes may be PR'ed by the implementer and merged upon approval by the steward. It is the responsibility of the Steward to determine what changes are minor enough to qualify as an amendment and which are fundamental and/or controversial enough to require a new superseding RFC.
@@ -177,7 +179,7 @@ PRs that amend an RFC should add an amendment to the [History](../0000-template.
 
 ### Amending the RFC Process
 
-The RFC process should be amended through the RFC process. However, the TOC reserves the right to change the process via a super-majority vote in the unlikely even that the process prove so irreparably flawed as to preclude its amendment via the process.
+The RFC process should be amended through the RFC process. However, the TOC reserves the right to change the process via a super-majority vote in the unlikely even that the process proves so irreparably flawed as to preclude its amendment via the process.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -196,8 +198,11 @@ The RFC process should be amended through the RFC process. However, the TOC rese
 | `status/needs-steward`    | Applied to all new RFCs. Removed once the RFC is accepted by a steward or closed.
 | `status/ready-for-review` | The Steward applies this to an RFC when they deem it ready for review by a broader audience.
 | `status/voting`           | The Steward applies this label when the voting window opens
+| `status/steward-assigned` | The Steward applies this label when adopting the RFC along with self-assigning the PR
 | `status/accepted`         | The Steward applies this label to accepted RFCs.
 | `status/rejected`         | The Steward applies this label to rejected RFCs.
+
+The `Final Comment Period` label will no longer be used.
 
 # Migration
 [migration]: #migration
@@ -207,7 +212,7 @@ This RFC should be accepted via the existing RFC process. The new process will t
 # Drawbacks
 [drawbacks]: #drawbacks
 
-None
+* Lazy consensus favors velocity and moving things forward, over rigor and thoroughness. This could result in a higher volume of changes that have some unforeseen consequences. This is a tradeoff we are consciously making.
 
 # Alternatives
 [alternatives]: #alternatives
