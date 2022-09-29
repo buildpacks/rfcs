@@ -124,7 +124,7 @@ oci
 And the exporter is invoked as follows
 
 ```=shell
-> export CNB_OCI_PATH=true
+> export CNB_USE_OCI=true
 > /cnb/lifecycle/exporter -run-image cnbs/sample-stack-run:bionic my-app-image
 ```
 
@@ -234,7 +234,7 @@ The following Dynamic Diagram from the C4 model, can give a little idea of the p
 In order to have an idea on how much is affected the performance of exporting to the Daemon using the OCI layout format, the following metrics were taken.
 
 Using a local workstation with the following specifications:
-- **(MacOS 12.3.1 / 2,4 GHz 8-Core Intel Core i9 / 32 GB 2667 MHz DDR4)**
+- **(MacOS 12.3.1 / 2,4 GHz 8-Core Intel Core i9 / 32 GB 2667 MHz DDR4 / 1 TB APFS SSD HD)**
 
 We built 5 times the Java, Kotlin and Ruby samples codes from our [repository](https://github.com/buildpacks/samples/tree/main/apps) and took the building's average time using the Daemon and the OCI layout format approaches.
 
@@ -317,7 +317,7 @@ I propose the following high level strategy to accomplish the goal
     - **Process Management:** Platforms must now manage a parallel process (registry in the daemon). This would entail ensuring that the registry is started and cleaned up appropriately.
     - **Networking:** There are additional network complications in order to route images to the ephemeral registry. For example, [network drivers](https://docs.docker.com/network/#network-drivers), [proxy](https://docs.docker.com/desktop/networking/#httphttps-proxy-support) and [DNS configuration](https://docs.docker.com/config/containers/container-networking/#dns-services), [host name resolution](https://docs.docker.com/desktop/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host), and [TLS certificates](https://betterprogramming.pub/deploy-a-docker-registry-using-tls-and-htpasswd-56dd57a1215a) to name a few.
 
-- Why is this proposal the best? [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format is a standard from which other tools can create a [OCI Runtime Specification bundle](https://github.com/opencontainers/runtime-spec/blob/v1.0.0/bundle.md) exporting to this format enables Platforms to implement any feature in the top of this format, for example, exporting to [containerd](https://containerd.io) has been [requested](https://github.com/buildpacks/lifecycle/issues/829) by the community and it could be implemented if we can get the application image exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.[OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format 
+- Why is this proposal the best? [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format is a standard from which other tools can create a [OCI Runtime Specification bundle](https://github.com/opencontainers/runtime-spec/blob/v1.0.0/bundle.md) exporting to this format enables Platforms to implement any feature in the top of this format, for example, exporting to [containerd](https://containerd.io) has been [requested](https://github.com/buildpacks/lifecycle/issues/829) by the community and it could be implemented if we can get the application image exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 - What is the impact of not doing this? Probably will never remove the Daemon support in the Lifecycle
 
 # Prior Art
