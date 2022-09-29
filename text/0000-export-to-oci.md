@@ -38,6 +38,7 @@ Exporting to [OCI Image Layout](https://github.com/opencontainers/image-spec/blo
   - This feature will help to unblock uses cases like
     - OCI annotations. See [RFC](https://github.com/buildpacks/rfcs/pull/196)
     - Cosign integration. See [RFC](https://github.com/buildpacks/rfcs/pull/195)
+    - Export to tarball. See [issue](https://github.com/buildpacks/lifecycle/issues/423)
 
 # What it is
 [what-it-is]: #what-it-is
