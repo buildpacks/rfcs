@@ -36,7 +36,7 @@ We desire a descriptor file that is:
 The Pack CLI will support a new descriptor file, `pack.toml`, that is a superset of the project descriptor.
 * An app MAY have a `pack.toml`
 * An app MAY have a `project.toml`
-* An app MAY have both a `pack.toml` and a `projec.toml`, in which case they will be merged.
+* An app MAY have both a `pack.toml` and a `project.toml`, in which case the `project.toml` will be ignored.
 
 The `pack.toml` will support an additional `[io.buildpacks.pack]` table that is NOT defined in the [project descriptor spec](https://github.com/buildpacks/spec/blob/main/extensions/project-descriptor.md). The `[io.buildpacks.pack]` table will have the following schema:
 
