@@ -208,6 +208,35 @@ choices=["0.7", "0.8"]
 
 and given a CLI invocation `pack buildpack create --arg BuildpackApi=0.6` the choices are restricted to `["0.7", "0.8"]`.  Therefore, `0.6` is an invalid argument and an error is returned to the end-user.
 
+Arguments for buildpack creation need to be discoverable.  We intend to support this via the `--help` flag to `pack buildpack create`.  Executing
+
+```
+pack buildpack create --help
+
+pack buildpack create
+arguments offered by template
+	ProjectName (default: pyexample)
+	BuildpackApi 0.7, 0.8 (default 0.7)
+```
+
+shows a default help message.  Invoking `--help` with a template url queries the prompts provided by the template:
+
+```
+pack buildpack create --help --template=<url>
+arguments offered by template
+	ProjectName (default: pyexample)
+	PythonVersion=python3.10, python3.9, python3.8 (default: python3.10)
+	NumDigits (default: 3)
+```
+The possible values of a template collection can similarly be queried:
+
+```
+pack buildpack create --help --template=<url>
+templates available in collection
+	Go
+	bash
+```
+
 ## `pack buildpack create` Substitutions
 
 The operation of variable substitution follows the operation of Go [`text/template`](https://pkg.go.dev/text/template).  Prompts defined in `prompts.toml` are interpreted, the user may be prompted and set of variables is generated.  The identifiers of variables are replaced with the value of the variable.
