@@ -7,7 +7,7 @@
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
-- Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
+- Supersedes: [#228](https://github.com/buildpacks/rfcs/pull/228)
 
 # Summary
 [summary]: #summary
@@ -141,10 +141,15 @@ Why should we *not* do this?
 # Alternatives
 [alternatives]: #alternatives
 
-## Do Nothing
+### Do Nothing
 
 If no new role is created, `maintainer` will continue to be accountable and responsible of all the software components inside a team.
 
+### Repository level ownership RFC
+
+The first attempt to addressed the problem was proposing the **repository level ownership** [RFC](https://github.com/buildpacks/rfcs/pull/228) but abandoned this idea because:
+- A new role is more consistent with current governance structure
+- A new role will provide more visibility to the community to identify individuals responsible for each repository.
 
 # Prior Art
 [prior-art]: #prior-art
