@@ -121,10 +121,14 @@ In this case, the existence of the **component maintainer** will provide the rul
 
 ## Guidelines nominate component maintainer
 
-A Team Lead or a Maintainer will follow this guideline to nominate a component maintainer for some software component inside their team
+Follow this guideline to nominate a **component maintainer** for a software component inside their team
 
-- A software component developed outside CNB project was [accepted](https://github.com/buildpacks/community/blob/main/contributors/guide.md#component) and current team do not have the know-how or experience to handle it.
-
+- The software component must be defined under the [GOVERNANCE](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md) team section, for example: Platform Team -> kpack
+- New **component maintainers** must already be contributors of the team
+- New **component maintainers** must be nominate by a **team lead** or a **maintainer** of the team under the following scenarios:  
+  - A software component developed outside CNB project was [accepted](https://github.com/buildpacks/community/blob/main/contributors/guide.md#component) under their team and current team do not have the know-how or experience to handle it.
+  - A community **contributor** have explicitly manifest the desire to become a **component maintainer** and the **team lead** or **maintainer** consider he/she has the skills and knowledge to take the responsibility and accountability of the component.
+- New **component maintainers** must be elected by [super-majority](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#supermajority) of the team’s maintainers
 
 # Migration
 [migration]: #migration
