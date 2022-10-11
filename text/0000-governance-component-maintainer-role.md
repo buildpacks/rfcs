@@ -27,7 +27,7 @@ This RFC proposes the creation of a new role **component maintainer** in the pro
 # Motivation
 [motivation]: #motivation
 
-- Why should we do this?
+### Why should we do this?
 
 Our current governance process defines [teams](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#teams) and each team  is responsible for maintaining some number of software components, these teams are organized internally with 3 different roles:   
   - Team Leads
@@ -40,11 +40,11 @@ Compared to the model based on 3 roles, this new role should:
 -  **re-balance responsibilities inside a team** empower contributors to take ownership of key components align with their technical skills or career path expectations
 - **support maintainers on their role's goals** one responsibility of a maintainer is `growing the team by mentoring aspiring contributors and maintainers`, this new role offers a growing path for some contributors what would like to become maintainers.
 
-- What use cases does it support?
+### What use cases does it support?
 
 It provides a mechanism to handle the increases of complexity of the source code of each component maintain by a team, when a team lead or maintainer determines a software component is big enough to be delegated to a contributor that desires to specialize and has the know-how to be responsible of a component they can nominate him/her to become **component maintainer** and delegates some of the day to day activities to this person.
 
-- What is the expected outcome?
+### What is the expected outcome?
 
 A new role and guideline on how to nominate individuals to this role will be include it in our governance process.
 
@@ -94,7 +94,7 @@ Because, this is hypothetical scenario, we actually don't have the size but, we 
 | [Kpack]() | +57000  |
 
 As we can see, a new implementation of the [Platform Interface Specification](https://github.com/buildpacks/spec/blob/main/platform.md) could be as big as [pack]() but most important:
--  It requires a specific knowledge in Kubernetes and everything related  
+-  It requires a specific knowledge in [Kubernetes](https://kubernetes.io/)
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -113,15 +113,15 @@ An updated version of the previous diagram shows graphically this new roles
 
 ### Example
 
-Let's come back to our previous example.
+Let's come back to our previous [kpack](https://github.com/pivotal/kpack) example.
 
 #### Integration with the Cloud Native Ecosystem
 
-In this case, the existence of the **component maintainer** will provide the rules to the **platform team lead** or **platform maintainers** to nominate (following the guidelines describe in the next section) a **component maintainer** for [kpack]() when they consider is necessary.
+In this case, the existence of the **component maintainer** role will provide the rules to the **platform team lead** or **platform maintainers** to nominate (following the guidelines describe in the next section) a **component maintainer** for [kpack](https://github.com/pivotal/kpack) when they consider is necessary.
 
 ## Guidelines nominate component maintainer
 
-Follow this guideline to nominate a **component maintainer** for a software component inside their team
+Follow this guideline to nominate a **component maintainer** for a software component inside a team
 
 - The software component must be defined under the [GOVERNANCE](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md) team section, for example: Platform Team -> kpack
 - New **component maintainers** must already be contributors of the team
