@@ -265,11 +265,58 @@ For each repository
 
 ### Governance
 
+#### Team roles
+
 Based on the [CNB governance policy](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md) and the fact that [kpack](https://github.com/pivotal/kpack/) is a [platform](https://buildpacks.io/docs/concepts/components/platform/) implementation of [Cloud Native Buildpacks](https://buildpacks.io/), it will be added under the responsibility of the [CNB Platform Team](https://github.com/buildpacks/community/blob/main/TEAMS.md#Platform-Team).
 
 How do migrate roles and responsibilities into the CNB governance process?
 
 Currently the [CNB Platform Team](https://github.com/buildpacks/community/blob/main/TEAMS.md#Platform-Team) already has a **team lead** assigned and, by definition, each team can have only one **team lead**. In order to provide the current [kpack](https://github.com/pivotal/kpack/) team with the same accountability for the migrated repositories the proposal is to follow the guidelines describe on the [Component Maintainer Role RFC](https://github.com/buildpacks/rfcs/pull/234)
+
+#### RFC process
+
+Once the migration is completed, [kpack](https://github.com/pivotal/kpack/) will follow the [RFC process](https://github.com/buildpacks/rfcs) stablished in CNB project for any new RFC required by the project.
+
+##### Template
+
+[kpack](https://github.com/pivotal/kpack/) have their own RFC process, let's compare both templates
+
+| [kpack template](https://github.com/pivotal/kpack/blob/main/rfcs/0000-template.md)   |  [CNB template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md) mapping   |
+| ----------------------- | ------------------------------ |
+| Problem           | Motivation       |
+| Outcome           | Motivation       |
+| Actions to take   | What it is / How it works       |
+| Complexity           |    -   |
+| - | Migration |
+| Prior Art           | Prior Art       |
+| Alternatives          | Alternatives     |
+| Risks           | Drawbacks      |
+| - | Unresolved Questions |
+| - | Spec. Changes  |
+| - | History|
+
+As we can see the [CNB RFC template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md) consider most of the sections required by the [kpack RFC](https://github.com/pivotal/kpack/blob/main/rfcs/0000-template.md) process, the only one missing is:
+  - **complexity**: What thoughts do you have on the complexity of this?
+
+The proposal is to incorporate this section into the [CNB template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md).
+
+##### Existing RFC
+
+- Open:
+- Closed: 
+
+#### Slack channel
+
+The proposal is to move the [kpack](https://github.com/pivotal/kpack/) slack instance from the [Kubernetes slack instance](https://kubernetes.slack.com/channels/kpack) to the [CNCF slack instance](https://slack.cncf.io/).
+
+[kpack](https://github.com/pivotal/kpack/) maintainers will have to request the migration of the [kpack](https://github.com/pivotal/kpack/) slack over to [CNCF slack](https://slack.cncf.io/) and co-ordinate the announcements/user migration.
+
+The following are the slack channels that will be migrated over and their proposed names after migrations
+
+| Current                 | Proposed                       |
+| ----------------------- | ------------------------------ |
+| kpack           | buildpacks-kpack       |
+
 
 # Risks
 
@@ -303,6 +350,7 @@ The [CNB](https://buildpacks.io/) community would have to develop from scratch a
 
 - Guidelines for accepting component-level contributions [RFC #143](https://github.com/buildpacks/rfcs/pull/143)
 - Component Maintainer Role [RFC #234](https://github.com/buildpacks/rfcs/pull/234)
+- Proposal to move CNCF slack [RFC #198](https://github.com/buildpacks/rfcs/pull/198)
 
 # Unresolved Questions
 
