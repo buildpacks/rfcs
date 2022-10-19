@@ -253,6 +253,13 @@ For each repository
 
 [kpack's](https://github.com/pivotal/kpack/) CI/CD infrastructure currently runs on internal VMware infrastructure. [kpack's](https://github.com/pivotal/kpack/) CI/CD pipelines will need to be rebuilt on [CNB](https://buildpacks.io/) infrastructure.
 
+##### Hardware requirements
+
+The minimal hardware requirements to request to CNCF to recreate the CI/CD pipelines are:
+
+- TBD
+
+
 ### Documentation
 
 [Kpack](https://github.com/pivotal/kpack/) documentation is currently hosted in the base code [repository](https://github.com/pivotal/kpack/tree/main/docs), after migrating to [CNB](https://buildpacks.io/) the documentation will be published into the Cloud Native Buildpack [site](https://buildpacks.io/).
@@ -275,13 +282,24 @@ Currently the [CNB Platform Team](https://github.com/buildpacks/community/blob/m
 
 #### RFC process
 
-Once the migration is completed, [kpack](https://github.com/pivotal/kpack/) will follow the [RFC process](https://github.com/buildpacks/rfcs) stablished in CNB project for any new RFC required by the project.
+Once the migration is completed, [kpack](https://github.com/pivotal/kpack/) will follow the [RFC process](https://github.com/buildpacks/rfcs) stablished in CNB project for any new RFC created in the project.
+
+##### Existing RFC
+
+- Open: Currently there are < 10 open RFCs (some of them opened 2 years ago).
+  - The proposal is to suggest the [kpack](https://github.com/pivotal/kpack/) maintainers to:
+    - Triage those RFCs an update their status before the donation.
+    - Co-ordinate the announcement of the donation to the RFCs authors and explain them the strategy after the migration (next section)
+    - After the donation, any open RFCs in [kpack](https://github.com/pivotal/kpack/) repository should be closed
+    - The RFC author should create a new RFC in the CNB RFC [repository](https://github.com/buildpacks/rfcs) and follow the CNB [RFC process](https://github.com/buildpacks/rfcs)
+
+- Closed: For historical purpose, we will keep those RFC in the repo
 
 ##### Template
 
-[kpack](https://github.com/pivotal/kpack/) have their own RFC process, let's compare both templates
+The following table shows the mapping between the sections of the current kpack [RFC template](https://github.com/pivotal/kpack/blob/main/rfcs/0000-template.md) vs the CNB [RFC template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md)
 
-| [kpack template](https://github.com/pivotal/kpack/blob/main/rfcs/0000-template.md)   |  [CNB template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md) mapping   |
+|   kpack template |   CNB template   |
 | ----------------------- | ------------------------------ |
 | Problem           | Motivation       |
 | Outcome           | Motivation       |
@@ -295,15 +313,10 @@ Once the migration is completed, [kpack](https://github.com/pivotal/kpack/) will
 | - | Spec. Changes  |
 | - | History|
 
-As we can see the [CNB RFC template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md) consider most of the sections required by the [kpack RFC](https://github.com/pivotal/kpack/blob/main/rfcs/0000-template.md) process, the only one missing is:
+As we can see the CNB [RFC template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md) consider most of the sections required by the kpack [RFC](https://github.com/pivotal/kpack/blob/main/rfcs/0000-template.md) process, the only missing one is:
   - **complexity**: What thoughts do you have on the complexity of this?
 
 The proposal is to incorporate this section into the [CNB template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md).
-
-##### Existing RFC
-
-- Open:
-- Closed: 
 
 #### Slack channel
 
