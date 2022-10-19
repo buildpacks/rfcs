@@ -286,14 +286,14 @@ Once the migration is completed, [kpack](https://github.com/pivotal/kpack/) will
 
 ##### Existing RFC
 
-- Open: Currently there are < 10 open RFCs (some of them opened 2 years ago).
+- **Open**: Currently there are less that 10 [open RFCs](https://github.com/pivotal/kpack/pulls?q=is%3Apr+label%3ARFC+is%3Aopen) (some of them opened 2 years ago) in [kpack](https://github.com/pivotal/kpack/) repository.
   - The proposal is to suggest the [kpack](https://github.com/pivotal/kpack/) maintainers to:
     - Triage those RFCs an update their status before the donation.
     - Co-ordinate the announcement of the donation to the RFCs authors and explain them the strategy after the migration (next section)
     - After the donation, any open RFCs in [kpack](https://github.com/pivotal/kpack/) repository should be closed
     - The RFC author should create a new RFC in the CNB RFC [repository](https://github.com/buildpacks/rfcs) and follow the CNB [RFC process](https://github.com/buildpacks/rfcs)
 
-- Closed: For historical purpose, we will keep those RFC in the repo
+- **Closed**: For historical purpose, we will keep those RFC in the repository.
 
 ##### Template
 
