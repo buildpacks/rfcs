@@ -59,7 +59,9 @@ As we can see in diagram above, a CNB team takes care of `N` number of [software
 
 Depending on the team, these components can increase in size or complexity, or there could be someone from the community that wants to specialize their contributions on certain components without taking the responsibility of become a **team maintainer**.
 
-### Example
+### Examples
+
+#### Platform Team
 
 Let's take for example the [Platform Team](https://github.com/buildpacks/community/blob/main/TEAMS.md#platform-team), which right now have 2 maintainers, and let's use the LOC (lines of code) metrics, for each of the components maintains by this team, to dimension the size of it.
 
@@ -71,20 +73,12 @@ Let's take for example the [Platform Team](https://github.com/buildpacks/communi
 
 **Note**: [Tokei](https://github.com/XAMPPRocky/tokei) tool was used to calculate the LOC of the repositories.
 
-#### Integration with the Cloud Native Ecosystem
+##### Integration with the Cloud Native Ecosystem
 
 As part of the [CNB roadmap](https://github.com/buildpacks/community/blob/main/ROADMAP.md#integration-with-the-cloud-native-ecosystem) a `better out-of-the box Kubernetes and Docker integration` is a goal of the project and in order to do that, the [Platform Team](https://github.com/buildpacks/community/blob/main/TEAMS.md#platform-team) will have to include another software component that accomplish this goal.
 
-In case of this scenario, then an hypothetical update of the component table will be:
+In case of this scenario, then an hypothetical update of the component table if kpack project is donated into CNB (see [RFC](https://github.com/buildpacks/rfcs/pull/235) for more details) will be:
 
-| Component                | LOC    |
-|--------------------------|--------|
-| [Pack]()                     | +58000 |
-| [Tekton Tasks + Pipelines]() | +2150  |
-| [CircleCI Pack Orb]()        | +400   |
-| Kubernetes Native Platform implementation | ?   |
-
-Because, this is hypothetical scenario, we actually don't have the size but, we can use [kpack]() as reference, because it is a Kubernetes Platform implementation of the CNB specification. Let's update the table again.
 
 | Component                | LOC    |
 |--------------------------|--------|
@@ -95,6 +89,10 @@ Because, this is hypothetical scenario, we actually don't have the size but, we 
 
 As we can see, a new implementation of the [Platform Interface Specification](https://github.com/buildpacks/spec/blob/main/platform.md) could be as big as [pack]() but most important:
 -  It requires a specific knowledge in [Kubernetes](https://kubernetes.io/)
+
+##### Adding Consign integration
+
+Another example of problem presented in this RFC is: [adding support to consign RFC](https://github.com/buildpacks/rfcs/pull/195). In this RFC a new phase executable must be developed and maintain by the Platform team, but this implementation requires knowledge and expertise on technologies like [sigstore](https://www.sigstore.dev/)
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -111,13 +109,23 @@ An updated version of the previous diagram shows graphically this new roles
 
 ![](https://i.imgur.com/rWElkCw.png)
 
-### Example
+### Examples
 
-Let's come back to our previous [kpack](https://github.com/pivotal/kpack) example.
+Let's come back to our previous examples.
 
-#### Integration with the Cloud Native Ecosystem
+#### Platform Team
 
-In this case, the existence of the **component maintainer** role will provide the rules to the **platform team lead** or **platform maintainers** to nominate (following the guidelines describe in the next section) a **component maintainer** for [kpack](https://github.com/pivotal/kpack) when they consider is necessary.
+In this cases, the existence of the **component maintainer** role will provide the rules to the platform team lead or platform maintainers to nominate (following the guidelines describe in the next section) a **component maintainer**.
+
+##### Integration with the Cloud Native Ecosystem
+
+In case [kpack](https://github.com/pivotal/kpack) is donated to CNB, [kpack](https://github.com/pivotal/kpack) maintainers could become **component maintainers** of this component and keep doing all the activities required for maintaining the lights on in the project without having to assume the whole set of responsibilities of a team maintainer. Also, platform maintainers will not be overwhelm being the sole reviewers/approvers for PRs for [kpack](https://github.com/pivotal/kpack) if they are not familiar with this project.  
+
+##### Adding Consign integration
+
+The existence of the **component maintainer** will open the door to the community, in particular, those volunteers with experience on [sigstore](https://www.sigstore.dev/) to help on with the contributions and maintenance of the new `signer` binary proposed.
+
+This case, is an example of two different areas of interest or knowledge where having the separation of responsibilities is relevant.
 
 ## Guidelines nominate component maintainer
 
