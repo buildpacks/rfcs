@@ -282,7 +282,7 @@ Currently the [CNB Platform Team](https://github.com/buildpacks/community/blob/m
 
 #### RFC process
 
-Once the migration is completed, [kpack](https://github.com/pivotal/kpack/) will follow the [RFC process](https://github.com/buildpacks/rfcs) stablished in CNB project for any new RFC created in the project.
+Once the migration is completed, [kpack](https://github.com/pivotal/kpack/) will follow the [RFC process](https://github.com/buildpacks/rfcs) and [RFC template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md) stablished in CNB project for any new RFC created in the project.
 
 ##### Existing RFC
 
@@ -294,29 +294,6 @@ Once the migration is completed, [kpack](https://github.com/pivotal/kpack/) will
     - The RFC author should create a new RFC in the CNB RFC [repository](https://github.com/buildpacks/rfcs) and follow the CNB [RFC process](https://github.com/buildpacks/rfcs)
 
 - **Closed**: For historical purpose, we will keep those RFC in the repository.
-
-##### Template
-
-The following table shows the mapping between the sections of the current kpack [RFC template](https://github.com/pivotal/kpack/blob/main/rfcs/0000-template.md) vs the CNB [RFC template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md)
-
-|   kpack template |   CNB template   |
-| ----------------------- | ------------------------------ |
-| Problem           | Motivation       |
-| Outcome           | Motivation       |
-| Actions to take   | What it is / How it works       |
-| Complexity           |    -   |
-| - | Migration |
-| Prior Art           | Prior Art       |
-| Alternatives          | Alternatives     |
-| Risks           | Drawbacks      |
-| - | Unresolved Questions |
-| - | Spec. Changes  |
-| - | History|
-
-As we can see the CNB [RFC template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md) consider most of the sections required by the kpack [RFC](https://github.com/pivotal/kpack/blob/main/rfcs/0000-template.md) process, the only missing one is:
-  - **complexity**: What thoughts do you have on the complexity of this?
-
-The proposal is to incorporate this section into the [CNB template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md).
 
 #### Slack channel
 
