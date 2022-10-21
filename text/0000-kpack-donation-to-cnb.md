@@ -297,16 +297,13 @@ Once the migration is completed, [kpack](https://github.com/pivotal/kpack/) will
 
 #### Slack channel
 
-The proposal is to move the [kpack](https://github.com/pivotal/kpack/) slack instance from the [Kubernetes slack instance](https://kubernetes.slack.com/channels/kpack) to the [CNCF slack instance](https://slack.cncf.io/).
+The proposals are:
+ - `keep` the [kpack](https://github.com/pivotal/kpack/) slack instance from the [Kubernetes slack instance](https://kubernetes.slack.com/channels/kpack), as [kpack](https://github.com/pivotal/kpack/) is a Kubernetes native application most of their users already use [Kubernetes slack instance](https://kubernetes.slack.com/channels/kpack) for communication.
+ - `create` a new channel in the [CNCF slack instance](https://slack.cncf.io/), this will bring the two communities (kpack and CNB) together
 
-[kpack](https://github.com/pivotal/kpack/) maintainers will have to request the migration of the [kpack](https://github.com/pivotal/kpack/) slack over to [CNCF slack](https://slack.cncf.io/) and co-ordinate the announcements/user migration.
+[kpack](https://github.com/pivotal/kpack/) maintainers should include the notification of the new channel in the announcement of the donation.
 
-The following are the slack channels that will be migrated over and their proposed names after migrations
-
-| Current                 | Proposed                       |
-| ----------------------- | ------------------------------ |
-| kpack           | buildpacks-kpack       |
-
+[Platform maintainers](https://github.com/buildpacks/community/blob/main/TEAMS.md#maintainers-1) will have to request or create the new slack channel with the following name: **buildpacks-kpack** (which will be defined as the preferred channel to be used).
 
 # Risks
 
