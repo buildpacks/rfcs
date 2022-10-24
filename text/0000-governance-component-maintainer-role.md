@@ -23,6 +23,7 @@ This RFC proposes the creation of a new role **component maintainer** in the pro
 - **team lead**: is a maintainer who has special responsibilities for representing team concerns at the project level
 - **component maintainer**: the proposed role in this RFC. Individual that maintain specific code repositories of a software-component inside a CNB team.
 - **software component**: is a software unit with a well-defined interface and explicitly specified dependencies.
+- **github team**: groups of organization members that reflects a company or group's structure with cascading access permissions.
 
 # Motivation
 [motivation]: #motivation
@@ -90,14 +91,14 @@ In case of this scenario, then an hypothetical update of the component table if 
 As we can see, a new implementation of the [Platform Interface Specification](https://github.com/buildpacks/spec/blob/main/platform.md) could be as big as [pack]() but most important:
 -  It requires a specific knowledge in [Kubernetes](https://kubernetes.io/)
 
-##### Adding Consign integration
+##### Adding Cosign integration
 
 Another example of problem presented in this RFC is: [adding support to consign RFC](https://github.com/buildpacks/rfcs/pull/195). In this RFC a new phase executable must be developed and maintain by the Platform team, but this implementation requires knowledge and expertise on technologies like [sigstore](https://www.sigstore.dev/)
 
 # How it Works
 [how-it-works]: #how-it-works
 
-The proposal is to incorporate a **component maintainer** role.
+The proposal is to incorporate a **component maintainer** role in our governance process.
 
 The **component maintainer** will take under his/her responsibility a well defined software component in a CNB team and for each repository will be allow to:
 
@@ -105,9 +106,25 @@ The **component maintainer** will take under his/her responsibility a well defin
 - planning release milestones, and releasing components versions
 - edit, label, assign issues
 
-An updated version of the previous diagram shows graphically this new roles
+An updated version of the previous diagram shows graphically this new role.
 
 ![](https://i.imgur.com/rWElkCw.png)
+
+As we can see in the previous diagram, a new orange box was drawn representing a component or group of software components the **component maintainer** is taking responsibilities for. When a team lead or  maintainer consider to use the role in their team, they must follow these steps:
+
+- In case it doesn't exist, a new **github team** must be created. A recommended name for this new team must follows the format `[cnb-team]-[component]-maintainers`, where:
+  - **cnb-team**: is the CNB team responsible for this software components, for example: Platform Team.
+  - **component**: is the software component name. for example: kpack.
+
+  Some examples are: `platform-kpack-maintainers` or `platform-cosign-maintainers`
+
+- For each repository related to the component or group of components:
+  - In case it doesn't exist, a new **CODEOWNERS** file must be added.
+  - Add the team `[cnb-team]-[component]-maintainers` created into the **CODEOWNERS** file.
+  - Members of the team should have maintainers permissions.
+  - The branch protection should require **CODEOWNERS** to approve or merge a pull request.
+
+- Add the new **component maintainer** into the `[cnb-team]-[component]-maintainers` **github team**.
 
 ### Examples
 
@@ -121,7 +138,7 @@ In this cases, the existence of the **component maintainer** role will provide t
 
 In case [kpack](https://github.com/pivotal/kpack) is donated to CNB, [kpack](https://github.com/pivotal/kpack) maintainers could become **component maintainers** of this component and keep doing all the activities required for maintaining the lights on in the project without having to assume the whole set of responsibilities of a team maintainer. Also, platform maintainers will not be overwhelm being the sole reviewers/approvers for PRs for [kpack](https://github.com/pivotal/kpack) if they are not familiar with this project.  
 
-##### Adding Consign integration
+##### Adding Cosign integration
 
 The existence of the **component maintainer** will open the door to the community, in particular, those volunteers with experience on [sigstore](https://www.sigstore.dev/) to help on with the contributions and maintenance of the new `signer` binary proposed.
 
