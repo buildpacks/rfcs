@@ -56,7 +56,7 @@ CNB maintainer contributor responsibility can be describe as: `is in charge of t
 
 ![](https://i.imgur.com/yXsLK6N.png)
 
-As we can see in diagram above, a CNB team takes care of `N` number of [software components](#definitions) and the project contributors from the community make them contributions to any of those components.
+As we can see in diagram above, a CNB team takes care of `N` number of [software components](#definitions) and the project contributors from the community make their contributions to any of those components.
 
 Depending on the team, these components can increase in size or complexity, or there could be someone from the community that wants to specialize their contributions on certain components without taking the responsibility of become a **team maintainer**.
 
@@ -64,7 +64,7 @@ Depending on the team, these components can increase in size or complexity, or t
 
 #### Platform Team
 
-Let's take for example the [Platform Team](https://github.com/buildpacks/community/blob/main/TEAMS.md#platform-team), which right now have 2 maintainers, and let's use the LOC (lines of code) metrics, for each of the components maintains by this team, to dimension the size of it.
+Let's take for example the [Platform Team](https://github.com/buildpacks/community/blob/main/TEAMS.md#platform-team), which right now have 2 maintainers, and let's use the LOC (lines of code) metric, for each of the components maintains by this team, to dimension the size of them.
 
 | Component                | LOC    |
 |--------------------------|--------|
@@ -93,7 +93,7 @@ As we can see, a new implementation of the [Platform Interface Specification](ht
 
 ##### Adding Cosign integration
 
-Another example of problem presented in this RFC is: [adding support to consign RFC](https://github.com/buildpacks/rfcs/pull/195). In this RFC a new phase executable must be developed and maintain by the Platform team, but this implementation requires knowledge and expertise on technologies like [sigstore](https://www.sigstore.dev/)
+Another example of the problem presented in this RFC is: [adding support to cosign RFC](https://github.com/buildpacks/rfcs/pull/195). In this RFC a new phase executable must be developed and maintain by the [Platform team](https://github.com/buildpacks/community/blob/main/TEAMS.md#platform-team), but this implementation requires knowledge and expertise on technologies like [sigstore](https://www.sigstore.dev/).
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -110,11 +110,11 @@ An updated version of the previous diagram shows graphically this new role.
 
 ![](https://i.imgur.com/rWElkCw.png)
 
-As we can see in the previous diagram, a new orange box was drawn representing a component or group of software components the **component maintainer** is taking responsibilities for. When a team lead or  maintainer consider to use the role in their team, they must follow these steps:
+As we can see a new orange box was drawn representing a component, or group of software components, the new **component maintainer** role is taking responsibilities for. When a team lead or maintainer wants to use the role in their team, they must follow these steps:
 
 - In case it doesn't exist, a new **github team** must be created. A recommended name for this new team must follows the format `[cnb-team]-[component]-maintainers`, where:
-  - **cnb-team**: is the CNB team responsible for this software components, for example: Platform Team.
-  - **component**: is the software component name. for example: kpack.
+  - **cnb-team**: is the CNB team responsible for the software component, for example: `Platform Team`.
+  - **component**: is the software component name. for example: `kpack`.
 
   Some examples are: `platform-kpack-maintainers` or `platform-cosign-maintainers`
 
@@ -124,7 +124,7 @@ As we can see in the previous diagram, a new orange box was drawn representing a
   - Members of the team should have maintainers permissions.
   - The branch protection should require **CODEOWNERS** to approve or merge a pull request.
 
-- Add the new **component maintainer** into the `[cnb-team]-[component]-maintainers` **github team**.
+- Add the new component maintainer's github account into the `[cnb-team]-[component]-maintainers` **github team**.
 
 ### Examples
 
@@ -132,11 +132,11 @@ Let's come back to our previous examples.
 
 #### Platform Team
 
-In this cases, the existence of the **component maintainer** role will provide the rules to the platform team lead or platform maintainers to nominate (following the guidelines describe in the next section) a **component maintainer**.
+In these cases, the existence of the **component maintainer** role will provide the rules to the platform team lead or platform maintainers to nominate (following the guidelines describe in the next section) a **component maintainer**.
 
 ##### Integration with the Cloud Native Ecosystem
 
-In case [kpack](https://github.com/pivotal/kpack) is donated to CNB, [kpack](https://github.com/pivotal/kpack) maintainers could become **component maintainers** of this component and keep doing all the activities required for maintaining the lights on in the project without having to assume the whole set of responsibilities of a team maintainer. Also, platform maintainers will not be overwhelm being the sole reviewers/approvers for PRs for [kpack](https://github.com/pivotal/kpack) if they are not familiar with this project.  
+In case [kpack](https://github.com/pivotal/kpack) is donated to CNB, [kpack](https://github.com/pivotal/kpack) maintainers could become **component maintainers** of this component and keep doing all the activities required for maintaining the lights on in the project without having to assume the whole set of responsibilities of a Platform team maintainer. Also, platform maintainers will not be overwhelm being the sole reviewers/approvers for [kpack's](https://github.com/pivotal/kpack) pull requests if they are not familiar with the project.  
 
 ##### Adding Cosign integration
 
@@ -151,7 +151,7 @@ Follow this guideline to nominate a **component maintainer** for a software comp
 - The software component must be defined under the [GOVERNANCE](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md) team section, for example: Platform Team -> kpack
 - New **component maintainers** must already be contributors of the team
 - New **component maintainers** must be nominate by a **team lead** or a **maintainer** of the team under the following scenarios:  
-  - A software component developed outside CNB project was [accepted](https://github.com/buildpacks/community/blob/main/contributors/guide.md#component) under their team and current team do not have the know-how or experience to handle it.
+  - A software component developed outside CNB project was [accepted](https://github.com/buildpacks/community/blob/main/contributors/guide.md#component) under their team and they do not have the know-how or experience to handle it.
   - A community **contributor** have explicitly manifest the desire to become a **component maintainer** and the **team lead** or **maintainer** consider he/she has the skills and knowledge to take the responsibility and accountability of the component.
 - New **component maintainers** must be elected by [super-majority](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#supermajority) of the team’s maintainers
 
