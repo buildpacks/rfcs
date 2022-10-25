@@ -329,7 +329,6 @@ I propose the following high level strategy to accomplish the goal
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-
 <!--
 - What parts of the design do you expect to be resolved before this gets merged?
 - What parts of the design do you expect to be resolved through implementation of the feature?
