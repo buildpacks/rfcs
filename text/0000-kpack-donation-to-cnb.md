@@ -257,9 +257,15 @@ For each repository
 
 The minimal hardware requirements to request to CNCF to recreate the CI/CD pipelines are:
 
-###### Kubernetes cluster
-  - 3 nodes: 2 CPU / 8 GB RAM / 100 GB ephemeral storage per node
-  - At least 100 GB of storage in a public OCI registry
+###### Kubernetes clusters
+
+**Build cluster**
+
+- Linux nodes
+  - 1 amd64 node / 2 CPU / 8GB memory / 50GB ephemeral disk storage
+- Windows nodes
+  - 1 amd64 node / 4 CPU / 16GB memory / 100GB ephemeral disk storage
+- At least 100 GB of storage in a public OCI registry  
 
 ### Documentation
 
