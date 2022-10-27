@@ -3,10 +3,10 @@
 - Name: Pack Buildpack New to Support Alternatives
 - Start Date: 2022-03-10
 - Author(s): aidandelaney
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#212](https://github.com/buildpacks/rfcs/pull/212)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: https://github.com/buildpacks/rfcs/blob/main/text/0077-pack-buildpack-create.md
 
 # Summary
