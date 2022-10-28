@@ -27,10 +27,20 @@ Add the capability to the `Exporter` phase to save the image to disk in [OCI Lay
 - A **image Manifest** provides a configuration and set of layers for a single container image for a specific architecture and operating system.
 - The **layer diffID** is the hash of the uncompressed layer
 - The **layer digest** is the hash of the compressed layer.
-- An [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) is the directory structure for OCI content-addressable blobs and location-addressable references.
+- An [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) is the directory structure for OCI content-addressable blobs and [location-addressable](https://en.wikipedia.org/wiki/Content-addressable_storage#Content-addressed_vs._location-addressed) references.
 
 # Motivation
 [motivation]: #motivation
+
+### Why should we do this?
+
+Lifecycle translates an application source code into an OCI image, in order to do this, it can be configured to interact with a docker daemon (using `daemon` flag) or with an OCI registry.
+
+The [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) is the directory structure for OCI content-addressable blobs and [location-addressable](https://en.wikipedia.org/wiki/Content-addressable_storage#Content-addressed_vs._location-addressed) references.
+
+The current process, executed by the lifecycle, does not take into consideration cases where a platform implementor may require to pass through the inputs or want to save the final application image on disk using [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
+
+### What use cases does it support?
 
 Exporting to [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) will enable new user's workflows on top of this functionality. For example:
   - Reduce the Lifecycle complexity removing the interaction with the Daemon.
@@ -40,142 +50,199 @@ Exporting to [OCI Image Layout](https://github.com/opencontainers/image-spec/blo
     - Cosign integration. See [RFC](https://github.com/buildpacks/rfcs/pull/195)
     - Export to tarball. See [issue](https://github.com/buildpacks/lifecycle/issues/423)
 
+### What is the expected outcome?
+
+Lifecycle will be capable of exporting application image into disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
+
 # What it is
 [what-it-is]: #what-it-is
 
-The target persona affected by this change are:
+The proposal is to add a new capability to the lifecycle (enabled by configuration) to resolve any **image reference** (input or output) to a disk location in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format. It means, instead of interacting with a daemon or registry lifecycle will interact against the filesystem to read or write any **image reference**.
 
-- **Platform implementors**: they will have to take care of the responsibility of:
-  - Pull the require dependencies (runtime image for example) and pass it through the lifecycle
+The target personas affected by this change are:
 
-The general idea is to produce an image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format and save it in a file system accesible from the lifecycle execution.
+- **Platform implementors**: they will have to take care of the responsibility of creating a store resource on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format and pass it through the lifecycle during the phases execution.  
 
 Let's see some examples of the proposed behavior
 
 ## Examples
 
-For each case, I will present two ways of invoking the new feature:
+### Requirements
 
-- Using the environment Variable
-- Using the new flag
+A folder on disk (accessible by the lifecycle) is required to execute the feature, this new folder works as a local registry and the content must be in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
-For both ways the expected output is the same
+Lifecycle phases accepts arguments pointing to `image reference`, those arguments are:
 
-### Analyzing run-image from OCI layout format
+| Input | Description
+|-------|------------
+| `<image>`	|	Tag reference to which the app image will be written |
+| `<previous-image>` | Image reference to be analyzed  (usually the result of the previous build) |
+| `<run-image>`	| Run image reference |
 
-Let's suppose the `<oci-dir>` or `CNB_OCI_PATH` environment variable points to a  directory that contains the `run-image` with the following format
+<!-- | `<cache-image>`	| Reference to a cache image in an OCI image registry | -->
+
+Let's suppose a directory exits and it has the following structure:
 
 ```=shell
 oci
-├── cnbs
-   └── sample-stack-run
-       ├── blobs
-       │   └── sha256
-       │       ├── 1f59171fcf9a8c2a78192d4dfbf88e6f0258e24f21798ffe015c07682d3a944a
-       │       ├── 219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e
-       │       ├── 63882e64890d1adea5824dbb9bc6a812140d6b85752bf74a0a26fca78e1baf5a
-       │       ├── 63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa
-       │       └── 6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941
-       ├── index.json
-       └── oci-layout
+├── cnb
+│   └── my-stack-run
+│       ├── blobs
+│       │   └── sha256
+│       │       └── 1bcd..x
+│       ├── index.json
+│       └── oci-layout
+├── foo
+│   └── my-cache
+│       ├── blobs
+│       │   └── sha256
+│       │       └── 1f591..a
+│       ├── index.json
+│       └── oci-layout
+└── bar
+    └── my-previous-app
+        ├── blobs
+        │   └── sha256
+        │       └── 1efg..w
+        ├── index.json
+        └── oci-layout
 ```
 
-And the analyzer is invoked as follows
+For each case, I will present two ways of enabling the new capability:
+
+- Using an environment Variable
+- Using a new `oci` flag
+
+In any case the expected output is the same.
+
+#### Analyze phase
+
+##### Analyzing run-image
 
 ```=shell
 > export CNB_USE_OCI=true
-> /cnb/lifecycle/analyzer -run-image cnbs/sample-stack-run:bionic my-app-image
+> /cnb/lifecycle/analyzer -run-image cnb/my-stack-run:bionic my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -oci -run-image cnb/my-stack-run:bionic my-app-image
+
+# expected output
+# analyzed.toml file with the usual `run-image.reference`
+
 ```
 
-Or
+##### Analyzing previous-image
 
-```=shell
-> /cnb/lifecycle/analyzer -oci -run-image cnbs/sample-stack-run:bionic my-app-image
+ ```=shell
+> export CNB_USE_OCI=true
+> /cnb/lifecycle/analyzer -run-image cnb/my-stack-run:bionic -previous-image bar/my-previous-app my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -oci -run-image cnb/my-stack-run:bionic-previous-image bar/my-previous-app my-app-image
+
+# expected output
+# analyzed.toml file with the usual `run-image.reference` and `previos-image.reference`
 ```
-
-The expected output is the analysis metadata [analyzed.toml](https://github.com/buildpacks/spec/blob/main/platform.md#analyzedtoml-toml) with a content similar to this one:
-
-```=TOML
-[run-image]
-  reference = "sha256:eed6d69be53111ad1d7d3f5d1c037350e6807986feb479a67f36b15f9205a56d"
-```
-
-Where the [ImageID](https://github.com/opencontainers/image-spec/blob/main/config.md#imageid) is calculated according to the OCI specification
-
-
-### Exporting to OCI layout format
-
-Similar to the previous example, let's suppose the `<oci-dir>` or `CNB_OCI_PATH` environment variable points to a  directory that contains the `run-image` with the following format
-
-```=shell
-oci
-├── cnbs
-   └── sample-stack-run
-       ├── blobs
-       │   └── sha256
-       │       ├── 1f59171fcf9a8c2a78192d4dfbf88e6f0258e24f21798ffe015c07682d3a944a
-       │       ├── 219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e
-       │       ├── 63882e64890d1adea5824dbb9bc6a812140d6b85752bf74a0a26fca78e1baf5a
-       │       ├── 63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa
-       │       └── 6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941
-       ├── index.json
-       └── oci-layout
-```
-
-And the exporter is invoked as follows
+<!--
+##### Analyzing using cache-image
 
 ```=shell
 > export CNB_USE_OCI=true
-> /cnb/lifecycle/exporter -run-image cnbs/sample-stack-run:bionic my-app-image
+> /cnb/lifecycle/analyzer -run-image cnb/my-stack-run:bionic -cache-image foo/my-cache my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -oci -run-image cnb/my-stack-run:bionic -cache-image foo/my-cache my-app-image
+
+# expected output
+# analyzed.toml file with the usual `run-image.reference`
+
 ```
 
-Or
+-->
+
+##### Analyzing run-image not saved on disk
 
 ```=shell
->  /cnb/lifecycle/exporter -oci -run-image cnbs/sample-stack-run:bionic my-app-image
+> export CNB_USE_OCI=true
+> /cnb/lifecycle/analyzer -run-image cnb/bad-run-image my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -oci -run-image cnb/bad-run-image my-app-image
+
+# expected output
+
+ERROR: the run-image could not be found at path: /oci/cnb/bad-run-image
 ```
 
-The expected output is the application `<image>` exported in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format
+##### Analyzing without run-image argument
 
 ```=shell
+> export CNB_USE_OCI=true
+> /cnb/lifecycle/analyzer my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -oci my-app-image
+
+# expected output
+
+ERROR: -run-image is required when OCI feature is enabled
+```
+
+#### Export phase
+
+##### Export to OCI
+
+
+```=shell
+> export CNB_USE_OCI=true
+> /cnb/lifecycle/exporter -run-image cnb/my-stack-run:bionic my-app-image
+
+# OR
+
+>  /cnb/lifecycle/exporter -oci -run-image cnb/my-stack-run:bionic my-app-image
+
+# expected output
+# the store folder will be updated with the application image as follows
+
 oci
-├── cnbs
-  │   └── sample-stack-run
-  │       ├── blobs
-  │       │   └── sha256
-  │       │       ├── 1f59171fcf9a8c2a78192d4dfbf88e6f0258e24f21798ffe015c07682d3a944a
-  │       │       ├── 219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e
-  │       │       ├── 63882e64890d1adea5824dbb9bc6a812140d6b85752bf74a0a26fca78e1baf5a
-  │       │       ├── 63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa
-  │       │       └── 6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941
-  │       ├── index.json
-  │       └── oci-layout
-  └── my-app-image
-      ├── blobs
-      │   └── sha256
-      │       ├── 14eaea7168b1fc4b8b30f7a20f7609335cc3dbcfb6d4c1afeb1e5daefd26cdf9
-      │       ├── 219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e -> ../../../cnbs/sample-stack-run/blobs/sha256/219480c73c20efd82d425207e7555eba09cb113c845250cef09ba376e1dd506e
-      │       ├── 410ce2030625414163d565a56bddc6587dbc49fa2a815af5e26bb08968dec7d2
-      │       ├── 54890b0245f8b234be46817f731b7b981d9ee2ea8d5a76380d91bb9abb001cdb
-      │       ├── 58b81a67d77e732ef07c4b995b6a7e099e5aa772d1805da7cf929d80a3fa044e
-      │       ├── 63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa -> ../../../cnbs/sample-stack-run/blobs/sha256/63cb781c9d22ed765584437fea6db568f79be248ce40fc6695017d3ef3e8caaa
-      │       ├── 68224c8aa806b9ec8cecf2282b7b10cdf1c615785652bcc85f3a79bd06e60384
-      │       ├── 6977801a3b8ac0c4a76ea22fa4dc0541fe8fc6ba964883ee0a21b5736f8acee9
-      │       ├── 6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941 -> ../../../cnbs/sample-stack-run/blobs/sha256/6b534265b45a4c09a5e05dde5ccf2450ea505481658a1c9ae9e0aae32362e941
-      │       ├── 7c83d7d24ac43dbdd419d15abb849b6d155d0bc361eca0908a8ae5aefcd55557
-      │       └── addd2357f3a0175410ab8f9303e747cc72af9aaeb0e7402d3fd3f144adb29db5
-      ├── index.json
-      └── oci-layout
+├── cnb
+│   └── my-stack-run
+│       ├── blobs
+│       │   └── sha256
+│       │       └── 1bcd..x
+│       ├── index.json
+│       └── oci-layout
+├── foo
+│   └── // omiting for simplicity
+├── bar
+│   └── // omiting for simplicity
+└── my-app-image
+    └── blobs
+        ├── sha256
+        │   ├── 1bcd..x
+        │   ├── 2f789..d
+        │   └── 3g234..f
+        ├── index.json
+        └── oci-layout
+
 ```
 
-Also, we are proposing to use symbolic links to reference the blobs from the `run-image` as this will help to save some hard drive space for the end user.
-
-### Using -oci flag in combination with --daemon or --publish flags
+##### Using -oci flag in combination with --daemon or --publish flags
 
 Any combination of using multiple sources or sinks in the Lifecycle invocation of phases should throw an error to the user. For example:
 
 ```=shell
-> /cnb/lifecycle/exporter -oci -daemon -run-image cnbs/sample-stack-run:bionic my-app-image
+> export CNB_USE_OCI=true
+> /cnb/lifecycle/exporter -daemon -run-image cnb/my-stack-run:bionic my-app-image
+
+# OR
+
+> /cnb/lifecycle/exporter -oci -daemon -run-image cnb/my-stack-run:bionic my-app-image
 
 ERROR: exporting to multiples target is not allowed
 ```
@@ -197,8 +264,8 @@ Notice that we are relying on the OCI format Specification to expose the data fo
 
 The following new inputs are proposed to be added to these phases
 
- | Input             | Environment Variable  | Default Value            | Description
- |-------------------|-----------------------|--------------------------|----------------------
+ | Input | Environment Variable  | Default Value | Description
+ |-------|-----------------------|---------------|--------------
  | `<oci>`      |  `CNB_USE_OCI` | false | Analyze or Export image from/to OCI layout format on disk |
  | `<oci-dir>` | `CNB_OCI_PATH` | /oci | Path to oci directory where the images are saved |
 
