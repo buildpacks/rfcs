@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Export to OCI format
 - Start Date: 2022-02-22
-- Author(s): Juan Bustamante (@jbustamante)
+- Author(s): Juan Bustamante (@jjbustamante)
 - Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
@@ -277,6 +277,9 @@ The image look up will be done following these rules:
     - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<oci-dir>/<registry>/<repo>/<digest>`
   - Apart from the look up, the logic for each phase should remain the same
 
+
+
+
 ## Proof of concept
 
 In order to validate the feasibility of the proposed feature, we developed a proof of concept with one of the most important side effects this capability can add into the project: **Removing the Daemon Support**. You can also check a recording with the demo in the following [link](https://drive.google.com/file/d/1W1125OHuyUlx88BRroUTLBfrFHhFM5A9/view?usp=sharing)
@@ -333,23 +336,6 @@ I think, this PoC demonstrate that adding the exporting to OCI layout format is 
 ## For the scope of this RFC
 
 - No breaking changes were identified
-
-## For removing Daemon support in near future
-
-I propose the following high level strategy to accomplish the goal
-
-- Approve this RFC and add the export to OCI layout format feature in Lifecycle
-- Implement in Pack a new workflow when the `-daemon` flag is enabled based on what we did with the PoC. The workflow could be enabled by the user in **experimental mode**
-  - Make noise in the community so people can help us using it
-  - Collect feedback about it
-  - Correct issues until we feel confortable
-- Turn off the actual `-daemon` implementation and replace it with the `-oci` by default in Pack
-  - Maybe we can also add a new flag to **re-use the old implementation** in case the user needs it
-  - Keep doing noise in the community
-  - Collect feedback about it
-  - Correct issues until we feel confortable
-- Schedule the removal of the Daemon support in Lifecycle version X.Y.Z.
-- Remove the actual daemon support from the code base for Lifecycle version X.Y.Z
 
 # Drawbacks
 [drawbacks]: #drawbacks
