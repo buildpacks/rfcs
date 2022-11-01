@@ -3,10 +3,10 @@
 - Name: RFC Process
 - Start Date: 2021-05-10
 - Author(s): [@ekcasey](https://github.com/ekcasey)
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
+- RFC Pull Request: [rfcs#233](https://github.com/buildpacks/rfcs/pull/233)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: [RFC 0004](0004-rfc-process.md)
 
 # Summary
