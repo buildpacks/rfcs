@@ -67,7 +67,7 @@ The target personas affected by this change are:
 
 - **Platform implementors**: they will have to take care of the responsibility of creating a store resource on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format and pass it through the lifecycle during the phases execution.  
 
-The process of writing any image on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format could be expensive in terms of hard drive space or IO operation (compressing or uncompressing layers). In order to provide flexibility for the implementation, the `analyzer` or `exporter` binaries only require the *Image Manifest* and the *Image Config* to execute their operations, based on this, we proposed the Lifecycle can be configured to work with a partial representation of the images on disk, meaning that some blobs MAY be missing (which is ok according to the [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format). The missing blobs COULD be those that are already available in a daemon or registry.  
+The process of writing any image on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format could be expensive in terms of hard drive space or IO operation (compressing or uncompressing layers). In order to provide flexibility for the implementation, the `analyzer` or `exporter` binaries only require the *Image Manifest* and the *Image Config* to execute their operations, based on this, we proposed the Lifecycle can be configured to work with a partial representation of the images on disk, meaning that some blobs MAY be missing (which is ok according to the [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format). The missing blobs SHOULD be those that are already available in a daemon or registry.  
 
 Let's see some examples of the proposed behavior
 
@@ -92,10 +92,21 @@ Let's suppose a directory exits and it has the following structure:
 ```=shell
 oci
 ├── cnb
-│   └── my-stack-run
+│   ├── my-full-stack-run
+│   │   ├── blobs
+│   │   │   └── sha256
+│   │   │       ├── 1f59...944a // manifest
+│   │   │       ├── 6388...af5a // config
+│   │   │       ├── 824b...f984e
+│   │   │       ├── f5f7...5b38
+│   │   │       └── 870e...f1b09
+│   │   ├── index.json
+│   │   └── oci-layout
+│   └── my-partial-stack-run
 │       ├── blobs
 │       │   └── sha256
-│       │       └── 1bcd..x
+│       │       ├── 1f59...944a // manifest
+│       │       └── 6388...af5a // config
 │       ├── index.json
 │       └── oci-layout
 ├── foo
@@ -105,16 +116,29 @@ oci
 │       │       └── 1f591..a
 │       ├── index.json
 │       └── oci-layout
-└── bar
-    └── my-previous-app
-        ├── blobs
-        │   └── sha256
-        │       └── 1efg..w
+├── bar
+│   └── my-previous-app
+│       ├── blobs
+│       │   └── sha256
+│       │       └── 1efg..w
+│       ├── index.json
+│       └── oci-layout
+└── my-app-image
+    └── blobs
+        ├── sha256
+        │   ├── 1bcd5..x               // app image manifest
+        │   ├── 2f789..d               // app image config
+        │   ├── 824b...f984e           // run layer
+        │   ├── f5f7...5b38            // run layer
+        │   ├── 870e...f1b09           // run layer
+        │   └── 3g234..f               // buildpack layer
         ├── index.json
         └── oci-layout
 ```
 
-For each case, I will present two ways of enabling the new capability:
+The images named **cnb/my-full-stack-run** and **cnb/my-partial-stack-run** represents the same image but the partial one has missing `blobs`, those `blobs` are the layers that are already available in the store from it came from.
+
+For each example case, I will present two ways of enabling the new capability:
 
 - Using an environment Variable
 - Using a new `oci` flag
@@ -123,18 +147,34 @@ In any case the expected output is the same.
 
 #### Analyze phase
 
-##### Analyzing run-image
+##### Analyzing run-image full saved on disk
 
 ```=shell
 > export CNB_USE_OCI=true
-> /cnb/lifecycle/analyzer -run-image cnb/my-stack-run:bionic my-app-image
+> /cnb/lifecycle/analyzer -run-image cnb/my-full-stack-run:bionic my-app-image
 
 # OR
 
-> /cnb/lifecycle/analyzer -oci -run-image cnb/my-stack-run:bionic my-app-image
+> /cnb/lifecycle/analyzer -oci -run-image cnb/my-full-stack-run:bionic my-app-image
 
 # expected output
 # analyzed.toml file with the usual `run-image.reference`
+
+```
+
+##### Analyzing run-image partial saved on disk
+
+```=shell
+> export CNB_USE_OCI=true
+> /cnb/lifecycle/analyzer -run-image cnb/cnb/my-partial-stack-run:bionic my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -oci -run-image cnb/cnb/my-partial-stack-run:bionic my-app-image
+
+# expected output
+# analyzed.toml file with the usual `run-image.reference`
+# there should be no change behavior in the phase even thought the image has missing blobs
 
 ```
 
@@ -142,32 +182,15 @@ In any case the expected output is the same.
 
  ```=shell
 > export CNB_USE_OCI=true
-> /cnb/lifecycle/analyzer -run-image cnb/my-stack-run:bionic -previous-image bar/my-previous-app my-app-image
+> /cnb/lifecycle/analyzer -run-image cnb/my-full-stack-run:bionic -previous-image bar/my-previous-app my-app-image
 
 # OR
 
-> /cnb/lifecycle/analyzer -oci -run-image cnb/my-stack-run:bionic-previous-image bar/my-previous-app my-app-image
+> /cnb/lifecycle/analyzer -oci -run-image cnb/my-full-stack-run:bionic-previous-image bar/my-previous-app my-app-image
 
 # expected output
 # analyzed.toml file with the usual `run-image.reference` and `previos-image.reference`
 ```
-<!--
-##### Analyzing using cache-image
-
-```=shell
-> export CNB_USE_OCI=true
-> /cnb/lifecycle/analyzer -run-image cnb/my-stack-run:bionic -cache-image foo/my-cache my-app-image
-
-# OR
-
-> /cnb/lifecycle/analyzer -oci -run-image cnb/my-stack-run:bionic -cache-image foo/my-cache my-app-image
-
-# expected output
-# analyzed.toml file with the usual `run-image.reference`
-
-```
-
--->
 
 ##### Analyzing run-image not saved on disk
 
@@ -201,42 +224,84 @@ ERROR: -run-image is required when OCI feature is enabled
 
 #### Export phase
 
-##### Export to OCI
-
+##### Export to OCI using run-image full saved on disk
 
 ```=shell
 > export CNB_USE_OCI=true
-> /cnb/lifecycle/exporter -run-image cnb/my-stack-run:bionic my-app-image
+> /cnb/lifecycle/exporter -run-image cnb/my-full-stack-run:bionic my-app-image
 
 # OR
 
->  /cnb/lifecycle/exporter -oci -run-image cnb/my-stack-run:bionic my-app-image
+>  /cnb/lifecycle/exporter -oci -run-image cnb/my-full-stack-run:bionic my-app-image
 
 # expected output
 # the store folder will be updated with the application image as follows
 
 oci
 ├── cnb
-│   └── my-stack-run
+│   └── my-full-stack-run
 │       ├── blobs
 │       │   └── sha256
-│       │       └── 1bcd..x
+│       │       ├── 1f59...944a         // manifest
+│       │       ├── 6388...af5a         // config
+│       │       ├── 824b...f984e
+│       │       ├── f5f7...5b38
+│       │       └── 870e...f1b09
 │       ├── index.json
 │       └── oci-layout
-├── foo
-│   └── // omiting for simplicity
-├── bar
-│   └── // omiting for simplicity
+├── // some folders omitted for simplicity
 └── my-app-image
     └── blobs
         ├── sha256
-        │   ├── 1bcd..x
-        │   ├── 2f789..d
-        │   └── 3g234..f
+        │   ├── 1bcd5..x               // app image manifest
+        │   ├── 2f789..d               // app image config
+        │   ├── 824b...f984e           // run layer
+        │   ├── f5f7...5b38            // run layer
+        │   ├── 870e...f1b09           // run layer
+        │   └── 3g234..f               // buildpack layer
         ├── index.json
         └── oci-layout
 
 ```
+
+As we can see, the application image `my-app-image` contains a **full** copy of the layers in its `blobs` folder.
+
+
+##### Export to OCI using run-image partially saved on disk
+
+```=shell
+> export CNB_USE_OCI=true
+> /cnb/lifecycle/exporter -run-image cnb/my-partial-stack-run:bionic my-app-image
+
+# OR
+
+>  /cnb/lifecycle/exporter -oci -run-image cnb/my-partial-stack-run:bionic my-app-image
+
+# expected output
+# the store folder will be updated with the application image as follows
+
+oci
+├── cnb
+│   └── my-partial-stack-run
+│       ├── blobs
+│       │   └── sha256
+│       │       ├── 1f59...944a         // manifest
+│       │       ├── 6388...af5a         // config
+│       ├── index.json
+│       └── oci-layout
+├── // some folders omitted for simplicity
+└── my-app-image
+    └── blobs
+        ├── sha256
+        │   ├── 1bcd5..x               // app image manifest
+        │   ├── 2f789..d               // app image config
+        │   └── 3g234..f               // buildpack layer
+        ├── index.json
+        └── oci-layout
+
+```
+
+As we can see, the application image `my-app-image` has missing `blobs` because they were not provided as input and the lifecycle just **skip writing** those layers on disk.
 
 ##### Using -oci flag in combination with --daemon or --publish flags
 
@@ -244,11 +309,11 @@ Any combination of using multiple sources or sinks in the Lifecycle invocation o
 
 ```=shell
 > export CNB_USE_OCI=true
-> /cnb/lifecycle/exporter -daemon -run-image cnb/my-stack-run:bionic my-app-image
+> /cnb/lifecycle/exporter -daemon -run-image cnb/my-full-stack-run:bionic my-app-image
 
 # OR
 
-> /cnb/lifecycle/exporter -oci -daemon -run-image cnb/my-stack-run:bionic my-app-image
+> /cnb/lifecycle/exporter -oci -daemon -run-image cnb/my-full-stack-run:bionic my-app-image
 
 ERROR: exporting to multiples target is not allowed
 ```
@@ -281,10 +346,119 @@ The image look up will be done following these rules:
     - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<oci-dir>/<registry>/<repo>/<tag>`
   - WHEN `the image points to a digest reference`
     - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<oci-dir>/<registry>/<repo>/<digest>`
-  - Apart from the look up, the logic for each phase should remain the same
+  - Apart for the image look up, the logic for each phase should remain the same and the lifecycle will write the layers on disk according to the following rules:
+    - Any layer generated by a buildpack SHOULD always be written to disk
+    - Layers from `base-image` or `run-image` MAY be written on disk if they were provided
 
+Let's review our previous examples.
 
+## Examples
 
+In all the examples the new feature is enabled by the use of the new flag `-oci` or by setting the new environment variable  `CNB_USE_OCI` to true.
+
+#### Analyze phase
+
+##### Analyzing run-image full saved on disk
+
+Arguments received:
+
+ - `run-image`: `cnb/my-full-stack-run:bionic`
+ - `image`: `my-app-image`
+
+The `<oci-dir>` is set with the default value `/oci`
+
+Lifecycle applies the rules for looking up the images:
+ - It takes the **tag reference** `cnb/my-full-stack-run:bionic` and look at path `/oci/cnb/my-full-stack-run` for an image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
+ - Lifecycle validates the `annotations` map in the **Image Manifest** contains a key-value paired `"org.opencontainers.image.ref.name" : "bionic"`
+ - In case of the *application image* it will look at path `/oci/my-app-image`
+
+ Because both images are found, the phase is executed as usual and the `analyzed.toml` file will be updated
+
+##### Analyzing run-image partial saved on disk
+
+Arguments received:
+
+ - `run-image`: `cnb/my-full-partial-run:bionic`
+ - `image`: `my-app-image`
+
+The `<oci-dir>` is set with the default value `/oci`
+
+Noticed the structure of the `run-image` provided
+
+```=shell
+oci
+├── cnb
+    └── my-partial-stack-run
+       ├── blobs
+       │   └── sha256
+       │       ├── 1f59...944a // manifest
+       │       └── 6388...af5a // config
+       ├── index.json
+       └── oci-layout
+```
+
+Similar to the previous example, Lifecycle applies the rules for looking up the images and look at path `/oci/cnb/my-partial-stack-run` and it determines a partial image was provided and execute the phase logic with the information from the **Image Manifest** and the **Image Config**
+
+##### Analyzing previous-image
+
+Arguments received:
+
+- `run-image`: `cnb/my-full-stack-run:bionic`
+- `previous-image`: `bar/my-previous-app`
+- `image`: `my-app-image`
+
+The `<oci-dir>` is set with the default value `/oci`
+
+`run-image` and `image` arguments are treated in the same way as previous examples, and for `previous-image` argument the looking up images rules are applied and Lifecycle will look at path `/oci/bar/my-previous-app` for a image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
+
+##### Analyzing run-image not saved on disk
+
+Arguments received:
+
+- `run-image`: `cnb/bad-run-image`
+- `image`: `my-app-image`
+
+The `<oci-dir>` is set with the default value `/oci`
+
+In this case, Lifecycle will will look at path `/oci/bad-run-image` and because the path doesn't exists then an error must be thrown.
+
+##### Analyzing without run-image argument
+
+Arguments received:
+
+- `image`: `my-app-image`
+
+The `<oci-dir>` is set with the default value `/oci`
+
+When the feature is enabled, Lifecycle requires any input image must be available on disk, because the `run-image` reference was not provided Lifecycle must thrown an error.
+
+#### Export phase
+
+##### Export to OCI using run-image full saved on disk
+
+Arguments received:
+
+- `run-image`: `cnb/my-full-stack-run:bionic`
+- `image`: `my-app-image`
+
+The `<oci-dir>` is set with the default value `/oci`
+
+Lifecycle applies the rules for looking up the images:
+ - It takes the **tag reference** `cnb/my-full-stack-run:bionic` and look at path `/oci/cnb/my-full-stack-run` for an image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
+ - Lifecycle validates the `annotations` map in the **Image Manifest** contains a key-value paired `"org.opencontainers.image.ref.name" : "bionic"`
+ - Lifecycle determines the `run-image` is a full image reference (it contains all the blobs)
+ - Lifecycle writes the *application image* at path `/oci/my-app-image` in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format including the layers from the `run-image`
+
+##### Export to OCI using run-image partially saved on disk
+
+Arguments received:
+
+- `run-image`: `cnb/my-partial-stack-run:bionic`
+- `image`: `my-app-image`
+
+The `<oci-dir>` is set with the default value `/oci`
+
+Lifecycle behaves similar to the previous example, but during the process of writing the output application image to disk it will skip the layers that are missing in the `blobs` folder at path  `/oci/cnb/my-partial-stack-run`
 
 ## Proof of concept
 
