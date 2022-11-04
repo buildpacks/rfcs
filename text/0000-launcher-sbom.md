@@ -104,6 +104,9 @@ The SBOM for a CNB-built image could be broken down as follows:
 * In theory, there should be no changes needed for end-users to consume the new SBOM files, as the files will be placed
   in the same directory, with the same structure, as SBOM files for buildpack-provided dependencies.
 
+* To expose the SBOM formats that it supports, a new field `[lifecycle.sbom-formats]` will be added to lifecycle.toml,
+  where `sbom-formats = [ "<string>" ]` must be supported SBOM media types (just like for buildpack.toml).
+
 # Drawbacks
 
 [drawbacks]: #drawbacks
