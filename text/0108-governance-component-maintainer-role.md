@@ -3,10 +3,10 @@
 - Name: add component maintainer role
 - Start Date: 2022-09-39
 - Author(s): @jjbustamante
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#234](https://github.com/buildpacks/rfcs/pull/234)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: [buildpacks/community#196](https://github.com/buildpacks/community/issues/196)
 - Supersedes: [#228](https://github.com/buildpacks/rfcs/pull/228)
 
 # Summary
