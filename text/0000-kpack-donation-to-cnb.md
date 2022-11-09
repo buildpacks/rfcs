@@ -230,6 +230,13 @@ The _spec_ key is used to define the desired state of the [Image](https://github
 - _builder_: Configuration of the [builder](https://github.com/pivotal/kpack/blob/main/docs/builders.md) resource the image builds will use.
 - source: The source code that will be monitored/built into images.
 
+# Adopters
+
+[VMware](https://www.vmware.com/) is the most obvious company using [kpack](https://github.com/pivotal/kpack/), but there are also other companies like:
+
+- [Bloomberg](http://techatbloomberg.com/opensource)
+- [WPengine](https://wpengine.com/)
+
 # Migration
 
 ### Repositories
@@ -322,9 +329,9 @@ The proposals are:
 
 # Risks
 
+- So far the main company behind [kpack](https://github.com/pivotal/kpack/) is [VMware](https://www.vmware.com/), a reduction in the investment from [VMware](https://www.vmware.com/) would create a problem and the CNB project would have to either sunset [kpack](https://github.com/pivotal/kpack/) or find investment from the community.
 - It's not clear how to handle the budget required to finance the infrastructure to rebuild the CI/CD pipelines on CNCF CNB infrastructure.
 - Evaluate any legal requirement from [CNCF](https://www.cncf.io) that must be fulfilled before accepting the project into the [CNB](https://buildpacks.io/) ecosystem.
-
 
 # Drawbacks
 
