@@ -287,6 +287,14 @@ How do migrate roles and responsibilities into the CNB governance process?
 
 Currently the [CNB Platform Team](https://github.com/buildpacks/community/blob/main/TEAMS.md#Platform-Team) already has a **team lead** assigned and, by definition, each team can have only one **team lead**. In order to provide the current [kpack](https://github.com/pivotal/kpack/) team with the same accountability for the migrated repositories the proposal is to follow the guidelines describe on the [Component Maintainer Role RFC](https://github.com/buildpacks/rfcs/pull/234)
 
+The [kpack's](https://github.com/pivotal/kpack/) maintainers that will be nominated as **component maintainer** in CNB are:
+
+| Name | Github account | Organization |
+| --- | --- | --- |
+| Matthew McNew| [@matthewmcnew](https://github.com/matthewmcnew)| VMware|
+| Tyler Phelan | [@tylerphelan](https://github.com/tylerphelan)| VMware|
+| Tom Kennedy | [@tomkennedy513](https://github.com/tomkennedy513) | VMware |
+
 #### RFC process
 
 Once the migration is completed, [kpack](https://github.com/pivotal/kpack/) will follow the [RFC process](https://github.com/buildpacks/rfcs) and [RFC template](https://github.com/buildpacks/rfcs/blob/main/0000-template.md) stablished in CNB project for any new RFC created in the project.
@@ -316,7 +324,7 @@ The proposals are:
 
 - It's not clear how to handle the budget required to finance the infrastructure to rebuild the CI/CD pipelines on CNCF CNB infrastructure.
 - Evaluate any legal requirement from [CNCF](https://www.cncf.io) that must be fulfilled before accepting the project into the [CNB](https://buildpacks.io/) ecosystem.
-- Relying on the approval of [Component Maintainer Role RFC](https://github.com/buildpacks/rfcs/pull/234) to guarantee current [kpack](https://github.com/pivotal/kpack/) maintainers could keep supporting the project after the donation.
+
 
 # Drawbacks
 
