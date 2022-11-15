@@ -5,10 +5,10 @@
 - Name: Deprecate old buildpack and platform APIs
 - Start Date: 2022-06-28
 - Author(s): natalieparellano
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#226](https://github.com/buildpacks/rfcs/pull/226)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: N/A
 
 # Summary
