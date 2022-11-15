@@ -3,10 +3,10 @@
 - Name: Support for pull images from or push images to insecure image registries.
 - Start Date: 2022-08-17
 - Author(s): wanjunlei
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#229](https://github.com/buildpacks/rfcs/pull/229)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: N/A
 
 # Summary
