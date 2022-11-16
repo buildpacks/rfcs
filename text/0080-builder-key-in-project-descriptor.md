@@ -3,6 +3,7 @@
 - Name: Builder key in project descriptor
 - Start Date: 2021-02-11
 - Author(s): @wburningham
+- Status: Approved
 - RFC Pull Request: [rfcs#138](https://github.com/buildpacks/rfcs/pull/138)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/spec#215](https://github.com/buildpacks/spec/issues/215), [buildpacks/pack#1114](https://github.com/buildpacks/pack/issues/1114), [buildpacks/docs#345](https://github.com/buildpacks/docs/issues/345)

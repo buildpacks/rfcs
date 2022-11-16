@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Export Report
 - Start Date: (fill in today's date: 2020-04-01)
+- Status: Approved
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: "N/A"

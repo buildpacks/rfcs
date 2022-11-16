@@ -44,6 +44,11 @@ This is the technical portion of the RFC, where you explain the design in suffic
 
 The section should return to the examples given in the previous section, and explain more fully how the detailed proposal makes those examples work.
 
+# Migration
+[migration]: #migration
+
+This section should document breaks to public API and breaks in compatibility due to this RFC's proposed changes. In addition, it should document the proposed steps that one would need to take to work through these changes. Care should be give to include all applicable personas, such as platform developers, buildpack developers, buildpack users and consumers of buildpack images.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -73,3 +78,24 @@ Discuss prior art, both the good and bad.
 Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
 Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fields, new fields in the buildpackage label, etc.
 This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are necessary, they should be documented here.
+
+# History
+[history]: #history
+
+<!--
+## Amended
+### Meta
+[meta-1]: #meta-1
+- Name: (fill in the amendment name: Variable Rename)
+- Start Date: (fill in today's date: YYYY-MM-DD)
+- Author(s): (Github usernames)
+- Amendment Pull Request: (leave blank)
+
+### Summary
+
+A brief description of the changes.
+
+### Motivation
+
+Why was this amendment necessary?
+--->

@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: CNB\_BUILDPACK\_DIR environment variable
 - Start Date: 2020-04-02
+- Status: Approved
 - CNB Pull Request: [rfcs#49](https://github.com/buildpacks/rfcs/pull/71)
 - CNB Issue: (leave blank)
 - Supersedes: N/A

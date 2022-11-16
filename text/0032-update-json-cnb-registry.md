@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Update JSON Structure of CNB Registry
 - Start Date: 2020-03-19
+- Status: Approved
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: [RFC-0022](https://github.com/buildpacks/rfcs/blob/main/text/0022-client-side-buildpack-registry.md)

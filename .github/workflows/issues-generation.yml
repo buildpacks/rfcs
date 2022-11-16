@@ -15,7 +15,7 @@ jobs:
     if: ${{ github.event.issue.pull_request || github.event.pull_request }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Run Issue Generation
         uses: jromero/issue-generation-action@v1.0.0-beta.4
         id: issues-generation

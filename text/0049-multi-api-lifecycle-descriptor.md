@@ -3,6 +3,7 @@
 - Name: Lifecycle Descriptor with Multiple APIs
 - Start Date: 2020-07-02
 - Author(s): ekcasey
+- Status: Superseded
 - RFC Pull Request: [rfcs#92](https://github.com/buildpacks/rfcs/pull/92)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

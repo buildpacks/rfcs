@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Buildpack homepage
 - Start Date: 1-23-2020
+- Status: Approved
 - CNB Pull Request: [rfcs#55](https://github.com/buildpacks/rfcs/pull/55)
 - CNB Issue: (leave blank)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
