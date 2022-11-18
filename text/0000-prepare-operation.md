@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Prepare Operation
 - Start Date: 2022-02-07
-- Author(s): @jromero
+- Author(s): @jromero, [@david-caro](https://github.com/david-caro)
 - Status: Draft
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
@@ -26,7 +26,7 @@ It is common for platform to execute common operations before executing the life
 # Motivation
 [motivation]: #motivation
 
-The motiviation for this change was to enable the following goals from being achieved:
+The motivation for this change was to enable the following goals from being achieved:
 
   - **Goal 1: Serializing CLI configuration**
     > As a user, I would like to be able to serialize and share the parameters I use with certain platforms such as `pack`.
@@ -35,7 +35,7 @@ The motiviation for this change was to enable the following goals from being ach
   - **Goal 3: Platform recognition of project.toml**
     > As a user, I would like to ensure that my configuration in `project.toml` is being used.
 
-**This RFC directly solves for Goal 3**, while enabling the solutions for Goals 1 and 2 via a supplimental RFC ([Support for pack.toml][rfc-pr-189]).
+**This RFC directly solves for Goal 3**, while enabling the solutions for Goals 1 and 2 via a supplemental RFC ([Support for pack.toml][rfc-pr-189]).
 
 [rfc-pr-189]: https://github.com/buildpacks/rfcs/pull/189
 
@@ -123,7 +123,7 @@ A `prepare` phase would be a new lifecycle phase that gets executed before `crea
 
 #### Responsibilities
 
-At minimum, the expected reponsibility of the `preparer` would be to:
+At minimum, the expected responsibility of the `preparer` would be to:
 
  - Apply the requested configuration.
 
@@ -147,7 +147,7 @@ A function that can help developers apply configuration to the filesystem based 
 
 ###### `preparer` executable
 
-The Cloud Native Buildpacks project will have a `preparer` it ships along with the existing `lifecyle` image.
+The Cloud Native Buildpacks project will have a `preparer` it ships along with the existing `lifecycle` image.
 
 > This would be useful for builder providers or platform implementers to not have to develop standard functionality.
 
@@ -164,8 +164,8 @@ The default implementation COULD take care of applying the following configurati
 [drawbacks]: #drawbacks
 
 1. Parsing and applying the `io.buildpacks` namespace becomes responsibility of the platform.
-    - This is mitigated by providing [utilities](#Cloud-Native-Buildpacks-utilities) and the fact that the prepare phase is an independant and swappable.
-2. Executing the Prepare operation may require an additional container to be spun up in some platforms; this would effectively increase the overall build process.
+    - This is mitigated by providing [utilities](#Cloud-Native-Buildpacks-utilities) and the fact that the prepare phase is independent and swappable.
+2. Executing the Prepare operation may require an additional container to be spun up in some platforms; this would effectively lengthen the overall build process.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -203,10 +203,10 @@ The idea of a buildpack that can apply configuration from `project.toml` has bee
 [unresolved-questions]: #unresolved-questions
 
 - Should arbitrary properties be allowed in `io.buildpacks`?
-  - Yes. By allowing for arbitrary properties we enable unforseen use cases. The only drawback being potential forward compatibility issues but given that the schema is versioned, it can be handled when a user wants to "upgrade".
+  - Yes. By allowing for arbitrary properties we enable unforeseen use cases. The only drawback being potential forward compatibility issues but given that the schema is versioned, it can be handled when a user wants to "upgrade".
 - How does the Prepare operation make changes to non-filesystem options such as `tags`, `run-image`, etc?
-    - Ideally, the lifecycle would have a filesystem based interface that we can leverage. This would prevent the preparer from having it's own independant mechanism. A prior RFC for something similar has existed (see [Add Lifecycle Config File RFC][lifecycle-config-rfc]). It may be worth revisiting.
-- Where do we define the `io.buildpacks` namespace if we want to keep it seperate from the Project Descriptor Spec?
+    - Ideally, the lifecycle would have a filesystem based interface that we can leverage. This would prevent the preparer from having it's own independent mechanism. A prior RFC for something similar has existed (see [Add Lifecycle Config File RFC][lifecycle-config-rfc]). It may be worth revisiting.
+- Where do we define the `io.buildpacks` namespace if we want to keep it separate from the Project Descriptor Spec?
     - We've been wanting to restructure our spec repo to include other schemas, in JSON format, as well. Maybe this is an opportunity to rethink our repo structure.
 
 [lifecycle-config-rfc]: https://github.com/buildpacks/rfcs/pull/128
@@ -308,13 +308,13 @@ A `preparer` may make general changes to the file system, modify input files, or
 
 #### Remove `io.buildpacks` namespace
 
-We'll want to remove the `io.buildpacks` namespace since it will be versioned seperate from the project descriptor.
+We'll want to remove the `io.buildpacks` namespace since it will be versioned separate from the project descriptor.
 
 ---
 
 ## `io.buildpacks` Namespace Schema
 
-> NOTE: This is expected to live in a seperate file.
+> NOTE: This is expected to live in a separate file.
 
 ---
 
