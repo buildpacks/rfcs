@@ -230,12 +230,27 @@ The _spec_ key is used to define the desired state of the [Image](https://github
 - _builder_: Configuration of the [builder](https://github.com/pivotal/kpack/blob/main/docs/builders.md) resource the image builds will use.
 - source: The source code that will be monitored/built into images.
 
+# Contributors
+
+Contributions to [kpack](https://github.com/pivotal/kpack/) during the period 2022-2019 can be summarized as follow
+
+```mermaid
+pie showData
+    title Pull Requests Open or Closed
+    "VMWare or Pivotal" : 438
+    "Others" : 37
+```
+
 # Adopters
 
-[VMware](https://www.vmware.com/) is the most obvious company using [kpack](https://github.com/pivotal/kpack/), but there are also other companies like:
+[VMware](https://www.vmware.com/) is the most obvious company using [kpack](https://github.com/pivotal/kpack/) as a core component in their [Tanzu](https://tanzu.vmware.com/tanzu) offer. [kpack](https://github.com/pivotal/kpack/) has been used in the enterprise for years in hundreds of costumers.
+
+Some others companies using [kpack](https://github.com/pivotal/kpack/) are:
 
 - [Bloomberg](http://techatbloomberg.com/opensource)
 - [WPengine](https://wpengine.com/)
+- [Terasky](https://www.terasky.com/)
+- [SAP](https://www.sap.com/)
 
 # Migration
 
@@ -299,8 +314,19 @@ The [kpack's](https://github.com/pivotal/kpack/) maintainers that will be nomina
 | Name | Github account | Organization |
 | --- | --- | --- |
 | Matthew McNew| [@matthewmcnew](https://github.com/matthewmcnew)| VMware|
-| Tyler Phelan | [@tylerphelan](https://github.com/tylerphelan)| VMware|
 | Tom Kennedy | [@tomkennedy513](https://github.com/tomkennedy513) | VMware |
+| Yael Harel | [@yaelharel](https://github.com/yaelharel) | VMware|
+| Daniel Chen |[@chenbh](https://github.com/chenbh) | VMware|
+| Juan Bustamante |[@jjbustamante](https://github.com/jjbustamante) | VMware|
+
+Also those members are willing to become more involved with CNB projects and become **Platform maintainers** in the near future.
+
+Outside VMware, the following contributors manifested their desired to become [kpack's](https://github.com/pivotal/kpack/) **component maintainer**.
+
+| Name | Github account | Organization |
+| --- | --- | --- |
+| Sambhav Kothari| [@samj1912](https://github.com/samj1912) | Bloomberg |
+| Aidan Delaney| [@AidanDelaney](https://github.com/AidanDelaney) | Bloomberg |
 
 #### RFC process
 
