@@ -3,7 +3,7 @@
 - Name: Buildpack Registry Search API
 - Start Date: 2020-11-11
 - Author(s): @elbandito
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#125](https://github.com/buildpacks/rfcs/pull/125)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [registry-api#3](https://github.com/buildpacks/registry-api/issues/3)

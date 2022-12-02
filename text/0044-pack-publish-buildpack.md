@@ -3,7 +3,7 @@
 - Name: Pack Register Buildpack
 - Start Date: 2020-04-27
 - Author(s): [Joe Kutner](https://github.com/jkutner), [Javier Romero](https://github.com/jromero)
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#75](https://github.com/buildpacks/rfcs/pull/75)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
