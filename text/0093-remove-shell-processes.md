@@ -376,3 +376,28 @@ command = ["<command>"]
 args = ["<arguments>"]
 default = false
 ```
+
+# History
+[history]: #history
+
+## Amended
+### Meta
+[meta-1]: #meta-1
+- Name: Removed references to custom env templating
+- Start Date: 2022-12-02
+- Author(s): natalieparellano
+- Amendment Pull Request: (leave blank)
+
+### Summary
+
+As this is a breaking change, we decided to do this in a separate (yet to be created) RFC.
+
+Created issue: #258
+
+In addition to the changes described originally in 0093 we'd like some way of versioning the launcher interface, to avoid surprising end-users.
+
+### Motivation
+
+Why was this amendment necessary?
+
+The RFC text should reflect what was actually implemented / agreed upon to avoid confusion.
