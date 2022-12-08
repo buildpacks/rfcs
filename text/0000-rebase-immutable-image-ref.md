@@ -34,18 +34,17 @@ A **digest reference**  refers to a [content addressable](https://en.wikipedia.o
 # What it is
 [what-it-is]: #what-it-is
 
-This provides a high level overview of the feature.
+This is a feature to expand the lifecycle rebase command to allow targeting an image by either `tag` or `digest`.
 
-- Define any new terminology.
-- Define the target persona: buildpack author, buildpack user, platform operator, platform implementor, and/or project contributor.
-- Explaining the feature largely in terms of examples.
-- If applicable, provide sample error messages, deprecation warnings, or migration guidance.
-- If applicable, describe the differences between teaching this to existing users and new users.
+Today, we get the following error when using a digest reference:
+```
+ERROR: failed to rebase: failed to write image to the following tags: [localhost:5003/foo/bar@sha256:916a9e100569ee521b86d03b8499b9b93d7d256d6e838868ae720295f2ea2f76: PUT http://localhost:5003/v2/foo/bar/manifests/sha256:916a9e100569ee521b86d03b8499b9b93d7d256d6e838868ae720295f2ea2f76: DIGEST_INVALID: provided digest did not match uploaded content]
+```
 
 # How it Works
 [how-it-works]: #how-it-works
 
-First, let's get some context. Today, we can execute rebase by using **tag references** but not **digest references**.
+Today, we can execute rebase by using **tag references** but not **digest references**.
 
 Here are some examples of valid rebase commands using **tag references**:
 1. `lifecycle rebase my-repo/foo`
@@ -60,8 +59,7 @@ Here are some examples of currently invalid rebase commands using **digest refer
 Supporting Rebase by Image Digest Reference will make both sets of commands valid.
 
 - When using a digest reference as the image target, there must be at least one tag reference to apply to exported image.
-- **If** the `rebase target` is a `digest reference` and one or more `<tag reference>` inputs are provided, each `<tag reference>` MUST refer to the same repository as the `rebase target`.
-- If a `<tag reference>` is included without a `<tag>`, latest will be used.
+- If a `<tag reference>` is included without a `<tag>`, the tag `latest` will be used.
 
 # Migration
 [migration]: #migration
