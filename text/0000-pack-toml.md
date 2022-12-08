@@ -70,7 +70,7 @@ The Pack CLI will honor both the `pack.toml` and `project.toml` file descriptors
 
 * If one or more descriptors are provided on the command line they will all be merged and used.
 * If a `pack.toml` file exists in the workspace and no descriptors are provided on the command line, it will be used.
-* If a `project.toml` file exists in the workspace and no descriptors are provided on the command line, it will be merged with any `pack.toml` that is present in the workspace and the result will be used.
+* Else If a `project.toml` file exists in the workspace and no descriptors are provided on the command line, it will be used.
 * Else no project descriptor will be used
 
 When multiple descriptors are _merged_ the following precedence is given:
