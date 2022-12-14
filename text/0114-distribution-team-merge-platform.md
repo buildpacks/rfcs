@@ -4,7 +4,7 @@
 - Start Date: 2022-12-01
 - Author(s): [@jkutner](https://github.com/jkutner)
 - Status: Draft
-- RFC Pull Request: (leave blank)
+- RFC Pull Request: https://github.com/buildpacks/rfcs/pull/239
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: [RFC-0062](https://github.com/buildpacks/rfcs/blob/main/text/0062-distribution-team.md)
