@@ -3,7 +3,7 @@
 - Name: `pack` subcommands
 - Start Date: 2020-07-08
 - Author(s): @jromero
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#93](https://github.com/buildpacks/rfcs/pull/93)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

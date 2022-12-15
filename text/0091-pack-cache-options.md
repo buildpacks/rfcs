@@ -3,7 +3,7 @@
 - Name: Pack cache options
 - Start Date: 2021-03-25
 - Author(s): [@jromero](https://github.com/jromero), [@dwillist](https://github.com/dwillist)
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#149](https://github.com/buildpacks/rfcs/pull/149)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [pack#1077](https://github.com/buildpacks/pack/issues/1077)

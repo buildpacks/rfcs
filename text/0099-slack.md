@@ -3,7 +3,7 @@
 - Name: Migrate to CNCF Slack
 - Start Date: 2021-12-07
 - Author(s): [@samj1912](https://github.com/samj1912)
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#198](https://github.com/buildpacks/rfcs/pull/198)
 - CNB Pull Request: (leave blank)
 - CNB Issue: N/A

@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Pack Build Default Process Flag
 - Start Date: 2019-10-29
-- Status: Approved
+- Status: Implemented
 - CNB Pull Request: [rfcs#28](https://github.com/buildpack/rfcs/pull/28)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
