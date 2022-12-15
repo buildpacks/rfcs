@@ -31,3 +31,5 @@ Documentation:
 <INSERT OTHER REPO>:
 - [ ] <INSERT ISSUE URL>
 - [ ] Released in <INSERT COMPONENT> version `<placeholder>`
+
+**Maintainers**: when closing this issue as completed, submit a PR to update the `Status` of the RFC to `Implemented`.

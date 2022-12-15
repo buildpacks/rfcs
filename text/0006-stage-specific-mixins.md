@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Stage-specific Mixins
 - Start Date: 2019-06-13
-- Status: Approved
+- Status: Superseded
 - CNB Pull Requests: [rfcs#13](https://github.com/buildpacks/rfcs/pull/13), [spec#54](https://github.com/buildpacks/spec/pull/54)
 - CNB Issues: (lifecycle issues to follow)
 

@@ -3,7 +3,7 @@
 - Name: Project Descriptor Domains
 - Start Date: 2021-02-26
 - Author(s): hone
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#140](https://github.com/buildpacks/rfcs/pull/140)
 - CNB Pull Request: (leave blank)
 - CNB Issue: N/A

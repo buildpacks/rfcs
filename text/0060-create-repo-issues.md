@@ -3,7 +3,7 @@
 - Name: Create Repo Issues
 - Start Date: 2020-08-06
 - Author(s): [@dfreilich][https://github.com/dfreilich]
-- Status: Approved
+- Status: Superseded
 - RFC Pull Request: [rfcs#106](https://github.com/buildpacks/rfcs/pull/106)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
