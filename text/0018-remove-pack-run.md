@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Remove `pack run`
 - Start Date: 2019-12-11
-- Status: Approved
+- Status: Implemented
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
