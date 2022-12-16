@@ -51,15 +51,15 @@ Here are some examples of valid rebase commands using **tag references**:
 1. `lifecycle rebase my-repo/foo:latest`
 1. `lifecycle rebase my-repo/foo:v4`
 
-Here are some examples of currently invalid rebase commands using **digest references**:
-1. `lifecycle rebase my-repo/foo@sha256:1234 myrepo/foo`
-1. `lifecycle rebase my-repo/foo@sha256:1234 myrepo/foo:latest`
-1. `lifecycle rebase my-repo/foo@sha256:1234 myrepo/foo:vNext`
+It is not currently possible to target an image using **digest references**.
 
-Supporting Rebase by Image Digest Reference will make both sets of commands valid.
+Supporting Rebase by Image Digest Reference will provide a mechanism to target an image rebase by tag reference or digest reference.
 
-- When using a digest reference as the image target, there must be at least one tag reference to apply to exported image.
-- If a `<tag reference>` is included without a `<tag>`, the tag `latest` will be used.
+Here is what targeting an image via digest will look like:
+1. `lifecycle rebase -previous-image my-repo/foo@sha256:1234 -tag my-repo/foo:rebase my-repo/foo`
+
+- When using a digest reference as the image target, there may be one or more `<tag references>` to apply to exported image. If no `tag` is provided, `latest` will be used.
+- If `-previous-image` is not provided, the previous is infered from the first argument, just like `analyzer`, for instance.
 
 # Migration
 [migration]: #migration
