@@ -118,5 +118,5 @@ N/A
 
 Addition of the definition of the above directory in the Platform specification i.e. - 
 
-- `CNB_CONFIG_DIR`
+- `CNB_BUILD_CONFIG_DIR`
 - `/cnb/config/env.build`
