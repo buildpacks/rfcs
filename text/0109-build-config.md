@@ -58,7 +58,7 @@ Final value: `FOO=test`
 
 
 Buildpack value: `FOO=test`
-Build config: `FOO.append=another-value, FOO.delim="`
+Build config: `FOO.append=another-value, FOO.delim=:`
 Final value: `FOO=test:another-value`
 
 Buildpack value: `FOO=test`
