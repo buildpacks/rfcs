@@ -76,22 +76,22 @@ A builder or lifecycle image with the above descriptor file should have the foll
 ### Deprecated APIs
 Only API versions defined in a spec release can be in the deprecated range.
 
-New `CNB_PLATFORM_DEPRECATION_MODE`, and `CNB_BUILDPACK_DEPRECATION_MODE` environment variables will control deprecation behavior with:
+A new `CNB_DEPRECATION_MODE`environment variable will control deprecation behavior with:
 * allowed values: `warn`, `error`, `silent`
 * default value: `warn`
 
 **When** the `CNB_PLATFROM_API` environment variable is set to an API version in the deprecated platform API, the lifecycle shall:
- - **If** `CNB_PLATFORM_DEPRECATION_MODE` is unset, **Then** print a warning and continue
- - **If** `CNB_PLATFORM_DEPRECATION_MODE=warn`, **Then** print a warning and continue
- - **If** `CNB_PLATFORM_DEPRECATION_MODE=error`, **Then** fail
- - **If** `CNB_PLATFORM_DEPRECATION_MODE=silent`, **Then** continue w/o warning
+ - **If** `CNB_DEPRECATION_MODE` is unset, **Then** print a warning and continue
+ - **If** `CNB_DEPRECATION_MODE=warn`, **Then** print a warning and continue
+ - **If** `CNB_DEPRECATION_MODE=error`, **Then** fail
+ - **If** `CNB_DEPRECATION_MODE=silent`, **Then** continue w/o warning
  
  
 **When** the `api` field in a `buildpack.toml` file is set to an API version in the deprecated buildpack API range the lifecycle shall:
- - **If** `CNB_BUILDPACK_DEPRECATION_MODE` is unset, **Then** print a warning and continue
- - **If** `CNB_BUILDPACK_DEPRECATION_MODE=warn`, **Then** print a warning and continue
- - **If** `CNB_BUILDPACK_DEPRECATION_MODE=error`, **Then** fail
- - **If** `CNB_BUILDPACK_DEPRECATION_MODE=silent`, **Then** continue w/o warning
+ - **If** `CNB_DEPRECATION_MODE` is unset, **Then** print a warning and continue
+ - **If** `CNB_DEPRECATION_MODE=warn`, **Then** print a warning and continue
+ - **If** `CNB_DEPRECATION_MODE=error`, **Then** fail
+ - **If** `CNB_DEPRECATION_MODE=silent`, **Then** continue w/o warning
 
 ### Supported APIs
 Only API versions defined in a spec release can be in the supported range.
@@ -157,3 +157,21 @@ Understanding buildpack/platform API support will require more documentation and
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 This RFC will not result in spec changes. The lifecycle descriptor file and builder labels are unspecified features.
+
+## Amended
+### Meta
+[meta-1]: #meta-1
+- Name: Variable Rename
+- Start Date: 2022-12-07
+- Author(s): natalieparellano
+- Amendment Pull Request: (leave blank)
+
+### Summary
+
+Instead of `CNB_PLATFORM_DEPRECATION_MODE` and `CNB_BUILDPACK_DEPRECATION_MODE` we have just one variable, `CNB_DEPRECATION_MODE`.
+
+### Motivation
+
+Why was this amendment necessary?
+
+Somewhere along the way, this is what we decided to implement. Updating the RFC to be accurate allows us to point end-users toward this RFC in helping to explain how APIs are deprecated.

@@ -7,6 +7,7 @@
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/rfcs#209](https://github.com/buildpacks/rfcs/issues/209)
 - Supersedes: N/A
+- Status: Approved
 
 # Summary
 [summary]: #summary

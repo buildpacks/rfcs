@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Image Labels
 - Start Date: 2020-03-24
-- Status: Approved
+- Status: Implemented
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: N/A

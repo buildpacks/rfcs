@@ -3,7 +3,7 @@
 - Name: Inline Buildpacks
 - Start Date: 2020-06-11
 - Author(s): [Joe Kutner](https://github.com/jkutner)
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#86](https://github.com/buildpacks/rfcs/pull/86)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

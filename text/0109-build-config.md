@@ -58,7 +58,7 @@ Final value: `FOO=test`
 
 
 Buildpack value: `FOO=test`
-Build config: `FOO.append=another-value, FOO.delim="`
+Build config: `FOO.append=another-value, FOO.delim=:`
 Final value: `FOO=test:another-value`
 
 Buildpack value: `FOO=test`
@@ -118,5 +118,5 @@ N/A
 
 Addition of the definition of the above directory in the Platform specification i.e. - 
 
-- `CNB_CONFIG_DIR`
+- `CNB_BUILD_CONFIG_DIR`
 - `/cnb/config/env.build`

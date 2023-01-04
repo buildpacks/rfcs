@@ -3,7 +3,7 @@
 - Name: Label RFCs With Specification And Target Audience
 - Start Date: 2020-08-15
 - Author(s): ForestEckhardt
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#108](https://github.com/buildpacks/rfcs/pull/108)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
