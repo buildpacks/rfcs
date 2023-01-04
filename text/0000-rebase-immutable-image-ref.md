@@ -12,8 +12,6 @@
 # Summary
 [summary]: #summary
 
-This is a feature for the implementation team.
-
 Allow passing a digest reference as rebase target. 
 
 # Definitions
@@ -29,17 +27,19 @@ A **digest reference**  refers to a [content addressable](https://en.wikipedia.o
 # Motivation
 [motivation]: #motivation
 
-- This feature will support a workflow where the rebase executing agent only has the digest available to it.
+Enables rebasing by targeting an immutable image digest. There are some scenarios where the **digest reference** is preferred over **tag reference**.
 
 # What it is
 [what-it-is]: #what-it-is
 
 This is a feature to expand the lifecycle rebase command to allow targeting an image by either `tag` or `digest`.
 
-Today, we get the following error when using a digest reference:
+Today, `lifecycle` returns the following error when appempting to use a **digest reference**:
 ```
 ERROR: failed to rebase: failed to write image to the following tags: [localhost:5003/foo/bar@sha256:916a9e100569ee521b86d03b8499b9b93d7d256d6e838868ae720295f2ea2f76: PUT http://localhost:5003/v2/foo/bar/manifests/sha256:916a9e100569ee521b86d03b8499b9b93d7d256d6e838868ae720295f2ea2f76: DIGEST_INVALID: provided digest did not match uploaded content]
 ```
+
+This error could be avoided if digest references were permitted.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -60,14 +60,14 @@ lifecycle rebase my-repo/foo:v4
 
 It is not currently possible to target an image using a **digest reference**.
 
-Supporting Rebase by Image Digest Reference will provide a mechanism to target an image rebase by tag reference or digest reference.
+_The proposed feature will provide a mechanism to target an image rebase by tag reference or digest reference._
 
 Here is what targeting an image via digest will look like:
 ```
 lifecycle rebase -previous-image my-repo/foo@sha256:1234 -tag my-repo/foo:rebase my-repo/foo
 ```
 
-- When using a digest reference as the image target, there may be one or more `<tag references>` to apply to exported image. If no `tag` is provided, `latest` will be used.
+- When using a digest reference as the image target, the caller may specify zero or more `<tag references>` to apply to exported image. If no `tag` is provided, `latest` will be used.
 - If `-previous-image` is not provided, it is infered from the first argument. This is similar behavior to `analyzer`, for instance.
 
 # Migration
