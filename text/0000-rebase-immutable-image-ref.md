@@ -46,20 +46,29 @@ ERROR: failed to rebase: failed to write image to the following tags: [localhost
 
 Today, we can execute rebase by using **tag references** but not **digest references**.
 
-Here are some examples of valid rebase commands using **tag references**:
-1. `lifecycle rebase my-repo/foo`
-1. `lifecycle rebase my-repo/foo:latest`
-1. `lifecycle rebase my-repo/foo:v4`
+Here are some examples of valid rebase commands. **Tag** is `latest` if not specified:
 
-It is not currently possible to target an image using **digest references**.
+```
+lifecycle rebase my-repo/foo
+```
+```
+lifecycle rebase my-repo/foo:latest
+```
+```
+lifecycle rebase my-repo/foo:v4
+```
+
+It is not currently possible to target an image using a **digest reference**.
 
 Supporting Rebase by Image Digest Reference will provide a mechanism to target an image rebase by tag reference or digest reference.
 
 Here is what targeting an image via digest will look like:
-1. `lifecycle rebase -previous-image my-repo/foo@sha256:1234 -tag my-repo/foo:rebase my-repo/foo`
+```
+lifecycle rebase -previous-image my-repo/foo@sha256:1234 -tag my-repo/foo:rebase my-repo/foo
+```
 
 - When using a digest reference as the image target, there may be one or more `<tag references>` to apply to exported image. If no `tag` is provided, `latest` will be used.
-- If `-previous-image` is not provided, the previous is infered from the first argument, just like `analyzer`, for instance.
+- If `-previous-image` is not provided, it is infered from the first argument. This is similar behavior to `analyzer`, for instance.
 
 # Migration
 [migration]: #migration
@@ -75,7 +84,8 @@ This is backwards compatible.
 # Prior Art
 [prior-art]: #prior-art
 
-`pack` explicitly does not support this. There is validation in `pack`:
+`pack` explicitly does not support this. There is a friendly validation message in `pack`:
+
 `<rebase target> is not a tag reference`
 
 # Unresolved Questions
