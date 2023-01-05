@@ -3,10 +3,10 @@
 - Name: Stop deleting cache images
 - Start Date: 2022-03-31
 - Author(s): jabrown85
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#216](https://github.com/buildpacks/rfcs/pull/216)
 - CNB Pull Request: (leave blank)
-- CNB Issue: [buildpacks/lifecycle#803](https://github.com/buildpacks/lifecycle/issues/803)
+- CNB Issue: N/A
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
