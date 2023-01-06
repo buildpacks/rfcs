@@ -40,7 +40,7 @@ The environment variables may ideally also take precendence over any user provid
 # What it is
 [what-it-is]: #what-it-is
 
-The RFC proposes the introduction of the following directory `/cnb/build-config/env.build` in build images. The directory follows the same convention as a `CNB environment directory`. The notable difference is that the environment variables sourced from this directory are applied **AFTER** processing the user-provided platform environment variables i.e. they should have the highest precedence. These variables should be available during both `detect` and `build` phases (and the `generate` phase in the future).
+The RFC proposes the introduction of the following directory `/cnb/build-config/env` in build images. The directory follows the same convention as a `CNB environment directory`. The notable difference is that the environment variables sourced from this directory are applied **AFTER** processing the user-provided platform environment variables i.e. they should have the highest precedence. These variables should be available during both `detect` and `build` phases (and the `generate` phase in the future).
 
 
 The operator can define this directory in the build image under `/cnb/build-config` or `CNB_BUILD_CONFIG_DIR` if defined.
