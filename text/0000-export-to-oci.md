@@ -349,7 +349,6 @@ The following new inputs are proposed to be added to these phases
  | `<layout-dir>` | `CNB_OCI_LAYOUT_PATH` | /layout-repo | Path to a directory where the images are saved in OCI layout format|
 
 ## How to map an image reference into a path in the layout repository
-[rules]: #rules
 
 In the previous examples one key element was how to translate an image reference into a path to look for in the `<layout-dir>`, let's define those rules.
 
@@ -706,4 +705,4 @@ Also the `analyzed.toml` [file](https://github.com/buildpacks/spec/blob/platform
 
 Where
 
-* `[image|run-image|previos-image].name` MUST point to the path of the image in OCI layout format following the rules describe [previously](#rules)
+* `[image|run-image|previos-image].name` MUST point to the path of the image in OCI layout format following the rules describe [previously](#how-to-map-an-image-reference-into-a-path-in-the-layout-repository)
