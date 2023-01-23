@@ -77,63 +77,42 @@ Let's see some examples of the proposed behavior
 
 A folder on disk (accessible by the lifecycle) is required to execute the feature, this new folder works as a local registry and the content must be in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
-Lifecycle phases accepts arguments pointing to `image reference`, those arguments are:
-
-| Input | Description
-|-------|------------
-| `<image>`	|	Tag reference to which the app image will be written |
-| `<previous-image>` | Image reference to be analyzed  (usually the result of the previous build) |
-| `<run-image>`	| Run image reference |
-
-<!-- | `<cache-image>`	| Reference to a cache image in an OCI image registry | -->
-
-Let's suppose a directory exits and it has the following structure:
+Let's suppose a directory exists and it has the following structure:
 
 ```=shell
-oci
-├── cnb
-│   ├── my-full-stack-run
-│   │   ├── blobs
-│   │   │   └── sha256
-│   │   │       ├── 1f59...944a // manifest
-│   │   │       ├── 6388...af5a // config
-│   │   │       ├── 824b...f984e
-│   │   │       ├── f5f7...5b38
-│   │   │       └── 870e...f1b09
-│   │   ├── index.json
-│   │   └── oci-layout
-│   └── my-partial-stack-run
-│       ├── blobs
-│       │   └── sha256
-│       │       ├── 1f59...944a // manifest
-│       │       └── 6388...af5a // config
-│       ├── index.json
-│       └── oci-layout
-├── foo
-│   └── my-cache
-│       ├── blobs
-│       │   └── sha256
-│       │       └── 1f591..a
-│       ├── index.json
-│       └── oci-layout
-├── bar
-│   └── my-previous-app
-│       ├── blobs
-│       │   └── sha256
-│       │       └── 1efg..w
-│       ├── index.json
-│       └── oci-layout
-└── my-app-image
-    └── blobs
-        ├── sha256
-        │   ├── 1bcd5..x               // app image manifest
-        │   ├── 2f789..d               // app image config
-        │   ├── 824b...f984e           // run layer
-        │   ├── f5f7...5b38            // run layer
-        │   ├── 870e...f1b09           // run layer
-        │   └── 3g234..f               // buildpack layer
-        ├── index.json
-        └── oci-layout
+layout-repo
+└── index.docker.io
+    ├── cnb
+    │   ├── my-full-stack-run:bionic
+    │   │   └── bionic
+    │   │       └── blobs
+    │   │           ├── sha256
+    │   │           │   ├── 1f59...944a // manifest
+    │   │           │   ├── 6388...af5a // config
+    │   │           │   ├── 824b...f984e
+    │   │           │   ├── f5f7...5b38
+    │   │           │   └── 870e...f1b09
+    │   │           ├── index.json
+    │   │           └── oci-layout
+    │   └── my-partial-stack-run:bionic
+    │       └── bionic
+    │           ├── blobs
+    │           │   └── sha256
+    │           │       ├── 1f59...944a // manifest
+    │           │       └── 6388...af5a // config
+    │           ├── index.json
+    │           └── oci-layout
+    └── bar
+        └── my-previous-app
+            └── latest
+                ├── blobs
+                │   └── sha256
+                │       ├── 4bcd5..x               // app image manifest
+                │       ├── 5f789..d               // app image config
+                │       ├── 624b...f984e           // run layer
+                │       └── 4g234..f               // buildpack layer
+                ├── index.json
+                └── oci-layout
 ```
 
 The images named **cnb/my-full-stack-run** and **cnb/my-partial-stack-run** represents the same image but the partial one has missing `blobs`, those `blobs` are the layers that are already available in the store from it came from.
@@ -150,15 +129,20 @@ In any case the expected output is the same.
 ##### Analyzing run-image full saved on disk
 
 ```=shell
-> export CNB_USE_OCI_LAYOUT=true
+> export CNB_USE_LAYOUT=true
 > /cnb/lifecycle/analyzer -run-image cnb/my-full-stack-run:bionic my-app-image
 
 # OR
 
 > /cnb/lifecycle/analyzer -layout -run-image cnb/my-full-stack-run:bionic my-app-image
+```
 
-# expected output
-# analyzed.toml file with the usual `run-image.reference`
+expected analyzed.toml output
+
+```=toml
+[run-image]
+  reference = "<image reference>"
+  name = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic"
 
 ```
 
@@ -171,10 +155,14 @@ In any case the expected output is the same.
 # OR
 
 > /cnb/lifecycle/analyzer -layout -run-image cnb/cnb/my-partial-stack-run:bionic my-app-image
+```
 
-# expected output
-# analyzed.toml file with the usual `run-image.reference`
-# there should be no change behavior in the phase even thought the image has missing blobs
+expected analyzed.toml output
+
+```=toml
+[run-image]
+  reference = "<image reference>"
+  name = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic"
 
 ```
 
@@ -187,9 +175,19 @@ In any case the expected output is the same.
 # OR
 
 > /cnb/lifecycle/analyzer -layout -run-image cnb/my-full-stack-run:bionic-previous-image bar/my-previous-app my-app-image
+```
 
-# expected output
-# analyzed.toml file with the usual `run-image.reference` and `previos-image.reference`
+expected analyzed.toml output
+
+```=toml
+[run-image]
+  reference = "<image reference>"
+  name = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic"
+
+[previous-image]
+  reference = "<image reference>"
+  name = "/layout-repo/index.docker.io/bar/my-previous-app/latest"
+
 ```
 
 ##### Analyzing run-image not saved on disk
@@ -204,7 +202,7 @@ In any case the expected output is the same.
 
 # expected output
 
-ERROR: the run-image could not be found at path: /oci/cnb/bad-run-image
+ERROR: the run-image could not be found at path: /layout-repo/index.docker.io/cnb/bad-run-image/latest
 ```
 
 ##### Analyzing without run-image argument
@@ -219,8 +217,10 @@ ERROR: the run-image could not be found at path: /oci/cnb/bad-run-image
 
 # expected output
 
-ERROR: -run-image is required when OCI feature is enabled
+ERROR: -run-image is required when OCI Layout feature is enabled
 ```
+
+Let's also check some examples when the export phase is executed
 
 #### Export phase
 
@@ -228,39 +228,43 @@ ERROR: -run-image is required when OCI feature is enabled
 
 ```=shell
 > export CNB_USE_OCI_LAYOUT=true
-> /cnb/lifecycle/exporter -run-image cnb/my-full-stack-run:bionic my-app-image
+> /cnb/lifecycle/exporter my-app-image
 
 # OR
 
->  /cnb/lifecycle/exporter -layout -run-image cnb/my-full-stack-run:bionic my-app-image
+>  /cnb/lifecycle/exporter -layout my-app-image
+```
 
-# expected output
-# the store folder will be updated with the application image as follows
+The output will be written into the repository folder described above and it should looks like this:
 
-oci
-├── cnb
-│   └── my-full-stack-run
-│       ├── blobs
-│       │   └── sha256
-│       │       ├── 1f59...944a         // manifest
-│       │       ├── 6388...af5a         // config
-│       │       ├── 824b...f984e
-│       │       ├── f5f7...5b38
-│       │       └── 870e...f1b09
-│       ├── index.json
-│       └── oci-layout
-├── // some folders omitted for simplicity
-└── my-app-image
-    └── blobs
-        ├── sha256
-        │   ├── 1bcd5..x               // app image manifest
-        │   ├── 2f789..d               // app image config
-        │   ├── 824b...f984e           // run layer
-        │   ├── f5f7...5b38            // run layer
-        │   ├── 870e...f1b09           // run layer
-        │   └── 3g234..f               // buildpack layer
-        ├── index.json
-        └── oci-layout
+```=shell
+layout-repo
+└── index.docker.io
+    ├── cnb
+    │   └── my-full-stack-run:bionic
+    │       └── bionic
+    │           └── blobs
+    │               ├── sha256
+    │               │   ├── 1f59...944a // manifest
+    │               │   ├── 6388...af5a // config
+    │               │   ├── 824b...f984e
+    │               │   ├── f5f7...5b38
+    │               │   └── 870e...f1b09
+    │               ├── index.json
+    │               └── oci-layout
+    └── library
+        └── my-app-image
+            └── latest
+                ├── blobs
+                │   └── sha256
+                │       ├── 1bcd5..x               // app image manifest
+                │       ├── 2f789..d               // app image config
+                │       ├── 824b...f984e           // run layer
+                │       ├── f5f7...5b38            // run layer
+                │       ├── 870e...f1b09           // run layer
+                │       └── 3g234..f               // buildpack layer
+                ├── index.json
+                └── oci-layout
 
 ```
 
@@ -271,33 +275,37 @@ As we can see, the application image `my-app-image` contains a **full** copy of 
 
 ```=shell
 > export CNB_USE_OCI_LAYOUT=true
-> /cnb/lifecycle/exporter -run-image cnb/my-partial-stack-run:bionic my-app-image
+> /cnb/lifecycle/exporter my-app-image
 
 # OR
 
->  /cnb/lifecycle/exporter -layout -run-image cnb/my-partial-stack-run:bionic my-app-image
+>  /cnb/lifecycle/exporter -layout my-app-image
+```
 
-# expected output
-# the store folder will be updated with the application image as follows
+Expected output:
 
-oci
-├── cnb
-│   └── my-partial-stack-run
-│       ├── blobs
-│       │   └── sha256
-│       │       ├── 1f59...944a         // manifest
-│       │       ├── 6388...af5a         // config
-│       ├── index.json
-│       └── oci-layout
-├── // some folders omitted for simplicity
-└── my-app-image
-    └── blobs
-        ├── sha256
-        │   ├── 1bcd5..x               // app image manifest
-        │   ├── 2f789..d               // app image config
-        │   └── 3g234..f               // buildpack layer
-        ├── index.json
-        └── oci-layout
+```=shell
+layout-repo
+└── index.docker.io
+    ├── cnb
+    │   └── my-partial-stack-run:bionic
+    │       └── bionic
+    │           ├── blobs
+    │           │   └── sha256
+    │           │       ├── 1f59...944a // manifest
+    │           │       └── 6388...af5a // config
+    │           ├── index.json
+    │           └── oci-layout
+    └── library
+        └── my-app-image
+            └── latest
+                ├── blobs
+                │   └── sha256
+                │       ├── 1bcd5..x               // app image manifest
+                │       ├── 2f789..d               // app image config
+                │       └── 3g234..f               // buildpack layer
+                ├── index.json
+                └── oci-layout
 
 ```
 
@@ -338,68 +346,128 @@ The following new inputs are proposed to be added to these phases
  | Input | Environment Variable  | Default Value | Description
  |-------|-----------------------|---------------|--------------
  | `<layout>`     | `CNB_USE_OCI_LAYOUT` | false | Enables the capability of resolving image from/to in OCI layout format on disk |
- | `<layout-dir>` | `CNB_OCI_LAYOUT_PATH` | /oci | Path to oci directory where the images are saved |
+ | `<layout-dir>` | `CNB_OCI_LAYOUT_PATH` | /layout-repo | Path to a directory where the images are saved in OCI layout format|
 
-- WHEN `the new flag -layout or the default environment variable CNB_USE_OCI_LAYOUT are set to true` during the phase invocation THEN the feature will be enabled.
+## How to map an image reference into a path in the layout repository
+[rules]: #rules
+
+In the previous examples one key element was how to translate an image reference into a path to look for in the `<layout-dir>`, let's define those rules.
+
+Considering an **image reference** refers to either a tag reference or digest reference. It could have the following formats
+- A tag reference refers to an identifier of form `<registry>/<repo>:<tag>`
+- A digest reference refers to a content addressable identifier of form `<registry>/<repo>@<algorithm>:<digest>`
+
 The image look up will be done following these rules:
   - WHEN `the image points to a tag reference`
-    - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<layout-dir>/<registry>/<repo>/<tag>`
+    - Lifecycle will load/save the image from/to disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<layout-dir>/<registry>/<repo>/<tag>`
   - WHEN `the image points to a digest reference`
     - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<layout-dir>/<registry>/<repo>/<digest>`
-  - Apart for the image look up, the logic for each phase should remain the same and the lifecycle will write the layers on disk according to the following rules:
-    - Any layer generated by a buildpack SHOULD always be written to disk
-    - Layers from `base-image` or `run-image` MAY be written on disk if they were provided
+  - WHEN `<registry>` is not provided default value will be **index.docker.io**
+    - IF `<repo>` is not also provided, then default value will be **library**
 
-Let's review our previous examples.
 
 ## Examples
 
-In all the examples the new feature is enabled by the use of the new flag `-layout` or by setting the new environment variable  `CNB_USE_OCI_LAYOUT` to true.
+In all the examples the new feature is enabled by the use of the new flag `-layout` or by setting
+the new environment variable  `CNB_USE_OCI_LAYOUT` to true.
+
+Let's review some of the previous examples
 
 #### Analyze phase
 
 ##### Analyzing run-image full saved on disk
+
+Command:
+
+```=shell
+> export CNB_USE_LAYOUT=true
+> /cnb/lifecycle/analyzer -run-image cnb/my-full-stack-run:bionic my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -layout -run-image cnb/my-full-stack-run:bionic my-app-image
+```
 
 Arguments received:
 
  - `run-image`: `cnb/my-full-stack-run:bionic`
  - `image`: `my-app-image`
 
-The `<layout-dir>` is set with the default value `/oci`
+The `<layout-dir>` is set with the default value `/layout-repo`
 
 Lifecycle applies the rules for looking up the images:
- - It takes the **tag reference** `cnb/my-full-stack-run:bionic` and look at path `/oci/cnb/my-full-stack-run` for an image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
- - Lifecycle validates the `annotations` map in the **Image Manifest** contains a key-value paired `"org.opencontainers.image.ref.name" : "bionic"`
- - In case of the *application image* it will look at path `/oci/my-app-image`
+ - It takes the **tag reference** `cnb/my-full-stack-run:bionic`, applies the conversion rules and look at path `/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic` for an image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
- Because both images are found, the phase is executed as usual and the `analyzed.toml` file will be updated
+ - In case of the *application image* it will look at path `/layout-repo/index.docker.io/library/my-app-image/latest`
+
+Because both images are found, the phase is executed as usual and the `analyzed.toml` file will be updated. A new field `Name` was added into the `analyzed.toml` that will contain the path resolved by the lifecycle, in these cases:
+
+```=toml
+[run-image]
+  reference = "<image reference>"
+  name = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic"
+
+```  
 
 ##### Analyzing run-image partial saved on disk
+
+Command received:
+
+```=shell
+> export CNB_USE_OCI_LAYOUT=true
+> /cnb/lifecycle/analyzer -run-image cnb/cnb/my-partial-stack-run:bionic my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -layout -run-image cnb/cnb/my-partial-stack-run:bionic my-app-image
+```
 
 Arguments received:
 
  - `run-image`: `cnb/my-full-partial-run:bionic`
  - `image`: `my-app-image`
 
-The `<layout-dir>` is set with the default value `/oci`
+The `<layout-dir>` is set with the default value `/layout-repo`
 
 Noticed the structure of the `run-image` provided
 
 ```=shell
-oci
-├── cnb
-    └── my-partial-stack-run
-       ├── blobs
-       │   └── sha256
-       │       ├── 1f59...944a // manifest
-       │       └── 6388...af5a // config
-       ├── index.json
-       └── oci-layout
+layout-repo
+└── index.docker.io
+    └── cnb
+        └── my-partial-stack-run:bionic
+            └── bionic
+                ├── blobs
+                │   └── sha256
+                │       ├── 1f59...944a // manifest
+                │       └── 6388...af5a // config
+                ├── index.json
+                └── oci-layout
 ```
 
-Similar to the previous example, Lifecycle applies the rules for looking up the images and look at path `/oci/cnb/my-partial-stack-run` and it determines a partial image was provided and execute the phase logic with the information from the **Image Manifest** and the **Image Config**
+Similar to the previous example, Lifecycle applies the rules for looking up the images and look at path `/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic` and it determines a partial image was provided and execute the phase logic with the information from the **Image Manifest** and the **Image Config**
+
+The output `analyzed.toml` will also include the new `name` field with the path where the image was located.
+
+```=toml
+[run-image]
+  reference = "<image reference>"
+  name = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic"
+
+```  
 
 ##### Analyzing previous-image
+
+Command received:
+
+```=shell
+> export CNB_USE_OCI_LAYOUT=true
+> /cnb/lifecycle/analyzer -run-image cnb/my-full-stack-run:bionic -previous-image bar/my-previous-app my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -layout -run-image cnb/my-full-stack-run:bionic -previous-image bar/my-previous-app my-app-image
+```
 
 Arguments received:
 
@@ -407,58 +475,101 @@ Arguments received:
 - `previous-image`: `bar/my-previous-app`
 - `image`: `my-app-image`
 
-The `<layout-dir>` is set with the default value `/oci`
+The `<layout-dir>` is set with the default value `/layout-repo`
 
-`run-image` and `image` arguments are treated in the same way as previous examples, and for `previous-image` argument the looking up images rules are applied and Lifecycle will look at path `/oci/bar/my-previous-app` for a image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
+`run-image` and `image` arguments are treated in the same way as previous examples, and for `previous-image` argument the looking up images rules are applied and Lifecycle will look at path `/layout-repo/index.docker.io/bar/my-previous-app` for a image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
-##### Analyzing run-image not saved on disk
+The `analyzed.toml` file es expected to be updated with the previous image section and the new label `name` will be also be there with the path to the `previous-image`
 
-Arguments received:
+```=toml
+[run-image]
+  reference = "<image reference>"
+  name = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic"
 
-- `run-image`: `cnb/bad-run-image`
-- `image`: `my-app-image`
+[previous-image]
+  reference = "<image reference>"
+  name = "/layout-repo/index.docker.io/bar/my-previous-app/latest"
 
-The `<layout-dir>` is set with the default value `/oci`
+```
 
-In this case, Lifecycle will will look at path `/oci/bad-run-image` and because the path doesn't exists then an error must be thrown.
-
-##### Analyzing without run-image argument
-
-Arguments received:
-
-- `image`: `my-app-image`
-
-The `<layout-dir>` is set with the default value `/oci`
-
-When the feature is enabled, Lifecycle requires any input image must be available on disk, because the `run-image` reference was not provided Lifecycle must thrown an error.
-
-#### Export phase
+Let's check how the `export` examples works on detailed
 
 ##### Export to OCI using run-image full saved on disk
 
+Pre-conditions:
+
+The following directories are accessible by the lifecycle
+```=shell
+/
+├── layout-repo
+│   └── index.docker.io
+│       └── cnb
+│           └── my-full-stack-run:bionic
+│               └── bionic
+│                   └── blobs
+│                       ├── sha256
+│                       │   ├── 1f59...944a // manifest
+│                       │   ├── 6388...af5a // config
+│                       │   ├── 824b...f984e
+│                       │   ├── f5f7...5b38
+│                       │   └── 870e...f1b09
+│                       ├── index.json
+│                       └── oci-layout
+└── layers
+    └── analyzed.tom
+```
+
+The `/layers/analyzed.toml` file contains the following data:
+
+```=toml
+[run-image]
+  reference = "<image reference>"
+  name = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic"
+
+```
+
+Command executed:
+
+```=shell
+> export CNB_USE_OCI_LAYOUT=true
+> /cnb/lifecycle/exporter  my-app-image
+
+# OR
+
+>  /cnb/lifecycle/exporter -layout  my-app-image
+```
+
 Arguments received:
 
-- `run-image`: `cnb/my-full-stack-run:bionic`
 - `image`: `my-app-image`
 
-The `<layout-dir>` is set with the default value `/oci`
+The `<layout-dir>` is set with the default value `/layout-repo`
 
-Lifecycle applies the rules for looking up the images:
- - It takes the **tag reference** `cnb/my-full-stack-run:bionic` and look at path `/oci/cnb/my-full-stack-run` for an image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
- - Lifecycle validates the `annotations` map in the **Image Manifest** contains a key-value paired `"org.opencontainers.image.ref.name" : "bionic"`
- - Lifecycle determines the `run-image` is a full image reference (it contains all the blobs)
- - Lifecycle writes the *application image* at path `/oci/my-app-image` in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format including the layers from the `run-image`
+Lifecycle:
+ - It will read the `[run-image]` section in the `analyzed.toml` and read the `name` attribute to load the `run-image` image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at path `/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic`.
+ - Lifecycle will execute the export steps and at the end of the process it will write the *application image* at path `/layout-repo/index.docker.io/library/my-app-image/latest` in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format
 
-##### Export to OCI using run-image partially saved on disk
 
-Arguments received:
+The output image will be written at:
 
-- `run-image`: `cnb/my-partial-stack-run:bionic`
-- `image`: `my-app-image`
+```=shell
+layout-repo
+└── index.docker.io
+    └── library
+        └── my-app-image
+            └── latest
+                ├── blobs
+                │   └── sha256
+                │       ├── 1bcd5..x               // app image manifest
+                │       ├── 2f789..d               // app image config
+                │       ├── 824b...f984e           // run layer
+                │       ├── f5f7...5b38            // run layer
+                │       ├── 870e...f1b09           // run layer
+                │       └── 3g234..f               // buildpack layer
+                ├── index.json
+                └── oci-layout
 
-The `<layout-dir>` is set with the default value `/oci`
-
-Lifecycle behaves similar to the previous example, but during the process of writing the output application image to disk it will skip the layers that are missing in the `blobs` folder at path  `/oci/cnb/my-partial-stack-run`
+```
 
 ## Proof of concept
 
@@ -570,7 +681,29 @@ I think, this PoC demonstrate that adding the exporting to OCI layout format is 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-<!--
-Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
-Examples of a spec. change might be new lifecycle flags, new `buildpack.toml` fields, new fields in the buildpackage label, etc.
-This section is not intended to be binding, but as discussion of an RFC unfolds, if spec changes are necessary, they should be documented here. -->
+The [Platform Interface Specification](https://github.com/buildpacks/spec/blob/platform/0.11/platform.md#inputs-5) must be updated to  include the following inputs to the [Create](https://buildpacks.io/docs/concepts/components/lifecycle/create/), [Analyze](https://buildpacks.io/docs/concepts/components/lifecycle/analyze/) and [Export](https://buildpacks.io/docs/concepts/components/lifecycle/export/) phases
+
+| Input | Environment Variable  | Default Value | Description
+|-------|-----------------------|---------------|--------------
+| `<layout>`     | `CNB_USE_OCI_LAYOUT` | false | Enables the capability of resolving image from/to in OCI layout format on disk |
+| `<layout-dir>` | `CNB_OCI_LAYOUT_PATH` | /layout-repo | Path to a directory where the images are saved in OCI layout format|
+
+Also the `analyzed.toml` [file](https://github.com/buildpacks/spec/blob/platform/0.11/platform.md#analyzedtoml-toml) will be updated to include the new `name` field
+
+```=toml
+[image]
+  reference = "<image reference>"
+  name = "<path/to/oci-layout>"
+
+[run-image]
+  reference = "<image reference>"
+  name = "<path/to/oci-layout>"
+
+[previous-image]
+  reference = "<image reference>"
+  name = "<path/to/oci-layout>"
+```
+
+Where
+
+* `[image|run-image|previos-image].name` MUST point to the path of the image in OCI layout format following the rules describe [previously](#rules)
