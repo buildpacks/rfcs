@@ -672,9 +672,15 @@ I think, this PoC demonstrate that adding the exporting to OCI layout format is 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-<!--
 - What parts of the design do you expect to be resolved before this gets merged?
+  - Tools like [umoci](https://umo.ci/) used to create a runtime bundle from an image in OCI layout format, requires the [annotation](https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys) `org.opencontainers.image.ref.name` to be present. Also tools like [skopeo](https://github.com/containers/skopeo) when an image is `copy` in oci format the annotation is included.
+  We are not adding the annotation as part of the Buildpacks Specification, but in this case this could make our output incompatible with some other tooling.
+  - Depending on the previous question, the rules for mapping an image reference into a path could change, also validations that the Lifecycle could do to verify the `org.opencontainers.image.ref.name` against the value provided in the image reference.
+
 - What parts of the design do you expect to be resolved through implementation of the feature?
+  - Handle symbolic links to the blobs in the `<layout-dir>` repository, this could be more efficient on hard drive space
+
+<!--
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC? -->
 
 # Spec. Changes (OPTIONAL)
