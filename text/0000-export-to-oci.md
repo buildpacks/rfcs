@@ -353,14 +353,14 @@ The following new inputs are proposed to be added to these phases
 In the previous examples one key element was how to translate an image reference into a path to look for in the `<layout-dir>`, let's define those rules.
 
 Considering an **image reference** refers to either a tag reference or digest reference. It could have the following formats
-- A tag reference refers to an identifier of form `<registry>/<repo>:<tag>`
-- A digest reference refers to a content addressable identifier of form `<registry>/<repo>@<algorithm>:<digest>`
+- A tag reference refers to an identifier of form `<registry>/<repo>/<image>:<tag>`
+- A digest reference refers to a content addressable identifier of form `<registry>/<repo>/<image>@<algorithm>:<digest>`
 
 The image look up will be done following these rules:
   - WHEN `the image points to a tag reference`
-    - Lifecycle will load/save the image from/to disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<layout-dir>/<registry>/<repo>/<tag>`
+    - Lifecycle will load/save the image from/to disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<layout-dir>/<registry>/<repo>/<image>/<tag>`
   - WHEN `the image points to a digest reference`
-    - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<layout-dir>/<registry>/<repo>/<digest>`
+    - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<layout-dir>/<registry>/<repo>/<image>/<algorithm>/<digest>`
   - WHEN `<registry>` is not provided default value will be **index.docker.io**
     - IF `<repo>` is not also provided, then default value will be **library**
 
