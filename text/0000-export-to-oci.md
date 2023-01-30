@@ -141,8 +141,7 @@ expected analyzed.toml output
 
 ```=toml
 [run-image]
-  reference = "<image reference>"
-  name = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic"
+  reference = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 ```
 
@@ -161,8 +160,7 @@ expected analyzed.toml output
 
 ```=toml
 [run-image]
-  reference = "<image reference>"
-  name = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic"
+  reference = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 ```
 
@@ -181,12 +179,10 @@ expected analyzed.toml output
 
 ```=toml
 [run-image]
-  reference = "<image reference>"
-  name = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic"
+  reference = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 [previous-image]
-  reference = "<image reference>"
-  name = "/layout-repo/index.docker.io/bar/my-previous-app/latest"
+  reference = "/layout-repo/index.docker.io/bar/my-previous-app/latest@sha256:aa0cf7fc8f161bdb96166c1644174affacd70d17f372373ca72c8e91116e2d43"
 
 ```
 
@@ -399,12 +395,11 @@ Lifecycle applies the rules for looking up the images:
 
  - In case of the *application image* it will look at path `/layout-repo/index.docker.io/library/my-app-image/latest`
 
-Because both images are found, the phase is executed as usual and the `analyzed.toml` file will be updated. A new field `Name` was added into the `analyzed.toml` that will contain the path resolved by the lifecycle, in these cases:
+Because both images are found, the phase is executed as usual and the `analyzed.toml` file will be updated. The `run-image.reference` added into the `analyzed.toml` will contain the path resolved by the lifecycle plus the digest reference to the image with the following format `[path]@[digest]`. In case of this example, it will look like this:
 
 ```=toml
 [run-image]
-  reference = "<image reference>"
-  name = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic"
+  reference = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 ```  
 
@@ -444,14 +439,13 @@ layout-repo
                 └── oci-layout
 ```
 
-Similar to the previous example, Lifecycle applies the rules for looking up the images and look at path `/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic` and it determines a partial image was provided and execute the phase logic with the information from the **Image Manifest** and the **Image Config**
+Similar to the previous example, Lifecycle applies the rules for looking up the images and look at path `/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic` and it determines a partial image was provided and execute the phase with the information from the **Image Manifest** and the **Image Config**
 
-The output `analyzed.toml` will also include the new `name` field with the path where the image was located.
+The output `analyzed.toml` will also include the new `run-image.reference` field the path and the digest of the run image. 
 
 ```=toml
 [run-image]
-  reference = "<image reference>"
-  name = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic"
+  reference = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 ```  
 
@@ -478,16 +472,14 @@ The `<layout-dir>` is set with the default value `/layout-repo`
 
 `run-image` and `image` arguments are treated in the same way as previous examples, and for `previous-image` argument the looking up images rules are applied and Lifecycle will look at path `/layout-repo/index.docker.io/bar/my-previous-app` for a image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
-The `analyzed.toml` file es expected to be updated with the previous image section and the new label `name` will be also be there with the path to the `previous-image`
+The `analyzed.toml` file es expected to be updated with the `previous-image.reference` containing the path and the digest of the `previous-image`
 
 ```=toml
 [run-image]
-  reference = "<image reference>"
-  name = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic"
+  reference = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 [previous-image]
-  reference = "<image reference>"
-  name = "/layout-repo/index.docker.io/bar/my-previous-app/latest"
+  reference = "/layout-repo/index.docker.io/bar/my-previous-app/latest@sha256:aa0cf7fc8f161bdb96166c1644174affacd70d17f372373ca72c8e91116e2d43"
 
 ```
 
@@ -522,8 +514,7 @@ The `/layers/analyzed.toml` file contains the following data:
 
 ```=toml
 [run-image]
-  reference = "<image reference>"
-  name = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic"
+  reference = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 ```
 
@@ -545,7 +536,8 @@ Arguments received:
 The `<layout-dir>` is set with the default value `/layout-repo`
 
 Lifecycle:
- - It will read the `[run-image]` section in the `analyzed.toml` and read the `name` attribute to load the `run-image` image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at path `/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic`.
+ - It will read the `[run-image]` section in the `analyzed.toml`, it will parse `reference` attribute using the `@` separator and load the `run-image` image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at path `/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic`.
+ - Lifecycle could also validate the digest of the image loaded is the same as the one established by the `reference`.
  - Lifecycle will execute the export steps and at the end of the process it will write the *application image* at path `/layout-repo/index.docker.io/library/my-app-image/latest` in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format
 
 
@@ -694,22 +686,22 @@ The [Platform Interface Specification](https://github.com/buildpacks/spec/blob/p
 | `<layout>`     | `CNB_USE_OCI_LAYOUT` | false | Enables the capability of resolving image from/to in OCI layout format on disk |
 | `<layout-dir>` | `CNB_OCI_LAYOUT_PATH` | /layout-repo | Path to a directory where the images are saved in OCI layout format|
 
-Also the `analyzed.toml` [file](https://github.com/buildpacks/spec/blob/platform/0.11/platform.md#analyzedtoml-toml) will be updated to include the new `name` field
+Also the `analyzed.toml` [file](https://github.com/buildpacks/spec/blob/platform/0.11/platform.md#analyzedtoml-toml) will be updated to include the `reference` format in case of layout is being used.
 
 ```=toml
 [image]
   reference = "<image reference>"
-  name = "<path/to/oci-layout>"
 
 [run-image]
   reference = "<image reference>"
-  name = "<path/to/oci-layout>"
 
 [previous-image]
   reference = "<image reference>"
-  name = "<path/to/oci-layout>"
 ```
 
 Where
 
-* `[image|run-image|previos-image].name` MUST point to the path of the image in OCI layout format following the rules describe [previously](#how-to-map-an-image-reference-into-a-path-in-the-layout-repository)
+- `[image|run-image|previos-image].reference` MUST be either a digest reference to an image in an OCI registry or the ID of an image in a docker daemon. 
+  - In case an image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format is being used, it will also include the path of the image in OCI layout format following the rules describe [previously](#how-to-map-an-image-reference-into-a-path-in-the-layout-repository) 
+  - The format MUST be as follows: `[path]@[digest]`  
+
