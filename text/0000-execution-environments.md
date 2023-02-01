@@ -81,6 +81,46 @@ This file be extended by adding `exec-env` to the following tables:
 `[[io.buildpacks.post.group.env]]`
 `[[io.buildpacks.build.env]]`
 
+An example would look like this:
+
+```TOML
+[_]
+schema-version = "0.3"
+
+[[io.buildpacks.group]]
+id = "buildpacks/ruby"
+version = "latest"
+
+[[io.buildpacks.group]]
+id = "buildpacks/metrics-agent"
+version = "latest"
+exec-env = "production"
+
+[[io.buildpacks.group]]
+id = "buildpacks/headless-chrome"
+version = "latest"
+exec-env = "test"
+
+[[io.buildpacks.post.group]]
+id = "buildpacks/procfile"
+version = "latest"
+
+[[io.buildpacks.buildenv]]
+name = "RAILS_ENV"
+value = "production"
+exec-env = "production"
+
+[[io.buildpacks.build.env]]
+name = "RAILS_ENV"
+value = "test"
+exec-env = "test"
+
+[[io.buildpacks.build.env]]
+name = "PARALLEL_WORKERS"
+value = "4"
+exec-env = "test"
+```
+
 ### `builder.toml` (Builder Authors)
 
 The only table that `exec-env` will be added to is `[[order.group.env]]`.
