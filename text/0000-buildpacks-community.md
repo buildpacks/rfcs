@@ -85,7 +85,7 @@ A project can be admitted to the Buildpacks community organization by creating a
 - Evidence for the above criteria
 - A list of maintainers for the project
 
-The above information will be structured into an appropriate issue template. The Buildpacks Leadership will review the issue and if the project meets the above criteria, the project will be added to the Buildpacks community organization. The Buildpacks Leadership will assign a steward team to the project and the team lead of the steward team will be responsible for ensuring that the project meets the above criteria.
+The above information will be structured into an appropriate issue template. The Buildpacks Leadership will review the issue and if the project meets the above criteria, the project will be added to the Buildpacks community organization. The Buildpacks Leadership will assign a team to the project and the team lead of the team will steward the project - i.e., will be responsible for ensuring that the project meets the above criteria.
 
 Once admitted, the team lead of the steward team will create a Github team for the project and add the project maintainers to the team and mark them as the team maintainers allowing them to add other maintainers. The existing team maintainers of the steward team will be added as maintainers to the project team.
 
