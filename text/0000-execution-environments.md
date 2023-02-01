@@ -168,7 +168,7 @@ While the design tries to stay simple, it still adds new additions to the spec.
 
 When using `Dockerfile`, it's common to create a separate one for other execution environments like `Dockerfile.test`. This makes the file clean and easy to read, but comes at the cost of duplicating setup/code.
 
-With Project Descriptor, this would remove the need for the `exec-env` key at the cost of replicating buildpack groups. It does bring a big benefit by easily unlocking the `builder` key in Project Descriptor to be specific to an execution environment. This would apply to any fields (not tables) that exist at the `[io.buildpacks]` level. There are some other options if this is desired, where a new table could be created for hoisting fields into that would allow us to add the `exec-env` field.
+With Project Descriptor, this would remove the need for the `exec-env` key at the cost of replicating buildpack groups. It does bring a big benefit by easily unlocking the `builder` key in Project Descriptor to be specific to an execution environment. This would apply to any fields (not tables) that exist at the `[io.buildpacks]` level like `include`/`exclude`. There are some other options if this is desired, where a new table could be created for hoisting fields into that would allow us to add the `exec-env` field.
 
 # Prior Art
 [prior-art]: #prior-art
@@ -191,7 +191,7 @@ The original Cloud Native Buildpacks spec included a Develop API, but it was nev
 [unresolved-questions]: #unresolved-questions
 
 - "env" is overloaded as a word since we also use it for environment variables. Is there a better word here?
-- Should there be builders that are specific to an execution environment?
+- Should there be builders that are specific to an execution environment? What about `include` or `exclude`?
 - Should the execution environments be an enum or flexible as a string?
   - enums will help encourage standardization across buildpacks and platforms.
   - strings can help account for use cases we haven't thought of yet.
