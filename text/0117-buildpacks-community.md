@@ -3,10 +3,10 @@
 - Name: Buildpacks Community
 - Start Date: 2023-01-26
 - Author(s): [@samj1912](https://github.com/samj1912)
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#273](https://github.com/buildpacks/rfcs/pull/273)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
