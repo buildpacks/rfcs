@@ -75,13 +75,12 @@ Let's see some examples of the proposed behavior
 
 ### Requirements
 
-A folder on disk (accessible by the lifecycle) is required to execute the feature, this new folder works as a local registry and the content must be in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
+Lifecycle will converts image references into local paths following define [rules](#how-to-map-an-image-reference-into-a-path-in-the-layout-repository) and the content must be in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
-Let's suppose a directory exists and it has the following structure:
+Let's suppose a *platform implementor* creates directories with the following structure:
 
 ```=shell
-layout-repo
-└── index.docker.io
+index.docker.io
     ├── cnb
     │   ├── my-full-stack-run:bionic
     │   │   └── bionic
@@ -141,7 +140,7 @@ expected analyzed.toml output
 
 ```=toml
 [run-image]
-  reference = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
+  reference = "/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 ```
 
@@ -160,7 +159,7 @@ expected analyzed.toml output
 
 ```=toml
 [run-image]
-  reference = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
+  reference = "/index.docker.io/cnb/my-partial-stack-run@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 ```
 
@@ -179,10 +178,10 @@ expected analyzed.toml output
 
 ```=toml
 [run-image]
-  reference = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
+  reference = "/index.docker.io/cnb/my-partial-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 [previous-image]
-  reference = "/layout-repo/index.docker.io/bar/my-previous-app/latest@sha256:aa0cf7fc8f161bdb96166c1644174affacd70d17f372373ca72c8e91116e2d43"
+  reference = "/index.docker.io/bar/my-previous-app/latest@sha256:aa0cf7fc8f161bdb96166c1644174affacd70d17f372373ca72c8e91116e2d43"
 
 ```
 
@@ -198,7 +197,7 @@ expected analyzed.toml output
 
 # expected output
 
-ERROR: the run-image could not be found at path: /layout-repo/index.docker.io/cnb/bad-run-image/latest
+ERROR: the run-image could not be found at path: /index.docker.io/cnb/bad-run-image/latest
 ```
 
 ##### Analyzing without run-image argument
@@ -234,8 +233,7 @@ Let's also check some examples when the export phase is executed
 The output will be written into the repository folder described above and it should looks like this:
 
 ```=shell
-layout-repo
-└── index.docker.io
+index.docker.io
     ├── cnb
     │   └── my-full-stack-run:bionic
     │       └── bionic
@@ -281,8 +279,7 @@ As we can see, the application image `my-app-image` contains a **full** copy of 
 Expected output:
 
 ```=shell
-layout-repo
-└── index.docker.io
+index.docker.io
     ├── cnb
     │   └── my-partial-stack-run:bionic
     │       └── bionic
@@ -341,22 +338,21 @@ The following new inputs are proposed to be added to these phases
 
  | Input | Environment Variable  | Default Value | Description
  |-------|-----------------------|---------------|--------------
- | `<layout>`     | `CNB_USE_OCI_LAYOUT` | false | Enables the capability of resolving image from/to in OCI layout format on disk |
- | `<layout-dir>` | `CNB_OCI_LAYOUT_PATH` | /layout-repo | Path to a directory where the images are saved in OCI layout format|
+ | `<layout>` | `CNB_USE_OCI_LAYOUT` | false | Enables the capability of resolving image from/to in OCI layout format on disk |
 
 ## How to map an image reference into a path in the layout repository
 
-In the previous examples one key element was how to translate an image reference into a path to look for in the `<layout-dir>`, let's define those rules.
+In the previous examples one key element was how to translate an image reference into a path, let's define those rules.
 
 Considering an **image reference** refers to either a tag reference or digest reference. It could have the following formats
-- A tag reference refers to an identifier of form `<registry>/<repo>/<image>:<tag>`
+- A name reference refers to an identifier of form `<registry>/<repo>/<image>:<tag>`
 - A digest reference refers to a content addressable identifier of form `<registry>/<repo>/<image>@<algorithm>:<digest>`
 
 The image look up will be done following these rules:
-  - WHEN `the image points to a tag reference`
-    - Lifecycle will load/save the image from/to disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<layout-dir>/<registry>/<repo>/<image>/<tag>`
+  - WHEN `the image points to a name reference`
+    - Lifecycle will load/save the image from/to disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `/<registry>/<repo>/<image>/<tag>`
   - WHEN `the image points to a digest reference`
-    - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `<layout-dir>/<registry>/<repo>/<image>/<algorithm>/<digest>`
+    - Lifecycle will load the image from disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at `/<registry>/<repo>/<image>/<algorithm>/<digest>`
   - WHEN `<registry>` is not provided default value will be **index.docker.io**
     - IF `<repo>` is not also provided, then default value will be **library**
 
@@ -388,18 +384,16 @@ Arguments received:
  - `run-image`: `cnb/my-full-stack-run:bionic`
  - `image`: `my-app-image`
 
-The `<layout-dir>` is set with the default value `/layout-repo`
-
 Lifecycle applies the rules for looking up the images:
- - It takes the **tag reference** `cnb/my-full-stack-run:bionic`, applies the conversion rules and look at path `/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic` for an image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
+ - It takes the **tag reference** `cnb/my-full-stack-run:bionic`, applies the conversion rules and look at path `/index.docker.io/cnb/my-full-stack-run/bionic` for an image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
- - In case of the *application image* it will look at path `/layout-repo/index.docker.io/library/my-app-image/latest`
+ - In case of the *application image* it will look at path `/index.docker.io/library/my-app-image/latest`
 
 Because both images are found, the phase is executed as usual and the `analyzed.toml` file will be updated. The `run-image.reference` added into the `analyzed.toml` will contain the path resolved by the lifecycle plus the digest reference to the image with the following format `[path]@[digest]`. In case of this example, it will look like this:
 
 ```=toml
 [run-image]
-  reference = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
+  reference = "/index.docker.io/cnb/my-partial-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 ```  
 
@@ -421,13 +415,10 @@ Arguments received:
  - `run-image`: `cnb/my-full-partial-run:bionic`
  - `image`: `my-app-image`
 
-The `<layout-dir>` is set with the default value `/layout-repo`
-
 Noticed the structure of the `run-image` provided
 
 ```=shell
-layout-repo
-└── index.docker.io
+index.docker.io
     └── cnb
         └── my-partial-stack-run:bionic
             └── bionic
@@ -439,13 +430,13 @@ layout-repo
                 └── oci-layout
 ```
 
-Similar to the previous example, Lifecycle applies the rules for looking up the images and look at path `/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic` and it determines a partial image was provided and execute the phase with the information from the **Image Manifest** and the **Image Config**
+Similar to the previous example, Lifecycle applies the rules for looking up the images and look at path `/index.docker.io/cnb/my-partial-stack-run/bionic` and it determines a partial image was provided and execute the phase with the information from the **Image Manifest** and the **Image Config**
 
 The output `analyzed.toml` will also include the new `run-image.reference` field the path and the digest of the run image. 
 
 ```=toml
 [run-image]
-  reference = "/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
+  reference = "/index.docker.io/cnb/my-partial-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 ```  
 
@@ -468,18 +459,16 @@ Arguments received:
 - `previous-image`: `bar/my-previous-app`
 - `image`: `my-app-image`
 
-The `<layout-dir>` is set with the default value `/layout-repo`
-
-`run-image` and `image` arguments are treated in the same way as previous examples, and for `previous-image` argument the looking up images rules are applied and Lifecycle will look at path `/layout-repo/index.docker.io/bar/my-previous-app` for a image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
+`run-image` and `image` arguments are treated in the same way as previous examples, and for `previous-image` argument the looking up images rules are applied and Lifecycle will look at path `/index.docker.io/bar/my-previous-app` for a image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
 The `analyzed.toml` file es expected to be updated with the `previous-image.reference` containing the path and the digest of the `previous-image`
 
 ```=toml
 [run-image]
-  reference = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
+  reference = "/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 [previous-image]
-  reference = "/layout-repo/index.docker.io/bar/my-previous-app/latest@sha256:aa0cf7fc8f161bdb96166c1644174affacd70d17f372373ca72c8e91116e2d43"
+  reference = "/index.docker.io/bar/my-previous-app/latest@sha256:aa0cf7fc8f161bdb96166c1644174affacd70d17f372373ca72c8e91116e2d43"
 
 ```
 
@@ -492,8 +481,7 @@ Pre-conditions:
 The following directories are accessible by the lifecycle
 ```=shell
 /
-├── layout-repo
-│   └── index.docker.io
+└── index.docker.io
 │       └── cnb
 │           └── my-full-stack-run:bionic
 │               └── bionic
@@ -514,7 +502,7 @@ The `/layers/analyzed.toml` file contains the following data:
 
 ```=toml
 [run-image]
-  reference = "/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
+  reference = "/index.docker.io/cnb/my-full-stack-run/bionic@sha256:fab3bb83de466ed29d7e9dcfdbee5b5fb2ff90e91bc849af85b261b4c2062a7a"
 
 ```
 
@@ -533,19 +521,16 @@ Arguments received:
 
 - `image`: `my-app-image`
 
-The `<layout-dir>` is set with the default value `/layout-repo`
-
 Lifecycle:
- - It will read the `[run-image]` section in the `analyzed.toml`, it will parse `reference` attribute using the `@` separator and load the `run-image` image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at path `/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic`.
+ - It will read the `[run-image]` section in the `analyzed.toml`, it will parse `reference` attribute using the `@` separator and load the `run-image` image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at path `/index.docker.io/cnb/my-full-stack-run/bionic`.
  - Lifecycle could also validate the digest of the image loaded is the same as the one established by the `reference`.
- - Lifecycle will execute the export steps and at the end of the process it will write the *application image* at path `/layout-repo/index.docker.io/library/my-app-image/latest` in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format
+ - Lifecycle will execute the export steps and at the end of the process it will write the *application image* at path `/index.docker.io/library/my-app-image/latest` in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format
 
 
 The output image will be written at:
 
 ```=shell
-layout-repo
-└── index.docker.io
+index.docker.io
     └── library
         └── my-app-image
             └── latest
@@ -671,7 +656,7 @@ I think, this PoC demonstrate that adding the exporting to OCI layout format is 
   - Exporting to a tarball can be handle on this RFC or a new one must be created?
 
 - What parts of the design do you expect to be resolved through implementation of the feature?
-  - Handle symbolic links to the blobs in the `<layout-dir>` repository, this could be more efficient on hard drive space
+  - Handle symbolic links to the blobs in the repository, this could be more efficient on hard drive space
 
 <!--
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC? -->
@@ -684,7 +669,6 @@ The [Platform Interface Specification](https://github.com/buildpacks/spec/blob/p
 | Input | Environment Variable  | Default Value | Description
 |-------|-----------------------|---------------|--------------
 | `<layout>`     | `CNB_USE_OCI_LAYOUT` | false | Enables the capability of resolving image from/to in OCI layout format on disk |
-| `<layout-dir>` | `CNB_OCI_LAYOUT_PATH` | /layout-repo | Path to a directory where the images are saved in OCI layout format|
 
 Also the `analyzed.toml` [file](https://github.com/buildpacks/spec/blob/platform/0.11/platform.md#analyzedtoml-toml) will be updated to include the `reference` format in case of layout is being used.
 
