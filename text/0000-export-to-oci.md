@@ -77,10 +77,11 @@ Let's see some examples of the proposed behavior
 
 Lifecycle will converts image references into local paths following define [rules](#how-to-map-an-image-reference-into-a-path-in-the-layout-repository) and the content must be in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
-Let's suppose a *platform implementor* creates directories with the following structure:
+Let's suppose a *platform implementor* creates a directory with the following structure:
 
 ```=shell
-index.docker.io
+layout-repo
+└── index.docker.io
     ├── cnb
     │   ├── my-full-stack-run:bionic
     │   │   └── bionic
@@ -118,8 +119,8 @@ The images named **cnb/my-full-stack-run** and **cnb/my-partial-stack-run** repr
 
 For each example case, I will present two ways of enabling the new capability:
 
-- Using an environment Variable
-- Using a new `-layout` flag
+- Using an environment variables
+- Using the new `-layout` and `layout-dir` flags
 
 In any case the expected output is the same.
 
@@ -129,11 +130,12 @@ In any case the expected output is the same.
 
 ```=shell
 > export CNB_USE_LAYOUT=true
+> export CNB_LAYOUT_DIR=/layout-repo
 > /cnb/lifecycle/analyzer -run-image cnb/my-full-stack-run:bionic my-app-image
 
 # OR
 
-> /cnb/lifecycle/analyzer -layout -run-image cnb/my-full-stack-run:bionic my-app-image
+> /cnb/lifecycle/analyzer -layout -layout-dir /layout-repo -run-image cnb/my-full-stack-run:bionic my-app-image
 ```
 
 expected analyzed.toml output
@@ -147,12 +149,13 @@ expected analyzed.toml output
 ##### Analyzing run-image partial saved on disk
 
 ```=shell
-> export CNB_USE_OCI_LAYOUT=true
+> export CNB_USE_LAYOUT=true
+> export CNB_LAYOUT_DIR=/layout-repo
 > /cnb/lifecycle/analyzer -run-image cnb/cnb/my-partial-stack-run:bionic my-app-image
 
 # OR
 
-> /cnb/lifecycle/analyzer -layout -run-image cnb/cnb/my-partial-stack-run:bionic my-app-image
+> /cnb/lifecycle/analyzer -layout -layout-dir /layout-repo -run-image cnb/cnb/my-partial-stack-run:bionic my-app-image
 ```
 
 expected analyzed.toml output
@@ -166,12 +169,13 @@ expected analyzed.toml output
 ##### Analyzing previous-image
 
  ```=shell
-> export CNB_USE_OCI_LAYOUT=true
+> export CNB_USE_LAYOUT=true
+> export CNB_LAYOUT_DIR=/layout-repo
 > /cnb/lifecycle/analyzer -run-image cnb/my-full-stack-run:bionic -previous-image bar/my-previous-app my-app-image
 
 # OR
 
-> /cnb/lifecycle/analyzer -layout -run-image cnb/my-full-stack-run:bionic-previous-image bar/my-previous-app my-app-image
+> /cnb/lifecycle/analyzer -layout -layout-dir /layout-repo -run-image cnb/my-full-stack-run:bionic-previous-image bar/my-previous-app my-app-image
 ```
 
 expected analyzed.toml output
@@ -188,7 +192,37 @@ expected analyzed.toml output
 ##### Analyzing run-image not saved on disk
 
 ```=shell
-> export CNB_USE_OCI_LAYOUT=true
+> export CNB_USE_LAYOUT=true
+> export CNB_LAYOUT_DIR=/layout-repo
+> /cnb/lifecycle/analyzer -run-image cnb/bad-run-image my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -layout -layout-dir /layout-repo -run-image cnb/bad-run-image my-app-image
+
+# expected output
+
+ERROR: the run-image could not be found at path: /layout-repo/index.docker.io/cnb/bad-run-image/latest
+```
+
+##### Analyzing without run-image argument
+
+```=shell
+> export CNB_USE_LAYOUT=true
+> export CNB_LAYOUT_DIR=/layout-repo
+> /cnb/lifecycle/analyzer my-app-image
+
+# OR
+
+> /cnb/lifecycle/analyzer -layout -layout-dir /layout-repo my-app-image
+
+# expected output
+
+ERROR: -run-image is required when OCI Layout feature is enabled
+```
+
+```=shell
+> export CNB_USE_LAYOUT=true
 > /cnb/lifecycle/analyzer -run-image cnb/bad-run-image my-app-image
 
 # OR
@@ -197,22 +231,7 @@ expected analyzed.toml output
 
 # expected output
 
-ERROR: the run-image could not be found at path: /index.docker.io/cnb/bad-run-image/latest
-```
-
-##### Analyzing without run-image argument
-
-```=shell
-> export CNB_USE_OCI_LAYOUT=true
-> /cnb/lifecycle/analyzer my-app-image
-
-# OR
-
-> /cnb/lifecycle/analyzer -layout my-app-image
-
-# expected output
-
-ERROR: -run-image is required when OCI Layout feature is enabled
+ERROR: defining a layout directory is required when OCI Layout feature is enabled. Use -layout-dir flag or CNB_LAYOUT_DIR environment variable
 ```
 
 Let's also check some examples when the export phase is executed
@@ -222,18 +241,20 @@ Let's also check some examples when the export phase is executed
 ##### Export to OCI using run-image full saved on disk
 
 ```=shell
-> export CNB_USE_OCI_LAYOUT=true
+> export CNB_USE_LAYOUT=true
+> export CNB_LAYOUT_DIR=/layout-repo
 > /cnb/lifecycle/exporter my-app-image
 
 # OR
 
->  /cnb/lifecycle/exporter -layout my-app-image
+>  /cnb/lifecycle/exporter -layout -layout-dir /layout-repo my-app-image
 ```
 
 The output will be written into the repository folder described above and it should looks like this:
 
 ```=shell
-index.docker.io
+layout-repo
+└── index.docker.io
     ├── cnb
     │   └── my-full-stack-run:bionic
     │       └── bionic
@@ -268,18 +289,20 @@ As we can see, the application image `my-app-image` contains a **full** copy of 
 ##### Export to OCI using run-image partially saved on disk
 
 ```=shell
-> export CNB_USE_OCI_LAYOUT=true
+> export CNB_USE_LAYOUT=true
+> export CNB_LAYOUT_DIR=/layout-repo
 > /cnb/lifecycle/exporter my-app-image
 
 # OR
 
->  /cnb/lifecycle/exporter -layout my-app-image
+>  /cnb/lifecycle/exporter -layout -layout-dir /layout-repo my-app-image
 ```
 
 Expected output:
 
 ```=shell
-index.docker.io
+layout-repo
+└── index.docker.io
     ├── cnb
     │   └── my-partial-stack-run:bionic
     │       └── bionic
@@ -309,12 +332,13 @@ As we can see, the application image `my-app-image` has missing `blobs` because 
 Any combination of using multiple sources or sinks in the Lifecycle invocation of phases should throw an error to the user. For example:
 
 ```=shell
-> export CNB_USE_OCI_LAYOUT=true
+> export CNB_USE_LAYOUT=true
+> export CNB_LAYOUT_DIR=/layout-repo
 > /cnb/lifecycle/exporter -daemon -run-image cnb/my-full-stack-run:bionic my-app-image
 
 # OR
 
-> /cnb/lifecycle/exporter -layout -daemon -run-image cnb/my-full-stack-run:bionic my-app-image
+> /cnb/lifecycle/exporter -layout -layout-dir /layout-repo -daemon -run-image cnb/my-full-stack-run:bionic my-app-image
 
 ERROR: exporting to multiples target is not allowed
 ```
@@ -336,9 +360,10 @@ Notice that we are relying on the OCI format Specification to expose the data fo
 
 The following new inputs are proposed to be added to these phases
 
- | Input | Environment Variable  | Default Value | Description |
- |-------|-----------------------|---------------|-------------|
- | `<layout>` | `CNB_USE_OCI_LAYOUT` | false | Enables the capability of resolving image from/to in OCI layout format on disk |
+ | Input | Environment Variable  | Default Value | Description
+ |-------|-----------------------|---------------|--------------
+ | `<layout>` | `CNB_USE_LAYOUT` | false | Enables the capability of resolving image from/to in OCI layout format on disk |
+ | `<layout-dir>` | `CNB_LAYOUT_DIR` |  | Path to a directory where the images are saved in OCI layout format|
 
 ## How to map an image reference into a path in the layout repository
 
@@ -360,9 +385,9 @@ The image look up will be done following these rules:
 ## Examples
 
 In all the examples the new feature is enabled by the use of the new flag `-layout` or by setting
-the new environment variable  `CNB_USE_OCI_LAYOUT` to true.
+the new environment variable `CNB_USE_LAYOUT` to true.
 
-Let's review some of the previous examples
+Let's review some previous examples
 
 #### Analyze phase
 
@@ -372,11 +397,12 @@ Command:
 
 ```=shell
 > export CNB_USE_LAYOUT=true
+> export CNB_LAYOUT_DIR=/layout-repo
 > /cnb/lifecycle/analyzer -run-image cnb/my-full-stack-run:bionic my-app-image
 
 # OR
 
-> /cnb/lifecycle/analyzer -layout -run-image cnb/my-full-stack-run:bionic my-app-image
+> /cnb/lifecycle/analyzer -layout -layout-dir /layout-repo -run-image cnb/my-full-stack-run:bionic my-app-image
 ```
 
 Arguments received:
@@ -384,12 +410,15 @@ Arguments received:
  - `run-image`: `cnb/my-full-stack-run:bionic`
  - `image`: `my-app-image`
 
+The `<layout-dir>` is set with the value `/layout-repo`
+
 Lifecycle applies the rules for looking up the images:
- - It takes the **tag reference** `cnb/my-full-stack-run:bionic`, applies the conversion rules and look at path `/index.docker.io/cnb/my-full-stack-run/bionic` for an image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
+ - It takes the **tag reference** `cnb/my-full-stack-run:bionic`, applies the conversion rules and gets `/index.docker.io/cnb/my-full-stack-run/bionic` 
+ - It will append the `<layout-dir>` at the beginning, getting the following path: `/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic`  
+ - It will look for an image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at path `/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic`.
+ - In case of the *application image* it will look at path `/layout-repo/index.docker.io/library/my-app-image/latest`
 
- - In case of the *application image* it will look at path `/index.docker.io/library/my-app-image/latest`
-
-Because both images are found, the phase is executed as usual and the `analyzed.toml` file will be updated. A new field `Name` was added into the `analyzed.toml` that will contain the path resolved by the lifecycle, in these cases:
+Because both images are found, the phase is executed as usual and the `analyzed.toml` file will be updated. The `run-image.reference` added into the `analyzed.toml` will contain the path resolved by the lifecycle plus the digest reference to the image with the following format `[path]@[digest]`. In case of this example, it will look like this:
 
 ```=toml
 [run-image]
@@ -401,7 +430,7 @@ Because both images are found, the phase is executed as usual and the `analyzed.
 Command received:
 
 ```=shell
-> export CNB_USE_OCI_LAYOUT=true
+> export CNB_USE_LAYOUT=true
 > /cnb/lifecycle/analyzer -run-image cnb/cnb/my-partial-stack-run:bionic my-app-image
 
 # OR
@@ -414,10 +443,13 @@ Arguments received:
  - `run-image`: `cnb/my-full-partial-run:bionic`
  - `image`: `my-app-image`
 
+The `<layout-dir>` is set with the default value `/layout-repo`
+
 Noticed the structure of the `run-image` provided
 
 ```=shell
-index.docker.io
+layout-repo
+└── index.docker.io
     └── cnb
         └── my-partial-stack-run:bionic
             └── bionic
@@ -430,7 +462,8 @@ index.docker.io
 ```
 
 Similar to the previous example, Lifecycle applies the rules for looking up the images and look at path `/layout-repo/index.docker.io/cnb/my-partial-stack-run/bionic` and it determines a partial image was provided and execute the phase with the information from the **Image Manifest** and the **Image Config**
-The output `analyzed.toml` will also include the new `name` field with the path where the image was located.
+
+The output `analyzed.toml` will also include the new `run-image.reference` field the path and the digest of the run image. 
 
 ```=toml
 [run-image]
@@ -442,7 +475,7 @@ The output `analyzed.toml` will also include the new `name` field with the path 
 Command received:
 
 ```=shell
-> export CNB_USE_OCI_LAYOUT=true
+> export CNB_USE_LAYOUT=true
 > /cnb/lifecycle/analyzer -run-image cnb/my-full-stack-run:bionic -previous-image bar/my-previous-app my-app-image
 
 # OR
@@ -456,9 +489,11 @@ Arguments received:
 - `previous-image`: `bar/my-previous-app`
 - `image`: `my-app-image`
 
+The `<layout-dir>` is set with the default value `/layout-repo`
+
 `run-image` and `image` arguments are treated in the same way as previous examples, and for `previous-image` argument the looking up images rules are applied and Lifecycle will look at path `/index.docker.io/bar/my-previous-app` for a image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format.
 
-The `analyzed.toml` file es expected to be updated with the previous image section and the new label `name` will be also be there with the path to the `previous-image`
+The `analyzed.toml` file es expected to be updated with the `previous-image.reference` containing the path and the digest of the `previous-image`
 
 ```=toml
 [run-image]
@@ -478,7 +513,8 @@ Pre-conditions:
 The following directories are accessible by the lifecycle
 ```=shell
 /
-└── index.docker.io
+├── layout-repo
+│   └── index.docker.io
 │       └── cnb
 │           └── my-full-stack-run:bionic
 │               └── bionic
@@ -506,7 +542,7 @@ The `/layers/analyzed.toml` file contains the following data:
 Command executed:
 
 ```=shell
-> export CNB_USE_OCI_LAYOUT=true
+> export CNB_USE_LAYOUT=true
 > /cnb/lifecycle/exporter  my-app-image
 
 # OR
@@ -518,6 +554,8 @@ Arguments received:
 
 - `image`: `my-app-image`
 
+The `<layout-dir>` is set with the default value `/layout-repo`
+
 Lifecycle:
  - It will read the `[run-image]` section in the `analyzed.toml`, it will parse `reference` attribute using the `@` separator and load the `run-image` image saved on disk in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format at path `/layout-repo/index.docker.io/cnb/my-full-stack-run/bionic`.
  - Lifecycle could also validate the digest of the image loaded is the same as the one established by the `reference`.
@@ -527,7 +565,8 @@ Lifecycle:
 The output image will be written at:
 
 ```=shell
-index.docker.io
+layout-repo
+└── index.docker.io
     └── library
         └── my-app-image
             └── latest
@@ -653,7 +692,7 @@ I think, this PoC demonstrate that adding the exporting to OCI layout format is 
   - Exporting to a tarball can be handle on this RFC or a new one must be created?
 
 - What parts of the design do you expect to be resolved through implementation of the feature?
-  - Handle symbolic links to the blobs in the repository, this could be more efficient on hard drive space
+  - Handle symbolic links to the blobs in the `<layout-dir>` repository, this could be more efficient on hard drive space
 
 <!--
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC? -->
@@ -665,9 +704,10 @@ The [Platform Interface Specification](https://github.com/buildpacks/spec/blob/p
 
 | Input | Environment Variable  | Default Value | Description|
 |-------|-----------------------|---------------|------------|
-| `<layout>`     | `CNB_USE_OCI_LAYOUT` | false | Enables the capability of resolving image from/to in OCI layout format on disk |
+| `<layout>`     | `CNB_USE_LAYOUT` | false | Enables the capability of resolving image from/to in OCI layout format on disk |
+| `<layout-dir>` | `CNB_LAYOUT_DIR` |  | Path to a directory where the images are saved in OCI layout format|
 
-Also the `analyzed.toml` [file](https://github.com/buildpacks/spec/blob/platform/0.11/platform.md#analyzedtoml-toml) will be updated to include the new `name` field
+Also the `analyzed.toml` [file](https://github.com/buildpacks/spec/blob/platform/0.11/platform.md#analyzedtoml-toml) will be updated to include the `reference` format in case of layout is being used.
 
 ```=toml
 [image]
@@ -682,4 +722,7 @@ Also the `analyzed.toml` [file](https://github.com/buildpacks/spec/blob/platform
 
 Where
 
-* `[image|run-image|previos-image].name` MUST point to the path of the image in OCI layout format following the rules describe [previously](#how-to-map-an-image-reference-into-a-path-in-the-layout-repository)
+- `[image|run-image|previos-image].reference` MUST be either a digest reference to an image in an OCI registry or the ID of an image in a docker daemon. 
+  - In case an image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format is being used, it will also include the path of the image in OCI layout format following the rules describe [previously](#how-to-map-an-image-reference-into-a-path-in-the-layout-repository) 
+  - The format MUST be as follows: `[path]@[digest]`  
+
