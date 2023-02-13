@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Defining Mixins for io.buildpacks.stacks.bionic
 - Start Date: 2019-12-05
-- Status: Approved
+- Status: Superseded
 - CNB Pull Request: https://github.com/buildpacks/rfcs/pull/40
 - CNB Issue: (leave blank)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)

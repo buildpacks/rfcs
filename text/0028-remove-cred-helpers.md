@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Remove Lifecycle Credential Helpers Integration
 - Start Date: 2020-01-22
-- Status: Approved
+- Status: Implemented
 - CNB Pull Request: [rfcs#49](https://github.com/buildpacks/rfcs/pull/49)
 - CNB Issue: (leave blank)
 - Supersedes: N/A

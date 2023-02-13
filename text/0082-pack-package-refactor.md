@@ -3,7 +3,7 @@
 - Name: Refactor Pack go packages
 - Start Date: 02/24/21
 - Author(s): dwillist
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#139](https://github.com/buildpacks/rfcs/pull/139)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/pack#1128](https://github.com/buildpacks/pack/issues/1128)

@@ -3,7 +3,7 @@
 - Name: Project Descriptor (project.toml) Schema
 - Start Date: 2020-28-07
 - Author(s): @joshwlewis
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request:
 - CNB Pull Request:
 - CNB Issue:
