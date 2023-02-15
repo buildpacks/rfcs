@@ -725,7 +725,8 @@ Also the `analyzed.toml` [file](https://github.com/buildpacks/spec/blob/platform
 
 Where
 
-- `[image|run-image|previos-image].reference` MUST be either a digest reference to an image in an OCI registry or the ID of an image in a docker daemon. 
-  - In case an image in [OCI Image Layout](https://github.com/opencontainers/image-spec/blob/main/image-layout.md) format is being used, it will also include the path of the image in OCI layout format following the rules describe [previously](#how-to-map-an-image-reference-into-a-path-in-the-layout-repository) 
-  - The format MUST be as follows: `[path]@[digest]`  
+- `[image|run-image|previos-image].reference` MUST be either:
+    - A digest reference to an image in an OCI registry
+    - The ID of an image in a docker daemon
+    - The path to an image in OCI layout format
 
