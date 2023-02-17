@@ -342,7 +342,7 @@ Any combination of using multiple sources or sinks in the Lifecycle invocation o
 
 > /cnb/lifecycle/exporter -layout -layout-dir /layout-repo -daemon -run-image cnb/my-full-stack-run:bionic my-app-image
 
-ERROR: exporting to multiples target is not allowed
+ERROR: exporting to multiple targets is unsupported
 ```
 
 # How it Works
