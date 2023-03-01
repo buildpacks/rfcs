@@ -40,7 +40,7 @@ It is risk mitigation for consumer and enterprise customers who want to apply cr
 # How it Works
 [how-it-works]: #how-it-works
 
-Lifecycle will maintain a publicly viewable table of LTS versions with anticipated sunset dates for support. 
+Lifecycle will maintain a publicly viewable table of LTS versions with anticipated sunset dates for support, probably by extending [this table](https://github.com/buildpacks/lifecycle#supported-apis).
 Not all Lifecycle releases will need to be LTS, but 3-5 each year probably will be marked as LTS. Maintainers will be responsible for marking releases as LTS.
 Some additional release automation will be built to support patching and releasing LTS releases.
 
