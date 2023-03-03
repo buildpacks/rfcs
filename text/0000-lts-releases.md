@@ -59,7 +59,7 @@ Like all efforts this does obviously come with an opportunity cost of alternativ
 [alternatives]: #alternatives
 
 - What other designs have been considered?
-  - Just upgrade to the latest: This is our current approach, and works pretty well until some large enterprise partners don't want to do it.
+  - Just upgrade to the latest: Our current approach encourages all users to upgrade to the latest binary but allows them to specify the version of the API to use. This works pretty well until some large enterprise partners don't want to do it because they're so risk averse that they want the reassurance that the changeset is the minimal one necessary to addrress the CVEs.
   - Don't apply patches to critical CVEs: This is probably a bad idea.
 - Why is this proposal the best? You're so smart, you only read the best proposals, and here you are, reading this one!
 - What is the impact of not doing this? We risk alienating some enterprise users of CNB.
