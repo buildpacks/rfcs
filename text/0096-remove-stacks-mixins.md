@@ -59,8 +59,8 @@ For Windows-based images, Distribution should be empty. Version should be the [s
 
 The `stacks` list in `buildpack.toml` is replaced by a `targets` list, where each entry corresponds to a different buildpack image that is exported into a [manifest index](https://github.com/opencontainers/image-spec/blob/master/image-index.md).
 Each entry may contain multiple valid values for Distribution and/or Version, but only a single OS, Architecture, and Variant.
-If the `targets` list is empty and `/bin/build` is present, a target with `os = "linux"` and `arch = "x86_64"` is assumed by tools reading `buildpack.toml`.
-If the `targets` list is empty and `/bin/build.bat` or `/bin/build.exe` is present, a target with `os = "windows"` and `arch = "x86_64"` is assumed by tools reading `buildpack.toml`.
+If the `targets` list is empty and `/bin/build` is present, a target with `os = "linux"` and `arch = "amd64"` is assumed by tools reading `buildpack.toml`.
+If the `targets` list is empty and `/bin/build.bat` or `/bin/build.exe` is present, a target with `os = "windows"` and `arch = "amd64"` is assumed by tools reading `buildpack.toml`.
 
 App image builds fail if the build image and selected run image have mismatched metadata. We may introduce flags or additional labels to skip this validation (e.g., for cross-compilation or minimal runtime base images).
 An image without a specified Distribution is compatible with images specifying any Distribution.
@@ -73,14 +73,14 @@ When an app image is rebased, `rebaser` must fail if the new run image and previ
 ```toml
 [[targets]]
 os = "linux"
-arch = "x86_64"
+arch = "amd64"
 [[targets.distributions]]
 name = "ubuntu"
 versions = ["18.04", "20.04"]
 
 [[targets]]
 os = "linux"
-arch = "x86_64"
+arch = "amd64"
 [[targets.distributions]]
 name = "ubuntu"
 versions = ["14.04", "16.04"]
@@ -152,7 +152,7 @@ If the newly-specified field values are missing, the lifecycle and pack may used
 
 ```
 config.os = "linux"
-config.architecture = "x86_64"
+config.architecture = "amd64"
 io.buildpacks.distribution.name = "ubuntu"
 io.buildpacks.distribution.version = "18.04"
 ```
@@ -169,7 +169,7 @@ to
 ```toml
 [[targets]]
 os = "linux"
-arch = "x86_64"
+arch = "amd64"
 [[targets.distributions]]
 name = "ubuntu"
 versions = ["18.04"]
@@ -201,3 +201,12 @@ versions = ["18.04"]
 [spec-changes]: #spec-changes
 
 This RFC requires extensive changes to all specifications.
+
+## Amended
+### Summary
+
+rename x86_64 -> amd64 in keeping with all other usages of arch. descriptors.
+
+### Motivation
+
+This is how we do it everywhere else, this is the way.
