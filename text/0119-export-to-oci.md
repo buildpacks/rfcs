@@ -3,10 +3,10 @@
 - Name: Export to OCI format
 - Start Date: 2022-02-22
 - Author(s): Juan Bustamante (@jjbustamante)
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#203](https://github.com/buildpacks/rfcs/pull/203)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
