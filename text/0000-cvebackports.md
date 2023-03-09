@@ -34,6 +34,9 @@ Following patch version line architecture also boosts user trust vs. a pledge to
 
 This is especially important for users who do not use CNB as part of a SaaS product, i.e. for “on-prem” deployments. These on-prem users are pulling down the provided lifecycle images and running the binaries on their own infrastructure, thus increasing their potential risk exposure and liability.
 
+Additionally, as we do have concrete plans to deprecate platform API versions in the lifecycle this calendar year, there's increased likelihood to learn of
+other lifecycle consumers who are not ready to upgrade and who would appreciate patch releases.
+
 - What is the expected outcome?
 
 Maintainers MAY issue patch releases in response to critical and high CVEs. Most importantly, users MAY upgrade to consume these patch releases in a timely manner if they are not comfortable consuming the latest version.
