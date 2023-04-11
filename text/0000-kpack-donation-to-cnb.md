@@ -264,17 +264,6 @@ pie showData
     "Others" : 37
 ```
 
-# Adopters
-
-[VMware](https://www.vmware.com/) is the most obvious company using [kpack](https://github.com/pivotal/kpack/) as a core component in their [Tanzu](https://tanzu.vmware.com/tanzu) offer. [kpack](https://github.com/pivotal/kpack/) has been used in the enterprise for years in hundreds of costumers.
-
-Some others companies using [kpack](https://github.com/pivotal/kpack/) are:
-
-- [Bloomberg](http://techatbloomberg.com/opensource)
-- [WPengine](https://wpengine.com/)
-- [Terasky](https://www.terasky.com/)
-- [SAP](https://www.sap.com/)
-
 # Migration
 
 ### Repositories
@@ -296,7 +285,8 @@ For each repository
 
 ### CI / CD Pipelines
 
-[kpack's](https://github.com/pivotal/kpack/) CI/CD infrastructure currently runs on internal VMware infrastructure. [kpack's](https://github.com/pivotal/kpack/) CI/CD pipelines will need to be rebuilt on [CNB](https://buildpacks.io/) infrastructure.
+[kpack's](https://github.com/pivotal/kpack/) CI/CD pipelines were rebuilt to use [github actions](https://github.com/pivotal/kpack/tree/main/.github). 
+In order for [kpack's](https://github.com/pivotal/kpack/) to run windows acceptance tests it requires a kubernetes cluster with windows nodes. The hardware requirements are specify in the following section.
 
 ##### Hardware requirements
 
