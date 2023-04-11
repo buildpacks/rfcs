@@ -11,7 +11,30 @@
 
 # Summary
 
-This RFC proposes the donation of the open-source project [kpack](https://github.com/pivotal/kpack/) into the [Cloud Native Buildpack](https://buildpacks.io/) (CNB) ecosystem.
+This RFC proposes the donation of the open-source project [kpack](https://github.com/pivotal/kpack/) into the [Cloud Native Community Organization Buildpack](https://github.com/buildpacks-community).
+
+Following the process defined in the [Buildpack Commnity RFC](https://github.com/buildpacks/rfcs/blob/main/text/0117-buildpacks-community.md) the following table presents the criteria used to evaluate the project.
+
+| Criteria                                                                                                                                                                                                                                                                                 | Evidence                                                                              |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| The project must be a tooling, platform or integration that is related to Cloud Native Buildpacks.                                                                                                                                                                                       | See [Motivation](#motivation) section                                                 |
+| The project must be open source and licensed under Apache 2.0.                                                                                                                                                                                                                           | See [License](https://github.com/pivotal/kpack/blob/main/LICENSE)                     |
+| It must follow the Cloud Native Computing Foundation Code of Conduct.                                                                                                                                                                                                                    | See [Code of conduct](https://github.com/pivotal/kpack/blob/main/CODE_OF_CONDUCT.md)  |
+| The project must enable DCO signoff for all commits.                                                                                                                                                                                                                                     | See Sign-off process [Pull Request](https://github.com/pivotal/kpack/pull/1149/files) |
+| The project must be open to contributions and have a public issue tracker.                                                                                                                                                                                                               | See public [issue tracker](https://github.com/pivotal/kpack/issues)                   |
+| The project must have a governance document that clearly defines the project maintainers and how they are elected. Each project may choose to define their own governance model as long as it is clearly documented and allows for project maintainers to be elected from the community. ||
+| The list of project maintainers must be publicly available and controlled through a Github team.                                                                                                                                                                                         ||
+| The project must use a CODEOWNERS file to define the maintainers for each repository. The CODEOWNERS file should reference the Github team that controls the list of maintainers.                                                                                                        | See [CODEOWNERS](https://github.com/pivotal/kpack/blob/main/CODEOWNERS) file          |
+| All project contributors must be members of the Buildpacks community organization.                                                                                                                                                                                                       | See [Team Roles](#team-roles) section                                                 |
+| The project must be actively maintained (i.e. issues and pull requests must be addressed regularly, approved pull requests must be merged or updated in a timely manner, etc.).                                                                                                          ||
+| There should have visible automated testing for all repositories that are part of the project.                                                                                                                                                                                           ||
+| The project maintainers must conform to a set of best effort SLOs around patching critical CVEs when applicable to the project.                                                                                                                                                          ||
+| The has a file - CONTRIBUTING.md: A guide to how contributors should submit patches and the expectations around code review.                                                                                                                                                             | See Contributing [Pull Request](https://github.com/pivotal/kpack/pull/1149/files)     |
+| The has a file - DEVELOPMENT.md: A guide to how contributors should develop the project.                                                                                                                                                                                                 ||                                                               
+| The has a file - ADOPTERS.md: A list of adopters of the project.                                                                                                                                                                                                                         | See Adopters [Pull Request](https://github.com/pivotal/kpack/pull/1142)               |                                                             
+| The has a file - VERSIONING.md: A guide to how versioning is done for the project.                                                                                                                                                                                                       | See Versioning [Pull Request](https://github.com/pivotal/kpack/pull/1150)             |                                                           
+| The has a file - RELEASE.md: A guide to how releases are done for the project.                                                                                                                                                                                                           ||                                                         
+| The has a file - SECURITY.md: A guide to how security vulnerabilities should be reported.                                                                                                                                                                                                | See Security [Pull Request](https://github.com/pivotal/kpack/pull/1149/files)         |
 
 # Definitions
 
@@ -307,26 +330,27 @@ Based on the [CNB governance policy](https://github.com/buildpacks/community/blo
 
 How do migrate roles and responsibilities into the CNB governance process?
 
-Currently the [CNB Platform Team](https://github.com/buildpacks/community/blob/main/TEAMS.md#Platform-Team) already has a **team lead** assigned and, by definition, each team can have only one **team lead**. In order to provide the current [kpack](https://github.com/pivotal/kpack/) team with the same accountability for the migrated repositories the proposal is to follow the guidelines describe on the [Component Maintainer Role RFC](https://github.com/buildpacks/rfcs/pull/234)
+Currently, the [CNB Platform Team](https://github.com/buildpacks/community/blob/main/TEAMS.md#Platform-Team) already has a **team lead** assigned and, by definition, each team can have only one **team lead**. In order to provide the current [kpack](https://github.com/pivotal/kpack/) team with the same accountability for the migrated repositories the proposal is to follow the guidelines describe on the [Component Maintainer Role RFC](https://github.com/buildpacks/rfcs/pull/234)
 
 The [kpack's](https://github.com/pivotal/kpack/) maintainers that will be nominated as **component maintainer** in CNB are:
 
-| Name | Github account | Organization |
-| --- | --- | --- |
-| Matthew McNew| [@matthewmcnew](https://github.com/matthewmcnew)| VMware|
-| Tom Kennedy | [@tomkennedy513](https://github.com/tomkennedy513) | VMware |
-| Yael Harel | [@yaelharel](https://github.com/yaelharel) | VMware|
-| Daniel Chen |[@chenbh](https://github.com/chenbh) | VMware|
-| Juan Bustamante |[@jjbustamante](https://github.com/jjbustamante) | VMware|
+| Name             | Github account                                     | Organization |
+|------------------|----------------------------------------------------|--------------|
+| Matthew McNew    | [@matthewmcnew](https://github.com/matthewmcnew)   | VMware       |
+| Tom Kennedy      | [@tomkennedy513](https://github.com/tomkennedy513) | VMware       |
+| Nicholas Carlson | [@ncarlson](https://github.com/ncarlson)           | VMWare       |
+| Yael Harel       | [@yaelharel](https://github.com/yaelharel)         | VMware       |
+| Daniel Chen      | [@chenbh](https://github.com/chenbh)               | VMware       |
+| Juan Bustamante  | [@jjbustamante](https://github.com/jjbustamante)   | VMware       |
 
 Also those members are willing to become more involved with CNB projects and become **Platform maintainers** in the near future.
 
 Outside VMware, the following contributors manifested their desired to become [kpack's](https://github.com/pivotal/kpack/) **component maintainer**.
 
-| Name | Github account | Organization |
-| --- | --- | --- |
-| Sambhav Kothari| [@samj1912](https://github.com/samj1912) | Bloomberg |
-| Aidan Delaney| [@AidanDelaney](https://github.com/AidanDelaney) | Bloomberg |
+| Name            | Github account                                   | Organization |
+|-----------------|--------------------------------------------------|--------------|
+| Sambhav Kothari | [@samj1912](https://github.com/samj1912)         | Bloomberg    |
+| Aidan Delaney   | [@AidanDelaney](https://github.com/AidanDelaney) | Bloomberg    |
 
 #### RFC process
 
