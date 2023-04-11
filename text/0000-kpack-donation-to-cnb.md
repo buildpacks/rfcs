@@ -274,9 +274,9 @@ The following table shows the candidates repositories to be transferred
 
 | Origin Repo | Description | Owner | Destination Repo | Owner |
 | --- | --- | --- | --- | --- |
-| [https://github.com/pivotal/kpack](https://github.com/pivotal/kpack) | kpack source code | Pivotal | [https://github.com/buildpacks/kpack](https://github.com/buildpacks/kpack) | [CNB Technical Oversight Committee](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#technical-oversight-committee) |
-| [https://github.com/vmware-tanzu/kpack-cli](https://github.com/vmware-tanzu/kpack-cli) | kpack CLI | VMware | [https://github.com/buildpacks/kpack-cli](https://github.com/buildpacks/kpack-cli) | [CNB Technical Oversight Committee](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#technical-oversight-committee) |
-| [https://github.com/vmware-tanzu/homebrew-kpack-cli](https://github.com/vmware-tanzu/homebrew-kpack-cli) | Homebrew tap for the kpack CLI | VMware | [https://github.com/buildpacks/homebrew-kpack-cli](https://github.com/buildpacks/homebrew-kpack-cli) | [CNB Technical Oversight Committee](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#technical-oversight-committee) |
+| [https://github.com/pivotal/kpack](https://github.com/pivotal/kpack) | kpack source code | Pivotal | [https://github.com/buildpacks-community/kpack](https://github.com/buildpacks/kpack) | [CNB Technical Oversight Committee](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#technical-oversight-committee) |
+| [https://github.com/vmware-tanzu/kpack-cli](https://github.com/vmware-tanzu/kpack-cli) | kpack CLI | VMware | [https://github.com/buildpacks-community/kpack-cli](https://github.com/buildpacks/kpack-cli) | [CNB Technical Oversight Committee](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#technical-oversight-committee) |
+| [https://github.com/vmware-tanzu/homebrew-kpack-cli](https://github.com/vmware-tanzu/homebrew-kpack-cli) | Homebrew tap for the kpack CLI | VMware | [https://github.com/buildpacks-community/homebrew-kpack-cli](https://github.com/buildpacks/homebrew-kpack-cli) | [CNB Technical Oversight Committee](https://github.com/buildpacks/community/blob/main/GOVERNANCE.md#technical-oversight-committee) |
 
 For each repository
 
