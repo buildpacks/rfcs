@@ -105,7 +105,7 @@ exec-env = "test"
 id = "buildpacks/procfile"
 version = "latest"
 
-[[io.buildpacks.buildenv]]
+[[io.buildpacks.build.env]]
 name = "RAILS_ENV"
 value = "production"
 exec-env = "production"
