@@ -22,7 +22,7 @@ Add support for different execution environments for buildpacks, with testing as
 # Motivation
 [motivation]: #motivation
 
-The main way Buildpacks are being used is building production images, but this is only one piece of the CI/CD pipeline. Without a solid buildpack test environment story, users will be required alternatives for building their environment. A testing environment, while different, shares many of the same broad strokes ultimately producing an execution environment. This is something Buildpacks are well suited to solve.
+The main way Buildpacks are being used is building production images, but this is only one piece of the software development process. Without a solid buildpack test environment story, users will be required alternatives for building their environment. A testing environment, while different, shares many of the same broad strokes ultimately producing an execution environment. This is something Buildpacks are well suited to solve.
 
 # What it is
 [what-it-is]: #what-it-is
