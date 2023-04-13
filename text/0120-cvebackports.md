@@ -3,10 +3,10 @@
 - Name: CVE discretional Patching
 - Start Date: 2023-03-08
 - Author(s): joe-kimmel-vmw, natalieparellano
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#281](https://github.com/buildpacks/rfcs/pull/281)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: N/A
 
 # Summary
