@@ -53,7 +53,7 @@ The expected outcome is to have a set of commands in pack to handle manifest lis
 # What it is
 [what-it-is]: #what-it-is
 
-The proposal is to add a new command `pack manifest` and different subcommands. 
+The proposal is to add a new _experimental_ command `pack manifest` and different subcommands.   The `pack manifest` commands will initially be gated behind `pack config experimental`.  The `pack manifest` commands will move from experimental status to supported status when maintainers deem it appropriate.
 - `pack manifest create` will create a local manifest list for annotating and pushing to a registry
 - `pack manifest annotate` will add additional information like os, arch or variant to an existing local manifest list
 - `pack manifest add` will add an image to an existing manifest list
