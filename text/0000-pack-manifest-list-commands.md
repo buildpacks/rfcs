@@ -2,7 +2,7 @@
 [meta]: #meta
 - Name: Manifest List Commands for Pack
 - Start Date: 2023-04-19
-- Author(s): [Juan Bustamante](Juan Bustamante)
+- Author(s): [Juan Bustamante](https://github.com/jjbustamante)
 - Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
