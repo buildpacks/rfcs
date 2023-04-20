@@ -60,7 +60,93 @@ The proposal is to add a new _experimental_ command `pack manifest` and differen
 - `pack manifest remove` will remove an image from a manifest list
 - `pack manifest push` will push a manifest list to a registry
 
-Our target user affected by the feature is: Buildpack Authors
+Our target user affected by the feature is: **Buildpack Authors**. Let's see some examples of how this feature will work. 
+
+Currently, if we check [sample-packages](https://hub.docker.com/r/cnbs/sample-package/tags) at dockerhub we will notice that we have a composed buildpack called `hello-universe` and we offer two tags to support different architectures: 
+- `cnbs/sample-package:hello-universe` for linux and 
+- `cnbs/sample-package:hello-universe-windows`. 
+
+Maybe our linux version should be called `cnbs/sample-package:hello-universe-linux` to keep the same naming convention, but we will keep it as it is for simplicity. If we want to distribute the `hello-universe` buildpack for any **architecture/os/variant** combination we need to use a tool outside the CNB ecosystem to create a manifest list. But, with our proposal experimental commands on pack we can do:
+
+```bash
+$ pack manifest create cnbs/sample-package:hello-multiarch-universe \ 
+     cnbs/sample-package:hello-universe \ 
+     cnbs/sample-package:hello-universe-windows
+```
+
+By default the command will create a manifest list in the local daemon using the docker media types [Version 2 schema 2](https://docs.docker.com/registry/spec/manifest-v2-2/) with a content similar to:
+
+```json
+{
+   "schemaVersion": 2,
+   "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+   "manifests": [
+      {
+         "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+         "size": 226083,
+         "digest": "sha256: 87a832fd6a8d6995d336c740eb6f3da015401a6e564fcbe95ee1bf37557a8225",
+         "platform": {
+            "os": "linux",
+           "architecture": ""
+         }
+      },
+      {
+         "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+         "size": 226083,
+         "digest": "sha256:670d62fbee841d256a706801a03be9c84d37fc2cd6ef7538a7af9985c3d2ed8b",
+         "platform": {
+            "os": "windows",
+           "architecture": ""
+         }
+      }   
+   ]
+}
+```
+The idea to save the manifest list locally is to allow the user to update the manifest before pushing it to a registry, 
+in this case, we need to define the **architecture** field because it is empty in our examples.
+
+We can use the `pack manifest annotate` command to add the architecture information:
+
+```bash
+$  pack manifest annotate --arch amd64 cnbs/sample-package:hello-multiarch-universe cnbs/sample-package:hello-universe
+$  pack manifest annotate --arch amd64 cnbs/sample-package:hello-multiarch-universe cnbs/sample-package:hello-universe-windows
+```
+
+After executing these commands, our local manifest list will be updated as follows:
+
+```json
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.docker.distribution.manifest.list.v2+json",
+  "manifests": [
+    {
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "size": 940,
+      "digest": "sha256:87a832fd6a8d6995d336c740eb6f3da015401a6e564fcbe95ee1bf37557a8225",
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      }
+    },
+    {
+      "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "size": 1148,
+      "digest": "sha256:670d62fbee841d256a706801a03be9c84d37fc2cd6ef7538a7af9985c3d2ed8b",
+      "platform": {
+        "architecture": "amd64",
+        "os": "windows"
+      }
+    }
+  ]
+}
+```
+
+Finally, our manifest list is ready to be pushed to a registry, and we can use the `pack manifest push` command to do it:
+
+```bash
+$ pack manifest push cnbs/sample-package:hello-multiarch-universe
+```
+And our manifest list should be published at [dockerhub](https://hub.docker.com/r/cnbs/sample-package/tags) as `cnbs/sample-package:hello-multiarch-universe`, asuming that we have the proper credentials to push the image.
 
 <!--
 This provides a high level overview of the feature.
