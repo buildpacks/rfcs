@@ -108,7 +108,7 @@ Using the new API this process could look like:
 ```
 [[processes]]
 type = "bash"
-command = ["-c", "dotnet", "my-app.dll", "--urls", "http://0.0.0.0:${PORT:-8080}"]
+command = ["bash", "-c", "dotnet", "my-app.dll", "--urls", "http://0.0.0.0:${PORT:-8080}"]
 default = true
 ```
 Things to note:
