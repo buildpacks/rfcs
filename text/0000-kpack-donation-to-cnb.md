@@ -11,7 +11,7 @@
 
 # Summary
 
-This RFC proposes the donation of the open-source project [kpack](https://github.com/pivotal/kpack/) into the [Cloud Native Community Organization Buildpack](https://github.com/buildpacks-community).
+This RFC proposes the donation of the open-source project [kpack](https://github.com/pivotal/kpack/) into the [Cloud Native Buildpacks Community Organization](https://github.com/buildpacks-community) as a vendor neutral staging ground under the CNB governance umbrella. Once the project is deemed sufficiently mature, the project will be moved under the [Cloud Native Buildpacks Organization](https://github.com/buildpacks).
 
 Following the process defined in the [Buildpack Commnity RFC](https://github.com/buildpacks/rfcs/blob/main/text/0117-buildpacks-community.md) the following table presents the criteria used to evaluate the project.
 
