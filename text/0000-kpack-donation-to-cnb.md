@@ -34,7 +34,7 @@ Following the process defined in the [Buildpack Commnity RFC](https://github.com
 | The has a file - DEVELOPMENT.md: A guide to how contributors should develop the project.                                                                                                                                                                                                 | See [Development](https://github.com/pivotal/kpack/blob/main/DEVELOPMENT.md)                                                                                             |                                                               
 | The has a file - ADOPTERS.md: A list of adopters of the project.                                                                                                                                                                                                                         | See [Adopters](https://github.com/pivotal/kpack/blob/main/ADOPTERS.md)                                                                                                   |                                                             
 | The has a file - VERSIONING.md: A guide to how versioning is done for the project.                                                                                                                                                                                                       | See [Versioning](https://github.com/pivotal/kpack/blob/main/VERSIONING.md)                                                                                               |                                                           
-| The has a file - RELEASE.md: A guide to how releases are done for the project.                                                                                                                                                                                                           | See Release [Pull Request](https://github.com/pivotal/kpack/pull/1216)                                                                                                   |                                                         
+| The has a file - RELEASE.md: A guide to how releases are done for the project.                                                                                                                                                                                                           | See [Release](https://github.com/pivotal/kpack/blob/main/RELEASE.md)                                                                                                     |                                                         
 | The has a file - SECURITY.md: A guide to how security vulnerabilities should be reported.                                                                                                                                                                                                | See Security [Pull Request](https://github.com/pivotal/kpack/pull/1149)                                                                                                  |
 
 # Definitions
@@ -329,11 +329,10 @@ The [kpack's](https://github.com/pivotal/kpack/) maintainers that will be nomina
 |------------------|----------------------------------------------------|--------------|
 | Matthew McNew    | [@matthewmcnew](https://github.com/matthewmcnew)   | VMware       |
 | Tom Kennedy      | [@tomkennedy513](https://github.com/tomkennedy513) | VMware       |
-| Yael Harel       | [@yaelharel](https://github.com/yaelharel)         | VMware       |
 | Daniel Chen      | [@chenbh](https://github.com/chenbh)               | VMware       |
 | Juan Bustamante  | [@jjbustamante](https://github.com/jjbustamante)   | VMware       |
 
-Also those members are willing to become more involved with CNB projects and become **Platform maintainers** in the near future.
+Also, those members are willing to become more involved with CNB projects and become **Platform maintainers** in the near future.
 
 Outside VMware, the following contributors manifested their desired to become [kpack's](https://github.com/pivotal/kpack/) **component maintainer**.
 
