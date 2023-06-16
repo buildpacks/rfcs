@@ -1,0 +1,86 @@
+# Meta
+[meta]: #meta
+- Name: Pack direct podman call
+- Start Date: 2023-06-16
+- Author(s): dvaumoron
+- Status: Draft
+- RFC Pull Request: (leave blank)
+- CNB Pull Request: (leave blank)
+- CNB Issue: (leave blank)
+- Supersedes: "N/A"
+
+# Summary
+[summary]: #summary
+
+A flag `--container-engine` will be added to the `pack` CLI, the allowed flag value will be `docker` (the current functioning) and `podman` to call podman directly (without socket call)
+
+# Definitions
+[definitions]: #definitions
+
+N/A
+
+# Motivation
+[motivation]: #motivation
+
+This will allow to use pack as a standalone on the OS supported by podman (currently Linux, as Windows and macOS need podman machine)
+
+# What it is
+[what-it-is]: #what-it-is
+
+Adding `--container-engine podman` to the `pack` command which currently need docker call would allow them to work without docker installed.
+
+# How it Works
+[how-it-works]: #how-it-works
+
+The flag will change the initialization of the CommonAPIClient passed to call docker (interface defined in "github.com/docker/docker/client") by an adapter to call podman as a library. 
+
+# Migration
+[migration]: #migration
+
+N/A
+
+# Drawbacks
+[drawbacks]: #drawbacks
+
+pack contributor could need to update the podman dependencies in go.mod for bugfixes
+
+# Alternatives
+[alternatives]: #alternatives
+
+pack user could have dificulties to set up docker or podman to work with the pack CLI
+
+# Prior Art
+[prior-art]: #prior-art
+
+N/A
+
+# Unresolved Questions
+[unresolved-questions]: #unresolved-questions
+
+N/A
+
+# Spec. Changes (OPTIONAL)
+[spec-changes]: #spec-changes
+
+N/A
+
+# History
+[history]: #history
+
+<!--
+## Amended
+### Meta
+[meta-1]: #meta-1
+- Name: (fill in the amendment name: Variable Rename)
+- Start Date: (fill in today's date: YYYY-MM-DD)
+- Author(s): (Github usernames)
+- Amendment Pull Request: (leave blank)
+
+### Summary
+
+A brief description of the changes.
+
+### Motivation
+
+Why was this amendment necessary?
+--->
