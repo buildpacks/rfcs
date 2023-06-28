@@ -22,7 +22,7 @@ N/A
 # Motivation
 [motivation]: #motivation
 
-This will allow to use pack as a standalone on the OS supported by podman (currently Linux, as Windows and macOS need podman machine)
+This will allow to use pack as a standalone on the OS supported by podman (currently Linux, as Windows and macOS need podman machine), making possible to use pack without installing docker or podman (a tool like skopeo will still be necessary to send image in registries)
 
 # What it is
 [what-it-is]: #what-it-is
