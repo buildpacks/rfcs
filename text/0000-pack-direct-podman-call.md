@@ -32,7 +32,7 @@ Adding `--container-engine podman` to the `pack` command which currently need do
 # How it Works
 [how-it-works]: #how-it-works
 
-The flag will change the initialization of the CommonAPIClient passed to call docker (interface defined in "github.com/docker/docker/client") by an adapter to call podman as a library. 
+The flag will change the initialization of the CommonAPIClient passed to call docker (interface defined in "github.com/docker/docker/client") by an adapter conforming to the used subset [DockerClient](https://github.com/buildpacks/pack/blob/v0.29.0/pkg/client/docker.go#L14) to call podman as a library (forwarding calls to an initialized instance of [Runtime](https://github.com/containers/podman/blob/v4.5.1/libpod/runtime.go#L63)).
 
 # Migration
 [migration]: #migration
