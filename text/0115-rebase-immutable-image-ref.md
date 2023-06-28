@@ -3,9 +3,9 @@
 - Name: Rebase by Image Digest Reference
 - Start Date: 2022-12-08
 - Author(s): [@joeybrown-sf](https://github.com/joeybrown-sf)
-- Status: Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#262](https://github.com/buildpacks/rfcs/pull/262)
-- CNB Pull Request: (leave blank)
+- CNB Pull Request: https://github.com/buildpacks/lifecycle/pull/985
 - CNB Issue: [buildpacks/lifecycle#983](https://github.com/buildpacks/lifecycle/issues/983)
 - Supersedes: N/A
 
