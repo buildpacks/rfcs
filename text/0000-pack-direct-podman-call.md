@@ -37,7 +37,7 @@ The flag will change the initialization of the CommonAPIClient passed to call do
 # Migration
 [migration]: #migration
 
-N/A
+The current mode of `pack` operation is the default mode of operation.  The proposed `--daemonless` mode of operation is an optional mode of execution.  We will need to document how to switch between operation modes and the motivations for choosing an appropriate mode of operation.
 
 # Drawbacks
 [drawbacks]: #drawbacks
