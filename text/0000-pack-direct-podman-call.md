@@ -17,7 +17,7 @@ A flag `--daemonless` will be added to the `pack` CLI, the flag presence will sw
 # Definitions
 [definitions]: #definitions
 
-N/A
+Orchestration Client API: an API such as Docker's `DockerClient` or Podman's `Runtime` that 
 
 # Motivation
 [motivation]: #motivation
