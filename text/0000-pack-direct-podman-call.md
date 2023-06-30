@@ -22,7 +22,7 @@ Orchestration Client API: an API such as Docker's `DockerClient` or Podman's `Ru
 # Motivation
 [motivation]: #motivation
 
-This will allow to use pack as a standalone on the OS supported by podman (currently Linux, as Windows and macOS need podman machine), making possible to use pack without installing docker or podman (a tool like skopeo will still be necessary to send image in registries)
+`pack` currently requires an orchestration client API available via a socket.  Both `docker` and `podman` are compatible with the [socket API](https://docs.docker.com/engine/api/v1.24/).  This RFC proposes that `pack` is extended to support a "daemonless" mode.  In a "daemonless" mode `pack` will directly use an orchestration client API.  This avoids running a `docker` or `podman` daemon and avoids opening up a local socket.  This will allow to use pack as a full-userspace, standalone application on the OS supported by podman (currently Linux, as Windows and macOS need podman machine).
 
 # What it is
 [what-it-is]: #what-it-is
