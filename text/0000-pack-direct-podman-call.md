@@ -35,7 +35,7 @@ Adding `--daemonless` to the `pack` command which currently need docker call wou
 The flag will change the initialization of the CommonAPIClient passed to call docker (interface defined in "github.com/docker/docker/client") by an adapter conforming to the used subset [DockerClient](https://github.com/buildpacks/pack/blob/main/pkg/client/docker.go#L14) to call podman as a library (forwarding calls to an initialized instance of [ContainerEngine](https://github.com/containers/podman/blob/main/pkg/domain/entities/engine_container.go#L16)).
 
 The adapter will look like :
-```
+```Go
 type podmanAdapter struct {
     inner entities.ContainerEngine
 }
