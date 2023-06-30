@@ -12,7 +12,7 @@
 # Summary
 [summary]: #summary
 
-A flag `--container-engine` will be added to the `pack` CLI, the allowed flag value will be `docker` (the current functioning) and `podman` to call podman directly (without socket call)
+A flag `--daemonless` will be added to the `pack` CLI, the flag presence will switch from the current functioning to one where podman is called directly (without needing a daemon backed socket)
 
 # Definitions
 [definitions]: #definitions
@@ -27,7 +27,7 @@ This will allow to use pack as a standalone on the OS supported by podman (curre
 # What it is
 [what-it-is]: #what-it-is
 
-Adding `--container-engine podman` to the `pack` command which currently need docker call would allow them to work without docker installed.
+Adding `--daemonless` to the `pack` command which currently need docker call would allow them to work without docker installed.
 
 # How it Works
 [how-it-works]: #how-it-works
