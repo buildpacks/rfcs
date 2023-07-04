@@ -167,10 +167,19 @@ The proposal is to implement an abstraction of an OCI *Image Index* and expose i
 
 ## Image Index Abstraction
 
+A new high level abstraction to represent an OCI Image Index is proposed, similar to the [Image](https://github.com/buildpacks/imgutil/blob/main/image.go) interface exposed in *imgutil* repository, 
+we proposed a new *ManifestList* interface to expose the behavior of an OCI Image Index.
+
 ```mermaid
 classDiagram
-    ManifestList <|-- remote_ManifestList
-    ManifestList <|-- local_ManifestList 
+    class ManifestList {
+       <<interface>>
+        +Add(repoName string) error
+        +Remove(repoName string) error
+        +Delete(additionalNames []string) error
+        +AnnotateManifest(manifestName string, opts AnnotateFields) error
+        +Save() error
+    }
 
     class remote_ManifestList {
         +NewManifestList(repoName string, keychain authn.Keychain) ManifestList 
@@ -179,16 +188,18 @@ classDiagram
     class local_ManifestList {
          +NewManifestList(repoName string, path string) ManifestList
     }
-
-    class ManifestList {
-       <<interface>>
-        +Add(repoName string) error
-        +Remove(repoName string) error
-        +Save() error
+    
+    class AnnotateFields {
+         +String Architecture
+         +String OS
+         +String Variant
     }
+    
+    ManifestList <|-- remote_ManifestList
+    ManifestList <|-- local_ManifestList 
 ```
 
-Two implementations: *remote* and *local* are propose, *remote* will take care of implementing the interaction with an OCI registry and *local* will deal with the local storage operations.
+Two implementations: *remote* and *local* are proposed, *remote* will take care of implementing the interaction with an OCI registry and *local* will deal with the local storage operations.
 
 ### Component Diagram
 
@@ -201,6 +212,15 @@ Using a [C4 component diagram](https://c4model.com/#ComponentDiagram), we can de
   - As we can see, depending on the implementation it will interact with the file system or with a remote registry
 
 ### Considerations
+
+#### When a user wants to create a manifest list using a manifest outside the user's repo. 
+
+Let's suppose the following user case: A user wants to create a manifest list `foo/my-manifest:my-tag` using a manifest outside his repository `foo` for example `other/external-manifest:latest`. 
+
+In this case, pack will need to *copy* the external manifest `other/external-manifest:latest` into `foo` repository `foo/external-manifest:latest` and then uses this reference into the manifest list created. Pack should at least *warn* the user about this operation.
+
+#### When a user wants to create a manifest list referencing a manifest list
+
 
 # Migration
 [migration]: #migration
