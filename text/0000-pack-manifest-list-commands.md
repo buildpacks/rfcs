@@ -57,8 +57,10 @@ The proposal is to add a new _experimental_ command `pack manifest` and differen
 - `pack manifest create` will create a local manifest list for annotating and pushing to a registry
 - `pack manifest annotate` will add additional information like os, arch or variant to an existing local manifest list
 - `pack manifest add` will add an image to an existing manifest list
-- `pack manifest remove` will remove an image from a manifest list
+- `pack manifest delete` will delete a manifest list from local storage
+- `pack manifest rm` will remove an image from a manifest list
 - `pack manifest push` will push a manifest list to a registry
+- `pack manifest inspect` will show the manifest information stored in local storage
 
 Our target user affected by the feature is: **Buildpack Authors**. Let's see some examples of how this feature will work. 
 
@@ -66,7 +68,7 @@ Currently, if we check [sample-packages](https://hub.docker.com/r/cnbs/sample-pa
 - `cnbs/sample-package:hello-universe` for linux and 
 - `cnbs/sample-package:hello-universe-windows`. 
 
-Maybe our linux version should be called `cnbs/sample-package:hello-universe-linux` to keep the same naming convention, but we will keep it as it is for simplicity. If we want to distribute the `hello-universe` buildpack for any **architecture/os/variant** combination we need to use a tool outside the CNB ecosystem to create a manifest list. But, with our proposal experimental commands on pack we can do:
+Let's suppose our linux version is called `cnbs/sample-package:hello-universe-linux` to keep the same naming convention, but we will keep it as it is for simplicity. If we want to distribute the `hello-universe` buildpack for any **architecture/os/variant** combination we need to use a tool outside the CNB ecosystem to create a manifest list. With the proposed experimental commands on pack we can do:
 
 ```bash
 $ pack manifest create cnbs/sample-package:hello-multiarch-universe \ 
@@ -74,7 +76,7 @@ $ pack manifest create cnbs/sample-package:hello-multiarch-universe \
      cnbs/sample-package:hello-universe-windows
 ```
 
-By default the command will create a manifest list in the local daemon using the docker media types [Version 2 schema 2](https://docs.docker.com/registry/spec/manifest-v2-2/) with a content similar to:
+By default, the command will create a manifest list in the local storage using the docker media types [Version 2 schema 2](https://docs.docker.com/registry/spec/manifest-v2-2/) with a content similar to:
 
 ```json
 {
@@ -161,9 +163,44 @@ This provides a high level overview of the feature.
 # How it Works
 [how-it-works]: #how-it-works
 
-This is the technical portion of the RFC, where you explain the design in sufficient detail.
+The proposal is to implement an abstraction of an OCI *Image Index* and expose it to users through `pack manifest` commands.
 
-The section should return to the examples given in the previous section, and explain more fully how the detailed proposal makes those examples work.
+## Image Index Abstraction
+
+```mermaid
+classDiagram
+    ManifestList <|-- remote_ManifestList
+    ManifestList <|-- local_ManifestList 
+
+    class remote_ManifestList {
+        +NewManifestList(repoName string, keychain authn.Keychain) ManifestList 
+    }
+
+    class local_ManifestList {
+         +NewManifestList(repoName string, path string) ManifestList
+    }
+
+    class ManifestList {
+       <<interface>>
+        +Add(repoName string) error
+        +Remove(repoName string) error
+        +Save() error
+    }
+```
+
+Two implementations: *remote* and *local* are propose, *remote* will take care of implementing the interaction with an OCI registry and *local* will deal with the local storage operations.
+
+### Component Diagram
+
+Using a [C4 component diagram](https://c4model.com/#ComponentDiagram), we can define the high level interaction on pack. This design follows the same pattern for each command already implemented.
+
+![](https://hackmd.io/_uploads/B1PpJ-fKh.png)
+
+- *Image Factory*: is responsible for instantiate the *Image Index* abstraction based on the configuration require, it could be a *remote* or a *local* implementation
+- *Image Index*: is the abstraction defined which exposes the operation methods we want to offer to users
+  - As we can see, depending on the implementation it will interact with the file system or with a remote registry
+
+### Considerations
 
 # Migration
 [migration]: #migration
