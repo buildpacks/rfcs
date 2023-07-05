@@ -57,7 +57,7 @@ For example, if we wanted to configure a mirror for Docker Hub and Quay.io, we c
 docker.io=https://docker.mirror.example.com;quay.io=https://quay.mirror.example.com
 ```
 
-When `lifecycle` requests an image during any phase (`analyze`, `export`, `extend`, etc.), it will first check the `CNB_REGISTRY_MIRRORS` environment variable. If the requested image's registry is configured in the `CNB_REGISTRY_MIRRORS` environment variable, it will use the mirror URL instead of the original registry URL.
+When `lifecycle` requests an image during any phase (`analyze`, `restore`, `export`, `rebase`), it will first check the `CNB_REGISTRY_MIRRORS` environment variable. If the requested image's registry is configured in the `CNB_REGISTRY_MIRRORS` environment variable, it will use the mirror URL instead of the original registry URL.
 
 If the private registry requires authentication, authentication to the registry will be handled by the existing `CNB_REGISTRY_AUTH` value. If the private registry does not require authentication, no additional configuration is required.
 
