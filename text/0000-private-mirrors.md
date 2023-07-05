@@ -61,6 +61,22 @@ When `lifecycle` requests an image during any phase (`analyze`, `restore`, `expo
 
 If the private registry requires authentication, authentication to the registry will be handled by the existing `CNB_REGISTRY_AUTH` value. If the private registry does not require authentication, no additional configuration is required.
 
+If registry mirrors are configured for specific images in configuration (e.g. `stack.toml` or `run.toml`), the `CNB_REGISTRY_MIRRORS` will be processed with each registry attempt. For example, the following `stack.toml` configures mirrors for `public/stack:run-image`:
+
+```toml
+[run-image]
+ image = "public/stack:run-image"
+ mirrors = ["quay.io/public/stack:run-image"]
+```
+
+If `CNB_REGISTRY_MIRRORS` has the value of:
+
+```
+docker.io=https://docker.mirror.example.com;quay.io=https://quay.mirror.example.com
+```
+
+When `lifecycle` attempts to resolve the `public/stack:run-image` image, `lifecycle` will attempt to fetch the image from `docker.mirror.example.com/public/stack:run-image`. If the [Run Image Resolution](https://github.com/buildpacks/spec/blob/main/platform.md#run-image-resolution) resulted in `quay.io/public/stack:run-image` being chosen, `lifecycle` will attempt to fetch the image from `quay.mirror.example.com/public/stack:run-image` instead. This new processing happens AFTER the [Run Image Resolution](https://github.com/buildpacks/spec/blob/main/platform.md#run-image-resolution) has executed.  The run image selection will NOT take `CNB_REGISTRY_MIRRORS` into account, but the final image resolution will. Think of `CNB_REGISTRY_MIRRORS` as a just-in-time override of the final image resolution.
+
 # Migration
 [migration]: #migration
 
