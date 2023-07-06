@@ -3,10 +3,10 @@
 - Name: kpack donation to CNB
 - Start Date: 2022-06-21
 - Author(s): [Juan Bustamante](https://github.com/jjbustamante/)
-- Status: Draft
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#235](https://github.com/buildpacks/rfcs/pull/235)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
