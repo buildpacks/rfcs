@@ -215,12 +215,22 @@ Using a [C4 component diagram](https://c4model.com/#ComponentDiagram), we can de
 
 #### When a user wants to create a manifest list using a manifest outside the user's repo. 
 
-Let's suppose the following user case: A user wants to create a manifest list `foo/my-manifest:my-tag` using a manifest outside his repository `foo` for example `other/external-manifest:latest`. 
+As a pack user I want to create a manifest list `foo/my-manifest:my-tag` using a manifest outside my repository `foo` for example `other/external-manifest:latest`.
 
-In this case, pack will need to *copy* the external manifest `other/external-manifest:latest` into `foo` repository `foo/external-manifest:latest` and then uses this reference into the manifest list created. Pack should at least *warn* the user about this operation.
+The user invokes a command similar to: `pack manifest create foo/my-manifest:my-tag other/external-manifest:latest`
+
+In this case, pack will need to *copy* the external image `other/external-manifest:latest` into `foo` repository `foo/external-manifest:latest` and then uses this reference to create the manifest list. In such as case `pack` should:
+ - *warn* the user about this operation, for example with a message
+ - *ask the user for confirmation* before executing the operation
 
 #### When a user wants to create a manifest list referencing a manifest list
 
+As a pack user I want to create a manifest list using a reference to another manifest list
+
+The user invokes a command similar to: `pack manifest create foo/my-manifest:my-tag foo/another-manifest:latest`
+
+In this case, pack should:
+ - add into the **manifests** array of objects a reference to the manifest index using the media-type `application/vnd.oci.image.index.v1+json` (nested index)
 
 # Migration
 [migration]: #migration
