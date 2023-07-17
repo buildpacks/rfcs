@@ -57,8 +57,8 @@ The proposal is to add a new _experimental_ command `pack manifest` and differen
 - `pack manifest create` will create a local manifest list for annotating and pushing to a registry
 - `pack manifest annotate` will add additional information like os, arch or variant to an existing local manifest list
 - `pack manifest add` will add an image to an existing manifest list
-- `pack manifest delete` will delete a manifest list from local storage
-- `pack manifest rm` will remove an image from a manifest list
+- `pack manifest remove` will delete a manifest list from local storage
+- `pack manifest rm` will remove an image from a manifest list in the local storage
 - `pack manifest push` will push a manifest list to a registry
 - `pack manifest inspect` will show the manifest information stored in local storage
 
@@ -231,6 +231,155 @@ The user invokes a command similar to: `pack manifest create foo/my-manifest:my-
 
 In this case, pack should:
  - add into the **manifests** array of objects a reference to the manifest index using the media-type `application/vnd.oci.image.index.v1+json` (nested index)
+
+### Commands details
+
+#### Create a Manifest List
+
+Pack will create a manifest a local manifest, it should handle the following scenarios:
+- IF user references a manifest list that already exists in a registry: In this case, pack will save a local copy of the remote manifest list, this is useful for updating (adding, updating or deleting) images
+- IF user references a manifest list that doesn't exist in a registry: pack will create a local representation of the manifest list that will only save on the remote registry if the user publish it
+
+```bash
+manifest create generates a manifest list for a multi-arch image
+
+Usage:
+  pack manifest create <manifest-list> <manifest> [<manifest> ... ] [flags]
+
+Examples:
+pack manifest create cnbs/sample-package:hello-multiarch-universe \
+					cnbs/sample-package:hello-universe \
+					cnbs/sample-package:hello-universe-windows
+
+Flags:
+  -f, --format string     Format to save image index as ("OCI" or "V2S2") (default "v2s2")
+      --insecure          Allow publishing to insecure registry
+      --publish           Publish to registry
+  -r, --registry string   Registry URL to publish the image index
+```
+
+#### Annotate (os/arch) a Manifest List 
+
+Sometimes a manifest list could reference an image that doesn't specify the *architecture*, for example, [check](https://hub.docker.com/r/cnbs/sample-package/tags) our sample buildpack
+packages. The `annotate` command allows users to update those values before pushing the manifest list a registry
+
+```bash
+manifest annotate modifies a manifest list (Image index) and update the platform information for an image included in the manifest list.
+
+Usage:
+  pack manifest annotate [OPTIONS] <manifest-list> <manifest> [flags]
+
+Examples:
+pack manifest annotate cnbs/sample-package:hello-universe-multiarch \ cnbs/sample-package:hello-universe --arch amd64
+
+Flags:
+      --arch string      Set the architecture
+      --os string        Set the operating system
+      --variant string   Set the architecture variant
+```
+
+#### Add an image to a Manifest List
+
+When a manifest list exits locally, user can add a new image to the manifest list using this command
+
+```bash
+manifest add modifies a manifest list (Image index) and add a new image to the list of manifests.
+
+Usage:
+  pack manifest add [OPTIONS] <manifest-list> <manifest> [flags]
+
+Examples:
+pack manifest add cnbs/sample-package:hello-multiarch-universe \
+					cnbs/sample-package:hello-universe-riscv-linux
+
+Flags:
+      --all              add all of the contents to the local list (applies only if <manifest> is an index)
+      --arch string      Set the architecture
+      --os string        Set the operating system
+      --variant string   Set the architecture variant
+```
+
+#### Remove an image from a Manifest List
+
+In the opposite case, users can remove existing images from a manifest list
+
+```bash
+Delete one or more manifest lists from local storage
+
+Usage:
+  pack manifest remove [manifest-list] [manifest-list...] [flags]
+
+Examples:
+pack manifest delete cnbs/sample-package:hello-multiarch-universe
+
+Flags:
+  -h, --help   Help for 'remove'
+```
+
+#### Remove a local Manifest List
+
+Sometimes users can just experiment with the feature locally and they want to discard all the local information created by pack. `rm` command just delete the *local* manifest list
+
+```bash
+manifest remove will remove the specified image manifest if it is already referenced in the index
+
+Usage:
+  pack manifest rm [manifest-list] [manifest] [flags]
+
+Examples:
+pack manifest rm cnbs/sample-package:hello-multiarch-universe \
+					cnbs/sample-package:hello-universe-windows
+
+Flags:
+  -h, --help   Help for 'rm'
+
+```
+
+#### Push a Manifest List to a remote registry
+
+Once a manifest list is ready to be publishe into the registry, the `push` command can be used
+
+```bash
+manifest push pushes a manifest list (Image index) to a registry.
+
+Usage:
+  pack manifest push [OPTIONS] <manifest-list> [flags]
+
+Examples:
+pack manifest push cnbs/sample-package:hello-multiarch-universe
+
+Flags:
+  -f, --format string   Manifest list type (oci or v2s2) to use when pushing the list (default is v2s2)
+      --insecure        Allow publishing to insecure registry
+  -p, --purge           Delete the manifest list or image index from local storage if pushing succeeds
+```
+
+#### Inspect a Manifest List
+
+Finally, the `inspect` command will help users to view how their local manifest list looks like
+
+```bash
+manifest inspect shows the manifest information stored in local storage
+
+Usage:
+  pack manifest inspect <manifest-list> [flags]
+
+Examples:
+pack manifest inspect cnbs/sample-builder:multiarch
+
+Flags:
+  -h, --help   Help for 'inspect'
+
+```
+
+One important concern for users is to inspect the content of a multi-arch builder or buildpack if they are accessible behind a manifest list. The proposal is to implement a `platform` flag for commands:
+
+- `pack builder inspect`
+- `pack buildpack inspect`
+
+The `--platform` flag specifies the platform in the form os/arch[/variant][:osversion] (e.g. linux/amd64). By default it will reference the host values. 
+The output of the commands should remain the same.
+
 
 # Migration
 [migration]: #migration
