@@ -38,7 +38,7 @@ When Buildpacks Authors execute commands like:
 `pack builder create ... <flatten options>` or
 `pack buildpack package ... <flatten options>`
 
-The final OCI image artifact (A) SHOULD contain layers blobs with more than *one* buildpack according to the configuration provided by the user. If we compare an artifact (B) created *without* `<flatten options>` then: 
+The final OCI image artifact (A) SHOULD contain layers blobs with more than *one* buildpack according to the configuration provided by the user. If we compare an artifact (B) created *without* `<flatten options>` then:
 
 $numberOfBuildpackLayers(A) \leq numberOfBuildpackLayers(B)$
 
@@ -57,10 +57,7 @@ The new flags will move from experimental status to supported status when mainta
 
 The new flags to be included are:
 
-- `--flatten` will flatten all the Buildpacks in one layer
-- `--flatten --depth=<int>` If there are composite buildpack to be flatten, `depth` is the high in the buildpack dependency tree to start flattening the buildpacks
-- `--flatten --flatten-exclude=<buildpacks>` will flatten all the Buildpacks in one layer excepts the ones specified under the `flatten-exclude` flag 
-- `--flatten --flatten-include=<buildpacks>` will flatten the Buildpacks specified after the `flatten-include` flag into a single layer. Can be used more than once, with each use resulting in a single layer.
+- `--flatten=<buildpacks>` will flatten the Buildpacks specified after the `flatten` flag into a single layer. Can be used more than once, with each use resulting in a single layer.
 
 We also need to define how a platform implementor needs to consume a flatten buildpackpage or builder.
 
@@ -86,119 +83,23 @@ flowchart TD
 
 Until now, when a buildpack like this is being shipped  into an OCI image every individual buildpack is being saved in one layer, as a result we will have:
 
-$$ 
- layer_1 = [CB_1] \\
- layer_2 = [G_1] \\
- layer_3 = [BP_1] \\
- layer_4 = [BP_2] \\
- layer_5 = [BP_4] \\
- layer_6 = [G_2] \\
- layer_7 = [BP_3] \\
- total = \text{7 layers}
+$$
+layer_1 = [CB_1] \\
+layer_2 = [G_1] \\
+layer_3 = [BP_1] \\
+layer_4 = [BP_2] \\
+layer_5 = [BP_4] \\
+layer_6 = [G_2] \\
+layer_7 = [BP_3] \\
+total = \text{7 layers}
 $$
 
-Noticed that duplicated buildpacks are cleaned up. 
+Noticed that duplicated buildpacks are cleaned up.
 
 We can use the new `flatten` flag to reduce the number of OCI image layers used by the buildpacks in different ways.
 
-* `--flatten`:
-Will flatten all buildpacks into one layer, the result will be:
-
-```mermaid
-classDiagram
-    class Layer1 {
-      CB1
-      G1 
-      BP1
-      BP2
-      BP4
-      G2
-      BP3
-    }
-```
-
-
-$$ 
- total = \text{1 layer}
-$$
-
----
-* `--flatten --flatten-exclude=<buildpack>` i.e. `--flatten-exclude=<BP2>`
-Will flatten all buildpacks in 1 layer except for`BP2`, the result will be
-
-```mermaid
-classDiagram
-    class Layer1 {
-      CB1
-      G1 
-      BP1
-      BP4
-      G2
-      BP3
-    }
-   class Layer2 {
-      BP2
-   }
-```
-
-$$ 
- total = \text{2 layers}
-$$
-
----
-
-* `--flatten --depth=0`
-Will flatten all layers at the root (0) level, which is similar to flatten all, the result will be:
-
-```mermaid
-classDiagram
-    class Layer1 {
-      CB1
-      G1 
-      BP1
-      BP2
-      BP4
-      G2
-      BP3
-    }
-```
-
-$$ 
- total = \text{1 layer}
-$$
-
----
-Increasing the depth number will allow to flatten the tree deeper,
-for example setting `--depth=1`, the result will be:
-
-```mermaid
-classDiagram
-    class Layer1 {
-      CB1
-    }
-    class Layer2 {
-      G1 
-      BP1
-      BP2
-      BP4
-    }
-    class Layer3 {
-      G2
-      BP3
-    }
-```
-
-
-$$ 
- total = \text{3 layers}
-$$
-
-
----
-
-* `--flatten --flatten-include=<buildpacks>` i.e. `--flatten --flatten-include=<BP1,BP2> --flatten-include=<BP3,BP4>`
-
-Will group the given buildpacks into one layer and keep the other ones as single layers buildpacks, the result will be:
+* `--flatten=<buildpacks>` i.e. `--flatten=<BP1,BP2> --flatten=<BP3,BP4>`:
+  Will group the given buildpacks into one layer and keep the other ones as single layers buildpacks, the result will be:
 
 ```mermaid
 classDiagram
@@ -222,9 +123,11 @@ classDiagram
 ```
 
 
-$$ 
- total = \text{5 layers}
 $$
+total = \text{5 layers}
+$$
+
+---
 
 
 # Migration
@@ -270,20 +173,14 @@ Not sure if it is the best, but way to solve the `layer limit error` is to optim
 
 - What is the impact of not doing this?
 
-Buildpack Authors and Platform Operators will keep seeing the layer limit error. 
+Buildpack Authors and Platform Operators will keep seeing the layer limit error.
 
 # Prior Art
 [prior-art]: #prior-art
 
 Discuss prior art, both the good and bad.
 
-# Unresolved Questions
-[unresolved-questions]: #unresolved-questions
-
-- What parts of the design do you expect to be resolved before this gets merged?
-
-We think the `--depth` command MAY not be helpful, after implementing a PoC. Should we get rid of this flag?
-
+---
 
 <!-- 
 - What parts of the design do you expect to be resolved through implementation of the feature?
