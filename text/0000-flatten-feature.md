@@ -19,6 +19,9 @@ We propose to add new capabilities to the Pack tool that allow end users to redu
 
 - Buildpack: A buildpack is a set of executables that inspects your app source code and creates a plan to build and run your application.
 - Builder: A builder is an image that contains all the components necessary to execute a build. A builder image is created by taking a build image and adding a lifecycle, buildpacks, and files that configure aspects of the build including the buildpack detection order and the location(s) of the run image
+- Component Buildpack: A component buildpack is a buildpack containing `/bin/detect` and `/bin/build` executables. Component buildpacks implement the [Buildpack Interface](https://github.com/buildpacks/spec/blob/main/buildpack.md).
+- Composite Buildpack: A composite buildpack is a buildpack containing an order definition in `buildpack.toml`. Composite buildpacks do not contain `/bin/detect` or `/bin/build` executables. They MUST be [resolvable](https://github.com/buildpacks/spec/blob/main/buildpack.md#order-resolution) into a collection of component buildpacks.
+- Buildpackage: A buildpackage is a [distributable](https://github.com/buildpacks/spec/blob/main/distribution.md) artifact that contains a buildpack. 
 
 # Motivation
 [motivation]: #motivation
@@ -141,7 +144,7 @@ Each buildpack layer blob MUST contain a single buildpack at the following file 
 /cnb/buildpacks/<buildpack ID>/<buildpack version>/
 ```
 
-A Buildpackage flattened with this new feature would not be consumable by older platform implementations because they are not expecting to find more than one buildpack on a blob layer.
+A Buildpackage and a Builder flattened with this new feature would not be consumable by older platform implementations because they are not expecting to find more than one buildpack on a blob layer.
 
 
 <!--
