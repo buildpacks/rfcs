@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Flatten builders and buildpacks
+- Name: Flatten builders
 - Start Date: 2023-07-13
 - Author(s): @jjbustamante, @dlion
 - Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
@@ -12,7 +12,9 @@
 # Summary
 [summary]: #summary
 
-We propose to add new capabilities to the Pack tool that allow end users to reduce the number of Buildpack's layers in an OCI image by flattening according to their requirements.
+We propose to add new capabilities to the Pack tool that allow end-users to reduce the number of Buildpack's layers in a Builder by flattening some Buildpacks according to their requirements.
+
+This RFC mainly focus on applying this strategy to Builders only.
 
 # Definitions
 [definitions]: #definitions
@@ -21,7 +23,7 @@ We propose to add new capabilities to the Pack tool that allow end users to redu
 - Builder: A builder is an image that contains all the components necessary to execute a build. A builder image is created by taking a build image and adding a lifecycle, buildpacks, and files that configure aspects of the build including the buildpack detection order and the location(s) of the run image
 - Component Buildpack: A component buildpack is a buildpack containing `/bin/detect` and `/bin/build` executables. Component buildpacks implement the [Buildpack Interface](https://github.com/buildpacks/spec/blob/main/buildpack.md).
 - Composite Buildpack: A composite buildpack is a buildpack containing an order definition in `buildpack.toml`. Composite buildpacks do not contain `/bin/detect` or `/bin/build` executables. They MUST be [resolvable](https://github.com/buildpacks/spec/blob/main/buildpack.md#order-resolution) into a collection of component buildpacks.
-- Buildpackage: A buildpackage is a [distributable](https://github.com/buildpacks/spec/blob/main/distribution.md) artifact that contains a buildpack. 
+- Buildpackage: A buildpackage is a [distributable](https://github.com/buildpacks/spec/blob/main/distribution.md) artifact that contains a buildpack.
 
 # Motivation
 [motivation]: #motivation
@@ -32,16 +34,15 @@ There is a limit in the number of layer an image can have, at least on Docker, w
 
 - What use cases does it support?
 
-Buildpacks provider like Paketo have composite buildpacks with several layers, when they pull many of those together into a builder, hitting the layer limit for a container image happens very often. A feature for the Buildpack author to group the buildpacks by any attribute will allow them to squash those groups into one layer and reduce their total number of layers, avoiding the layer limit.
+Buildpacks provider like Paketo have Composite Buildpacks with several layers, when they pull many of those together into a Builder, hitting the layer limit for a container image happens very often. A feature for the Builder author to group the Buildpacks by any attribute will allow them to squash those groups into one layer and reduce their total number of layers, avoiding the layer limit.
 
 - What is the expected outcome?
 
-When Buildpacks Authors execute commands like:
+When Builder Authors execute the command:
 
-`pack builder create ... <flatten options>` or
-`pack buildpack package ... <flatten options>`
+`pack builder create ... <flatten options>`
 
-The final OCI image artifact (A) SHOULD contain layers blobs with more than *one* buildpack according to the configuration provided by the user. If we compare an artifact (B) created *without* `<flatten options>` then:
+The final Builder (A) SHOULD contain layers blobs with more than *one* buildpack according to the configuration provided by the user. If we compare an artifact (B) created *without* `<flatten options>` then:
 
 $numberOfBuildpackLayers(A) \leq numberOfBuildpackLayers(B)$
 
@@ -51,26 +52,25 @@ A and B MUST be otherwise interchangeable, only differing by their number of lay
 # What it is
 [what-it-is]: #what-it-is
 
-The proposal is to include new experimental flags to the following commands on pack:
+The proposal is to include a new experimental flag to the following command on Pack:
 
 - `pack builder create`
-- `pack buildpack package`
 
-The new flags will move from experimental status to supported status when maintainers deem it appropriate.
+The new flag will move from experimental status to supported status when maintainers deem it appropriate.
 
-The new flags to be included are:
+The new flag to be included is:
 
 - `--flatten=<buildpacks>` will flatten the Buildpacks specified after the `flatten` flag into a single layer. Can be used more than once, with each use resulting in a single layer.
 
-We also need to define how a platform implementor needs to consume a flatten buildpackpage or builder.
+We also need to define how a Platform implementor needs to consume a flattened Builder.
 
-- When a platform consumes an OCI image artifact, they will need to inspect each buildpack layer blob and determine if the blob contains more than one buildpack, in such as case, they will need to process those buildpacks correctly.
+- When a Platform consumes a Builder, they will need to inspect each Buildpack layer blob and determine if the blob contains more than one Buildpack, in such as case, they will need to process those Buildpacks correctly.
 
 
 # How it Works
 [how-it-works]: #how-it-works
 
-Let's say we have a composite buildpack (CB1) with the following dependency tree:
+Let's say we have a Composite Buildpack (CB1) with the following dependency tree:
 ```mermaid
 flowchart TD
     A[CB1]
@@ -84,7 +84,7 @@ flowchart TD
     C --> BPE[BP4]
 ```
 
-Until now, when a buildpack like this is being shipped  into an OCI image every individual buildpack is being saved in one layer, as a result we will have:
+Until now, when a Buildpack like this is being shipped into a Builder every individual Buildpack is being saved in one layer, as a result we will have:
 
 $$
 layer_1 = [CB_1] \\
@@ -97,12 +97,12 @@ layer_7 = [BP_3] \\
 total = \text{7 layers}
 $$
 
-Noticed that duplicated buildpacks are cleaned up.
+Noticed that duplicated Buildpacks are cleaned up.
 
-We can use the new `flatten` flag to reduce the number of OCI image layers used by the buildpacks in different ways.
+We can use the new `flatten` flag to reduce the number of Builder layers used by the buildpacks in different ways.
 
 * `--flatten=<buildpacks>` i.e. `--flatten=<BP1,BP2> --flatten=<BP3,BP4>`:
-  Will group the given buildpacks into one layer and keep the other ones as single layers buildpacks, the result will be:
+  Will group the given Buildpacks into one layer and keep the other ones as single layers Buildpacks, the result will be:
 
 ```mermaid
 classDiagram
@@ -136,6 +136,7 @@ $$
 # Migration
 [migration]: #migration
 
+
 The current [distribution spec](https://github.com/buildpacks/spec/blob/main/distribution.md#buildpackage) defines:
 
 ```
@@ -144,7 +145,7 @@ Each buildpack layer blob MUST contain a single buildpack at the following file 
 /cnb/buildpacks/<buildpack ID>/<buildpack version>/
 ```
 
-A Buildpackage and a Builder flattened with this new feature would not be consumable by older platform implementations because they are not expecting to find more than one buildpack on a blob layer.
+A Builder flattened with this new feature would not be consumable by older platform implementations because they are not expecting to find more than one buildpack on a blob layer.
 
 
 <!--
@@ -155,11 +156,7 @@ This section should document breaks to public API and breaks in compatibility du
 
 Why should we *not* do this?
 
-Distributing a buildpackage with more than one buildpack in a layer blob adds complexity to platform implementors because they will need to do the opposite process when consuming the OCI images.
-
-It will add complexity to Buildpack Authors processes because they will need to think how to group their buildpacks together in a layer blob in an efficient way avoiding for example network issues when pulling new blobs from a registry. Size, frequency of change and other variables must be taken into consideration when buildpacks are flatten.
-
-It will create artifacts that are not consumable by older platforms.
+It could create artifacts that are not consumable by older platforms.
 
 
 # Alternatives
@@ -167,16 +164,16 @@ It will create artifacts that are not consumable by older platforms.
 
 - What other designs have been considered?
 
-Some other alternatives mentioned are: squashing by the buildpack size or squashing a CNB Builder when the number of layers is reaching the limit, but those ideas, do not deal with the main problems of distributing more than one buildpack in a layer blob.
+Some other alternatives mentioned are: squashing by the buildpack size or squashing a CNB Builder when the number of layers is reaching the limit, but those ideas, do not provide the freedom to the buildpacks authors to decide which buildpacks to flatten.
 
 
 - Why is this proposal the best?
 
-Not sure if it is the best, but way to solve the `layer limit error` is to optimize the uses of the layer in a OCI image.
+Not sure if it is the best, but a way to solve the `layer limit error` is to optimize the uses of the layer in a Builder.
 
 - What is the impact of not doing this?
 
-Buildpack Authors and Platform Operators will keep seeing the layer limit error.
+Builder Authors and Platform Operators will keep seeing the layer limit error.
 
 # Prior Art
 [prior-art]: #prior-art
@@ -194,7 +191,7 @@ Discuss prior art, both the good and bad.
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-Maybe, but it's not clear about this.
+No spec changes at this time
 
 <!--
 Does this RFC entail any proposed changes to the core specifications or extensions? If so, please document changes here.
