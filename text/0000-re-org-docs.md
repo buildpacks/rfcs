@@ -126,6 +126,7 @@ This provides a high level overview of the feature.
 │   │   │   ├── defer-plan-entries.md <- NOTE: missing content!
 │   │   │   ├── re-use-layers.md <- NOTE: missing content!
 │   │   │   ├── specify-env
+│   │   │   │   ├── add-to-posix-paths.md <- NOTE: missing content!
 │   │   │   │   ├── for-build.md <- NOTE: missing content!
 │   │   │   │   ├── for-process.md <- NOTE: missing content!
 │   │   │   │   ├── for-run.md <- NOTE: missing content!
