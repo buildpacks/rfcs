@@ -12,7 +12,7 @@
 # Summary
 [summary]: #summary
 
-This RFC proposes reorganizing the docs website according to personas and the "four quadrants of docs" aka the [Divio documentation system](https://documentation.divio.com/structure.html).
+This RFC proposes reorganizing the docs website according to CNB personas and the "four quadrants of docs" aka the [Divio documentation system](https://documentation.divio.com/structure.html).
 
 # Definitions
 [definitions]: #definitions
@@ -24,9 +24,14 @@ This RFC proposes reorganizing the docs website according to personas and the "f
   * ...
 * Four quadrants
   * Tutorials - from Divio: `lessons that take the reader by the hand through a series of steps to complete a project of some kind`
+    * Oriented toward beginners
+    * Should be tested to make sure they work
   * Explanations - from Divio: `discussion [that] clarify and illuminate a particular topic`
+    * Theoretical knowledge
   * How-to guides - from Divio: `take the reader through the steps required to solve a real-world problem`
+    * Practical knowledge
   * Reference - from Divio: `technical descriptions of the machinery and how to operate it` (similar to CNB spec)
+    * Technical knowledge
 
 # Motivation
 [motivation]: #motivation
@@ -180,7 +185,7 @@ This provides a high level overview of the feature.
 │   │       │       └── trusted_builders.md
 │   │       ├── piper.md
 │   │       └── tekton.md
-│   └── tutorials
+│   └── tutorials <- NOTE: we should add stuff here
 └── reference <- NOTE: we should keep this content as lean as possible and link back to the spec where we can, as it tends to get out of date
 │   ├── config
 │   │   ├── builder-config.md
@@ -216,22 +221,21 @@ Why should we *not* do this?
 - Why is this proposal the best?
   - Easier to find stuff
   - Easier to add stuff
-  - TODO: add benefits mentioned by Divio docs system
 
 # Prior Art
 [prior-art]: #prior-art
 
-TODO
+See https://documentation.divio.com/adoption.html
 
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
 - What parts of the design do you expect to be resolved before this gets merged?
-  - TODO
+  - The general structure in the tree above
 - What parts of the design do you expect to be resolved through implementation of the feature?
-  - TODO
+  - Edits to individual pages
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
-  - TODO
+  - ???
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
