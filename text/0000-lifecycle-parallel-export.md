@@ -51,6 +51,33 @@ The target personas affected by this change are:
 
 This proposal, in addition to acceleration, has the greatest impact on the export time of app image. This will lead to resource competition, that is, when the app image and cache image are exported at the same time, the app image export time will become longer. For some users, they only care about the export time of the app image, but not the overall optimization effect, and enabling this capability will affect their performance. Therefore, this ability is optional.
 
+The flag name, refer to other boolean flag like `daemon`, `layout`, I think it can be named `parallel`. And then the usage is just like this:
+```
+/cnb/lifecycle/exporter \
+  [-analyzed <analyzed>] \
+  [-app <app>] \
+  [-cache-dir <cache-dir>] \
+  [-cache-image <cache-image>] \
+  [-daemon] \ # sets <daemon>
+  [-extended <extended>] \
+  [-gid <gid>] \
+  [-group <group>] \
+  [-launch-cache <launch-cache> ] \
+  [-launcher <launcher> ] \
+  [-launcher-sbom <launcher-sbom> ] \
+  [-layers <layers>] \
+  [-layout] \ # sets <layout>
+  [-layout-dir] \ # sets <layout-dir>
+  [-log-level <log-level>] \
+  [-parallel] \ # sets <parallel>
+  [-process-type <process-type> ] \
+  [-project-metadata <project-metadata> ] \
+  [-report <report> ] \
+  [-run <run>] \
+  [-uid <uid> ] \
+  <image> [<image>...]
+```
+
 # How it Works
 [how-it-works]: #how-it-works
 
@@ -87,6 +114,40 @@ func export() {
 }
 ```
 
+## Examples
+
+For command line use, control this process through the `parallel` flag.
+
+### Export both app image and cache image
+
+By specifying environment variable `CNB_PARALLEL_EXPORT`, or pass a `-parallel` flag, images will be pushed to `cr1.example.com` and `cr2.example.com` simultaneously.
+
+```shell
+> export CNB_PARALLEL_EXPORT=true
+> /cnb/lifecycle/exporter -app cr1.example.com/foo:app -cache-image cr2.example.com/foo:cache
+
+# OR
+
+> /cnb/lifecycle/exporter -app cr1.example.com/foo:app -cache-image cr2.example.com/foo:cache -parallel
+```
+
+### Export app image only or export cache image only
+
+If export one image, the effect of this function is not very obvious.
+
+```shell
+> export CNB_PARALLEL_EXPORT=true
+> /cnb/lifecycle/exporter -app cr1.example.com/foo:app
+
+# OR
+
+> /cnb/lifecycle/exporter -app cr1.example.com/foo:app -parallel
+
+# EQUAL TO
+
+> /cnb/lifecycle/exporter -app cr1.example.com/foo:app
+```
+
 # Migration
 [migration]: #migration
 
@@ -114,10 +175,17 @@ N/A.
 - Does it also need to be specified in the pack tool?
 - Should this feature be enabled by default?
 
-# Spec. Changes (OPTIONAL)
+# Spec. Changes
 [spec-changes]: #spec-changes
 
-N/A.
+This new feature will affect the API of [Create](https://buildpacks.io/docs/concepts/components/lifecycle/create/) and [Export](https://buildpacks.io/docs/concepts/components/lifecycle/export/) phases, by adding the following fields.
+
+Back to API changes, we will add a new flag to control this.
+
+| Input        | Environment Variable  | DefaultValue | Description                                  |
+|--------------|-----------------------|--------------|----------------------------------------------|
+| `<parallel>` | `CNB_PARALLEL_EXPORT` | `false`      | Export app image and cache image in parallel |
+
 
 # History
 [history]: #history
