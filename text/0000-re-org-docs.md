@@ -212,6 +212,7 @@ We should make these changes in one huge PR. We should NOT attempt to redirect f
 
 Why should we *not* do this?
 - It's a lot of work
+- Changing the structure of the docs could be surprising for users who are already familiar with its content
 
 # Alternatives
 [alternatives]: #alternatives
