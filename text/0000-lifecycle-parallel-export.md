@@ -138,10 +138,14 @@ If export one image, the effect of this function is not very obvious.
 ```shell
 > export CNB_PARALLEL_EXPORT=true
 > /cnb/lifecycle/exporter -app cr1.example.com/foo:app
+[debug] Parsing inputs...
+[warn] parallel export has been enabled, but it has not taken effect because cache image (-cache-image) has not been specified.
 
 # OR
 
 > /cnb/lifecycle/exporter -app cr1.example.com/foo:app -parallel
+[debug] Parsing inputs...
+[warn] parallel export has been enabled, but it has not taken effect because cache image (-cache-image) has not been specified.
 
 # EQUAL TO
 
