@@ -55,35 +55,12 @@ This provides a high level overview of the feature.
 
 ```
 .
-├── concepts <- NOTE: this corresponds to the explanation quadrant; this content would be largely unchanged (just reorganized slightly)
-│   ├── components
-│   │   ├── builder
-│   │   │   ├── base-images
-│   │   │   │   ├── build.md
-│   │   │   │   └── run.md
-│   │   │   ├── builder.md
-│   │   │   ├── buildpacks
-│   │   │   │   ├── buildpack.md
-│   │   │   │   ├── component-buildpacks.md <- NOTE: missing content!
-│   │   │   │   ├── group.md
-│   │   │   │   └── order.md <- NOTE: missing content!
-│   │   │   ├── extensions
-│   │   │   │   └── extensions.md
-│   │   │   ├── lifecycle
-│   │   │   │   ├── analyze.md
-│   │   │   │   ├── build.md
-│   │   │   │   ├── create.md
-│   │   │   │   ├── detect.md
-│   │   │   │   ├── export.md
-│   │   │   │   ├── launch.md
-│   │   │   │   ├── rebase.md
-│   │   │   │   └── restore.md
-│   │   │   └── metadata
-│   │   └── platform.md
-│   ├── operations
-│   │   ├── build.md
-│   │   ├── rebase.md
 ├── for-app-developers
+│   ├── concepts
+│   │   ├── builder.md <- NOTE: missing content!
+│   │   ├── oci-image.md <- NOTE: missing content!
+│   │   ├── platform.md <- NOTE: missing content!
+│   │   └── project-descriptor.md <- NOTE: missing content!
 │   ├── how-to-guides
 │   │   ├── configure-build-env.md
 │   │   ├── declare-source-metadata.md
@@ -108,6 +85,16 @@ This provides a high level overview of the feature.
 │           ├── basic-build.md
 │           └── build-phases.md
 ├── for-buildpack-authors
+│   ├── concepts
+│   │   ├── build-plan.md <- NOTE: missing content!
+│   │   ├── buildpack.md
+│   │   ├── component-buildpack.md <- NOTE: missing content!
+│   │   ├── extension.md
+│   │   ├── group.md <- NOTE: missing content!
+│   │   ├── layer.md <- NOTE: missing content!
+│   │   ├── package.md
+│   │   ├── sbom.md <- NOTE: missing content!
+│   │   └── targets.md <- NOTE: missing content!
 │   ├── how-to-guides
 │   │   ├── migrate <- NOTE: moved from the "reference" section
 │   │   │   ├── buildpack-api-0.4-0.5.md
@@ -161,6 +148,38 @@ This provides a high level overview of the feature.
 │           ├── setup-local-environment.md
 │           └── why-dockerfiles.md
 ├── for-platform-operators
+│   ├── concepts
+│   │   ├── builder
+│   │   │   ├── base-images
+│   │   │   │   ├── base-images.md
+│   │   │   │   ├── build.md
+│   │   │   │   └── run.md
+│   │   │   ├── builder.md
+│   │   │   ├── buildpacks
+│   │   │   │   ├── buildpack.md
+│   │   │   │   ├── group.md
+│   │   │   │   └── order.md
+│   │   │   ├── create-builder.svg
+│   │   │   ├── extensions
+│   │   │   │   └── extensions.md
+│   │   │   ├── lifecycle
+│   │   │   │   ├── _index.md
+│   │   │   │   ├── analyze.md
+│   │   │   │   ├── build.md
+│   │   │   │   ├── create.md
+│   │   │   │   ├── detect.md
+│   │   │   │   ├── export.md
+│   │   │   │   ├── launch.md
+│   │   │   │   ├── rebase.md
+│   │   │   │   └── restore.md
+│   │   │   └── metadata
+│   │   ├── operations
+│   │   │   ├── _index.md
+│   │   │   ├── build.md
+│   │   │   ├── build.svg
+│   │   │   ├── rebase.md
+│   │   │   └── rebase.svg
+│   │   └── platform.md
 │   ├── how-to-guides
 │   │   ├── create-a-builder.md
 │   │   ├── create-a-stack.md
@@ -201,9 +220,13 @@ This provides a high level overview of the feature.
 [migration]: #migration
 
 A lot of content would be moving from the buildpack tutorial to the buildpack how-to section.
-The current buildpack tutorial has the end-user make a ruby buildpack by editing the same file over and over.
+The current buildpack tutorial has the end-user make a `ruby` buildpack by editing the same file over and over.
 It is good for teaching but hard to explain advanced concepts like multiple processes, SBOM, etc.
 We should break the advanced concepts out of the tutorial and link back to the samples (or just give short code snippets) instead.
+
+As suggested by @AidanDelaney, we should consider changing the tutorial to make a `nodejs` buildpack:
+
+> The current example installs the runtime, installs the package manager, and resolves the packages. Could we simply install a nodejs runtime and build a vanilla application?
 
 We should make these changes in one huge PR. We should NOT attempt to redirect from old links as that would be too hard.
 
