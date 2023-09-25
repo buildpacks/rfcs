@@ -97,9 +97,10 @@ This provides a high level overview of the feature.
 │   │   └── targets.md <- NOTE: missing content!
 │   ├── how-to-guides
 │   │   ├── migrate <- NOTE: moved from the "reference" section
-│   │   │   ├── buildpack-api-0.4-0.5.md
-│   │   │   ├── buildpack-api-0.5-0.6.md
-│   │   │   ├── buildpack-api-0.6-0.7.md
+│   │   │   └── deprecated
+│   │   │       ├── buildpack-api-0.4-0.5.md
+│   │   │       ├── buildpack-api-0.5-0.6.md
+│   │   │       └── buildpack-api-0.6-0.7.md
 │   │   │   ├── buildpack-api-0.7-0.8.md
 │   │   │   ├── buildpack-api-0.8-0.9.md
 │   │   │   └── buildpack-api-0.9-0.10.md
@@ -184,12 +185,14 @@ This provides a high level overview of the feature.
 │   │   ├── create-a-builder.md
 │   │   ├── create-a-stack.md
 │   │   ├── migrate
+│   │   │   ├── _index.md
+│   │   │   ├── deprecated
+│   │   │   │   ├── platform-api-0.3-0.4.md
+│   │   │   │   ├── platform-api-0.4-0.5.md
+│   │   │   │   ├── platform-api-0.5-0.6.md
+│   │   │   │   └── platform-api-0.6-0.7.md
 │   │   │   ├── platform-api-0.10-0.11.md
 │   │   │   ├── platform-api-0.11-0.12.md
-│   │   │   ├── platform-api-0.3-0.4.md
-│   │   │   ├── platform-api-0.4-0.5.md
-│   │   │   ├── platform-api-0.5-0.6.md
-│   │   │   ├── platform-api-0.6-0.7.md
 │   │   │   ├── platform-api-0.7-0.8.md
 │   │   │   ├── platform-api-0.8-0.9.md
 │   │   │   └── platform-api-0.9-0.10.md
