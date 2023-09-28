@@ -3,7 +3,7 @@
 - Name: Flatten builders
 - Start Date: 2023-07-13
 - Author(s): @jjbustamante, @dlion
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
+- Status: Approved
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -110,7 +110,7 @@ classDiagram
       CB1
     }
     class Layer2 {
-      G1 
+      G1
     }
     class Layer3 {
       BP1
@@ -182,7 +182,7 @@ Discuss prior art, both the good and bad.
 
 ---
 
-<!-- 
+<!--
 - What parts of the design do you expect to be resolved through implementation of the feature?
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 
