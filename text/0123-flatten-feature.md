@@ -182,7 +182,7 @@ Discuss prior art, both the good and bad.
 
 ---
 
-<!--
+<!-- 
 - What parts of the design do you expect to be resolved through implementation of the feature?
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
 

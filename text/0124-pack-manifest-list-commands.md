@@ -68,11 +68,13 @@ Currently, if we check [sample-packages](https://hub.docker.com/r/cnbs/sample-pa
 - `cnbs/sample-package:hello-universe` for linux and
 - `cnbs/sample-package:hello-universe-windows`.
 
+
 Let's suppose our linux version is called `cnbs/sample-package:hello-universe-linux` to keep the same naming convention, but we will keep it as it is for simplicity. If we want to distribute the `hello-universe` buildpack for any **architecture/os/variant** combination we need to use a tool outside the CNB ecosystem to create a manifest list. With the proposed experimental commands on pack we can do:
 
 ```bash
 $ pack manifest create cnbs/sample-package:hello-multiarch-universe \
      cnbs/sample-package:hello-universe \
+
      cnbs/sample-package:hello-universe-windows
 ```
 
@@ -105,6 +107,7 @@ By default, the command will create a manifest list in the local storage using t
 }
 ```
 The idea to save the manifest list locally is to allow the user to update the manifest before pushing it to a registry,
+
 in this case, we need to define the **architecture** field because it is empty in our examples.
 
 We can use the `pack manifest annotate` command to add the architecture information:
@@ -168,6 +171,7 @@ The proposal is to implement an abstraction of an OCI *Image Index* and expose i
 ## Image Index Abstraction
 
 A new high level abstraction to represent an OCI Image Index is proposed, similar to the [Image](https://github.com/buildpacks/imgutil/blob/main/image.go) interface exposed in *imgutil* repository,
+
 we proposed a new *ManifestList* interface to expose the behavior of an OCI Image Index.
 
 ```mermaid
@@ -183,11 +187,13 @@ classDiagram
 
     class remote_ManifestList {
         +NewManifestList(repoName string, keychain authn.Keychain) ManifestList
+
     }
 
     class local_ManifestList {
          +NewManifestList(repoName string, path string) ManifestList
     }
+
 
     class AnnotateFields {
          +String Architecture
@@ -197,6 +203,7 @@ classDiagram
 
     ManifestList <|-- remote_ManifestList
     ManifestList <|-- local_ManifestList
+
 ```
 
 Two implementations: *remote* and *local* are proposed, *remote* will take care of implementing the interaction with an OCI registry and *local* will deal with the local storage operations.
@@ -214,6 +221,7 @@ Using a [C4 component diagram](https://c4model.com/#ComponentDiagram), we can de
 ### Considerations
 
 #### When a user wants to create a manifest list using a manifest outside the user's repo.
+
 
 As a pack user I want to create a manifest list `foo/my-manifest:my-tag` using a manifest outside my repository `foo` for example `other/external-manifest:latest`.
 
@@ -259,6 +267,7 @@ Flags:
 ```
 
 #### Annotate (os/arch) a Manifest List
+
 
 Sometimes a manifest list could reference an image that doesn't specify the *architecture*, for example, [check](https://hub.docker.com/r/cnbs/sample-package/tags) our sample buildpack
 packages. The `annotate` command allows users to update those values before pushing the manifest list a registry
@@ -378,6 +387,7 @@ One important concern for users is to inspect the content of a multi-arch builde
 - `pack buildpack inspect`
 
 The `--platform` flag specifies the platform in the form os/arch[/variant][:osversion] (e.g. linux/amd64). By default it will reference the host values.
+
 The output of the commands should remain the same.
 
 
