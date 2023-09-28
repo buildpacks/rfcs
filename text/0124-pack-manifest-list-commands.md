@@ -3,7 +3,7 @@
 - Name: Manifest List Commands for Pack
 - Start Date: 2023-04-19
 - Author(s): [Juan Bustamante](https://github.com/jjbustamante)
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
+- Status: Approved
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
@@ -22,7 +22,7 @@ This RFC proposes to create a new set of CRUD commands in pack to handle manifes
 [definitions]: #definitions
 
 - Image Manifest: The image manifest provides a configuration and set of layers for a single container image for a specific architecture and operating system. See [spec](https://github.com/opencontainers/image-spec/blob/main/manifest.md)
-- Image Index: The image index is a higher-level manifest which points to specific image manifests, ideal for one or more platforms. See [spec](https://github.com/opencontainers/image-spec/blob/main/image-index.md) 
+- Image Index: The image index is a higher-level manifest which points to specific image manifests, ideal for one or more platforms. See [spec](https://github.com/opencontainers/image-spec/blob/main/image-index.md)
 
 # Motivation
 [motivation]: #motivation
@@ -38,10 +38,10 @@ Or the conversations around this topic in our [slack channel](https://cloud-nati
 
 - What use cases does it support?
 
-Currently, buildpack authors can build and package their buildpacks for different OS and Architectures, but when they distribute them the URI for a buildpack can’t disambiguate, they need to use different tags to differentiate between them. This makes harder for users to consume those Buildpacks. 
+Currently, buildpack authors can build and package their buildpacks for different OS and Architectures, but when they distribute them the URI for a buildpack can’t disambiguate, they need to use different tags to differentiate between them. This makes harder for users to consume those Buildpacks.
 The solution is to share a single URI for all the different OS and Architectures, and the way to do that is using a manifest list.
 
-Adding commands to support the operations to handle the manifest list will allow buildpack authors to migrate their existing buildpacks to support multi-arch, without afecting their current existing process. 
+Adding commands to support the operations to handle the manifest list will allow buildpack authors to migrate their existing buildpacks to support multi-arch, without afecting their current existing process.
 
 - What is the expected outcome?
 
@@ -62,17 +62,19 @@ The proposal is to add a new _experimental_ command `pack manifest` and differen
 - `pack manifest push` will push a manifest list to a registry
 - `pack manifest inspect` will show the manifest information stored in local storage
 
-Our target user affected by the feature is: **Buildpack Authors**. Let's see some examples of how this feature will work. 
+Our target user affected by the feature is: **Buildpack Authors**. Let's see some examples of how this feature will work.
 
-Currently, if we check [sample-packages](https://hub.docker.com/r/cnbs/sample-package/tags) at dockerhub we will notice that we have a composed buildpack called `hello-universe` and we offer two tags to support different architectures: 
-- `cnbs/sample-package:hello-universe` for linux and 
-- `cnbs/sample-package:hello-universe-windows`. 
+Currently, if we check [sample-packages](https://hub.docker.com/r/cnbs/sample-package/tags) at dockerhub we will notice that we have a composed buildpack called `hello-universe` and we offer two tags to support different architectures:
+- `cnbs/sample-package:hello-universe` for linux and
+- `cnbs/sample-package:hello-universe-windows`.
+
 
 Let's suppose our linux version is called `cnbs/sample-package:hello-universe-linux` to keep the same naming convention, but we will keep it as it is for simplicity. If we want to distribute the `hello-universe` buildpack for any **architecture/os/variant** combination we need to use a tool outside the CNB ecosystem to create a manifest list. With the proposed experimental commands on pack we can do:
 
 ```bash
-$ pack manifest create cnbs/sample-package:hello-multiarch-universe \ 
-     cnbs/sample-package:hello-universe \ 
+$ pack manifest create cnbs/sample-package:hello-multiarch-universe \
+     cnbs/sample-package:hello-universe \
+
      cnbs/sample-package:hello-universe-windows
 ```
 
@@ -100,11 +102,12 @@ By default, the command will create a manifest list in the local storage using t
             "os": "windows",
            "architecture": ""
          }
-      }   
+      }
    ]
 }
 ```
-The idea to save the manifest list locally is to allow the user to update the manifest before pushing it to a registry, 
+The idea to save the manifest list locally is to allow the user to update the manifest before pushing it to a registry,
+
 in this case, we need to define the **architecture** field because it is empty in our examples.
 
 We can use the `pack manifest annotate` command to add the architecture information:
@@ -167,7 +170,8 @@ The proposal is to implement an abstraction of an OCI *Image Index* and expose i
 
 ## Image Index Abstraction
 
-A new high level abstraction to represent an OCI Image Index is proposed, similar to the [Image](https://github.com/buildpacks/imgutil/blob/main/image.go) interface exposed in *imgutil* repository, 
+A new high level abstraction to represent an OCI Image Index is proposed, similar to the [Image](https://github.com/buildpacks/imgutil/blob/main/image.go) interface exposed in *imgutil* repository,
+
 we proposed a new *ManifestList* interface to expose the behavior of an OCI Image Index.
 
 ```mermaid
@@ -182,21 +186,24 @@ classDiagram
     }
 
     class remote_ManifestList {
-        +NewManifestList(repoName string, keychain authn.Keychain) ManifestList 
+        +NewManifestList(repoName string, keychain authn.Keychain) ManifestList
+
     }
 
     class local_ManifestList {
          +NewManifestList(repoName string, path string) ManifestList
     }
-    
+
+
     class AnnotateFields {
          +String Architecture
          +String OS
          +String Variant
     }
-    
+
     ManifestList <|-- remote_ManifestList
-    ManifestList <|-- local_ManifestList 
+    ManifestList <|-- local_ManifestList
+
 ```
 
 Two implementations: *remote* and *local* are proposed, *remote* will take care of implementing the interaction with an OCI registry and *local* will deal with the local storage operations.
@@ -213,7 +220,8 @@ Using a [C4 component diagram](https://c4model.com/#ComponentDiagram), we can de
 
 ### Considerations
 
-#### When a user wants to create a manifest list using a manifest outside the user's repo. 
+#### When a user wants to create a manifest list using a manifest outside the user's repo.
+
 
 As a pack user I want to create a manifest list `foo/my-manifest:my-tag` using a manifest outside my repository `foo` for example `other/external-manifest:latest`.
 
@@ -258,7 +266,8 @@ Flags:
   -r, --registry string   Registry URL to publish the image index
 ```
 
-#### Annotate (os/arch) a Manifest List 
+#### Annotate (os/arch) a Manifest List
+
 
 Sometimes a manifest list could reference an image that doesn't specify the *architecture*, for example, [check](https://hub.docker.com/r/cnbs/sample-package/tags) our sample buildpack
 packages. The `annotate` command allows users to update those values before pushing the manifest list a registry
@@ -377,7 +386,8 @@ One important concern for users is to inspect the content of a multi-arch builde
 - `pack builder inspect`
 - `pack buildpack inspect`
 
-The `--platform` flag specifies the platform in the form os/arch[/variant][:osversion] (e.g. linux/amd64). By default it will reference the host values. 
+The `--platform` flag specifies the platform in the form os/arch[/variant][:osversion] (e.g. linux/amd64). By default it will reference the host values.
+
 The output of the commands should remain the same.
 
 
@@ -412,7 +422,7 @@ The impact of not doing this is that users will need to use other tools to creat
 [prior-art]: #prior-art
 
 These features are inspired in similar commands in other tools like:
-- [docker](https://docs.docker.com/engine/reference/commandline/manifest/) 
+- [docker](https://docs.docker.com/engine/reference/commandline/manifest/)
 - [podman](https://docs.podman.io/en/v3.2.0/markdown/podman-manifest-create.1.html)
 
 # Unresolved Questions
