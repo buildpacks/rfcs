@@ -12,7 +12,8 @@
 # Summary
 [summary]: #summary
 
-This RFC proposes optionally relocating SBOM files for buildpack-provided dependencies from the application image to in-toto attestations in an OCI registry
+This RFC proposes optionally relocating SBOM files for buildpack-provided dependencies from the application image to in-toto attestations
+in an OCI registry
 via a new optional lifecycle phase called `sign`.
 
 # Definitions
@@ -24,9 +25,9 @@ and the lifecycle includes these as a (single) layer in the application image.
 The SBOM files may be image-scoped or layer-scoped.
 The layer-scoped files are restored on future builds so that buildpacks can use them during the build phase.
 
-**in-toto [attestations](https://github.com/in-toto/attestation/blob/main/spec/README.md)** - signed statements about software artifacts
-
 **image signature** - allows for cryptographically verifying the digest of an OCI image
+
+**in-toto [attestations](https://github.com/in-toto/attestation/blob/main/spec/README.md)** - signed statements about software artifacts
 
 **[cosign](https://github.com/sigstore/cosign/tree/main#cosign)** - tooling for generating image signatures and attestations
 
@@ -69,18 +70,24 @@ Notably, these new specs codify ways of "attaching" arbitrary OCI artifacts to a
 # How it Works
 [how-it-works]: #how-it-works
 
+## Setup
+
 The lifecycle will ship with a new `signer` binary.
 In the past we've talked about making this totally separate from the lifecycle,
 but given the need to restore SBOM data and thus teach the lifecycle about attestations, there isn't much value there.
-We should make it possible to invoke the `signer` separate from other phases.
+We should make it possible to invoke the `signer` separately from other phases.
 
 Buildpacks should continue to output SBOM files as before. We won't need to bother buildpack authors with this change.
+
+## Export
 
 The `exporter` will accept a new optional flag `-omit-sbom` that defaults to `false`.
 * If `-omit-sbom=false` the exporter will behave as today, and include the SBOM layer containing the `<layers>/sbom/launch/` directory in the application image.
 * If `-omit-sbom=true` the exporter will not create the SBOM layer, but `<layers>/sbom/launch/` will remain on the filesystem and be available to the `signer`.
 
 The exporter will additionally generate configuration for the `signer` irrespective of the value of `-omit-sbom`.
+
+## Sign
 
 The `signer` will accept configuration that will allow it to sign images with `cosign`. 
 An example `cosign.toml` was provided in [PR 195](https://github.com/buildpacks/rfcs/pull/195), however there were concerns about encoding sensitive data (such as passwords) in files.
@@ -110,6 +117,8 @@ reference = "<image digest>"
   value = "<value>"
 ```
 
+## Mapping layers to attestations
+
 For each "launch" SBOM file output by buildpacks, the `exporter` will create attestation configuration, e.g.:
 
 `<layers>/sbom/launch/<buildpack-id>/<layer-id>/bom.<ext>` (where `<ext>` is one of: `cdx.json`, `spdx.json`, or `syft.json` as currently spec'd)
@@ -138,18 +147,17 @@ And the `signer` will turn this into an in-toto statement that looks like:
 
 TODO
 
+It's worth noting, many buildpacks-produced SBOM files will be "layer-scoped" meaning that they don't describe the whole image, just a layer within it.
+`cosign` has a [deprecated](https://github.com/sigstore/cosign/blob/main/specs/SBOM_SPEC.md#scopes) method of denoting the scope of an SBOM with annotations.
+It now seems recommended to denote the scope with the `subject` of the attestation [statement](https://github.com/in-toto/attestation/blob/main/spec/v1/statement.md).
+
 And serialize the statement in a manifest that looks like:
 
 TODO
 
-Cosign docs give an example manifest [here](https://github.com/sigstore/cosign/blob/main/specs/ATTESTATION_SPEC.md#overall-layout),
+Note: cosign docs give an example manifest [here](https://github.com/sigstore/cosign/blob/main/specs/ATTESTATION_SPEC.md#overall-layout),
 but the config media type is `application/vnd.oci.image.config.v1+json`, which doesn't give any indication that it's an SBOM.
 The correct media type to use would require some research (TODO).
-
-It's worth noting, many buildpacks-produced SBOM files will be "layer-scoped" meaning that they don't describe the whole image, just a layer within it.
-`cosign` has a [deprecated](https://github.com/sigstore/cosign/blob/main/specs/SBOM_SPEC.md#scopes) method of denoting the scope of an SBOM with annotations.
-It now seems recommended to denote the scope with the `subject` of the attestation [statement](https://github.com/in-toto/attestation/blob/main/spec/v1/statement.md).
-But, this potentially makes the scope less discoverable as you have to deserialize the envelope to read it.
 
 ### Example 2 - image-scoped SBOM file
 
@@ -181,18 +189,19 @@ Platforms could inject TOML to describe the run image, e.g.:
 
 ## Rebase
 
-During `rebase`, the lifecycle should verify attestations for the old application image, and remove any attestations where the scopes are no longer valid
+During `rebase`, the lifecycle should verify attestations for the old application image, and remove any attestations where the subjects are no longer valid
 when signing the new image digest
-(e.g., if the scope references a layer in the old run image that is no longer present, the attestation will be removed).
+(e.g., if the subject references a layer in the old run image that is no longer present, the attestation will be removed).
 
-It should optionally accept configuration for new attestations to describe the new run image (or whatever the platform wants to add).
+It should optionally accept configuration for new attestations to describe the new run image (or whatever else the platform wants to add).
 
 ## Next builds
 
 During `analyze`, the lifecyle should verify attestations for the previous application image, and download the SBOM data as files in `<layers>/sbom/launch/`
 so that the `restorer` can behave just as it does today when recreating `<layers>/<buildpack-id>/<layer>.sbom.<ext>` files for buildpacks.
 
-The lifecycle should fall back to pulling the SBOM layer from the image if no attestations exist (this will be necessary to keep compatibility with daemon images).
+The lifecycle should fall back to pulling the SBOM layer from the previous image if no attestations exist
+(this will be necessary to keep compatibility with daemon images).
 
 # Migration
 [migration]: #migration
