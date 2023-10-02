@@ -47,12 +47,11 @@ Notably, these new specs codify ways of "attaching" arbitrary OCI artifacts to a
 - Why should we do this? Our current approach has a few drawbacks, namely:
   * It can make application images quite large
   * It can be hard to find SBOMs for buildpacks-built images; ecosystem tooling such as `cosign download sbom` won't work (see [PR 278](https://github.com/buildpacks/rfcs/pull/278))
-  * There is no clear way to associate SBOMs for build and run base images with an application image (today this is unspec'd and entirely up to the platform to manage)
-
-
+  * There is currently no clear way to associate SBOMs for build and run base images with an application image (today this is unspec'd and entirely up to the platform to manage)
+  
 - What use cases does it support?
-  * TODO
-
+  * As a buildpacks user, I want **signed** SBOMs for my images in an easily consumable format.
+  * ...
 
 - What is the expected outcome?
   * Smaller application images
@@ -62,10 +61,7 @@ Notably, these new specs codify ways of "attaching" arbitrary OCI artifacts to a
 # What it is
 [what-it-is]: #what-it-is
 
-- Define the target persona: buildpack user, platform operator.
-- Explaining the feature largely in terms of examples. TODO
-- If applicable, provide sample error messages, deprecation warnings, or migration guidance. TODO
-- If applicable, describe the differences between teaching this to existing users and new users. TODO
+See [How it Works](#how-it-works).
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -309,21 +305,60 @@ It should optionally accept configuration for new attestations to describe the n
 
 ## Next builds
 
+The `analyzer` will accept `cosign` configuration that will allow it to verify attestations.
+If no configuration is provided, verification will not be attempted.
+
 During `analyze`, the lifecyle should verify attestations for the previous application image, and download the SBOM data as files in `<layers>/sbom/launch/`
 so that the `restorer` can behave just as it does today when recreating `<layers>/<buildpack-id>/<layer>.sbom.<ext>` files for buildpacks.
 
 The lifecycle should fall back to pulling the SBOM layer from the previous image if no attestations exist
 (this will be necessary to keep compatibility with daemon images).
 
+## Consuming an SBOM
+
+Today's method looks like:
+
+```bash
+pack sbom download <image-name>
+```
+
+This looks for the SBOM as a layer within the application image.
+We can update this command to optionally take `cosign` configuration that would allow signed attestations to be validated.
+Something like:
+
+```bash
+pack sbom download \
+  --cosign-key=cosign.pub \
+  <image-name>
+```
+
+Or for keyless signing:
+
+```bash
+pack sbom download \
+  --cosign-certificate-identity-regexp=<workflow file regexp> \
+  --certificate-oidc-issuer=https://token.actions.githubusercontent.com \
+  <image-name>
+```
+
 # Migration
 [migration]: #migration
 
-TODO
+Platforms can choose to do nothing when upgrading to the Platform API version that supports this change.
+They will continue to obtain application images with an embedded SBOM layer, and nothing will be signed.
+
+Platforms can invoke the `signer` while keeping the old export behavior, so that SBOMs will effectively reside in two places
+(within the application image and as a separate artifact on the registry),
+which will give SBOM consumers some time to update their workflows to the new `pack sbom download` invocation or comparable method.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this? TODO
+Why should we *not* do this?
+
+As always, it's a lot of work - and despite there being more consensus now than there was two years ago, the industry is still evolving here.
+We might implement something only to want to change it soon after.
+However, it's fair to say that our current way of doing things is fairly outdated at this point.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -423,7 +458,8 @@ Discuss prior art, both the good and bad.
 - What parts of the design do you expect to be resolved through implementation of the feature?
   - TODO
 - What related issues do you consider out of scope for this RFC that could be addressed in the future independently of the solution that comes out of this RFC?
-  - Merging data from SBOM files together
+  - Merging data from buildpacks-produced SBOM files together
+  - Scanning to produce additional SBOM files that would also need to be attached
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
