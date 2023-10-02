@@ -303,14 +303,14 @@ When the OCI v1.1 specs are released the default behavior will probably be #3 wi
 ## Rebase
 
 During `rebase`, the lifecycle should verify attestations for the old application image, and remove any attestations where the subjects are no longer valid
-when signing the new image digest
+when adding attestations to the new image digest
 (e.g., if the subject references a layer in the old run image that is no longer present, the attestation will be removed).
 
 It should optionally accept configuration for new attestations to describe the new run image (or whatever else the platform wants to add).
 
 ## Next builds
 
-The `analyzer` will accept `cosign` configuration that will allow it to verify attestations.
+The `analyzer` will accept `cosign` configuration that will allow it to verify attestations for the previous image.
 If no configuration is provided, verification will not be attempted.
 
 During `analyze`, the lifecyle should verify attestations for the previous application image, and download the SBOM data as files in `<layers>/sbom/launch/`
