@@ -394,6 +394,8 @@ And the attestation manifest would be attached to the image it describes via an 
 We would probably want to explore directly integrating with BuildKit (see this [issue](https://github.com/buildpacks/pack/issues/768) and others) before trying to add support for this workflow.
 But, nothing in this RFC precludes anything we might do here.
 
+TODO: what about OCI layout images?
+
 ## What other designs have been considered?
 
 ## Why is this proposal the best?
