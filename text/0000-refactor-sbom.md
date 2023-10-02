@@ -73,9 +73,10 @@ Notably, these new specs codify ways of "attaching" arbitrary OCI artifacts to a
 ## Setup
 
 The lifecycle will ship with a new `signer` binary.
-In the past we've talked about making this totally separate from the lifecycle,
+In the past we've talked about making this binary totally separate from the lifecycle,
 but given the need to restore SBOM data and thus teach the lifecycle about attestations, there isn't much value there.
 We should make it possible to invoke the `signer` separately from other phases.
+It should not be necessary to run the `signer` within the build container (although it might be more convenient to run it that way).
 
 Buildpacks should continue to output SBOM files as before. We won't need to bother buildpack authors with this change.
 
@@ -100,7 +101,7 @@ The `signer` will accept configuration that will allow it to attach attestations
 
 ```toml
 [image]
-reference = "<image digest>"
+reference = "<image reference - e.g., my.registry.io/my-namespace/my-image:my-tag@sha:256$IMAGE_DIGEST>"
 
 [[attestations]]
   [[attestations.predicate]]
@@ -125,7 +126,89 @@ For each "launch" SBOM file output by buildpacks, the `exporter` will create att
 
 or more concretely:
 
-### Example 1 - layer-scoped SBOM file
+### Example 1 - image-scoped SBOM file
+
+The `exporter` will turn `/layers/sbom/launch/my-buildpack/launch.sbom.cdx.json` into configuration:
+
+```toml
+  [[attestations.predicate]]
+  type = "https://cyclonedx.org/bom"
+  uri = "/layers/sbom/launch/my-buildpack/launch.sbom.cdx.json"
+  
+  [[attestations.statement.subject]]
+  name = "my.registry.io/my-namespace/my-image:my-tag"
+  digest = "sha256:$IMAGE_DIGEST"
+```
+
+And the `signer` will use `cosign` to turn this into an in-toto statement that looks like:
+
+```json
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "predicateType": "https://cyclonedx.org/bom",
+  "subject": [
+    {
+      "name": "my.registry.io/my-namespace/my-image:my-tag",
+      "digest": {
+        "sha256": "$IMAGE_DIGEST"
+      }
+    }
+  ],
+  "predicate": { /* data from SBOM file goes here */ }
+}
+```
+
+And serialize the data as a layer in an OCI image manifest that looks like:
+
+```json
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.manifest.v1+json",
+  "config": {
+    "mediaType": "application/vnd.oci.image.config.v1+json",
+    "size": 233,
+    "digest": "sha256:s0m3d1g3st"
+  },
+  "layers": [
+    {
+      "mediaType": "application/vnd.dsse.envelope.v1+json",
+      "size": 1234,
+      "digest": "sha256:s0m3d1g3st",
+      "annotations": {
+        "dev.cosignproject.cosign/signature": "",
+        "dev.sigstore.cosign/bundle": "FOO",
+        "dev.sigstore.cosign/certificate": "BAR",
+        "dev.sigstore.cosign/chain": "BAZ",
+        "predicateType": "https://cyclonedx.org/bom"
+      }
+    }
+  ]
+}
+```
+
+TODO: explore the possibility of using other config media types to indicate that the artifact is an SBOM,
+e.g., `cosign` may use `application/vnd.dev.cosign.artifact.sbom.v1+json`.
+
+Where the referenced layer looks like:
+
+```json
+{
+  "payloadType": "application/vnd.in-toto+json",
+  "payload": "<base64 encoded in-toto statement>",
+  "signatures": [
+    {
+      "keyid": "",
+      "sig": "MEYCIQC6NShQIMi+7OJJnEP2c38WyHmIgwsgY87PXJxWyOvUUAIhAKr4If9WTUOsKKtATALOBIp7rjFZSikCNWFDWEmuoelF"
+    }
+  ]
+}
+```
+
+### Example 2 - layer-scoped SBOM file
+
+Many buildpacks-produced SBOM files will be "layer-scoped" meaning that they don't describe the whole image, just a layer within it.
+`cosign` has a [deprecated](https://github.com/sigstore/cosign/blob/main/specs/SBOM_SPEC.md#scopes) method of denoting the scope of an SBOM with annotations.
+It now seems recommended to denote the scope with the `subject` of the attestation [statement](https://github.com/in-toto/attestation/blob/main/spec/v1/statement.md).
 
 The `exporter` will turn `/layers/sbom/launch/my-buildpack/launch-dep/sbom.cdx.json` into configuration:
 
@@ -145,32 +228,49 @@ The `exporter` will turn `/layers/sbom/launch/my-buildpack/launch-dep/sbom.cdx.j
 
 And the `signer` will turn this into an in-toto statement that looks like:
 
-TODO
-
-It's worth noting, many buildpacks-produced SBOM files will be "layer-scoped" meaning that they don't describe the whole image, just a layer within it.
-`cosign` has a [deprecated](https://github.com/sigstore/cosign/blob/main/specs/SBOM_SPEC.md#scopes) method of denoting the scope of an SBOM with annotations.
-It now seems recommended to denote the scope with the `subject` of the attestation [statement](https://github.com/in-toto/attestation/blob/main/spec/v1/statement.md).
+```json
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "predicateType": "https://cyclonedx.org/bom",
+  "subject": [
+    {
+      "name": "launch-dep",
+      "digest": {
+        "sha256": "$LAYER_DIGEST"
+      }
+    }
+  ],
+  "predicate": { /* data from SBOM file goes here */ }
+}
+```
 
 And serialize the statement in a manifest that looks like:
 
-TODO
-
-Note: cosign docs give an example manifest [here](https://github.com/sigstore/cosign/blob/main/specs/ATTESTATION_SPEC.md#overall-layout),
-but the config media type is `application/vnd.oci.image.config.v1+json`, which doesn't give any indication that it's an SBOM.
-The correct media type to use would require some research (TODO).
-
-### Example 2 - image-scoped SBOM file
-
-The `exporter` will turn `/layers/sbom/launch/my-buildpack/launch.sbom.cdx.json` into configuration:
-
-```toml
-  [[attestations.predicate]]
-  type = "https://cyclonedx.org/bom"
-  uri = "/layers/sbom/launch/my-buildpack/launch.sbom.cdx.json"
-  
-  [[attestations.statement.subject]]
-  name = "all" # or something? not sure what is recommended
-  digest = "sha256:$IMAGE_DIGEST"
+```json
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.manifest.v1+json",
+  "config": {
+    "mediaType": "application/vnd.oci.image.config.v1+json",
+    "size": 233,
+    "digest": "sha256:s0m3d1g3st"
+  },
+  "layers": [
+    {
+      "mediaType": "application/vnd.dsse.envelope.v1+json",
+      "size": 1234,
+      "digest": "sha256:s0m3d1g3st",
+      "annotations": {
+        "io.buildpacks.buildpack.id": "my-buildpack",
+        "dev.cosignproject.cosign/signature": "",
+        "dev.sigstore.cosign/bundle": "FOO",
+        "dev.sigstore.cosign/certificate": "BAR",
+        "dev.sigstore.cosign/chain": "BAZ",
+        "predicateType": "https://cyclonedx.org/bom"
+      }
+    }
+  ]
+}
 ```
 
 ### Example 3 - platform-provided SBOM file
@@ -183,9 +283,21 @@ Platforms could inject TOML to describe the run image, e.g.:
   uri = "/platform/some-file.cdx.json"
   
   [[attestations.statement.subject]]
-  name = "run" # maybe?
-  digest = "sha256:$RUN_IMAGE_DIGEST" # is it possible to denote a list of layers? Like in the deprecated cosign SBOM spec?
+  name = "my-run-image-name" # maybe?
+  digest = "sha256:$RUN_IMAGE_DIGEST" # TODO: is it possible to denote a list of layers? Like in the deprecated cosign SBOM spec?
 ```
+
+## Attaching attestations to images
+
+There are a few known methods to associate the attestation manifest to the image it describes.
+
+1. `cosign` currently does this by creating an `my.registry.io/my-namespace/my-image:sha256-<image digest>.att` tag in the registry pointing to the attestation manifest
+2. If the Referrers API is not supported by the registry, via the Referrers Tag Schema, which creates a `my.registry.io/my-namespace/my-image:sha256-<image digest>` **manifest list** where the attestation manifest is one entry
+3. If the Referrers API is supported by the registry, via the Referrers API, where no new tags are created
+4. If using BuildKit with Docker (see below), by embedding the attestation manifest in the `my.registry.io/my-namespace/my-image:my-tag` manifest list
+
+Cosign makes this configurable with the `COSIGN_EXPERIMENTAL` environment variable.
+When the OCI v1.1 specs are released the default behavior will probably be #3 with #2 as fallback.
 
 ## Rebase
 
@@ -216,11 +328,82 @@ Why should we *not* do this? TODO
 # Alternatives
 [alternatives]: #alternatives
 
-TODO
+## BuildKit
 
-- What other designs have been considered?
-- Why is this proposal the best?
-- What is the impact of not doing this?
+Docker (via BuildKit) allows attestations to be attached to an image via a manifest list (see [here](https://docs.docker.com/build/attestations/attestation-storage/#image-attestation-storage)).
+In [Example 1](https://github.com/buildpacks/rfcs/blob/refactor-sbom/text/0000-refactor-sbom.md#example-1---image-scoped-sbom-file) above,
+the same in-toto statement would be created, but rather than being serialized as a DSSE envelope, it would simply be saved as a layer in an OCI image manifest that looks like:
+
+```json
+{
+  "mediaType": "application/vnd.oci.image.manifest.v1+json",
+  "schemaVersion": 2,
+  "config": {
+    "mediaType": "application/vnd.oci.image.config.v1+json",
+    "digest": "sha256:s0m3d1g3st",
+    "size": 123
+  },
+  "layers": [
+    {
+      "mediaType": "application/vnd.in-toto+json",
+      "digest": "sha256:s0m3d1g3st",
+      "size": 1234,
+      "annotations": {
+        "in-toto.io/predicate-type": "https://cyclonedx.org/bom"
+      }
+    }
+  ]
+}
+```
+
+And the attestation manifest would be attached to the image it describes via an image index that looks like:
+
+```json
+{
+  "mediaType": "application/vnd.oci.image.index.v1+json",
+  "schemaVersion": 2,
+  "manifests": [
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:$IMAGE_DIGEST",
+      "size": 1234,
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux"
+      }
+    },
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:s0m3d1g3st",
+      "size": 1234,
+      "annotations": {
+        "vnd.docker.reference.digest": "sha256:$IMAGE_DIGEST",
+        "vnd.docker.reference.type": "attestation-manifest"
+      },
+      "platform": {
+         "architecture": "unknown",
+         "os": "unknown"
+      }
+    }
+  ]
+}
+```
+
+`cosign` currently does not support downloading attestations that have been associated this way, but maybe it could (see discussion on this [issue](https://github.com/sigstore/cosign/issues/2688)).
+
+We would probably want to explore directly integrating with BuildKit (see this [issue](https://github.com/buildpacks/pack/issues/768) and others) before trying to add support for this workflow.
+But, nothing in this RFC precludes anything we might do here.
+
+## What other designs have been considered?
+
+## Why is this proposal the best?
+
+The proposed configuration for the `signer` is generic enough that platforms could inject other kinds of attestations as necessary,
+such as [SLSA provenance attestations](https://slsa.dev/spec/v1.0/provenance) or others.
+
+## What is the impact of not doing this?
+
+SBOMs for CNB-built images feel clunky and outdated.
 
 # Prior Art
 [prior-art]: #prior-art
