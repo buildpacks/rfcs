@@ -134,6 +134,10 @@ The `exporter` will turn `/layers/sbom/launch/my-buildpack/launch.sbom.cdx.json`
   [[attestations.statement.subject]]
   name = "my.registry.io/my-namespace/my-image:my-tag"
   digest = "sha256:$IMAGE_DIGEST"
+  
+  [[attestations.annotations]]
+  name = "io.buildpacks.buildpack.id"
+  value = "my-buildpack"
 ```
 
 And the `signer` will use `cosign` to turn this into an in-toto statement that looks like:
@@ -175,6 +179,7 @@ And serialize the data as a layer in an OCI image manifest that looks like:
         "dev.sigstore.cosign/bundle": "FOO",
         "dev.sigstore.cosign/certificate": "BAR",
         "dev.sigstore.cosign/chain": "BAZ",
+        "io.buildpacks.buildpack.id": "my-buildpack",
         "predicateType": "https://cyclonedx.org/bom"
       }
     }
@@ -257,11 +262,11 @@ And serialize the statement in a manifest that looks like:
       "size": 1234,
       "digest": "sha256:s0m3d1g3st",
       "annotations": {
-        "io.buildpacks.buildpack.id": "my-buildpack",
         "dev.cosignproject.cosign/signature": "",
         "dev.sigstore.cosign/bundle": "FOO",
         "dev.sigstore.cosign/certificate": "BAR",
         "dev.sigstore.cosign/chain": "BAZ",
+        "io.buildpacks.buildpack.id": "my-buildpack",
         "predicateType": "https://cyclonedx.org/bom"
       }
     }
