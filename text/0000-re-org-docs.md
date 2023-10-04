@@ -197,7 +197,7 @@ This provides a high level overview of the feature.
 │   │   │   ├── platform-api-0.8-0.9.md
 │   │   │   └── platform-api-0.9-0.10.md
 │   │   ├── specify-extensions.md
-│   │   └── use-tooling
+│   │   └── integrate-ci
 │   │       ├── circleci.md
 │   │       ├── gitlab.md
 │   │       ├── kpack.md
