@@ -95,7 +95,6 @@ Instead, lifecycle should generate the parsable report of phases and buildpacks,
     ]
 }
 ```
-
 Meanwhile, a `collect` phase should be supported by buildpack extension to collect the report file.
 
 # Prior Art
