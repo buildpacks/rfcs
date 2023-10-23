@@ -3,10 +3,10 @@
 - Name: Export App Image and Cache Image in Parallel
 - Start Date: 2023-08-26
 - Author(s): ESWZY
-- Status: Draft
-- RFC Pull Request:
+- Status: Approved
+- RFC Pull Request: [rfcs#291](https://github.com/buildpacks/rfcs/pull/291)
 - CNB Pull Request: [lifecycle#1167](https://github.com/buildpacks/lifecycle/pull/1167)
-- CNB Issue:
+- CNB Issue: N/A
 - Supersedes: N/A
 
 # Summary
