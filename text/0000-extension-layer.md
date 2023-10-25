@@ -25,26 +25,56 @@ This would allow distroless run images to be extended.
 # What it is
 [what-it-is]: #what-it-is
 
-This follows up on RFC-0105 and proposes that during the execution of the extension's `bin/generate`, an extension is allowed to write arbitrary data to its exclusive layer. This data then becomes accessible during the execution of the `extend` phase via Kaniko context. The content of these extension-specific layers is ignored at build and launch time, it serves only the extension phase.
+This follows up on RFC-0105 and proposes that during the execution of the extension's `./bin/generate`, an extension is allowed to write arbitrary data to the `context` folder within its exclusive layer. This data then becomes accessible during the execution of the `extend` phase via Kaniko build context. The content of these extension-specific layers is ignored at build and launch time, it serves only the extension phase.
 
 # How it Works
 [how-it-works]: #how-it-works
 
-Before execution of the `bin/generate`, the lifecycle will create a distinct writable layer for each extension which passed detection. The extensions can then write to these layers, and the Kaniko context is set to the corresponding layer during the `extend` phase instead of the `<app>` directory. The Extension Layers will not be included in the final image by the lifecycle.
+- New root directory `/layers-ext` is introduced which contains extension layers.
+- Before execution of the `./bin/generate`, the lifecycle will create a distinct writable layer `/layers-ext/<extension-id>` for each extension which passed detection.
+- The `/layers-ext/<extension-id>` is provided to the `./bin/generate` as `<output>` directory.
+- In addition to the files specified in [RFC#0105](https://github.com/buildpacks/rfcs/blob/main/text/0105-dockerfiles.md), the extension may create the `<output>/context` folder with an arbitrary content.
+- If the folder `<output>/context` is present it will be set as Kaniko build context during the `extend` phase instead of the `<app>` directory.
+- If the folder `<output>/context` is not present, Kaniko build context defaults to the `<app>` folder.
+ 
+The `/layers-ext` will not be included in the final image by the lifecycle.
 
-The location of the Extension Layer will be provided to the `bin/generate` via additional environment variable `CNB_EXT_LAYER_DIR`.
+### Example: Extend distroless run image with Debian packages.
+
+This example extension would allow to install `tar` package on the run image without package manager (distroless image). The extension contains `./bin/generate` and `./bin/custom-installer` file, which installs `.deb` files.
+
+##### `./bin/generate`
+
+```bash
+#!/bin/sh
+
+mkdir -p ${CNB_OUTPUT_DIR}/context
+
+cp ${CNB_EXTENSION_DIR}/bin/custom-installer ${CNB_OUTPUT_DIR}/context/
+curl -o ${CNB_OUTPUT_DIR}/context/tar.deb http://security.ubuntu.com/ubuntu/pool/main/t/tar/tar_1.34+dfsg-1ubuntu0.1.22.04.1_amd64.deb
+
+cat >> "${CNB_OUTPUT_DIR}/run.Dockerfile" <<EOL
+ARG base_image
+FROM \${base_image}
+ARG build_id=0
+
+ADD custom-installer .
+ADD tar.deb .
+RUN ./custom-installer -p ./tar.deb
+EOL
+```
 
 # Migration
 [migration]: #migration
 
-Since we would change the Kaniko context, this would be breaking for existing extensions.
+- No breaking changes were identified
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 Why should we *not* do this?
 
-The workspace would no longer be the Kaniko context. But the benefit of having it in the first place seems quite limited anyway.
+N/A
 
 # Alternatives
 [alternatives]: #alternatives
@@ -59,17 +89,15 @@ Discuss prior art, both the good and bad.
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- Should the `bin/generate` be executed during the `extend` phase instead of the `detect` phase?
-- The Kaniko context might consist of two folders: `<app>` and the Extension Layer for better compatibility.
+- Should the `./bin/generate` be executed during the `extend` phase instead of the `detect` phase?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
 This RFC requires changes to the layers metadata and the `extend` phase:
 
-- layer metadata needs ti ubducate if a layer is a "extension layer"
-- env variable with the layer location for the extension to write to
-- kaniko context should be the extension layer and not the workspace
+- allow optional folder `<output>/context` with an arbitrary content to be provided by extension.
+- if the `<output>/context` is present, kaniko context should be set to this folder instead of the `<app>`.
 
 <!--
 ## Amended
