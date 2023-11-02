@@ -18,7 +18,7 @@ This RFC introduces support for Extension configurable context to allow data tra
 # Motivation
 [motivation]: #motivation
 
-This change allows extensions to possess their own layers to utilize during the generation/extend process. Additionally, it ensures that extension output does not inadvertently interfere with other extension or buildpack layers during the build, and it does not unintentionally become part of the final application image.
+This change allows extensions to create their own context for the extend phase during the generation phase. Additionally, it ensures that extension output does not inadvertently interfere with other extension or buildpack layers during the build, and it does not unintentionally become part of the final application image.
 
 This would allow distroless run images to be extended.
 
