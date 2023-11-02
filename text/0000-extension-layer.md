@@ -25,7 +25,7 @@ This would allow distroless run images to be extended.
 # What it is
 [what-it-is]: #what-it-is
 
-This follows up on RFC-0105 and proposes that during the execution of the extension's `./bin/generate`, an extension is allowed to write arbitrary data to the `context` folder within its exclusive layer. This data then becomes accessible during the execution of the `extend` phase via Kaniko build context. The content of these extension-specific layers is ignored at build and launch time, it serves only the extension phase.
+This follows up on RFC-0105 and proposes that during the execution of the extension's `./bin/generate`, an extension is allowed to write arbitrary data to the `context` folder within its exclusive output directory. This data then becomes accessible during the execution of the `extend` phase via Kaniko build context. The content of these extension-specific context is ignored at build and launch time, it serves only the extension phase.
 
 # How it Works
 [how-it-works]: #how-it-works
