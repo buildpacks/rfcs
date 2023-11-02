@@ -31,7 +31,7 @@ This follows up on RFC-0105 and proposes that during the execution of the extens
 [how-it-works]: #how-it-works
 
 - New root directory `/layers-ext` is introduced which contains extension layers.
-- Before execution of the `./bin/generate`, the lifecycle will create a distinct writable layer `/layers-ext/<extension-id>` for each extension which passed detection.
+- Before execution of the `./bin/generate`, the lifecycle will create a distinct writable directory `/layers-ext/<extension-id>` for each extension which passed detection.
 - The `/layers-ext/<extension-id>` is provided to the `./bin/generate` as `<output>` directory.
 - In addition to the files specified in [RFC#0105](https://github.com/buildpacks/rfcs/blob/main/text/0105-dockerfiles.md), the extension may create the `<output>/context` folder with an arbitrary content.
 - If the folder `<output>/context` is present it will be set as Kaniko build context during the `extend` phase instead of the `<app>` directory.
