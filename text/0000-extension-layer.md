@@ -13,7 +13,7 @@
 # Summary
 [summary]: #summary
 
-This RFC introduces support for Extension Layers to allow data transfer between the build environment and the Kaniko execution.
+This RFC introduces support for Extension configurable context to allow data transfer between the build environment and the Kaniko execution.
 
 # Motivation
 [motivation]: #motivation
