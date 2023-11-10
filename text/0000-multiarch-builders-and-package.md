@@ -122,10 +122,10 @@ my-multiarch-buildpack
                 └── detect.bat
 ```
 
-Now `pack` will be able to package them separately for each os/arch family, following our [guide](https://buildpacks.io/docs/buildpack-author-guide/package-a-buildpack/) 
-we will need to create a `package.toml` file.
+Now `pack` will be able to package them separately for each os/arch family. 
 
-The `package.toml` file will be similar to the one describe in our documentation:
+Following our [guide](https://buildpacks.io/docs/buildpack-author-guide/package-a-buildpack/) we will need to create a 
+`package.toml` let's suppose it looks like this:
 
 ```toml
 [buildpack]
@@ -134,7 +134,7 @@ uri = "examples/my-multiarch-buildpack"
 uri = "my-multiarch-buildpack.tgz"
 ```
 
-But in this case, we actually **remove** the [platform](https://buildpacks.io/docs/reference/config/package-config/) section because it will be taken from the `buildpack.toml`.
+In this case we **remove** the [platform](https://buildpacks.io/docs/reference/config/package-config/) section because it will be taken from the `buildpack.toml`.
 
 Packaging a multi-arch buildpack will require the output to be **publish** to a registry or **saved on disk** in OCI layout format.
 
@@ -147,13 +147,13 @@ pack buildpack package my-buildpack.cnb --config ./package.toml --format file
 > **Important**
 > pack will determine a multi-arch buildpack package is being created because there are more than one target defined.  
 
-In these cases each `target` entry corresponds to a different buildpack image that is exported into an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md)
+Each `target` entry corresponds to a different buildpack image that is exported into an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md)
 
 ### Package a multi-arch Builder
 
 In case of packing a **Builder**, we assume the following premises: 
 
-1. Buildpack authors updated their `builder.toml` to include the new `targets` fields defined in this RFC. 
+1. Buildpack authors updated their `builder.toml` to include the new `targets` fields defined in this [RFC](https://github.com/buildpacks/rfcs/blob/main/text/0096-remove-stacks-mixins.md). 
 2. Multi-architecture `build`, `run` images and `buildpacks` are available for baking into the **Builder**.
 
 A sample `builder.toml` file looks like:
@@ -193,11 +193,13 @@ As we can see, the proposal is based on the assumption that the `run-image`, `bu
 in the builder are **multi-arch artifacts**, and we can reach them by reading an 
 [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md)
 
+Packaging a multi-arch builder will require the output to be **publish** to a registry.
+
 ```bash
 pack builder create my-jammy-builder --config ./builder.toml --publish
 ```
 > **Important**
-> Similar to the `buildpack package`, pack will determine a multi-arch builder must be created based on the multiple targets defined.
+> Similar to the `buildpack package,` pack will determine a multi-arch builder must be created based on the multiple targets defined.
 
 In this case `pack` will follow the builder creation process for **each provided target**, 
 pulling the correct (based on os/arch) buildpacks, build and run images and creating different builders images that are 
@@ -210,7 +212,7 @@ exported and combined into an [image index](https://github.com/opencontainers/im
 
 As a quick summary, our current process to create a buildpack package involves:
 
-- The end-users defined `os` for the OCI image using the [package.toml](https://buildpacks.io/docs/reference/config/package-config/) when they want to export a buildpack package.
+- The end-users defined `os` for the OCI image using the [package.toml](https://buildpacks.io/docs/reference/config/package-config/).
 - The only values allowed are `linux` and `windows` and by default when is not present, `linux` is being used.
 - When exporting to daemon, the `docker.OSType` must be equal to `platform.os`
 
@@ -231,6 +233,8 @@ We propose:
 this will be the way for end-users to specify the platform for which they want to create single OCI artifact.
 > **Note**
 > We want to avoid duplicated information, we expect to have `targets` with all the platform supported by a buildpack
+
+- Add `targets` section to `buildpack.toml` to help Buildpack Authors to include support for new platforms without having to update their `pack buildpack package` command in their CI/CD pipelines
 
 - A new folder structure to organize the buildpacks binaries for multi-arch images
 ```bash
@@ -259,7 +263,8 @@ this will be the way for end-users to specify the platform for which they want t
                     └── detect
 ```
 > **Note** 
-> For cross-compile buildpacks like Paketo, it looks easy to add a step to their Makefile to compile and separate the binaries following this structure.
+> For cross-compile buildpacks like Paketo, it looks easy to add a step to their Makefile to compile and separate the binaries following this structure. It is important to mention
+> that the final buildpack image will not change, this will only change the buildpack structure from `pack` perspective
 
 In case, this folder structure is not suitable for Buildpack Authors:
 
@@ -288,17 +293,20 @@ versions = ["<distribution version>"]
       - `pack` will determine the binaries path (based on the `targets.path` in the buildpack.toml or infering a folder structure similar to the one show above)
       - `pack` will include the binaries in the buildpack package OCI image
     - If more than 1 OCI image was created, an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md) will be created to combine them
+  - When `--daemon` is specified
+    - `pack` can keep using `docker.OSType` to determine the target `os` and probably can do some validations it the `os` is valid target
 
 ### Examples
 
 Let's use some examples to explain the expected behavior in different use cases
 
-#### Buildpacks authors do not use targets
-
-##### `platform.os` is not present at `package.toml`
+#### Buildpacks authors do not use targets AND `platform.os` is not present at `package.toml`
 
 This seems to be the case for [Paketo Buildpacks](https://github.com/paketo-buildpacks/java/blob/main/package.toml) 
-or [Heroku](https://github.com/heroku/buildpacks-jvm/blob/main/meta-buildpacks/java/package.toml). A simplified version of their folder structures is:
+or [Heroku](https://github.com/heroku/buildpacks-jvm/blob/main/meta-buildpacks/java/package.toml), and it represents how `pack` 
+will work for most the users when new behavior is implemented
+
+A simplified version of Buildpack Authors folder structures is:
 
 ```bash
 ├── bin
@@ -308,7 +316,8 @@ or [Heroku](https://github.com/heroku/buildpacks-jvm/blob/main/meta-buildpacks/j
 └── package.toml
 ```
 
-In these cases, the expected output will be similar to:
+In these cases: We expect `pack` to keep doing what is doing today, but with the warning messages we mentioned above to 
+let end users know things are changing. 
 
 ```bash
 pack buildpack package <buildpack> --config ./package.toml --publish 
@@ -319,65 +328,19 @@ Successfully published package <buildpack> and saved to registry
 pack buildpack package  <buildpack> --config ./package.toml --format file 
 Warning: A new '--target' flag is available to set the platform for the buildpack package, using 'linux' as default
 Successfully created package <buildpack> and saved to file
+ ```
+**Output**: pack will create a buildpack package image (as it is doing it today) with the provided binaries and a 
+[configuration](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) with the following target 
+platform:
+
+```json
+{
+  "architecture": "",
+  "os": "linux"
+}
 ```
 
-We will keep `linux` as the default target platform, and we don't expect end-users to change anything else on their side.
-
-In case, Buildpack authors tries to use the new folder structure like:
-
-```bash
-├── buildpack.toml
-├── linux-amd64
-│ └── bin
-│     ├── build
-│     └── detect
-├── linux-arm64
-│ └── bin
-│     ├── build
-│     └── detect
-└── package.toml
-```
-
-The current `pack` version creates an OCI artifact copying all the files on it. 
-
-![](https://hackmd.io/_uploads/BkGkZ_mla.png)
-
-But I think this buildpack can't be executed because `./bin/build` or `./bin/detect` can't be found. We could add some validations and throw an error, but I do not see any value on doing that. 
-
-> **Important**
-> New folder structure is not useful if Buildpack Authors don't remove stacks and migrate to use targets
-> 
-
-Trying to use the new flags
-
-```bash
-pack buildpack package <buildpack> --config ./package.toml --publish --multi-arch
-Error: 'targets' must be defined when creating a multi-architecture buildpack
-
-# Or
-pack buildpack package  <buildpack> --config ./package.toml --format file --multi-arch
-Error: 'targets' must be defined when creating a multi-architecture buildpack
-```
-
-In these cases, we don't have enough information to create a multi-arch buildpack, and pack must fail its execution. 
-
-A valid way to re-write the command could be:
-
-```bash
-pack buildpack package <buildpack> --config ./package.toml --publish --target linux/arm64 --target linux/amd64 --multi-arch
-A multi-arch buildpack package will be created for target platforms: 'linux/amd64', 'linux/arm64'
-Successfully published package <buildpack> and saved to registry
-
-# Or
-pack buildpack package  <buildpack> --config ./package.toml --format file --target linux/arm64 --target linux/amd64  --multi-arch
-A multi-arch buildpack package will be created for target platforms: 'linux/amd64', 'linux/arm64'
-Successfully created package <buildpack> and saved to file
-```
-
-In these cases, two OCI images, with the same binaries, will be created and pushed into the registry, for each image the configuration file will be
-created with the correct `os` and `architecture` and  an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md) will be created to combine them
-
-what about creating a single image for a new target platform?
+After checking the **warning** messages, some end users must feel curious, and the try to use the new `--target` flag.
 
 ```bash
 pack buildpack package <buildpack> --config ./package.toml --publish --target linux/arm64
@@ -388,8 +351,9 @@ pack buildpack package  <buildpack> --config ./package.toml --format file --targ
 Successfully created package <buildpack> and saved to file
 ```
 
-In these cases, pack will create buildpack package image with the provided binaries and a [configuration](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) 
-with the following target platform:
+**Output**: In these cases, pack will create buildpack a package image with the provided binaries and a 
+[configuration](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) with the following target 
+platform:
 
 ```json
 {
@@ -398,24 +362,77 @@ with the following target platform:
 }
 ```
 
-##### `platform.os` is present at `package.toml`
+what about creating a multi-arch image for several target platforms?
 
+```bash
+pack buildpack package <buildpack> --config ./package.toml --publish --target linux/arm64 --target linux/amd64
+A multi-arch buildpack package will be created for target platforms: 'linux/amd64', 'linux/arm64'
+Successfully published package <buildpack> and saved to registry
+
+# Or
+pack buildpack package <buildpack> --config ./package.toml --format file --target linux/arm64 --target linux/amd64
+A multi-arch buildpack package will be created for target platforms: 'linux/amd64', 'linux/arm64'
+Successfully created package <buildpack> and saved to file
+```
+
+**Output**: two OCI images, with the same binaries, will be created and pushed into the registry, for each image the 
+configuration file will be created with the correct `os` and `architecture` and an 
+[image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md) will be created to combine them
+using the `<buildpack>` name provided.
+
+#### Buildpacks authors do not use targets AND `platform.os` is present at `package.toml`
+
+Let's suppose the `package.toml` has the following:
+
+```toml
+[buildpack]
+uri = "<A URL or path to an archive, or a path to a directory>"
+
+[platform]
+os = "linux"
+```
 These cases are similar to the previous one, but we can change the warning message.
 
 ```bash
 pack buildpack package <buildpack> --config ./package.toml --publish 
-Warning: 'platform.os' field in package.toml will be deprecated, use new '--target' flag to set target platform 
+Warning: 'platform.os' field in package.toml will be deprecated, use new '--target' flag or `targets` field in buildpack.toml to set the platform.
 Successfully published package <buildpack> and saved to registry
 
 # Or
 pack buildpack package  <buildpack> --config ./package.toml --format file 
-Warning: 'platform.os' field in package.toml will be deprecated, use new '--target' flag to set target platform 
+Warning: 'platform.os' field in package.toml will be deprecated, use new '--target' flag or `targets` field in buildpack.toml to set the platform.
 Successfully created package <buildpack> and saved to file
+```
+**Output**: The OCI Image [configuration](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) file will have:
+
+```json
+{
+  "architecture": "",
+  "os": "linux"
+}
+```
+
+Trying to use `--target` flag with `platform.os` field at the same time should throw an error, in this way, the end-user will need to update
+their `package.toml`
+
+```bash
+pack buildpack package <buildpack> --config ./package.toml --publish  --target linux/arm64
+# Or
+pack buildpack package  <buildpack> --config ./package.toml --format file  --target linux/arm64
+
+Error: 'platform.os' and '--target' flag can not be used in conjunction, please remove 'platform.os' from package.toml, use new '--target' flag 
+       or `targets` field in buildpack.toml to set the platform
 ```
 
 #### Buildpacks authors use targets
 
+> **Important**
+> `pack` considers the use of `targets` as an acknowledgement of expecting a multi-arch images as output. Also, we expect
+> `platform.os` do not be present in `buildpack.toml`
+
 We can divide the problem in two main scenarios: Buildpack authors use or not use the new folder structure.
+
+##### New folder structure is not use
 
 Let's start with the first one, which is the natural path for Buildpack Authors to migrate from `stacks` to `targets`. Let's suppose a buildpack folder structure like:
 
@@ -437,73 +454,25 @@ arch = "amd64"
 [[targets]]
 os = "linux"
 arch = "arm64"
-```
 
-How could Buildpack Authors set which `os/arch` to use?, currently `pack` doesn't care about `targets` and 
-it sets `linux` as the `os` in the final OCI image. We can keep this behavior, and show warning messages to end-users, 
-this will avoid breaking the current behavior.
+# Stacks (deprecated) the buildpack will work with
+[[stacks]]
+id = "*"
+```
 
 ```bash
 pack buildpack package <buildpack> --config ./package.toml --publish 
-Warning: Multiple targets 'linux/amd64', 'linux/arm64' are present at 'buildpack.toml' 
-Warning: A new '--target' flag is available to set the target platform for the buildpack package, using 'linux' as default
+A multi-arch buildpack package will be created for target platforms: 'linux/amd64', 'linux/arm64'
 Successfully published package <buildpack> and saved to registry
 
 # Or
 pack buildpack package <buildpack> --config ./package.toml --format file 
-Warning: Multiple targets 'linux/amd64', 'linux/arm64' are present at 'buildpack.toml' 
-Warning: A new '--target' flag is available to set the target platform for the buildpack package, using 'linux' as default
+A multi-arch buildpack package will be created for target platforms: 'linux/amd64', 'linux/arm64'
 Successfully created package <buildpack> and saved to file
-
-# Or
-pack buildpack package <buildpack> --config ./package.toml 
-Warning: Multiple targets 'linux/amd64', 'linux/arm64' are present at 'buildpack.toml' 
-Warning: A new '--target' flag is available to set the target platform for the buildpack package, using 'linux' as default
-Successfully created package <buildpack> and saved to docker daemon
 ```
 
-The OCI Image [configuration](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) file will have: 
-
-```json
-{
-  "architecture": "",
-  "os": "linux"
-}
-```
-
-On the other hand, when end-users use the new `target` flag
-
-```bash
-pack buildpack package <buildpack> --config ./package.toml --publish --target linux/arm64
-Successfully published package <buildpack> and saved to registry
-```
-
-The OCI Image [configuration](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) file will have:
-
-```json
-{
-  "architecture": "amd64",
-  "os": "linux"
-}
-```
-
-Trying to create a buildpack package for an unsupported platform should throw an error
-
-```bash
-pack buildpack package <buildpack> --config ./package.toml --publish --target windows/arm64
-Error: target platform 'windows/arm64' is not supported in buildpack targets, check your 'buildpack.toml'
-```
-
-Let's go one more step further, and check what will happen if Buildpack Authors use the new `--multi-arch` flag
-
-```bash
-pack buildpack package <buildpack> --config ./package.toml --publish --multi-arch
-Info: A multi-arch buildpack package will be created for targets platforms: 'linux/amd64', 'linux/arm64'
-Successfully published package <buildpack> and saved to registry
-```
-
-In this case, two OCI images will be created and pushed into the registry, for each image the configuration file will be 
-created with the correct `os` and `architecture` and 
+**Output**: In this case, two OCI images will be created and pushed into the registry, for each image the configuration file will be
+created with the correct `os` and `architecture` and
 an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md) will be created to combine them,
 with a content similar to:
 
@@ -534,43 +503,70 @@ with a content similar to:
   "schemaVersion": 2
 }
 ```
-> **Important**
-> In this case, the layer blob for the OCI image will have the same bin/build and bin/detect binaries. This could be helpful 
-> for bash buildpacks for example. 
 
-There is a downside for this case, how can we do it if we have windows and linux scripts?
-One way to do it could be just copying the .bat scripts along with the linux scripts, something like:
+In case of targeting the daemon, pack will match **daemon os/arch** with the **targets os/arch**, for example when running
+on a `linux/arm64` machine.
 
 ```bash
-├── bin
-│ ├── build
-│ ├── build.bat
-│ ├── detect
-│ └── detect.bat
-├── buildpack.toml
-└── package.toml
+pack buildpack package <buildpack> --config ./package.toml 
+Successfully created package <buildpack> and saved to docker daemon 
 ```
 
-But we will end up distributing windows and linux scripts together. 
+**Output**: In these cases, pack will create buildpack a package image with the provided binaries and a
+[configuration](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) with the following target
+platform:
 
-Finally, let's check some examples for the second scenario, when Buildpack Authors migrated from `stacks` to `targets` and 
-they want to take advantage of the new multi-architecture capabilities, let's use our original folder structure:
+```json
+{
+  "architecture": "arm64",
+  "os": "linux"
+}
+```
+
+But, if we execute the same command on a **windows/amd64** machine, platform doesn't match and an error is thrown
+```bash
+pack buildpack package <buildpack> --config ./package.toml 
+Error: daemon platform 'windows/amd64' does not match target platforms: 'linux/amd64', 'linux/arm64'
+```
+On the other hand, when end-users use the new `--target` flag
 
 ```bash
+pack buildpack package <buildpack> --config ./package.toml --publish --target linux/arm64
+Successfully published package <buildpack> and saved to registry
+```
+
+**Output**: The OCI Image [configuration](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) file will have:
+
+```json
+{
+  "architecture": "amd64",
+  "os": "linux"
+}
+```
+
+##### New folder structure is use
+
+Finally, let's check some examples for the second scenario, when Buildpack Authors want to take advantage of the new 
+multi-architecture capabilities, let's use our original folder structure:
+
+```bash
+.
 ├── buildpack.toml
-├── linux-amd64
-│         └── bin
-│             ├── build
-│             └── detect
-├── linux-arm64
-│         └── bin
-│             ├── build
-│             └── detect
-└── windows-amd64
-    └── 10.0.20348.1970
-        └── bin
-            ├── build.bat
-            └── detect.bat
+├── linux
+│ ├── amd64
+│ │ └── bin
+│ │     ├── build
+│ │     └── detect
+│ └── arm64
+│     └── bin
+│         ├── build
+│         └── detect
+└── windows
+    └── amd64
+        └── windows@10.0.20348.1970
+            └── bin
+                ├── build.bat
+                └── detect.bat
 ```
 
 And a `buildpack.toml` with the following `targets` defined:
@@ -591,6 +587,10 @@ arch = "amd64"
 [[targets.distributions]]
 name = "windows"
 versions = ["10.0.20348.1970"]
+
+# Stacks (deprecated) the buildpack will work with
+[[stacks]]
+id = "*"
 ```
 
 If the Buildpack Author wants to create a single buildpack package they will use the `target` flag
@@ -600,18 +600,18 @@ pack buildpack package <buildpack> --config ./package.toml --publish --target li
 Successfully published package <buildpack> and saved to registry
 ```
 
-In this case, `pack` will determine the folder `linux-arm64` exists, and that must be the root folder for the buildpack.  
+In this case, `pack` will find the folder `linux/arm64`, and it must be the root folder for the buildpack.  
 `pack` will copy `buildpack.toml` from the root and include it, something like:
 
 ```bash
-linux-arm64
+linux/arm64
 ├── bin
 │ ├── build
 │ └── detect
 └── buildpack.toml  // Must be copy on the fly
 ```
 
-Similar to previous cases, the OCI Image [configuration](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) file will have:
+**Output**: The OCI Image [configuration](https://github.com/opencontainers/image-spec/blob/main/config.md#properties) file will have:
 
 ```json
 {
@@ -620,15 +620,15 @@ Similar to previous cases, the OCI Image [configuration](https://github.com/open
 }
 ```
 
-A fully multi-arch buildpack could be created as follows:
+A fully multi-arch buildpack will be created automatically, because we have more than one target defined.
 
 ```bash
-pack buildpack package <buildpack> --config ./package.toml --publish --multi-arch
+pack buildpack package <buildpack> --config ./package.toml --publish
 Info: A multi-arch buildpack package will be created for target platforms: 'linux/amd64', 'linux/arm64', 'windows/amd64'
 Successfully published package <buildpack> and saved to registry
 ```
 
-In this case, three OCI images will be created and pushed into the registry, for each image the configuration file will be
+**Output**: In this case, three OCI images will be created and pushed into the registry, for each image the configuration file will be
 created with the correct target: `os` and `architecture`,
 an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md) will be created to combine them,
 with a content similar to:
