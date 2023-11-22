@@ -30,14 +30,26 @@ This follows up on RFC-0105 and proposes that during the execution of the extens
 # How it Works
 [how-it-works]: #how-it-works
 
-- New root directory `/layers-ext` is introduced which contains extension layers.
-- Before execution of the `./bin/generate`, the lifecycle will create a distinct writable directory `/layers-ext/<extension-id>` for each extension which passed detection.
-- The `/layers-ext/<extension-id>` is provided to the `./bin/generate` as `<output>` directory.
-- In addition to the files specified in [RFC#0105](https://github.com/buildpacks/rfcs/blob/main/text/0105-dockerfiles.md), the extension may create the `<output>/context` folder with an arbitrary content.
-- If the folder `<output>/context` is present it will be set as Kaniko build context during the `extend` phase instead of the `<app>` directory.
-- If the folder `<output>/context` is not present, Kaniko build context defaults to the `<app>` folder.
+- Before execution of the `./bin/generate`, the lifecycle will create a distinct writable layer `$CNB_GENERATED_DIR/<extension-id>` for each extension which passed detection.
+- The `$CNB_GENERATED_DIR/<extension-id>` is provided to the `./bin/generate` as `<output>` (`$CNB_OUTPUT_DIR`) directory.
+- In addition to the files specified in [RFC#0105](https://github.com/buildpacks/rfcs/blob/main/text/0105-dockerfiles.md), the extension may create the following folders with an arbitrary content:
+
+    either:
+
+    - `<output>/context`
+
+    or the image-specific folders:
+
+    - `<output>/context.run`
+    - `<output>/context.build`
+  
+  If the `<output>/context` is provided together with any of the image-specific folders the detection phase must fail.
+- If the folder `<output>/context` is present it will be set as Kaniko build context during the `extend` phase of the build and run images.
+- If the folder `<output>/context.run` is present it will be set as Kaniko build context during the `extend` phase of the run image only.
+- If the folder `<output>/context.build` is present it will be set as Kaniko build context during the `extend` phase of the build image only.
+- If none of these folders is not present, Kaniko build context defaults to the `<app>` folder.
  
-The `/layers-ext` will not be included in the final image by the lifecycle.
+The `$CNB_GENERATED_DIR/<extension-id>` folders will not be included in the final image by the lifecycle.
 
 ### Example: Extend distroless run image with Debian packages.
 
@@ -48,10 +60,10 @@ This example extension would allow to install `tar` package on the run image wit
 ```bash
 #!/bin/sh
 
-mkdir -p ${CNB_OUTPUT_DIR}/context
+mkdir -p ${CNB_OUTPUT_DIR}/context.run
 
-cp ${CNB_EXTENSION_DIR}/bin/custom-installer ${CNB_OUTPUT_DIR}/context/
-curl -o ${CNB_OUTPUT_DIR}/context/tar.deb http://security.ubuntu.com/ubuntu/pool/main/t/tar/tar_1.34+dfsg-1ubuntu0.1.22.04.1_amd64.deb
+cp ${CNB_EXTENSION_DIR}/bin/custom-installer ${CNB_OUTPUT_DIR}/context.run/
+curl -o ${CNB_OUTPUT_DIR}/context.run/tar.deb http://security.ubuntu.com/ubuntu/pool/main/t/tar/tar_1.34+dfsg-1ubuntu0.1.22.04.1_amd64.deb
 
 cat >> "${CNB_OUTPUT_DIR}/run.Dockerfile" <<EOL
 ARG base_image
@@ -96,8 +108,9 @@ Discuss prior art, both the good and bad.
 
 This RFC requires changes to the layers metadata and the `extend` phase:
 
-- allow optional folder `<output>/context` with an arbitrary content to be provided by extension.
-- if the `<output>/context` is present, kaniko context should be set to this folder instead of the `<app>`.
+- the `$CNB_OUTPUT_DIR` must point to the `$CNB_GENERATED_DIR/<extension-id>` folder instead of a temporary directory.
+- allow optional folders `$CNB_GENERATED_DIR/<extension-id>/context`, `$CNB_GENERATED_DIR/<extension-id>/context.run` and `$CNB_GENERATED_DIR/<extension-id>/context.build` with an arbitrary content to be provided by extension.
+- if the context folders are present, kaniko context should be set to the corresponding folder instead of the `<app>` (following the rules defined in [#how-it-works](#how-it-works)).
 
 <!--
 ## Amended
