@@ -709,8 +709,8 @@ But what happen with the layers on those OCI images and the files that are share
 
 If we update the buildpack package creation process as follows:
 
-- If `A` is a multi-arch buildpack  
-- If `Platform` is a target defined for the buildpack A that follows a folder structure like `{os}/{arch}[/{variant}/{name@version-1}]/bin`
+- `A` is a multi-arch buildpack  
+- `Platform` is a target defined for the buildpack A that follows a folder structure like `{os}/{arch}[/{variant}/{name@version-1}]/bin`
 
 $$BuildpackPackageLayers(A, Platform) = ShareLayers(A) + PlatformLayers(A, Platform)$$
 
