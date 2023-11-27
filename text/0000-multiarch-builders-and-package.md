@@ -679,7 +679,7 @@ with a content similar to:
 If the Buildpack Author wants to create a single buildpack package they will use the `target` flag, similar to our previous 
 examples.
 
-### Important considerations for share files in the new folder structure
+### Important considerations for sharing files with the new folder structure
 
 Let's suppose we have a multi-arch buildpack **A** with local folder structure like this:
 
@@ -704,22 +704,26 @@ Let's suppose we have a multi-arch buildpack **A** with local folder structure l
           └── bar
 ```
 
-As we already discussed in this RFC, we are expecting to create two OCI images artifacts, combined with an  [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). 
+As we already discussed in this RFC, we are expecting to create two OCI images artifacts and combine with an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). 
 But what happen with the layers on those OCI images and the files that are shared? 
 
-If we update the buildpack package creation process as follows:
+Let's suppose we have the following:
+
+Given
 
 - `A` is a multi-arch buildpack  
-- `Platform` is a target defined for the buildpack A that follows a folder structure like `{os}/{arch}[/{variant}/{name@version-1}]/bin`
+- `Platform` is a target defined for `A` that follows a structure like `{os}/{arch}[/{variant}/{name@version-1}]/bin`
+
+We define the buildpack package layers as:
 
 $$BuildpackPackageLayers(A, Platform) = ShareLayers(A) + PlatformLayers(A, Platform)$$
 
 Where
 
-- **ShareLayers**: Will be a layer created with the content of the root folder filtering out any `{os}` folder
-- **PlatformLayers**: Will be a layer created with the content of the `Platform` folder given
+- **ShareLayers**: Will be a layer created with the content of the root folder filtering out all the `{os}` folders
+- **PlatformLayers**: Will be a layer created with the `bin` folder content of the given `Platform` 
 
-With our previous example, it means
+Using our previous example:
 
 $$ ShareLayers(A) = \{\text{LICENSE},\text{NOTICE},\text{README.md},\text{buildpack.toml},\text{resources/config.properties}\} $$
 
