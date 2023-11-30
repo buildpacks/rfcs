@@ -689,6 +689,8 @@ Let's suppose we have a multi-arch buildpack **A** with local folder structure l
 ├── NOTICE
 ├── README.md
 ├── buildpack.toml
+├── package.toml
+├── some-file             // a file with a big size for example
 ├── resources
 │ ├── config.properties
 └── linux
@@ -704,38 +706,35 @@ Let's suppose we have a multi-arch buildpack **A** with local folder structure l
           └── bar
 ```
 
-As we already discussed in this RFC, we are expecting to create two OCI images artifacts and combine with an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). 
-But what happen with the layers on those OCI images and the files that are shared? 
+As we already discussed in this RFC, we are expecting to create two OCI images artifacts and combine with an 
+[image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). The current [distribution spec](https://github.com/buildpacks/spec/blob/main/distribution.md#buildpackage) 
+defines:
 
-Let's suppose we have the following:
+```
+Each buildpack layer blob MUST contain a single buildpack at the following file path:
 
-Given
+/cnb/buildpacks/<buildpack ID>/<buildpack version>/
+```
 
-- `A` is a multi-arch buildpack  
-- `Platform` is a target defined for `A` that follows a structure like `{os}/{arch}[/{variant}/{name@version-1}]/bin`
+This means, we will end up duplicating the big file in each OCI images, for example our `linux/amd64` buildpack package 
+will have 1 layer with the following content under `/cnb/buildpacks/<buildpack ID>/<buildpack version>/` 
 
-We define the buildpack package layers as:
+```bash
+├── LICENSE
+├── NOTICE
+├── README.md
+├── buildpack.toml
+├── some-file             // a file with a big size for example
+├── resources
+│ └── config.properties
+└── bin
+  ├── build
+  ├── detect
+  └── foo
+```
 
-$$BuildpackPackageLayers(A, Platform) = ShareLayers(A) + PlatformLayers(A, Platform)$$
-
-Where
-
-- **ShareLayers**: Will be a layer created with the content of the root folder filtering out all the `{os}` folders
-- **PlatformLayers**: Will be a layer created with the `bin` folder content of the given `Platform` 
-
-Using our previous example:
-
-$$ ShareLayers(A) = \{\text{LICENSE},\text{NOTICE},\text{README.md},\text{buildpack.toml},\text{resources/config.properties}\} $$
-
-$$ PlatformLayers(A,\text{linux,amd64}) = \{\text{bin/build},\text{bin/detect},\text{bin/foo}\} $$
-
-$$ PlatformLayers(A,\text{linux,arm64}) = \{\text{bin/build},\text{bin/detect},\text{bin/bar}\} $$
-
-$$ BuildpackPackageLayers(A,\text{linux,amd64}) = ShareLayers(A) + PlatformLayers(A,\text{linux,amd64}) $$
-
-$$ BuildpackPackageLayers(A,\text{linux,arm64}) = ShareLayers(A) + PlatformLayers(A,\text{linux,arm64}) $$
-
-This means the shared layer can be reused in each intermediate image and improve the performance when it contains big files
+And the `linux/arm64` version will be similar but with the `bar` file inside the `bin/` folder, as a consequence, the big file
+will be duplicated on two different layers increasing the space requirements in the registry
 
 ## Builder
 
