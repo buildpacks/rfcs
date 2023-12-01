@@ -22,7 +22,7 @@ Container Manager Client API: an API such as Docker's `CommonAPIClient` or Podma
 # Motivation
 [motivation]: #motivation
 
-`pack` currently requires a container manager client API available via a socket.  Both `docker` and `podman` are compatible with the [socket API](https://docs.docker.com/engine/api/v1.24/).  This RFC proposes that `pack` is extended to support a "daemonless" mode.  In a "daemonless" mode `pack` will directly use a container manager client API.  This avoids running a `docker` or `podman` daemon and avoids opening up a local socket.  This will allow to use pack as a full-userspace, standalone application on the OS supported by podman (currently Linux, as Windows and macOS need podman machine).
+`pack` currently interacts with `podman` through API service.  Both `docker` and `podman` can run the service, which provides compatible [socket API](https://docs.docker.com/engine/api/v1.24/).  This RFC proposes alternative "daemonless" mode with direct calls to `podman` without opening up a local socket or running API service. This makes `pack` userspace, standalone application (currently Linux, as Windows and macOS need `podman` machine).
 
 # What it is
 [what-it-is]: #what-it-is
