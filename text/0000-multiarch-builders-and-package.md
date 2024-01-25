@@ -284,9 +284,10 @@ versions = ["<distribution version>"]
 ```
 - When `more than 1 target is defined`
   - When `--publish` or `--format file` is specified
-    - For each `target` an OCI image will be created, following our current process
-      - `pack` will determine the binaries path (based on the `targets.path` in the buildpack.toml or infering a folder structure similar to the one show above)
-      - `pack` will include the binaries in the buildpack package OCI image
+    - For each `target` an OCI image will be created, following these rules
+      - `pack` will copy everything in the root folder excluding all `{os}/**` folder 
+      - `pack` will determine the **target root binary folder**, this is the specific root folder for a given `target` (based on the `targets.path` in the buildpack.toml or inferring it from a folder structure similar to the one show above)
+        - `pack` will copy everything from the **target root binary folder** into the base buildpack package folder, in case a conflict file name is found, `pack` will **override** the existing file with the latest one
     - If more than 1 OCI image was created, an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md) will be created to combine them
   - When `--daemon` is specified
     - `pack` can keep using `docker.OSType` to determine the target `os` and probably can do some validations it the `os` is valid target
@@ -294,6 +295,85 @@ versions = ["<distribution version>"]
 ### Examples
 
 Let's use some examples to explain the expected behavior in different use cases
+
+#### Overriding files rules
+
+Let's suppose the Buildpack Author creates a multi-arch folder structure and wants to create multiple buildpack packages
+
+```bash
+.
+├── buildpack.toml
+├── package.toml
+├── foo             // some common file for all the platforms
+└── linux
+   ├── amd64
+   │   └── bin
+   │      ├── build
+   │      ├── detect
+   │      └── foo
+   └── arm64
+       ├── foo     // for some reason we need a different binary for arm64
+       └── bin
+          ├── build
+          ├── detect
+          └── bar
+```
+
+In this case:  
+ - The targets `os` provided are `["linux"]`, then 
+ - For each `target` pack will exclude everything from `linux/**` to be copied into the initial buildpack package
+
+Resulting into a base structure like:
+
+```bash
+.
+└── cnb
+    └── buildpacks
+        └── {ID}
+            └── {version}
+                ├── buildpack.toml
+                ├── foo             // this is our common file
+                └── package.toml
+```
+
+When target is `linux/amd64`
+  - `pack` will determined **target root binary folder** is `./linux/amd64` 
+    - `pack` will copy everything from the `./linux/arm64` into the base buildpack package folder, because there are no conflicts the expected output will be:
+
+```bash
+
+.
+└── cnb
+    └── buildpacks
+        └── {ID}
+            └── {version}
+                ├── bin
+                │    ├── build
+                │    ├── detect
+                │    └── foo         // specific platform binary
+                ├── buildpack.toml
+                ├── foo              // common file
+                └── package.toml
+```
+
+On the other hand, When target is `linux/arm64`
+- `pack` will determined **target root binary folder** is `./linux/arm64`
+  - `pack` will copy everything from the `./linux/arm64` into the base buildpack package folder, because there is a conflict trying to copy `./linux/arm64/foo` into `cnb/buildpacks/{ID}/{version}/foo`, `pack` will override it and moves forward, resulting into:
+
+```bash
+.
+└── cnb
+    └── buildpacks
+        └── {ID}
+            └── {version}
+                ├── bin
+                │    ├── bar        // specific platform binary
+                │    ├── build
+                │    └── detect
+                ├── buildpack.toml
+                ├── foo             // override files with the content of the arm64 folder
+                └── package.toml
+```
 
 #### Buildpacks authors do not use targets AND `platform.os` is not present at `package.toml`
 
