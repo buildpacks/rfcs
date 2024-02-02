@@ -401,7 +401,7 @@ Successfully published package <buildpack> and saved to registry
 
 # Or
 pack buildpack package  <buildpack> --config ./package.toml --format file 
-Warning: A new '--target' flag is available to set the platform for the buildpack package, using 'linux' as default
+Warning: A new '--target' flag is available to set the platform for the buildpack package, using 'linux/amd64' as default
 Successfully created package <buildpack> and saved to file
  ```
 **Output**: pack will create a buildpack package image (as it is doing it today) with the provided binaries and a 
