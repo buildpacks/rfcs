@@ -223,7 +223,7 @@ We propose:
 - When `platform.os` is present in [package.toml](https://buildpacks.io/docs/reference/config/package-config/), throw a warning messages indicating the field will be removed 
 and `--target` flag must be used
 - When `platform.os` is not present in [package.toml](https://buildpacks.io/docs/reference/config/package-config/) and `--target` flag is not used, throw a warning messages indicating 
-a new `--target` flag is available
+a new `--target` flag is available and how to use it, or some helpful information on how to add `targets` to the `buildpack.toml`
 - Keep doing our current process to package a buildpack
 
 ### To improve user experience
@@ -265,7 +265,7 @@ this will be the way for end-users to specify the platform for which they want t
 > that the final buildpack image will not change, this will only change the buildpack structure from `pack` perspective
 
 In case, this folder structure is not suitable for Buildpack Authors, **we propose** a new `path` attribute to be included 
-into the `target` section of the `buildpack.toml` to specify where the binaries are located in the filesystem.
+into the `target` section of the `buildpack.toml` to specify where the **buildapck root directoy** is located in the filesystem.
 
 Based on the [RFC-0096](https://github.com/buildpacks/rfcs/blob/main/text/0096-remove-stacks-mixins.md) the new `buildpack.toml` schema will look like this:
 
