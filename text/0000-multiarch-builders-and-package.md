@@ -396,7 +396,7 @@ let end users know things are changing.
 
 ```bash
 pack buildpack package <buildpack> --config ./package.toml --publish 
-Warning: A new '--target' flag is available to set the platform for the buildpack package, using 'linux' as default
+Warning: A new '--target' flag is available to set the platform for the buildpack package, using 'linux/amd64' as default
 Successfully published package <buildpack> and saved to registry
 
 # Or
