@@ -3,7 +3,7 @@
 - Name: Enable CNB_SKIP_SBOM IN /cnb/lifecycle/creator
 - Start Date: (fill in today's date: 2023-10-17)
 - Author(s): kritkasahni-google
-- Status: Draft
+- Status: Approved
 - RFC Pull Request: 
 - CNB Pull Request: 
 - CNB Issue: 

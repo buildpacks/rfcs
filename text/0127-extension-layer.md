@@ -3,7 +3,7 @@
 - Name: Add extension layer to exchange data
 - Start Date: 2023-10-09
 - Author(s): [c0d1ngm0nk3y](https://github.com/c0d1ngm0nk3y), [pbusko](https://github.com/pbusko)
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
+- Status: Approved
 - RFC Pull Request:
 - CNB Pull Request:
 - CNB Issue:
