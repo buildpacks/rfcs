@@ -1,9 +1,9 @@
 # Meta
 [meta]: #meta
 - Name: Reorganize docs website
-- Start Date: (fill in today's date: 2023-09-20)
+- Start Date: 2024-02-08
 - Author(s): natalieparellano
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
+- Status: Approved <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
