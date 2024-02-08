@@ -32,6 +32,11 @@ that combines them into one single consumable tag for end-users.
 - Builder: A builder is an image that contains all the components necessary to execute a build. A builder image is created by taking a build image and adding a lifecycle, buildpacks, and files that configure aspects of the build including the buildpack detection order and the location(s) of the run image
 - Image Manifest: The image manifest provides a configuration and set of layers for a single container image for a specific architecture and operating system. See [spec](https://github.com/opencontainers/image-spec/blob/main/manifest.md)
 - Image Index: The image index is a higher-level manifest which points to specific image manifests, ideal for one or more platforms. See [spec](https://github.com/opencontainers/image-spec/blob/main/image-index.md)
+- Buildpack root folder: is the top-most directory where a `buildpack.toml` can be found
+- Platform root folder: Based on our new folder structure, the **platform root folder** is the top-most directory that identifies a target in **buildpack root folder**
+  For example:
+    - given a target `linux/amd64` the **platform root folder** will be `<buildpack root folder>/linux/amd64`
+    - given a target `windows/amd64:windows@10.0.20348.1970` the **platform root folder** will be `<buildpack root folder>/windows/amd64/windows@10.0.20348.1970`
 
 # Motivation
 [motivation]: #motivation
@@ -239,8 +244,9 @@ this will be the way for end-users to specify the platform for which they want t
 # Option 1 - no variant is required
 .
 ├── buildpack.toml                 // mandatory
+├── package.toml                   // mandatory
 └── {os}                           // optional
-    └── {arch}                     // optional
+    └── {arch}                     // optional (becomes the platform root folder)
         └── bin
             ├── build              // platform dependant binary (mandatory)
             └── detect             // platform dependant binary (mandatory)
@@ -248,19 +254,24 @@ this will be the way for end-users to specify the platform for which they want t
 # Option 2 - variant is required
 .
 ├── buildpack.toml                  // mandatory
+├── package.toml                    // mandatory
 └── {os}                            // optional
     └── {arch}                      // optional
         └── {variant}               // optional
-            ├── {name@version-1}    // optional
-            │ └── bin
-            │     ├── build         // platform dependant binary (mandatory)
-            │     └── detect        // platform dependant binary (mandatory)
-            └── {name@version-2}    // optional
+            ├── {name@version-1}    // optional  (becomes the platform root folder)
+            │   └── bin
+            │       ├── build       // platform dependant binary (mandatory)
+            │       └── detect      // platform dependant binary (mandatory)
+            └── {name@version-2}    // optional (becomes the platform root folder)
                 └── bin
                     ├── build       // platform dependant binary (mandatory)
                     └── detect      // platform dependant binary (mandatory)
 ```
-> **Note** 
+- `buildpack.toml` file MUST be present at the **buildpack root folder**
+- `package.toml` file MUST be present at the **buildpack root folder**
+- For each platform, Buildpack Authors are responsible for copying or creating symlink or hard link for files into each **platform root folder** 
+
+> **Note**
 > For cross-compile buildpacks like Paketo, it looks easy to add a step to their Makefile to compile and separate the binaries following this structure. It is important to mention
 > that the final buildpack image will not change, this will only change the buildpack structure from `pack` perspective
 
@@ -285,9 +296,8 @@ versions = ["<distribution version>"]
 - When `more than 1 target is defined`
   - When `--publish` or `--format file` is specified
     - For each `target` an OCI image will be created, following these rules
-      - `pack` will copy everything in the root folder excluding all `{os}/**` folder 
-      - `pack` will determine the **target root binary folder**, this is the specific root folder for a given `target` (based on the `targets.path` in the buildpack.toml or inferring it from a folder structure similar to the one show above)
-        - `pack` will copy everything from the **target root binary folder** into the base buildpack package folder, in case a conflict file name is found, `pack` will **override** the existing file with the latest one
+      - `pack` will determine the **platform root folder**, this is the specific root folder for a given `target` (based on the `targets.path` in the buildpack.toml or inferring it from a folder structure similar to the one show above)
+      - `pack` will execute the current process to create a buildpack package using the **platform root folder** and the `target` values  
     - If more than 1 OCI image was created, an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md) will be created to combine them
   - When `--daemon` is specified
     - `pack` can keep using `docker.OSType` to determine the target `os` and probably can do some validations it the `os` is valid target
@@ -296,15 +306,14 @@ versions = ["<distribution version>"]
 
 Let's use some examples to explain the expected behavior in different use cases
 
-#### Overriding files rules
+#### How to determine the platform root folder
 
 Let's suppose the Buildpack Author creates a multi-arch folder structure and wants to create multiple buildpack packages
 
 ```bash
 .
 ├── buildpack.toml
-├── package.toml
-├── foo             // some common file for all the platforms
+├── package.toml            
 └── linux
    ├── amd64
    │   └── bin
@@ -312,33 +321,15 @@ Let's suppose the Buildpack Author creates a multi-arch folder structure and wan
    │      ├── detect
    │      └── foo
    └── arm64
-       ├── foo     // for some reason we need a different binary for arm64
+       ├── foo
        └── bin
           ├── build
           ├── detect
           └── bar
 ```
 
-In this case:  
- - The targets `os` provided are `["linux"]`, then 
- - For each `target` pack will exclude everything from `linux/**` to be copied into the initial buildpack package
-
-Resulting into a base structure like:
-
-```bash
-.
-└── cnb
-    └── buildpacks
-        └── {ID}
-            └── {version}
-                ├── buildpack.toml
-                ├── foo             // this is our common file
-                └── package.toml
-```
-
-When target is `linux/amd64`
-  - `pack` will determined **target root binary folder** is `./linux/amd64` 
-    - `pack` will copy everything from the `./linux/arm64` into the base buildpack package folder, because there are no conflicts the expected output will be:
+- When `linux/amd64` the **platform root folder** determined is `<buildpack root folder>/linux/amd64`, and the expected
+folder structure in the OCI image for each buildpack package will be:
 
 ```bash
 
@@ -352,14 +343,11 @@ When target is `linux/amd64`
                 │    ├── detect
                 │    └── foo         // specific platform binary
                 ├── buildpack.toml
-                ├── foo              // common file
                 └── package.toml
 ```
 
-On the other hand, When target is `linux/arm64`
-- `pack` will determined **target root binary folder** is `./linux/arm64`
-  - `pack` will copy everything from the `./linux/arm64` into the base buildpack package folder, because there is a conflict trying to copy `./linux/arm64/foo` into `cnb/buildpacks/{ID}/{version}/foo`, `pack` will override it and moves forward, resulting into:
-
+On the other hand, When target is `linux/arm64, the **platform root folder** determined is `<buildpack root folder>/linux/arm64`
+and the output OCI image folder structure looks like:
 ```bash
 .
 └── cnb
@@ -371,7 +359,7 @@ On the other hand, When target is `linux/arm64`
                 │    ├── build
                 │    └── detect
                 ├── buildpack.toml
-                ├── foo             // override files with the content of the arm64 folder
+                ├── foo
                 └── package.toml
 ```
 
@@ -759,63 +747,6 @@ with a content similar to:
 If the Buildpack Author wants to create a single buildpack package they will use the `target` flag, similar to our previous 
 examples.
 
-### Important considerations for sharing files with the new folder structure
-
-Let's suppose we have a multi-arch buildpack **A** with local folder structure like this:
-
-```bash
-.
-├── LICENSE
-├── NOTICE
-├── README.md
-├── buildpack.toml
-├── package.toml
-├── some-file             // a file with a big size for example
-├── resources
-│ ├── config.properties
-└── linux
-   ├── amd64
-   │   └── bin
-   │      ├── build
-   │      ├── detect
-   │      └── foo
-   └── arm64
-       └── bin
-          ├── build
-          ├── detect
-          └── bar
-```
-
-As we already discussed in this RFC, we are expecting to create two OCI images artifacts and combine with an 
-[image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md). The current [distribution spec](https://github.com/buildpacks/spec/blob/main/distribution.md#buildpackage) 
-defines:
-
-```
-Each buildpack layer blob MUST contain a single buildpack at the following file path:
-
-/cnb/buildpacks/<buildpack ID>/<buildpack version>/
-```
-
-This means, we will end up duplicating the big file in each OCI images, for example our `linux/amd64` buildpack package 
-will have 1 layer with the following content under `/cnb/buildpacks/<buildpack ID>/<buildpack version>/` 
-
-```bash
-├── LICENSE
-├── NOTICE
-├── README.md
-├── buildpack.toml
-├── some-file             // a file with a big size for example
-├── resources
-│ └── config.properties
-└── bin
-  ├── build
-  ├── detect
-  └── foo
-```
-
-And the `linux/arm64` version will be similar but with the `bar` file inside the `bin/` folder, as a consequence, the big file
-will be duplicated on two different layers increasing the space requirements in the registry
-
 ## Builder
 
 Similar to how we did it for the `buildpack package`, lets summaries, our current process to create a **Builder**:
@@ -1005,10 +936,6 @@ Tip: Run pack build <image-name> --builder <builder> to use this builder
 **Output**: We keep our current behavior and detect the `os` and `architecture` from the daemon. Because there is `target` 
 that matches the daemon `os/arch` the builder is being built.
 
-Using `--target` flag against the daemon with a different platform
-
-TODO check if this is possible!
-
 <!--  
 ```bash
 pack builder create <builder> --config ./builder.toml --target linux/arm64
@@ -1091,6 +1018,8 @@ create [image indexes](https://github.com/opencontainers/image-spec/blob/master/
 - What are the intermediate images for each target named/called?
 - What happen if I want to exclude some buildpack for a particular target?
 - What happen if I want to include the same file or folder for every image, do I have to copy then inside the {os}-{arch} folder?
+- Initially we proposed a shared file strategy but, we decided to leave that complexity out of the scope of this RFC and can be 
+revisited later if it required
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
