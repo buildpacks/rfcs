@@ -346,7 +346,7 @@ folder structure in the OCI image for each buildpack package will be:
                 └── package.toml
 ```
 
-On the other hand, When target is `linux/arm64, the **platform root folder** determined is `<buildpack root folder>/linux/arm64`
+On the other hand, When target is `linux/arm64`, the **platform root folder** determined is `<buildpack root folder>/linux/arm64`
 and the output OCI image folder structure looks like:
 ```bash
 .
@@ -384,12 +384,12 @@ let end users know things are changing.
 
 ```bash
 pack buildpack package <buildpack> --config ./package.toml --publish 
-Warning: A new '--target' flag is available to set the platform for the buildpack package, using 'linux/amd64' as default
+Warning: A new '--target' flag is available to set the platform for the buildpack package, using 'linux' as default
 Successfully published package <buildpack> and saved to registry
 
 # Or
 pack buildpack package  <buildpack> --config ./package.toml --format file 
-Warning: A new '--target' flag is available to set the platform for the buildpack package, using 'linux/amd64' as default
+Warning: A new '--target' flag is available to set the platform for the buildpack package, using 'linux' as default
 Successfully created package <buildpack> and saved to file
  ```
 **Output**: pack will create a buildpack package image (as it is doing it today) with the provided binaries and a 
