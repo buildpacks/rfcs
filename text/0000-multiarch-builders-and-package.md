@@ -244,7 +244,7 @@ this will be the way for end-users to specify the platform for which they want t
 # Option 1 - no variant is required
 .
 ├── buildpack.toml                 // mandatory
-├── package.toml                   // mandatory
+├── package.toml
 └── {os}                           // optional
     └── {arch}                     // optional (becomes the platform root folder)
         └── bin
@@ -254,7 +254,7 @@ this will be the way for end-users to specify the platform for which they want t
 # Option 2 - variant is required
 .
 ├── buildpack.toml                  // mandatory
-├── package.toml                    // mandatory
+├── package.toml
 └── {os}                            // optional
     └── {arch}                      // optional
         └── {variant}               // optional
