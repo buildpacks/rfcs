@@ -220,6 +220,7 @@ As a quick summary, our current process to create a buildpack package involves:
 - The end-users defined `os` for the OCI image using the [package.toml](https://buildpacks.io/docs/reference/config/package-config/).
 - The only values allowed are `linux` and `windows` and by default when is not present, `linux` is being used.
 - When exporting to daemon, the `docker.OSType` must be equal to `platform.os`
+- When building a single buildpack package, `package.toml` is optional
 
 ### To keep compatibility 
 
@@ -244,7 +245,6 @@ this will be the way for end-users to specify the platform for which they want t
 # Option 1 - no variant is required
 .
 ├── buildpack.toml                 // mandatory
-├── package.toml
 └── {os}                           // optional
     └── {arch}                     // optional (becomes the platform root folder)
         └── bin
@@ -254,7 +254,6 @@ this will be the way for end-users to specify the platform for which they want t
 # Option 2 - variant is required
 .
 ├── buildpack.toml                  // mandatory
-├── package.toml
 └── {os}                            // optional
     └── {arch}                      // optional
         └── {variant}               // optional
@@ -268,7 +267,6 @@ this will be the way for end-users to specify the platform for which they want t
                     └── detect      // platform dependant binary (mandatory)
 ```
 - `buildpack.toml` file MUST be present at the **buildpack root folder**
-- `package.toml` file MUST be present at the **buildpack root folder**
 - For each platform, Buildpack Authors are responsible for copying or creating symlink or hard link for files into each **platform root folder** 
 
 > **Note**
@@ -285,7 +283,6 @@ Based on the [RFC-0096](https://github.com/buildpacks/rfcs/blob/main/text/0096-r
 os = "<operating system>"
 arch = "<system architecture>"
 variant = "<architecture variant>"
-
 # optional
 path = "<path to look for the binaries if the folder structure convention is not followed>" 
 
@@ -294,11 +291,16 @@ name = "<distribution ID>"
 versions = ["<distribution version>"]
 ```
 - When `more than 1 target is defined`
-  - When `--publish` or `--format file` is specified
+  - When `--publish` is specified
     - For each `target` an OCI image will be created, following these rules
       - `pack` will determine the **platform root folder**, this is the specific root folder for a given `target` (based on the `targets.path` in the buildpack.toml or inferring it from a folder structure similar to the one show above)
       - `pack` will execute the current process to create a buildpack package using the **platform root folder** and the `target` values  
     - If more than 1 OCI image was created, an [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md) will be created to combine them
+  - When `--format file` is specified AND `<file-name>` is the expected name for the `.cnb` file
+    - For each `target` an OCI layout file will be created, following these rules
+      - `pack` will determine the **platform root folder**, this is the specific root folder for a given `target` (based on the `targets.path` in the buildpack.toml or inferring it from a folder structure similar to the one show above)
+      - `pack` will execute the current process to create a buildpack package (.cnb file) using the **platform root folder** and the `target` values
+      - `pack` will saved on disk the `.cnb` file with a name `<file-name>-[os][-arch][-variant]-[name@version].cnb`
   - When `--daemon` is specified
     - `pack` can keep using `docker.OSType` to determine the target `os` and probably can do some validations it the `os` is valid target
 
@@ -312,8 +314,7 @@ Let's suppose the Buildpack Author creates a multi-arch folder structure and wan
 
 ```bash
 .
-├── buildpack.toml
-├── package.toml            
+├── buildpack.toml   
 └── linux
    ├── amd64
    │   └── bin
@@ -342,8 +343,7 @@ folder structure in the OCI image for each buildpack package will be:
                 │    ├── build
                 │    ├── detect
                 │    └── foo         // specific platform binary
-                ├── buildpack.toml
-                └── package.toml
+                └── buildpack.toml
 ```
 
 On the other hand, When target is `linux/arm64`, the **platform root folder** determined is `<buildpack root folder>/linux/arm64`
@@ -359,14 +359,13 @@ and the output OCI image folder structure looks like:
                 │    ├── build
                 │    └── detect
                 ├── buildpack.toml
-                ├── foo
-                └── package.toml
+                └── foo
 ```
 
-#### Buildpacks authors do not use targets AND `platform.os` is not present at `package.toml`
+#### Buildpacks authors do not use targets or the new folder structure
 
-This seems to be the case for [Paketo Buildpacks](https://github.com/paketo-buildpacks/java/blob/main/package.toml) 
-or [Heroku](https://github.com/heroku/buildpacks-jvm/blob/main/meta-buildpacks/java/package.toml), and it represents how `pack` 
+This seems to be the case for [Paketo Buildpacks](https://github.com/paketo-buildpacks/maven) 
+or [Heroku](https://github.com/heroku/buildpacks-jvm/tree/main/buildpacks/maven), and it represents how `pack` 
 will work for most the users when new behavior is implemented
 
 A simplified version of Buildpack Authors folder structures is:
@@ -487,7 +486,7 @@ uri = "<A URL or path to an archive, or a path to a directory>"
 [platform]
 os = "linux"
 ```
-These cases are similar to the previous one, but we the warning message will be changed.
+These cases are similar to the previous one, but the warning message will be changed.
 
 ```bash
 pack buildpack package <buildpack> --config ./package.toml --publish 
@@ -537,8 +536,7 @@ Let's suppose a buildpack folder structure like:
 ├── bin
 │ ├── build
 │ └── detect
-├── buildpack.toml
-└── package.toml
+└── buildpack.toml
 ```
 
 And a `buildpack.toml` with `targets` defined as:
@@ -746,6 +744,50 @@ with a content similar to:
 
 If the Buildpack Author wants to create a single buildpack package they will use the `target` flag, similar to our previous 
 examples.
+
+## Composite Buildpack Package
+
+When packaging a composite buildpack we need a `package.toml` to declare the dependencies, this could be improved and there is an [issue](https://github.com/buildpacks/pack/issues/1082) for it 
+but today the `package.toml` is mandatory on `pack`. Also, it's important to remember that **we can't** use `targets` in the `buildpack.toml` when we also need to declare an `order` so this open
+the question: 
+
+**Where do we define targets for composite buildpacks?**
+The natural answer will be `package.toml`, as it already defines the dependencies, it seems very straight forward to include this section for this particular case. The new schema will look like:
+
+```toml
+[buildpack]
+uri = "<A URL or path to an archive, or a path to a directory. If path is relative, it must be relative to the package.toml>" 
+
+[[targets]]
+os = "<operating system>"
+arch = "<system architecture>"
+variant = "<architecture variant>"
+
+[[targets.distributions]]
+name = "<distribution ID>"
+versions = ["<distribution version>"]
+
+[[dependencies]]
+uri = "<A URL or path to an archive, a packaged buildpack (saved as a .cnb file), or a directory. If path is relative, it must be relative to the package.toml>"
+
+# Deprecated
+[platform]
+os = "<The operating system type that the buildpackage will run on. Only linux or windows is supported. If omitted, linux will be the default.>"
+```
+
+This information will help `pack` to determine a multi-arch composite buildpack is expected, but there is another 
+problem to solve, currently, the dependencies can be located in several places:
+ - OCI Registry
+ - Local file in the filesystem (.cnb) file
+ - Local folder in the filesystem
+ - A .tar.gz file in a remote S3 bucket accessible through HTTPS
+
+**How will pack find the correct artifact for each target?**
+
+For the OCI registry case, we'd expect Buildpack Authors to release multi-arch single buildpacks behind an 
+[image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md) and pulling these dependencies 
+will be a natural process, this will be the **only valid** locator in the `dependencies.uri` in cases where a multi-arch
+composite buildpack is expected to be built.
 
 ## Builder
 
