@@ -3,6 +3,7 @@
 - Name: CNB User Research 2021
 - Start Date: 2020-12-10
 - Author(s): [@sampeinado](@sampeinado)
+- Status: Implemented
 - RFC Pull Request: [rfcs#126](https://github.com/buildpacks/rfcs/pull/126)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

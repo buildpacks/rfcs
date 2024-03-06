@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Buildpack URIs
 - Start Date: 02/07/2020
+- Status: Implemented
 - CNB Pull Request: [rfcs#56](https://github.com/buildpacks/rfcs/pull/56)
 - CNB Issue: (leave blank)
 - Supersedes: "N/A"

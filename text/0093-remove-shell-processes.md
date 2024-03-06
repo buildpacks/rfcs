@@ -3,6 +3,7 @@
 - Name: Remove Shell Processes
 - Start Date: 2021-05-14
 - Author(s): @ekcasey
+- Status: Implemented
 - RFC Pull Request: [rfcs#168](https://github.com/buildpacks/rfcs/pull/168)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/spec#244](https://github.com/buildpacks/spec/issues/244), [buildpacks/spec#245](https://github.com/buildpacks/spec/issues/245), [buildpacks/lifecycle#693](https://github.com/buildpacks/lifecycle/issues/693), [buildpacks/pack#1260](https://github.com/buildpacks/pack/issues/1260), [buildpacks/docs#391](https://github.com/buildpacks/docs/issues/391), [buildpacks/libcnb#70](https://github.com/buildpacks/libcnb/issues/70)
@@ -87,15 +88,12 @@ The following changes have been made:
 - **`direct` has been removed** - all processes are executed directly. If `bash` or `cmd.exe` is required it should be included in `command`. No surprises.
 - **`command` is now an array** - Arguments in `command` *will not* be overwritten if a user provides additional arguments at runtime. `args` are default arguments that *will* be overwritten if a user provides additional arguments at runtime. The makes `command` analogous to `Entrypoint` in the OCI spec and `command` in a Kubernetes PodSpec. `args` is analogous to `cmd` and `args` in docker and Kubernetes respectively.
 
-## Using Environment Variables in a Process
-
-One upside to our previous execution strategy was that it enable users to include environment variable references in arguments that were later evaluated in the container. To preserve this feature we can instead adopt the Kubernetes strategy for [environment variables interpolation](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#using-environment-variables-inside-of-your-config). If a buildpack or user includes `$(<env>)` in the `command` or `args` and `<env>` is the name of an environment variable set in the launch environment, the launcher will replace this string with the value of the environment variable after apply buildpack-provided env modifications and before launching the process.
-
 
 # How it Works
 [how-it-works]: #how-it-works
 
 ## Buildpack-provided process types
+
 ### Example 1 - A Shell Process
 The Paketo .Net Execute Buildpack may generates shell processes similar to the following:
 ```
@@ -109,12 +107,11 @@ NOTE: the buildpack API used by this buildpack (`0.5`) predates the introduction
 Using the new API this process could look like:
 ```
 [[processes]]
-type = "web"
-command = ["dotnet", "my-app.dll", "--urls", "http://0.0.0.0:$(PORT)"] # the default value of PORT would need to be provided in a layer
+type = "bash"
+command = ["bash", "-c", "dotnet", "my-app.dll", "--urls", "http://0.0.0.0:${PORT:-8080}"]
 default = true
 ```
 Things to note:
-* In the above example I have eliminated the dependency on Bash instead of explicitly adding it to the command, because it is likely unnecessary.
 * If the buildpack authors believed that `--urls` should be overridable they could set move the last two arguments from `command` to `args`.
 
 ### Example 2 - A Script Process
@@ -138,39 +135,9 @@ command = ["bash", "-c", "pre-start.sh && nodejs server.js && post-start.sh"]
 default = false
 ```
 
-## User Provided Processes
+## User-provided process types
 
-Currently if the user can specify a custom process dynamically at runtime by setting the container entrypoint to `launcher` directly rather than using a symlink to the launcher, the providing a custom `cmd`. This custom command is executed directly if `cmd` is an array and the first element is `--`. Otherwise the custom command is assumed to be a shell process. In the interest of removing complexity we should do away with the special `--` argument and execute all custom commands directly. 
-
-### Example 1 - A Direct process
-The follow direct commands:
-```
-docker run --entrypoint launcher <image> -- env
-docker run --entrypoint launcher <image> -- echo hello '$WORLD' 
-```
-will become the following, using the new platform API
-```
-docker run --entrypoint launcher <image> env
-docker run --entrypoint launcher <image> echo hello '$(WORLD)'
-```
-Previously, in the second command in this example, `$WORLD` would not have been interpolated because this is a direct process; instead the output would include the literal string `$WORLD`. With the changes proposed, `$(WORLD)` will now be evaluated, even though the process is direct.
-
-### Example 2 - A Shell Process
-The follow custom shell command:
-```
-docker run --entrypoint launcher <image> echo hello '${WORLD}'
-docker run --entrypoint launcher <image> echo hello '${WORLD:-world}'
-```
-will become the following, using the new platform API
-```
-docker run --entrypoint launcher <image> echo hello '$(WORLD)'
-docker run --entrypoint launcher <image> bash -c 'echo hello "${WORLD:-world}"'
-```
-The first command in this example needed to adopt the new environment variable syntax to behave as expected with the new API. Previously it was necessary to use a shell process in order to evaluate `${WORLD}`. Now, the shell is unnecessary.
-
-If the user wishes, they may explicitly invoke a shell and let Bash handle the interpolation, which provides a richer feature set.
-
-### Example 3 - A Script Process
+### Example 1 - A Script Process
 The follow custom script command:
 ```
 docker run --entrypoint launcher <image> 'for opt in $JAVA_OPTS; do echo $opt; done'
@@ -179,35 +146,6 @@ will become the following, using the new platform API
 ```
 docker run --entrypoint launcher <image> bash -c 'for opt in $JAVA_OPTS; do echo $opt; done'
 ```
-
-### Example 4 - A Script Process in Kubernetes
-
-Because we have adopted the Kubernetes environment variable notation here, users may need to escape some references in their PodSpec in specific situations. This is necessary only if all of the following are true:
-* The user is providing a `command` or `args` which contain an environment variable reference.
-* The variable is explicitly initialized in the `env` section of the PodSpec.
-* The user wishes for the variable to be interpolated **after** build-provided env modifications have been applied.
-
-```
-apiVersion: v1
-kind: Pod
-metadata:
-  name: env-example
-spec:
-  containers:
-  - name: env-print-demo
-    image: bash
-    env:
-    - name: IN_CONTAINER_1
-      value: "k8s-val"
-    - name: IN_K8S
-      value: "val2"
-    command: ["bash", "-c", "echo $$(IN_CONTAINER_1)) $(IN_CONTAINER_2) $(IN_K8S) ${IN_BASH}"]
-```
-In the above example the environment variables will be interpolated as follows:
-- `$IN_CONTAINER` - Interpolated by the launcher after buildpack-provided modifications (e.g. `k8s-val:buildpack-appended-val`)
-- `$IN_CONTAINER_2` - Interpolated by the launcher after buildpack-provided modifications. No escaping is required here because `$IN_CONTAINER_2` is not set in `env`.
-- `$IN_K8S` - Interpolated by Kubernetes before the container runs. Buildpack-provided modifications will not affect the resulting value.
-- `$IN_BASH` - Interpolated by Bash.
 
 ## What About Profile Scripts?
 
@@ -294,7 +232,6 @@ we would convert it to the following in `metadata.toml`
 type = "hi"
 command = ["echo", "hello", "world"]
 args = []
-api = "0.5"
 direct = true
 ```
 This spares users from having to learn about the differences between buildpack APIs in order to predict how additional arguments will behave.
@@ -318,7 +255,6 @@ It should be converted to the following in `metadata.toml`
 type = "hi"
 command = ["echo", "hello", "${WORLD:-world}"]
 args = []
-api = "0.5"
 direct = false
 ```
 
@@ -338,7 +274,6 @@ When migrating to the new API, buildpack authors should take the following steps
 1. Does the buildpack contribute a `direct=false` process? If so, there are two options:
    1. Explicitly add `bash` or `cmd` to the process definition, this is the safest path forward.
    2. Remove an unnecessary dependency on  `bash` or `cmd` by:
-        * Changing any environment variable references to use the `$(<env)` syntax.
         * Ensure that your process functions properly as PID1.
 
 ## Platform Maintainers
@@ -352,30 +287,6 @@ In exchange for a reduction in complexity and cognitive overhead buildpack-autho
 
 # Alternatives
 [alternatives]: #alternatives
-
-## `$((<env>))` syntax
-
-We could use our own explicit syntax like `$((<env>))` or environment variable replacements instead of `$(<env>)`.
-
-pros:
-* Extremely explicit
-* There is never any need to escape values in k8s
-* Eliminates all conflicts or situations where the evaluation order must be explained
-
-cons:
-* A third syntax
-* A buildpack-specific syntax that users must learn about through documentation
-
-## `${<env>}` syntax
-We could use Bash-like `${<env>}` syntax for environment variable replacements instead of `$(<env>)`.
-
-pros:
-* It might "just work" in a lot of cases
-* Familiar
-
-cons:
-* The launcher might evaluate env vars that were truly intended for Bash to evaluate (e.g. in a command like `["bash", "-c", "source foo-setter.sh && echo ${FOO}"]`)
-* Users might reasonably expect things like `$FOO` or `${FOO:-dafault-foo}` to work and discover the limitations only via trial and error or documentation.
 
 ## Lifecycle support for `<app>/.exec`
 When we remove support for `<app>/.profile` we could add support for `<app>/.exec` or similar where `<app>/.exec` must implement the `exec.d` interface.
@@ -425,15 +336,7 @@ However, things get very complicated if we explicitly source profiles or shell e
 
 The Paketo Java buildpacks have already converted an extensive collection of profile script to exec.d binaries and converted all processes to direct processes in order to support minimal stacks like `io.paketo.stacks.tiny` and to provide users with more intuitive argument handling.
 
-The Procfile interface is supported by Paketo, Heroku, and Google buildpacks, demonstrating that it is possible to have a consistent interface across buildpack ecosystems without building direct support for that interface in the lifecycle. 
-
-# Unresolved Questions
-[unresolved-questions]: #unresolved-questions
-
-Do we need to provide a mechanism for turning `$(env)` interpolation off? E.g.
-```
-docker run --env "CNB_INTERPOLATE=false" --entrypoint launcher <image> echo hello '${WORLD}' # prints "hello '$(WORLD)'"
-```
+The Procfile interface is supported by Paketo, Heroku, and Google buildpacks, demonstrating that it is possible to have a consistent interface across buildpack ecosystems without building direct support for that interface in the lifecycle.
 
 
 # Spec. Changes
@@ -473,3 +376,28 @@ command = ["<command>"]
 args = ["<arguments>"]
 default = false
 ```
+
+# History
+[history]: #history
+
+## Amended
+### Meta
+[meta-1]: #meta-1
+- Name: Removed references to custom env templating
+- Start Date: 2022-12-02
+- Author(s): natalieparellano
+- Amendment Pull Request: (leave blank)
+
+### Summary
+
+As this is a breaking change, we decided to do this in a separate (yet to be created) RFC.
+
+Created issue: #258
+
+In addition to the changes described originally in 0093 we'd like some way of versioning the launcher interface, to avoid surprising end-users.
+
+### Motivation
+
+Why was this amendment necessary?
+
+The RFC text should reflect what was actually implemented / agreed upon to avoid confusion.

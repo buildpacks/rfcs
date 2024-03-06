@@ -45,12 +45,13 @@ Once an RFC has been accepted, the sub-team maintainers should:
 Once an `issues-created/<sub-team>` label has been created for each sub-team, the RFC is ready to merge. The team member who merges the pull request should do the following:
 
 1. Assign an id based off the pull request number.
-1. Rename the file based off the ID inside `text/`.
-1. Fill in the remaining metadata at the top.
-1. Commit everything.
-1. Update issues with RFC ID and a link to the text file.
-1. Update any links in PR description to point at the committed file.
-1. Remove the "Final Comment Period" label.
+2. Rename the file based off the ID inside `text/`.
+3. Fill in the remaining metadata at the top.
+4. Commit everything.
+5. Update issues with RFC ID and a link to the text file.
+6. Update any links in PR description to point at the committed file.
+7. Remove the "status/voting" label.
+8. Create a [tracking issue](https://github.com/buildpacks/rfcs/issues/new?assignees=&labels=type%2Ftracking&template=tracking.md&title=%5BRFC+%23%3CINSERT+RFC+NUMBER+-+e.g.%2C+0099%3E%5D+-+%3CINSERT+RFC+TITLE%3E).
 
 ## Automation
 
@@ -60,4 +61,6 @@ The `merge-rfc.sh` script automates several steps of the merge process for accep
 ```
 Each `<issue>` should be of the form `<org>/<repo>#<number>` (e.g. `buildpacks/spec#1`). In the rare case that no work must be done in the project as a result of the RFC pass the `-n` flag to explicitly indicate that no issues should be linked.
 
-After running the `merge-rfc.sh` script, manually verify the output before pushing changes.
+After running the `merge-rfc.sh` script:
+* Manually verify the output before pushing changes.
+* Create a [tracking issue](https://github.com/buildpacks/rfcs/issues/new?assignees=&labels=type%2Ftracking&template=tracking.md&title=%5BRFC+%23%3CINSERT+RFC+NUMBER+-+e.g.%2C+0099%3E%5D+-+%3CINSERT+RFC+TITLE%3E).

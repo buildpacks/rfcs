@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Spec API branches
 - Start Date: 2020-01-27
+- Status: Implemented
 - CNB Pull Request: [rfcs#49](https://github.com/buildpacks/rfcs/pull/49)
 - CNB Issue:
 - Supersedes: N/A

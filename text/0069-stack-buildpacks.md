@@ -3,6 +3,7 @@
 - Name: Stack Buildpacks
 - Start Date: 2020-08-27
 - Author(s): [@jkutner](@jkutner)
+- Status: Superseded
 - RFC Pull Request: [rfcs#111](https://github.com/buildpacks/rfcs/pull/111)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/spec#177](https://github.com/buildpacks/spec/issues/177), [buildpacks/spec#178](https://github.com/buildpacks/spec/issues/178), [buildpacks/spec#170](https://github.com/buildpacks/spec/issues/170), [buildpacks/lifecycle#501](https://github.com/buildpacks/lifecycle/issues/501), [buildpacks/pack#1021](https://github.com/buildpacks/pack/issues/1021)

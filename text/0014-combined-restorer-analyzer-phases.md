@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Lifecycle cache contract changes.
 - Start Date: 2019-08-02
+- Status: Implemented
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: N/A

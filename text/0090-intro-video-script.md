@@ -3,6 +3,7 @@
 - Name: Intro video script
 - Start Date: 2021-05-18
 - Author(s): yaelharel
+- Status: Implemented
 - RFC Pull Request: (leave blank)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

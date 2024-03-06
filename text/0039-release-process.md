@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Release Process
 - Start Date: 2019-11-18
+- Status: Implemented
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)

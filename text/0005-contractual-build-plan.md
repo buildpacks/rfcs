@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Contractual Build Plan
 - Start Date: 2019-04-12
+- Status: Implemented
 - CNB Pull Requests: [rfcs#12](https://github.com/buildpacks/rfcs/pull/12), [spec#52](https://github.com/buildpacks/spec/pull/52), [lifecycle#149](https://github.com/buildpacks/lifecycle/pull/149)
 - CNB Issues: (lifecycle issues to follow)
 

@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: RFC template changes
 - Start Date: 2020-02-03
+- Status: Implemented
 - CNB Pull Request: [rfcs#52](https://github.com/buildpacks/rfcs/pull/52)
 - CNB Issue: (leave blank)
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)

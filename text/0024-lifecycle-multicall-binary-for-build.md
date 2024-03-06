@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Lifecycle as a multicall binary for build phases
 - Start Date: 01/21/2020
+- Status: Implemented
 - CNB Pull Request: [rfcs#45](https://github.com/buildpacks/rfcs/pull/45)
 - CNB Issue: (leave blank)
 - Supersedes: "N/A"

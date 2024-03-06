@@ -3,7 +3,7 @@
 - Name: Add Status to RFC Metadata
 - Start Date: 2021-07-14
 - Author(s): @aemengo, @ekcasey
-- Status: Draft Approved
+- Status: Implemented
 - RFC Pull Request: [rfcs#177](https://github.com/buildpacks/rfcs/pull/177)
 - CNB Pull Request: (leave blank)
 - CNB Issue: [buildpacks/rfcs#183](#https://github.com/buildpacks/rfcs/issues/183)
@@ -70,6 +70,12 @@ Since the approval of this RFC additional concerns X, Y, and Z have been raised.
 
 If at a later date the core team or responsible sub-team wishes to move the RFC from "On Hold" back to "Approved", this should be done via PR and another note should be added, describing the resolution of the discussion and the rationale for proceeding with the original RFC.
 
+When an RFC is fully implemented (i.e., the associated tracking issue is closed), then change is reflected like so:
+
+```
+- Status: Implemented
+```
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -90,10 +96,33 @@ If at a later date the core team or responsible sub-team wishes to move the RFC 
 [unresolved-questions]: #unresolved-questions
 
 - Should **"Implemented"** be one of the accepted values?
-    - Perhaps, but then what's the process of keeping the _Implemented_ status in sync?
+    - Yes, the RFC shepherd should create a PR updating the status from `Approved` to `Implemented` when the tracking issue is closed.
 
 - How do we retroactively add a **Status:** field to prior RFCs?
     - Manually?
 
 - How do we validate the [#meta](#meta) section of prior RFCs?
     - Perhaps we make a [../validate-rfcs.sh](../validate-rfcs.sh) script that lints the **#meta** section of all rfcs?
+
+# History
+[history]: #history
+
+## Amended
+### Meta
+[meta-1]: #meta-1
+- Name: Add Implemented
+- Start Date: 2022-12-01
+- Author(s): natalieparellano
+- Amendment Pull Request: (leave blank)
+
+### Summary
+
+Added `Implemented` as a valid status.
+
+### Motivation
+
+Why was this amendment necessary?
+
+It can be confusing when reviewing older RFCs to know if they were implemented or not.
+This can lead to RFCs being "forgotten".
+The introduction of [tracking issues](https://github.com/buildpacks/rfcs/blob/main/.github/ISSUE_TEMPLATE/tracking.md) to our process can help ensure that the status gets updated appropriately.

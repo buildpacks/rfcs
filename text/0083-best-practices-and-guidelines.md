@@ -3,6 +3,7 @@
 - Name: Best practices and guidelines for Cloud Native Buildpacks
 - Start Date: 2021-03-29
 - Author(s): [@samj1912](https://github.com/samj1912)
+- Status: Implemented
 - RFC Pull Request: [rfcs#150](https://github.com/buildpacks/rfcs/pull/150)
 - CNB Pull Request: (leave blank)
 - CNB Issue: N/A

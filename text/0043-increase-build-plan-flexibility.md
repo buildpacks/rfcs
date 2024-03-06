@@ -3,6 +3,7 @@
 - Name: Increase Build Plan Flexibility
 - Start Date: 2020-05-28
 - Author(s): nebhale
+- Status: Implemented
 - RFC Pull Request: [rfcs#82](https://github.com/buildpacks/rfcs/pull/82)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

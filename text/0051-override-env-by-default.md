@@ -3,6 +3,7 @@
 - Name: Override Env Vars by Default
 - Start Date: 2020-07-26
 - Author(s): @sclevine
+- Status: Implemented
 - RFC Pull Request: [rfcs#98](https://github.com/buildpacks/rfcs/pull/98)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

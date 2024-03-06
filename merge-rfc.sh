@@ -55,7 +55,7 @@ require_command issues-generation
 if [[ -z "${GITHUB_TOKEN:-}" ]]; then
   require_command op
   echo "> Pulling GitHub token from vault..."
-  GITHUB_TOKEN=$(op get item 7xorpxvz3je3vozqg3fy3wrcg4 --vault "Shared" --account buildpacks | jq -r '.details.sections[] | select(.fields).fields[] | select(.t == "credential").v')
+  GITHUB_TOKEN=$(op read op://Shared/7xorpxvz3je3vozqg3fy3wrcg4/credential --account buildpacks)
 fi
 
 ####
@@ -146,7 +146,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 sed $SEDOPTION "s|- RFC Pull Request:.*|- RFC Pull Request: [${REPO}#${PR_NUMBER}](https://github.com/${OWNER}/${REPO}/pull/${PR_NUMBER})|" "${SOURCE_DOC}"
 sed $SEDOPTION "s|- CNB Issue:.*|- CNB Issue: $ISSUES_TEXT|" "${SOURCE_DOC}"
-sed $SEDOPTION "s|- State:.*|- State: **Approved**|" "${SOURCE_DOC}"
+sed $SEDOPTION "s|- Status:.*|- Status: Approved|" "${SOURCE_DOC}"
 
 echo "> Moving ${SOURCE_DOC} to ${TARGET_DOC}..."
 git mv "${SOURCE_DOC}" "${TARGET_DOC}"

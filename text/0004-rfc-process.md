@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: RFC Process
 - Start Date: 2019-04-09
+- Status: Superseded
 - CNB Pull Request: [rfcs#1](https://github.com/buildpacks/rfcs/pull/1), [rfcs#7](https://github.com/buildpacks/rfcs/pull/7)
 - CNB Issue: (leave blank)
 - Supersedes: N/A

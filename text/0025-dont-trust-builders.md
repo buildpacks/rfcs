@@ -2,6 +2,7 @@
 [meta]: #meta
 - Name: Isolate Registry Credentials from Builder Images
 - Start Date: 2020-01-14
+- Status: Implemented
 - CNB Pull Request: [rfcs#43](https://github.com/buildpacks/rfcs/pull/43)
 - CNB Issue:
 - Supersedes: N/A

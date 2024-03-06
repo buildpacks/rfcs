@@ -3,6 +3,7 @@
 - Name: `pack` Image Pull Policy
 - Start Date: 2020-05-21
 - Author(s): [Javier Romero](https://github.com/jromero)
+- Status: Implemented
 - RFC Pull Request: [rfcs#80](https://github.com/buildpacks/rfcs/pull/80)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

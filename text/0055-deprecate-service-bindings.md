@@ -3,6 +3,7 @@
 - Name: Deprecate Bindings Extension Specification
 - Start Date: 2020-08-06
 - Author(s): @nebhale
+- Status: Implemented
 - RFC Pull Request: [rfcs#105](https://github.com/buildpacks/rfcs/pull/105)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

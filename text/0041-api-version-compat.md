@@ -3,6 +3,7 @@
 - Name: Lifecycle API version support changes
 - Start Date: 2020-05-14
 - Author(s): [Emily Casey](https://github.com/ekcasey)
+- Status: Implemented
 - RFC Pull Request: [rfcs#79](https://github.com/buildpacks/rfcs/pull/79)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)

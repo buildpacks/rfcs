@@ -3,6 +3,7 @@
 - Name: Move analyze phase
 - Start Date: 2021-01-13
 - Author(s): [@jkutner](github.com/jkutner/) [@jabrown85](github.com/jabrown85)
+- Status: Implemented
 - RFC Pull Request: [rfcs#135](https://github.com/buildpacks/rfcs/pull/135)
 - CNB Pull Request: [buildpacks/spec#172](https://github.com/buildpacks/spec/pull/172)
 - CNB Issue: [buildpacks/spec#194](https://github.com/buildpacks/spec/issues/194), [buildpacks/lifecycle#530](https://github.com/buildpacks/lifecycle/issues/530), [buildpacks/pack#1078](https://github.com/buildpacks/pack/issues/1078), [buildpacks/docs#302](https://github.com/buildpacks/docs/issues/302)

@@ -3,6 +3,7 @@
 - Name: Launcher Arguments
 - Start Date: 2020-06-02
 - Author(s): nebhale ekcasey
+- Status: Superseded
 - RFC Pull Request: [rfcs#84](https://github.com/buildpacks/rfcs/pull/84)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
