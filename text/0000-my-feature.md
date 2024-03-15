@@ -40,7 +40,7 @@ This provides a high level overview of the feature.
 # How it Works
 [how-it-works]: #how-it-works
 
-Ideally, the user should run something like `pack detect --path ./path/to/project --builder builder:name` and it should run only the detect binary in the lifecycle and output the logs / output of it. Preferrably, can also output the `group.toml` to a directory specified with `--detect-output-dir`.
+Ideally, the user should run something like `pack detect --path ./path/to/project --builder builder:name` and it should run the analyze binary, followed by the detect binary in the lifecycle and output the logs / output of it. Preferrably, can also output the `group.toml` to a directory specified with `--detect-output-dir`. The reason to run the analyze binary is to get information about the run image that may impact the outcome of detect via CNB_TARGET_* environment variables.
 
 The following flags should be supported and they will work more or less like `pack build`.
 
@@ -49,14 +49,24 @@ The following flags should be supported and they will work more or less like `pa
 |-B |--builder|string|
 |-b |--buildpack|strings|
 |-r |--buildpack-registry|string|
+||--detect-output-dir|string|
+|-d|--descriptor|string|
+||--docker-host|string|
 |-e|--env|stringArray|
 ||--env-file|stringArray|
 ||--extension|strings|
+||--gid|int|
 |-h|--help|
+||--lifecycle-image|string|
+||--network|string|
 |-p|--path|string|
 ||--post-buildpack|stringArray|
 ||--pre-buildpack|stringArray|
-||--detect-output-dir|string|
+||--pull-policy|string|
+||--run-image|string|
+||--uid|int|
+||--workspace|string|
+
 
 # Migration
 [migration]: #migration
