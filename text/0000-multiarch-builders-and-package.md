@@ -1,6 +1,6 @@
 # Meta
 [meta]: #meta
-- Name: Multi-arch support for builders and buildpack packages
+- Name: Multi-platform support for builders and buildpack packages
 - Start Date: 2023-09-14
 - Author(s): @jjbustamante
 - Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
@@ -12,7 +12,7 @@
 # Summary
 [summary]: #summary
 
-The problem for adding support for multi-arch buildpacks can be divided into three parts:
+The problem for adding support for multi-platform buildpacks can be divided into three parts:
 1. Support buildpack authors to **migrate their existing buildpacks** to support multiple operating systems, architectures, variants and distros.
 2. Support buildpack authors to **create new buildpacks and builders** that handle multi-arch from the beginning.
 3. Support application developers to **create application images** using multi-arch buildpacks and builders.
@@ -240,7 +240,7 @@ this will be the way for end-users to specify the platform for which they want t
 
 - Add `targets` section to `buildpack.toml` to help Buildpack Authors to include support for new platforms without having to update their `pack buildpack package` command in their CI/CD pipelines
 
-- A new folder structure to organize the buildpacks binaries for multi-arch images, similar to this one:
+- A new folder structure to organize the buildpacks binaries for multi-platform images, similar to this one:
 ```bash
 # Option 1 - no variant is required
 .
@@ -310,7 +310,7 @@ Let's use some examples to explain the expected behavior in different use cases
 
 #### How to determine the platform root folder
 
-Let's suppose the Buildpack Author creates a multi-arch folder structure and wants to create multiple buildpack packages
+Let's suppose the Buildpack Author creates a multi-platform folder structure and wants to create multiple buildpack packages
 
 ```bash
 .
@@ -432,7 +432,7 @@ what about creating a multi-platform image for several targets?
 
 ```bash
 pack buildpack package <buildpack> --config ./package.toml --publish --target linux/arm64 --target linux/amd64
-A multi-arch buildpack package will be created for target platforms: 'linux/amd64', 'linux/arm64'
+A multi-platform buildpack package will be created for: 'linux/amd64', 'linux/arm64'
 Successfully published package <buildpack> and saved to registry
 
 # Or
@@ -693,7 +693,7 @@ id = "*"
 When Buildpack Authors want to create a multi-arch images, they can execute the following command:
 ```bash
 pack buildpack package <buildpack> --config ./package.toml --publish
-Info: A multi-arch buildpack package will be created for target platforms: 'linux/amd64', 'linux/arm64', 'windows/amd64'
+Info: A multi-platform buildpack package will be created for targets: 'linux/amd64', 'linux/arm64', 'windows/amd64'
 Successfully published package <buildpack> and saved to registry
 ```
 A fully multi-arch buildpack will be created automatically, because we have more than one target defined
@@ -1002,7 +1002,7 @@ What about multi-architecture builders?
 
 ```bash
 pack builder create <builder> --config ./builder.toml --publish 
-Info: A multi-arch builder will be created for targets platform: 'linux/amd64', 'linux/arm64'
+Info: A multi-platform builder will be created for targets: 'linux/amd64', 'linux/arm64'
 Successfully created builder image <builder>
 Tip: Run pack build <image-name> --builder <builder> to use this builder
 ```
@@ -1014,7 +1014,7 @@ pack builder create <builder> --config ./builder.toml  \
            --target linux/amd64 \ 
            --target linux/arm64 \ 
            --publish
-Info: A multi-arch builder will be created for targets platform: 'linux/amd64', 'linux/arm64'
+Info: A multi-platform builder will be created for targets: 'linux/amd64', 'linux/arm64'
 Successfully created builder image <builder>
 Tip: Run pack build <image-name> --builder <builder> to use this builder
 ```
