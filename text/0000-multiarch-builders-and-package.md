@@ -13,7 +13,7 @@
 [summary]: #summary
 
 The problem for adding support for multi-arch buildpacks can be divided into three parts:
-1. Support buildpack authors to **migrate their existing buildpacks** to support multi-arch.
+1. Support buildpack authors to **migrate their existing buildpacks** to support multiple operating systems, architectures, variants and distros.
 2. Support buildpack authors to **create new buildpacks and builders** that handle multi-arch from the beginning.
 3. Support application developers to **create application images** using multi-arch buildpacks and builders.
 
@@ -235,7 +235,7 @@ a new `--target` flag is available and how to use it, or some helpful informatio
 ### To improve user experience
 
 We propose:
-- Add a new `--target` flag with the follwing format `[os][/arch][/variant]:[name@version]` to build for a particular target, once the `platform.os` field is removed, 
+- Add a new `--target` flag using the format `[os][/arch][/variant]:[name@version]` to build for a particular target, once the `platform.os` field is removed, 
 this will be the way for end-users to specify the platform for which they want to create single OCI artifact.
 
 - Add `targets` section to `buildpack.toml` to help Buildpack Authors to include support for new platforms without having to update their `pack buildpack package` command in their CI/CD pipelines
@@ -248,8 +248,8 @@ this will be the way for end-users to specify the platform for which they want t
 └── {os}                           // optional
     └── {arch}                     // optional (becomes the platform root folder)
         └── bin
-            ├── build              // platform dependant binary (mandatory)
-            └── detect             // platform dependant binary (mandatory)
+            ├── build              // platform dependent binary (mandatory)
+            └── detect             // platform dependent binary (mandatory)
 
 # Option 2 - variant is required
 .
@@ -259,22 +259,22 @@ this will be the way for end-users to specify the platform for which they want t
         └── {variant}               // optional
             ├── {name@version-1}    // optional  (becomes the platform root folder)
             │   └── bin
-            │       ├── build       // platform dependant binary (mandatory)
-            │       └── detect      // platform dependant binary (mandatory)
+            │       ├── build       // platform dependent binary (mandatory)
+            │       └── detect      // platform dependent binary (mandatory)
             └── {name@version-2}    // optional (becomes the platform root folder)
                 └── bin
-                    ├── build       // platform dependant binary (mandatory)
-                    └── detect      // platform dependant binary (mandatory)
+                    ├── build       // platform dependent binary (mandatory)
+                    └── detect      // platform dependent binary (mandatory)
 ```
-- `buildpack.toml` file MUST be present at the **buildpack root folder**
+- `buildpack.toml` file MUST be present in the **buildpack root folder**
 - For each platform, Buildpack Authors are responsible for copying or creating symlink or hard link for files into each **platform root folder** 
 
 > **Note**
 > For cross-compile buildpacks like Paketo, it looks easy to add a step to their Makefile to compile and separate the binaries following this structure. It is important to mention
 > that the final buildpack image will not change, this will only change the buildpack structure from `pack` perspective
 
-In case, this folder structure is not suitable for Buildpack Authors, **we propose** a new `path` attribute to be included 
-into the `target` section of the `buildpack.toml` to specify where the **buildapck root directoy** is located in the filesystem.
+In case this folder structure is not suitable for Buildpack Authors, **we propose** a new `path` attribute to be included 
+in the `targets` section of the `buildpack.toml`, to specify where the **buildpack root directory** is located in the filesystem.
 
 Based on the [RFC-0096](https://github.com/buildpacks/rfcs/blob/main/text/0096-remove-stacks-mixins.md) the new `buildpack.toml` schema will look like this:
 
@@ -428,7 +428,7 @@ platform:
 > Pack will assume the binaries are appropriate for the given target platform, what the flag is doing is expose a mechanism
 > to update the metadata present in the OCI config file
 
-what about creating a multi-arch image for several target platforms?
+what about creating a multi-platform image for several targets?
 
 ```bash
 pack buildpack package <buildpack> --config ./package.toml --publish --target linux/arm64 --target linux/amd64
@@ -464,7 +464,7 @@ will be similar to:
       "digest": "sha256:2589fe6bcf90466564741ae0d8309d1323f33b6ec8a5d401a62d0b256bcc3c37",
       "mediaType": "application/vnd.oci.image.manifest.v1+json",
       "platform": {
-        "architecture": "arm",
+        "architecture": "arm64",
         "os": "linux"
       },
       "size": 424
@@ -817,7 +817,7 @@ We propose:
 
 - Add `targets` section to the `builder.toml` schema, this will keep consistency for end-users to understand how to 
 define multi-architecture. Adding more than one target to the `builder.toml` will be considered by `pack` as an 
-acknowledgement of the desired to generate multi-arch [Builders](https://buildpacks.io/docs/concepts/components/builder/).  
+acknowledgement of the desire to generate [Builders](https://buildpacks.io/docs/concepts/components/builder/) with multiple platform targets.  
 
 The new schema will be
 similar to:
@@ -1056,7 +1056,7 @@ create [image indexes](https://github.com/opencontainers/image-spec/blob/master/
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- If I already have an [image indexe](https://github.com/opencontainers/image-spec/blob/master/image-index.md) created and I want to add support for new plaform, how do I do it?
+- How would I add support for a new platform to an existing [image index](https://github.com/opencontainers/image-spec/blob/master/image-index.md)?
 - What are the intermediate images for each target named/called?
 - What happen if I want to exclude some buildpack for a particular target?
 - What happen if I want to include the same file or folder for every image, do I have to copy then inside the {os}-{arch} folder?
