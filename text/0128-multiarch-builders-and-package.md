@@ -3,10 +3,10 @@
 - Name: Multi-platform support for builders and buildpack packages
 - Start Date: 2023-09-14
 - Author(s): @jjbustamante
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#295](https://github.com/buildpacks/rfcs/pull/295)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: N/A
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
