@@ -95,9 +95,9 @@ arch = "arm64"
 os = "windows"
 arch = "amd64"
 
-[[targets.distributions]]
+[[targets.distros]]
 name = "windows"
-versions = ["10.0.20348.1970"]
+version = "10.0.20348.1970"
 
 # Stacks (deprecated) the buildpack will work with
 [[stacks]]
@@ -286,9 +286,9 @@ variant = "<architecture variant>"
 # optional
 path = "<path to look for the binaries if the folder structure convention is not followed>" 
 
-[[targets.distributions]]
+[[targets.distros]]
 name = "<distribution ID>"
-versions = ["<distribution version>"]
+version = "<distribution version>"
 ```
 - When `more than 1 target is defined`
   - When `--publish` is specified
@@ -681,9 +681,9 @@ arch = "arm64"
 os = "windows"
 arch = "amd64"
 
-[[targets.distributions]]
+[[targets.distros]]
 name = "windows"
-versions = ["10.0.20348.1970"]
+version = "10.0.20348.1970"
 
 # Stacks (deprecated) the buildpack will work with
 [[stacks]]
@@ -763,9 +763,9 @@ os = "<operating system>"
 arch = "<system architecture>"
 variant = "<architecture variant>"
 
-[[targets.distributions]]
+[[targets.distros]]
 name = "<distribution ID>"
-versions = ["<distribution version>"]
+version = "<distribution version>"
 
 [[dependencies]]
 uri = "<A URL or path to an archive, a packaged buildpack (saved as a .cnb file), or a directory. If path is relative, it must be relative to the package.toml>"
@@ -843,9 +843,9 @@ image = "<build image reference>"
 os = "<operating system>"
 arch = "<system architecture>"
 variant = "<architecture variant>"
-[[targets.distributions]]
+[[targets.distros]]
 name = "<distribution ID>"
-versions = ["<distribution version>"]
+version = "<distribution version>"
 ```
 - Add a new `--target` optional flag with format `[os][/arch][/variant]:[name@version]` to create a builder for a 
 particular target, this will help end-users to specify the platform for which they want to create single OCI artifact.
