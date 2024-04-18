@@ -99,6 +99,8 @@ This metadata is written to the [`lifecycle.metadata` label](https://github.com/
 
 These values are written to image labels. And they are among values that `pack inspect` returns.
 
+`report.toml` was introduced in [RFC 0040](/text/0040-export-report.md). That RFC includes some context for why `report.toml` exists.
+
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
