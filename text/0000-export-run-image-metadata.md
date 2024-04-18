@@ -12,7 +12,13 @@
 # Summary
 [summary]: #summary
 
-The `report.toml` file created by the lifecycle exporter and rebaser should include `run-image.image`, `run-image.reference`, and `run-image.top-layer`. These values are not necessarily known prior to export or rebase they can be critical to a platform rebase process.
+The `report.toml` file created by the lifecycle exporter and rebaser should include the following properties:
+- `run-image.image`
+- `run-image.mirrors`
+- `run-image.reference`
+- `run-image.top-layer`
+
+These values are not necessarily known prior to export or rebase they can be critical to a platform rebase process.
 
 # Motivation
 [motivation]: #motivation
@@ -37,11 +43,10 @@ tags = ...
 digest = ...
 image-id = ...
 manifest-size = ...
-
-[run-image]
-image = "run/name:foo"
-reference = "index.docker.io/run/name@sha256:94f85561b0976bf1e2bef6b14de92299ebcd4c8148802cf9b217654651e4f416"
-top-layer = "sha256:83ad2f0b091621ce19357e19d853c8be1b8f4d60d99c281fc2db75e0f56df42a"
+run-image.image = "run/name:foo"
+run-image.reference = "index.docker.io/run/name@sha256:94f85561b0976bf1e2bef6b14de92299ebcd4c8148802cf9b217654651e4f416"
+run-image.top-layer = "sha256:83ad2f0b091621ce19357e19d853c8be1b8f4d60d99c281fc2db75e0f56df42a"
+run-image.mirrors = ["<mirror1>", "<mirror2>"]
 ```
 
 #### Image exported to the docker daemon:
@@ -51,11 +56,10 @@ tags = ...
 digest = ...
 image-id = ...
 manifest-size = ...
-
-[run-image]
-image = "run/name:foo"
-reference = "5b90f9c0e189"
-top-layer = "sha256:83ad2f0b091621ce19357e19d853c8be1b8f4d60d99c281fc2db75e0f56df42a"
+run-image.image = "run/name:foo"
+run-image.reference = "5b90f9c0e189"
+run-image.top-layer = "sha256:83ad2f0b091621ce19357e19d853c8be1b8f4d60d99c281fc2db75e0f56df42a"
+run-image.mirrors = ["<mirror1>", "<mirror2>"]
 ```
 
 # How it Works
@@ -105,11 +109,13 @@ N/A
 
 The following would be appended to the [`report.toml` spec](https://github.com/buildpacks/spec/blob/main/platform.md#reporttoml-toml) (this section would be materially identical to the [`lifecycle.metadata` label](https://github.com/buildpacks/spec/blob/main/platform.md#iobuildpackslifecyclemetadata-json)):
 
-> run-image.top-layer MUST contain the uncompressed digest of the top layer of the run-image.
+> runImage.topLayer MUST contain the uncompressed digest of the top layer of the run-image.
 > 
->run-image.reference MUST uniquely identify the run image. It MAY contain one of the following
+> runImage.reference MUST uniquely identify the run image. It MAY contain one of the following
 > - An image ID (the digest of the uncompressed config blob)
 > - A digest reference to a manifest stored in an OCI registry
+>
+> runImage.image and runImage.mirrors MUST be resolved from run.toml from the given <run-image>
 
 # History
 [history]: #history
