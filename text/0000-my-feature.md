@@ -25,6 +25,7 @@ Make a list of the definitions that may be useful for those reviewing. Include p
 - Simplify and streamline the build process by providing a targeted command for buildpack detection.
 - Reduce build times by skipping unnecessary phases of the buildpack lifecycle.
 - Enable developers to quickly identify which buildpacks are applicable to their application without waiting for the entire build process to complete, or having to `Ctrl+C` midway through.
+- Lighter-weight integration testing of the build plan.
 
 # What it is
 [what-it-is]: #what-it-is
