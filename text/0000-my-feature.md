@@ -15,7 +15,7 @@
 
 [summary]: #summary
 
-The `pack detect` command is introduced to the Cloud Native Buildpacks ecosystem, providing a way to run only the detect phase of the buildpack lifecycle. This feature enhances the developer experience by allowing them to quickly determine which buildpacks are relevant for their application without progressing through the entire build process. This was partially discussed in [issue #681](https://github.com/buildpacks/pack/issues/681) but the issue was about implementing a `dry-run` flag. With further discussion with @jjbustamante, decided to go forward with this as a new `pack detect` command rather than a flag.
+The `pack execute` command is introduced to the Cloud Native Buildpacks ecosystem, providing a way to run only selected phases of the buildpack lifecycle. For the moment, only `detect` will be implemented, which will be invoked through `pack execute detect`.This feature enhances the developer experience by allowing them to quickly determine which buildpacks are relevant for their application without progressing through the entire build process. This was partially discussed in [issue #681](https://github.com/buildpacks/pack/issues/681) but the issue was about implementing a `dry-run` flag. With further discussion with @jjbustamante, decided to go forward with this as a new `pack detect` command rather than a flag, and after further review it will be implemented as `pack execute detect`.
 
 # Definitions
 
@@ -27,6 +27,7 @@ Make a list of the definitions that may be useful for those reviewing. Include p
 
 [motivation]: #motivation
 
+- Enable the running of selected phases of buildpacks upon need.
 - Simplify and streamline the build process by providing a targeted command for buildpack detection.
 - Reduce build times by skipping unnecessary phases of the buildpack lifecycle.
 - Enable developers to quickly identify which buildpacks are applicable to their application without waiting for the entire build process to complete, or having to `Ctrl+C` midway through.
@@ -48,7 +49,7 @@ This provides a high level overview of the feature.
 
 [how-it-works]: #how-it-works
 
-Ideally, the user should run something like `pack detect --path ./path/to/project --builder builder:name` and it should run the analyze binary, followed by the detect binary in the lifecycle and output the logs / output of it. Preferrably, can also output the `group.toml` to a directory specified with `--detect-output-dir`. The reason to run the analyze binary is to get information about the run image that may impact the outcome of detect via CNB*TARGET*\* environment variables.
+Ideally, the user should run something like `pack execute detect --path ./path/to/project --builder builder:name` and it should run the analyze binary, followed by the detect binary in the lifecycle and output the logs / output of it. This also copies `group.toml` to a directory specified with `--detect-output-dir`, if the flag was enabled. The reason to run the analyze binary is to get information about the run image that may impact the outcome of detect via CNB*TARGET*\* environment variables.
 
 The following flags should be supported and they will work more or less like `pack build`.
 
@@ -91,12 +92,10 @@ Why should we _not_ do this?
 
 [alternatives]: #alternatives
 
-Initially thought of implementing this through something like `pack build --detect`. But after further discussion with @jjbustamante and for the following reasons, decided to do this functionality to a new command.
+Initially thought of implementing this through something like `pack build --detect`. But after further discussion with @jjbustamante and for the following reasons, decided to do this functionality to a new command. Upon further review, this will be implemented as `pack execute detect ..`
 
 - The main use case of `pack build` is to create OCI images, and detect is just a binary in the lifecycle, so it doesn't make much sense to include it in there.
 - To avoid making the mostly used `pack build` command overly complicated.
-
-Also, instead of `pack detect`, something like `pack execute --phase detect` can also be done, where the user can select exclusively what phase they need to run. Can start by implementing just the `detect` phase.
 
 # Prior Art
 
