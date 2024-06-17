@@ -116,7 +116,7 @@ Discuss prior art, both the good and bad.
 # Unresolved Questions
 [unresolved-questions]: #unresolved-questions
 
-- How will will teach kaniko-style extensions to use the mirrors?
+- How will we teach kaniko-style extensions to use the mirrors?
 - In what situations should `lifecycle` fallback to the original registry if the mirror is unavailable?
 - Should the mirror be put into the metadata at all for SBOM type of reasons? We know it shouldn't be written as the base image, but it could be written to a new key in the metadata.
 
