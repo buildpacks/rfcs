@@ -30,12 +30,14 @@ As a platform operator, we'd like to protect our Cloud Native Buildpack operatio
 Importantly, the presence of a mirror should be invisible outside of the platform. The resulting image should not contain any references to the mirror. This will allow the image to be used in any environment, regardless of whether the mirror is available. For example, the metadata set on the resulting image would reference the original registry URL, not the mirror URL. This will allow the resulting image to be used as if there was no mirror configured. This is important for future actions against the resulting image, such as `pack rebase` or `pack inspect`.
 
 - What use cases does it support?
-If a public registry was having service interruptions, an operator that had a previously configured mirror would be able to continue to build images without interruption.
 
-If a public registry introduced lower rate limits, an operator that had a previously configured mirror would be able to continue to build images without interruption or fear of hitting the rate limit.
+  If a public registry was having service interruptions, an operator that had a previously configured mirror would be able to continue to build images without interruption.
+
+  If a public registry introduced lower rate limits, an operator that had a previously configured mirror would be able to continue to build images without interruption or fear of hitting the rate limit.
 
 - What is the expected outcome?
-Operators concerned with the reliability of their builds that use public images will be able to configure private registry mirrors for the most popular registries.
+
+  Operators concerned with the reliability of their builds that use public images will be able to configure private registry mirrors for the most popular registries.
 
 # What it is
 [what-it-is]: #what-it-is
