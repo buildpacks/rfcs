@@ -3,10 +3,10 @@
 - Name: Export Run Image Metadata
 - Start Date: 2024-04-11
 - Author(s): joeybrown-sf
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
+- RFC Pull Request: https://github.com/buildpacks/rfcs/pull/313
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: https://github.com/buildpacks/lifecycle/issues/1372
 - Supersedes: N/A
 
 # Summary
