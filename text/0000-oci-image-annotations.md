@@ -33,8 +33,8 @@ The outcome will be that users and tools will be able to gather more information
 
 `pack buildpack package` should set the following OCI annotations on the images it produces:
 
-- `org.opencontainers.image.source`
-- `org.opencontainers.image.revision`
+- `org.opencontainers.image.source` (when possible)
+- `org.opencontainers.image.revision` (when possible)
 - `org.opencontainers.image.title`
 - `org.opencontainers.image.version`
 - `org.opencontainers.image.url` (when possible)
