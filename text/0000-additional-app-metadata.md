@@ -27,6 +27,7 @@ Dockerfiles settings for the proposed metadata:
 
 - It is not presently possible to set this metadata using buildpacks.
 - Deploying with Docker or other container orchestrators, the system can use this information to more easily run images.
+- To support Prometheus' or Grafana Agent's Docker Service Discovery. The exposed port will be used to scrape metrics. If you don't expose (or map) your port, the service discovery doesn't find the container.
 
 # What it is
 [what-it-is]: #what-it-is
