@@ -45,7 +45,7 @@ The target personas as buildpack users, platform operators, and platform impleme
 # How it Works
 [how-it-works]: #how-it-works
 
-When building the buildpack, the `pack` tool can get the values for the `org.opencontainers.image.source` and `org.opencontainers.image.revision` annotations from git. `org.opencontainers.image.source` is derived from the git origin and `org.opencontainers.image.revision` is the git commit hash.
+When packaging the buildpack, the `pack` tool can get the values for the `org.opencontainers.image.source` and `org.opencontainers.image.revision` annotations from git. `org.opencontainers.image.source` is derived from the git origin and `org.opencontainers.image.revision` is the git commit hash.
 
 The other annotation values come from `buildpack.toml` mapped to OCI annotations as follows:
 
