@@ -12,7 +12,7 @@
 # Summary
 [summary]: #summary
 
-The `buildpack` tool should set OCI annotations on the OCI artifacts it produces providing users of these buildpacks with a consistent, standard mechanism for gathering information about the buildpack, including how to find its documentation and what version it is. The annotation values can be gathered from existing data sources (such as `buildpack.toml`) therefore not requiring any additional effort on the part of users of the `buildpack` tool.
+The `pack` tool should set OCI annotations on the OCI artifacts it produces providing users of these buildpacks with a consistent, standard mechanism for gathering information about the buildpack, including how to find its documentation and what version it is. The annotation values can be gathered from existing data sources (such as `buildpack.toml`) therefore not requiring any additional effort on the part of users of the `pack` tool.
 
 # Definitions
 [definitions]: #definitions
@@ -45,7 +45,7 @@ The target personas as buildpack users, platform operators, and platform impleme
 # How it Works
 [how-it-works]: #how-it-works
 
-When building the buildpack, the `buildpack` tool can get the values for the `org.opencontainers.image.source` and `org.opencontainers.image.revision` annotations from git. `org.opencontainers.image.source` is derived from the git origin and `org.opencontainers.image.revision` is the git commit hash.
+When building the buildpack, the `pack` tool can get the values for the `org.opencontainers.image.source` and `org.opencontainers.image.revision` annotations from git. `org.opencontainers.image.source` is derived from the git origin and `org.opencontainers.image.revision` is the git commit hash.
 
 The other annotation values come from `buildpack.toml` mapped to OCI annotations as follows:
 
@@ -66,7 +66,7 @@ The following example values are from [Paketo Buildpack for Java 13.0.1](https:/
 # Migration
 [migration]: #migration
 
-The `buildpack` tool would be modified to set the annotations. Because the tool _should_ set these annotations (not _must_ set), buildpacks created with earlier versions of the tool are still consider to be valid in accordance with the distribution specification. 
+The `pack` tool would be modified to set the annotations. Because the tool _should_ set these annotations (not _must_ set), buildpacks created with earlier versions of the tool are still consider to be valid in accordance with the distribution specification.
 
 # Drawbacks
 [drawbacks]: #drawbacks
