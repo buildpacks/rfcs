@@ -66,7 +66,7 @@ The following example values are from [Paketo Buildpack for Java 13.0.1](https:/
 # Migration
 [migration]: #migration
 
-The `pack` tool would be modified to set the annotations. Because the tool _should_ set these annotations (not _must_ set), buildpacks created with earlier versions of the tool are still consider to be valid in accordance with the distribution specification.
+The `pack` tool would be modified to set the annotations. Because the tool _should_ set these annotations (not _must_ set), buildpacks created with earlier versions of the tool are still considered to be valid in accordance with the distribution specification.
 
 # Drawbacks
 [drawbacks]: #drawbacks
