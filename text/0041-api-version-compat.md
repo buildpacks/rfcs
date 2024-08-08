@@ -43,7 +43,7 @@ The spec will use future `0.x` API releases to include any desired changes with 
 This RFC does not make changes to the API compatibility rules post 1.0. 1.x APIs version are stil assumed to be purely additive.
 
 ## Lifecycle
-The lifecycle will use the [lifecycle descriptor](https://github.com/buildpacks/rfcs/blob/pack-publish-buildpack/text/0011-lifecycle-descriptor.md)
+The lifecycle will use the [lifecycle descriptor](https://github.com/buildpacks/rfcs/blob/main/text/0011-lifecycle-descriptor.md)
 to indicate the implemented API versions as before. However, the compatibility assumptions will change.
 It will be assumed that a lifecycle declaring support for the `0.x` version of the API, supports all 0.2-0.x API versions.
 
