@@ -3,10 +3,10 @@
 - Name: OCI Image Annotations on Buildpacks
 - Start Date: 2024-06-26
 - Author(s): @candrews
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#314](https://github.com/buildpacks/rfcs/pull/314)
 - CNB Pull Request: (leave blank)
-- CNB Issue: (leave blank)
+- CNB Issue: https://github.com/buildpacks/rfcs/issues/318
 - Supersedes: (put "N/A" unless this replaces an existing RFC, then link to that RFC)
 
 # Summary
