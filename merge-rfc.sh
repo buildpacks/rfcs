@@ -50,13 +50,6 @@ require_command() {
 
 require_command git
 require_command jq
-require_command issues-generation
-
-if [[ -z "${GITHUB_TOKEN:-}" ]]; then
-  require_command op
-  echo "> Pulling GitHub token from vault..."
-  GITHUB_TOKEN=$(op read op://Shared/7xorpxvz3je3vozqg3fy3wrcg4/credential --account buildpacks)
-fi
 
 ####
 # INPUTS / VALIDATION
@@ -107,25 +100,13 @@ fi
 RFC_ID=$(generate_id)
 echo "> Generated RFC number: ${RFC_ID}"
 
-echo "> Creating issues for PR#${PR_NUMBER}"
-export GITHUB_TOKEN
-
-issues-generation create --pr "${OWNER}/${REPO}#${PR_NUMBER}" --bot $BOT_USERNAME  --prepend "[RFC #${RFC_ID}] "
-ISSUES_TO_LINK=$(issues-generation list --pr "${OWNER}/${REPO}#${PR_NUMBER}" --bot $BOT_USERNAME --json | jq -r '[.[] | select(.num) | .repo + "#" + (.num|tostring) ] | join(" ")')
-
-for ISSUE in ${ISSUES_TO_LINK}; do
-  if [[ $ISSUES_TEXT == "N/A" ]]; then
-    ISSUES_TEXT=$(link_issue "$ISSUE")
-  else
-    ISSUES_TEXT+=", $(link_issue "$ISSUE")"
-  fi
-done
-
-
 if [[ $NO_ISSUES = false && $ISSUES_TEXT == "N/A" ]]; then
-  echo -e "ERROR! No issues were provided. Are you sure there are no issues that should be linked?"
-  echo -e "ERROR! Either -i or -n is required\n"
-  usage
+  echo "> Please create an issue by following the link below:"
+  echo "https://github.com/buildpacks/rfcs/issues/new?assignees=&labels=type%2Ftracking&projects=&template=tracking.md&title=%5BRFC+%23${RFC_ID}%5D+%3C+-+INSERT+RFC+TITLE%3E"
+  echo ""
+  read -p "Press Enter to continue" </dev/tty
+
+  read -p "> Please enter the issue link: " ISSUES_TEXT
 fi
 
 echo "> Pulling latest changes...."
