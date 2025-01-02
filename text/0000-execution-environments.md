@@ -22,7 +22,7 @@ Add support for different execution environments for buildpacks, with testing as
 # Motivation
 [motivation]: #motivation
 
-The main way Buildpacks are being used is building production images, but this is only one piece of the software development process. Without a solid buildpack test environment story, users will be required alternatives for building their environment. A testing environment, while different, shares many of the same broad strokes ultimately producing an execution environment. This is something Buildpacks are well suited to solve.
+The main way Buildpacks are being used is building production images, but this is only one piece of the software development process. Without a solid buildpack test environment story, users will be required use alternatives for building their environment. A testing environment, while different, shares many of the same broad strokes ultimately producing an execution environment. This is something Buildpacks are well positioned to solve.
 
 # What it is
 [what-it-is]: #what-it-is
@@ -70,11 +70,11 @@ The specifics of creating development enviroments are out of scope of this RFC, 
 
 ## `exec-env` key in TOML
 
-In order to support additional execution environments an `exec-env` key will be added to various TOML tables in the project. The value can be any string with `all` having special meaning. `all` will apply to all execution environments and will be the default if not specified. This should make it backwards compatible and optional. When `exec-env` is not set to `all`, the table settings will only be applied to that execution environment.
+In order to support additional execution environments an `exec-env` key will be added to various TOML tables in the project. This will be an array that takes string values. An individual element can be any string with `*` having special meaning. Similar to the ["any stack RFC"](https://github.com/buildpacks/rfcs/blob/main/text/0056-any-stack-buildpacks.md) `*` will apply to all execution environments. `["*"]` will be the default if not specified. This should make the key backwards compatible and optional. When `exec-env` is not empty and does not include `*`, the table settings will only be applied to the specificed execution environments.
 
 ### Project Descriptor - `project.toml` (App Developers)
 
-This file be extended by adding `exec-env` to the following tables:
+An app developer may have execution environment configuration like only using a metrics agent in production or headless user agent needs in test. In order to facilitate these needs, the project descriptor will be extended by adding `exec-env` to the following tables:
 
 `[[io.buildpacks.group]]`
 `[[io.buildpacks.pre.group]]`
@@ -92,14 +92,19 @@ id = "buildpacks/ruby"
 version = "latest"
 
 [[io.buildpacks.group]]
+id = "buildpacks/nodejs"
+version = "latest"
+exec-env = ["production", "test"]
+
+[[io.buildpacks.group]]
 id = "buildpacks/metrics-agent"
 version = "latest"
-exec-env = "production"
+exec-env = ["production"]
 
 [[io.buildpacks.group]]
 id = "buildpacks/headless-chrome"
 version = "latest"
-exec-env = "test"
+exec-env = ["test"]
 
 [[io.buildpacks.post.group]]
 id = "buildpacks/procfile"
@@ -108,30 +113,38 @@ version = "latest"
 [[io.buildpacks.build.env]]
 name = "RAILS_ENV"
 value = "production"
-exec-env = "production"
+exec-env = ["production"]
 
 [[io.buildpacks.build.env]]
 name = "RAILS_ENV"
 value = "test"
-exec-env = "test"
+exec-env = ["test"]
 
 [[io.buildpacks.build.env]]
 name = "PARALLEL_WORKERS"
 value = "4"
-exec-env = "test"
+exec-env = ["production"]
 ```
 
 ### `builder.toml` (Builder Authors)
 
-The only table that `exec-env` will be added to is `[[order.group.env]]`.
+The the only table `exec-env` will be added to is `[[order.group]]` and `[[build.env]]`.
 
 ### `buildpack.toml` (Buildpack Authors)
 
 The only table that `exec-env` will be added to is `[[buildpack.order.group]]`. This only is applicable for composite buildpacks.
 
+### `launch.toml` (Buildpack Authors)
+
+Not all process types make sense for every execution environment. In order to help hint to the platform the intention how a process should be used, the `exec-env` key will be added to the `[[processes]]` table.
+
+### `metadata.toml` (Platform Operators)
+
+On the platform side, the `exec-env` key will be added to `metadata.toml` in the `[[processes]]` table to mirror `launch.toml`. This will help platforms to make decisions on which processes are desired for each execution environment. `lifecycle` will list all processes and will not exclude any based on the execution environment Instead, a platform can use the available information to make a decision.
+
 ## `CNB_EXEC_ENV` Environment Variable
 
-This env var will reserve the following values:
+The spec will reserve the following values to help standardize execution environments:
 
 * production
 * test
@@ -139,7 +152,9 @@ This env var will reserve the following values:
 
 ### Buildpack API
 
-A buildpack author will be able to determine the execution environment their buildpack is expected to build for by reading the `CNB_EXEC_ENV` environment variable. If this value is not set, a Buildpack Author can assume it's set to `production`.
+A buildpack author will be able to determine the execution environment their buildpack is expected to build for by reading the `CNB_EXEC_ENV` environment variable. If this value is not set, a Buildpack Author can assume it's set to `production`. This will be provided for both `bin/detect` and `bin/build`.
+
+This would let a buildpack author do different things based on the execution environment. For example, it's common for a production build to not include test dependencies or files, while a test environment would include those things. For compiled languages, a production might even remove the source code and just leave the compiled binary with optimizations. In a test environment, it may include debug symbols, not run with optimizations, not prune the source tree.
 
 ### Platform API
 
@@ -197,6 +212,8 @@ The original Cloud Native Buildpacks spec included a Develop API, but it was nev
   - strings can help account for use cases we haven't thought of yet.
 - Should buildpacks be allowed specify allowlist execution environments?
 - What changes are needed in the buildpack registry?
+- Does `build.env` need to support execution environments in `builder.toml`?
+- Should the reserved exec env strings be namespaced?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
