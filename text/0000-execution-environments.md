@@ -76,10 +76,10 @@ In order to support additional execution environments an `exec-env` key will be 
 
 An app developer may have execution environment configuration like only using a metrics agent in production or headless user agent needs in test. In order to facilitate these needs, the project descriptor will be extended by adding `exec-env` to the following tables:
 
-`[[io.buildpacks.group]]`
-`[[io.buildpacks.pre.group]]`
-`[[io.buildpacks.post.group.env]]`
-`[[io.buildpacks.build.env]]`
+* `[[io.buildpacks.group]]`
+* `[[io.buildpacks.pre.group]]`
+* `[[io.buildpacks.post.group.env]]`
+* `[[io.buildpacks.build.env]]`
 
 An example would look like this:
 
@@ -160,6 +160,8 @@ This would let a buildpack author do different things based on the execution env
 
 It will be up to the platform to set the environment variable `CNB_EXEC_ENV`. If this value is set, `lifecycle` MUST NOT override this value. If the value is not set, `lifecycle` will set it to `production`.
 
+During the export phase, `lifecycle` will set the `io.buildpacks.exec-env` label with the value from the `CNB_EXEC_ENV` environment variable. This will make it easier for anyone examining the OCI image to determine the execution environment.
+
 # Migration
 [migration]: #migration
 
@@ -214,6 +216,7 @@ The original Cloud Native Buildpacks spec included a Develop API, but it was nev
 - What changes are needed in the buildpack registry?
 - Does `build.env` need to support execution environments in `builder.toml`?
 - Should the reserved exec env strings be namespaced?
+- Instead of creating a new label, should we stash it into a JSON label?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
