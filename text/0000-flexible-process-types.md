@@ -46,7 +46,7 @@ It is not presently possible for a different buildpack that runs subsequently to
 
 As described in the Motivation section, there are cases where this would be helpful and this RFC aims to make this both possible buildpack authors and safe for buildpack users.
 
-The proposal is that any subsequent buildpack can modify a previous buildpacks' process types by defining a process in `launch.toml` with the same type and a transform section that defines the changes to be made. This will allow the subsequent buildpack to change the command, args and working directory.
+The proposal is that any subsequent buildpack can modify a previous buildpacks' process types by defining a process in `launch.toml` with the same type and a transform section that defines the changes to be made. This will allow the subsequent buildpack to change the command, args, working directory, and indicate a reason for the change.
 
 Because a subsequent buildpack does not know what a previous buildpack has defined for the command, args, and working directory the following place holders may be used to reference those values:
 
@@ -58,7 +58,7 @@ Because a subsequent buildpack does not know what a previous buildpack has defin
 
 While these place holders allow a subsequent buildpack to generate a modified version of a command based on the original, the subsequent buildpack cannot see the original command at build time. The reason is simply to limit the scope of this RFC and reduce complexity in the implementation (see Alternatives for more details).
 
-The modification of process types will be performed by the lifecycle when it is convenient for the lifecycle. The lifecycle should ensure that any process type changes are prominently logged, both what changed and who changed it.
+The modification of process types will be performed by the lifecycle when it is convenient for the lifecycle. The lifecycle should ensure that any process type changes are prominently logged, including what changed, who changed it, and the reason if provided.
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -98,6 +98,7 @@ Buildpack B runs and wants to modify the previously defined tasks.
 
     [processes.transform]
     args = [$ORIGINAL_ARGS, "--production"]
+    reason = "adding additional arguments"
     ```
 
     This would result in the following process type being defined on the container image (represented in TOML):
@@ -121,6 +122,7 @@ Buildpack B runs and wants to modify the previously defined tasks.
 
     [processes.transform]
     command = ["time", $ORIGINAL_CMD]
+    reason = "Wrapping start command to log time spent"
     ```
 
     This would result in the following process type being defined on the container image (represented in TOML):
@@ -144,6 +146,7 @@ Buildpack B runs and wants to modify the previously defined tasks.
 
     [processes.transform]
     command = ["bash", "-c '$ORIGINAL_CMD_STRING'"]
+    reason = "Wrapping to run through Bash"
     ```
 
     This would result in the following process type being defined on the container image (represented in TOML):
@@ -202,7 +205,7 @@ This topic has been discussed previously, but no formal RFC was written up. See 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-This RFC would require changes to `launch.toml`. Entries in the `[[processes]]` block could now have a property `transform` that has the properties `command`, `args` and `working-dir`.
+This RFC would require changes to `launch.toml`. Entries in the `[[processes]]` block could now have a property `transform` that has the properties `command`, `args`, `working-dir`, and `reason`. All of the properties in `transform` are optional.
 
 For example:
 
@@ -214,6 +217,7 @@ type = "task"
 command = ["time", $ORIGINAL_CMD]
 args = ["more", "args"]
 working-dir = "/somewhere-else"
+reason = "Reason for transformation"
 ```
 
 When `transform` is present, the `command`, `default`, `args`, and `working-dir` properties on the process itself should not be set, just the `type`.
