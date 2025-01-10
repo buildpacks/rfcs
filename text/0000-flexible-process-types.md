@@ -50,11 +50,11 @@ The proposal is that any subsequent buildpack can modify a previous buildpacks' 
 
 Because a subsequent buildpack does not know what a previous buildpack has defined for the command, args, and working directory the following place holders may be used to reference those values:
 
-- `$ORIGINAL_CMD` - the original command as a list, fits into a TOML list
-- `$ORIGINAL_CMD_STRING` - the original command as a string, space separated
-- `$ORIGINAL_ARGS` - the original arguments as a list, fits into a TOML list
-- `$ORIGINAL_ARGS_STRING` - the original arguments as a string, space separated
-- `$ORIGINAL_WORKING_DIR` - the original working directory
+- `$CMD` - the original command as a list, fits into a TOML list
+- `$CMD_STRING` - the original command as a string, space separated
+- `$ARGS` - the original arguments as a list, fits into a TOML list
+- `$ARGS_STRING` - the original arguments as a string, space separated
+- `$WORKING_DIR` - the original working directory
 
 While these place holders allow a subsequent buildpack to generate a modified version of a command based on the original, the subsequent buildpack cannot see the original command at build time. The reason is simply to limit the scope of this RFC and reduce complexity in the implementation (see Alternatives for more details).
 
@@ -97,7 +97,7 @@ Buildpack B runs and wants to modify the previously defined tasks.
     type = "web" # reference original process type
 
     [processes.transform]
-    args = [$ORIGINAL_ARGS, "--production"]
+    args = [$ARGS, "--production"]
     reason = "adding additional arguments"
     ```
 
@@ -112,7 +112,7 @@ Buildpack B runs and wants to modify the previously defined tasks.
     working-dir = "/workspace"
     ```
 
-    Notice how `$ORIGINAL_ARGS` is treated as a list of the original arguments and is automatically expanded into args. It is like writing `["arg1", "arg2", "--production"]`. This is opposed to `$ORIGINAL_ARGS_STRING`, which would not be expanded and is like writing `["arg1 args", "--production"]`.
+    Notice how `$ARGS` is treated as a list of the original arguments and is automatically expanded into args. It is like writing `["arg1", "arg2", "--production"]`. This is opposed to `$ARGS_STRING`, which would not be expanded and is like writing `["arg1 args", "--production"]`.
 
 2. It wants to wrap the task process type with `time` so we can track how long the task takes to run.
 
@@ -121,7 +121,7 @@ Buildpack B runs and wants to modify the previously defined tasks.
     type = "task" # reference original process type
 
     [processes.transform]
-    command = ["time", $ORIGINAL_CMD]
+    command = ["time", $CMD]
     reason = "Wrapping start command to log time spent"
     ```
 
@@ -136,7 +136,7 @@ Buildpack B runs and wants to modify the previously defined tasks.
     working-dir = "/workspace"
     ```
 
-    Notice how `$ORIGINAL_CMD` is treated as a list of the original command and is automatically expanded into command. It is like writing `["time", "my-task"]`. This is opposed to `$ORIGINAL_CMD_STRING`, which would not be expanded and is just the space separate string of all the items in command.
+    Notice how `$CMD` is treated as a list of the original command and is automatically expanded into command. It is like writing `["time", "my-task"]`. This is opposed to `$CMD_STRING`, which would not be expanded and is just the space separate string of all the items in command.
 
 3. It wants to wrap the migration process type and run it in a bash shell.
 
@@ -145,7 +145,7 @@ Buildpack B runs and wants to modify the previously defined tasks.
     type = "migration" # reference original process type
 
     [processes.transform]
-    command = ["bash", "-c '$ORIGINAL_CMD_STRING'"]
+    command = ["bash", "-c '$CMD_STRING'"]
     reason = "Wrapping to run through Bash"
     ```
 
@@ -160,7 +160,7 @@ Buildpack B runs and wants to modify the previously defined tasks.
     working-dir = "/workspace"
     ```
 
-    Notice how `$ORIGINAL_CMD_STRING` is used here to get the original command as a space separated string, which is necessary to embed it in the argument to `bash`.
+    Notice how `$CMD_STRING` is used here to get the original command as a space separated string, which is necessary to embed it in the argument to `bash`.
 
 # Migration
 [migration]: #migration
@@ -214,7 +214,7 @@ For example:
 type = "task"
 
 [processes.transform]
-command = ["time", $ORIGINAL_CMD]
+command = ["time", $CMD]
 args = ["more", "args"]
 working-dir = "/somewhere-else"
 reason = "Reason for transformation"
@@ -230,7 +230,7 @@ For example:
 [[processes]]
 type = "task"
 transform = true
-command = ["time", $ORIGINAL_CMD]
+command = ["time", $CMD]
 args = ["more", "args"]
 working-dir = "/somewhere-else"
 ```
@@ -246,7 +246,7 @@ For example:
 ```
 [[transforms]]
 type = "task"
-command = ["time", $ORIGINAL_CMD]
+command = ["time", $CMD]
 args = ["more", "args"]
 working-dir = "/somewhere-else"
 ```
