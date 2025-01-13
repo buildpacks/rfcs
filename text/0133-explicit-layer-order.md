@@ -74,7 +74,7 @@ load_order = 1
 
 Add an optional positive numeric field to `<buildpack-layer-dir>/<layer-name>.toml` with a key `load_order`. Buildpack authors start with a number such as `1` and then increment it for every layer they write a new layer. The lifecycle reads these numbers and orders the written layers in the same ascending order. This way, `1` will be evaluated before `2`.
 
-Any layers with a duplicate `load_order` will be evaluated in alphabetic order (the same behavior as today). Any layers without a `load_order` will be loaded before layers with an explicit order. A load order of `0` will be loaded after layers without an explicit `load_order`. This default means that any explicitly ordered layers will have their `PATH` modifications prepended after the default layers, which has the effect of taking precedence.
+Any layers with a duplicate `load_order` will be evaluated in alphabetic order (the same behavior as today). Any layers without an explicit `load_order` will default to a value of `0`. This default means that any explicitly ordered layers will have their `PATH` modifications prepended after the default layers, which has the effect of taking precedence.
 
 The section should return to the examples from the previous section, and explain more fully how the detailed proposal makes those examples work.
 
