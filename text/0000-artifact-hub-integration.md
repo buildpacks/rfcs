@@ -18,7 +18,7 @@
 This RFC proposes that we integrate and augment our bespoke registry service
 with [ArtifactHub.io](https://artifacthub.io/). This RFC does not stipulate that we _remove_ or _replace_ our existing
 registry. ArtifactHub.io is a public instance of the [ArtifactHub](https://github.com/artifacthub/hub) project, and we
-will not be running our own instance of the _ArtifactHub project_.
+do not plan for ArtifactHub to outright replace our current registry service.
 
 This is an augmentation, not a replacement. It will not affect how Images are built--this is a tool for artifact
 discoverability for human consumption.
