@@ -132,7 +132,9 @@ The the only table `exec-env` will be added to is `[[order.group]]` and `[[build
 
 ### `buildpack.toml` (Buildpack Authors)
 
-The only table that `exec-env` will be added to is `[[buildpack.order.group]]`. This only is applicable for composite buildpacks.
+As a piece of metadata, a buildpack should list the execution environments it supports in the `[[buildpack.exec-env]]` array. This can be used by the buildpack registry in the future.
+
+For composite buildpacks, `exec-env` will be added to is `[[buildpack.order.group]]`.
 
 ### `launch.toml` (Buildpack Authors)
 
@@ -144,11 +146,17 @@ On the platform side, the `exec-env` key will be added to `metadata.toml` in the
 
 ## `CNB_EXEC_ENV` Environment Variable
 
+This value is a string and must abide by similar rules we use for IDs:
+
+* MUST only contain numbers, letters, and the characters `.`, and `-`.
+
 The spec will reserve the following values to help standardize execution environments:
 
 * production
 * test
 * development
+
+In addition, the `/` character is reserved in case we need to introduce namespacing in the future.
 
 ### Buildpack API
 
@@ -208,15 +216,22 @@ The original Cloud Native Buildpacks spec included a Develop API, but it was nev
 [unresolved-questions]: #unresolved-questions
 
 - "env" is overloaded as a word since we also use it for environment variables. Is there a better word here?
+While "env" is overloaded, it matches the intent.
 - Should there be builders that are specific to an execution environment? What about `include` or `exclude`?
+No reason right now to restrict builders to an execution environment.
 - Should the execution environments be an enum or flexible as a string?
   - enums will help encourage standardization across buildpacks and platforms.
   - strings can help account for use cases we haven't thought of yet.
+We're going to opt for a string to be flexible.
 - Should buildpacks be allowed specify allowlist execution environments?
+We're currently optimizing for app developer flexibility to use the buildpacks as they see fit.
 - What changes are needed in the buildpack registry?
+The buildpack registry will need to expand the index to support the `buildpack.toml`'s `exec-env` field.
 - Does `build.env` need to support execution environments in `builder.toml`?
 - Should the reserved exec env strings be namespaced?
+We're going to reserve the `/` character for namespacing if needed in the future.
 - Instead of creating a new label, should we stash it into a JSON label?
+The current JSON blobs are exports of lifecycle files, so we're going to create a new one for now.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
