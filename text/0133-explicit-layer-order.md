@@ -44,13 +44,16 @@ The "inside of the same buildpack" relies on the order of buildpack execution to
 - Today a single buildpack can write multiple layers.
 - For launch or the next buildpack in build, each layer is evaluated in alphabetic order via the spec.
 - This order can differ from the order that layers were written by the buildpack which is surprising and can result in difficult to debug problem.
-- We should introduce a mechanism that allows buildpack authors to ensure that build, launch, and "inside of the same buildpack" have the same order of environment variable modification.
+- The current ordering mechanism requires prefixing a directory to change order. Some binaries cannot be relocated without being rebuilt.
+- We should introduce a mechanism that allows buildpack authors to ensure that build, launch, and "inside of the same buildpack" have the same order of environment variable modification. This mechanism should allow non-relocatable binaries to be re-ordered.
 
 > - Why should we do this?
 
-To improve the correctness and reliability of buildpacks
+To improve the correctness and reliability of buildpacks.
 
 > - What use cases does it support?
+
+- Re-ordering layers without having to move files on disk.
 
 > - What is the expected outcome?
 
