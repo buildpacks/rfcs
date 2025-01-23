@@ -160,6 +160,12 @@ A value such as a date or time might not have sufficient fidelity and takes more
 We could make duplicate values an error. For example, two layers with `load_order=1` could generate an exception and stop the build process instead of falling back to alphanumeric layer name ordering.
   - I chose to make the feature more permissive to make it easier to adopt. In the event of a duplicate value, the lifecycle could issue a warning, or we could make the warning/error behavior configurable via the `buildpack.toml`. Future RFCs could change the default behavior of duplicate keys.
 
+### Alternative feature: Explicit identity
+
+The current implementation uses the layer name as the identity of a layer and its location on disk. We could introduce an explicit `identity` key into the TOML, allowing us to decouple disk structure from how layers are referenced and identified. The identifier would be alphanumeric and used for layer ordering.
+
+This scheme would be difficult to implement via a wrapper library (i.e., libcnb.rs could fairly safely auto-add a `load_order=1` based on the order of execution, but it would be surprising if it prepended `0001_<name>` to an identity). This feature would also introduce some ambiguity around the purpose and difference between a layer "name" and a layer "identity." It might be more generally useful for some future unspecified purpose. This proposal suggests that we investigate and introduce a specific solution if that need arises.
+
 ### Store the data somewhere that's other than the existing TOML file
 
 We could introduce a `<buildpack-name>/order.toml` or some other file so that its name could be appended to the bottom of the order when a new layer is created.
