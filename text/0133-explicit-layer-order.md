@@ -69,7 +69,7 @@ For example:
 ```
 build = true
 launch = true
-load_order = 1
+load-order = 1
 ```
 
 # How it Works
