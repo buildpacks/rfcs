@@ -3,8 +3,8 @@
 - Name: Remove Windows Containers Support
 - Start Date: 2024-04-11
 - Author(s): aidan.delaney
-- Status: Draft <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
-- RFC Pull Request: (leave blank)
+- Status: Approved <!-- Acceptable values: Draft, Approved, On Hold, Superseded -->
+- RFC Pull Request: [rfcs#311](https://github.com/buildpacks/rfcs/pull/311)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: "N/A"
