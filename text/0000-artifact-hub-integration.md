@@ -33,7 +33,7 @@ A CNCF project that is a web-based application that enables finding, installing,
 
 ### [ArtifactHub.io](https://artifacthub.io/)
 
-An instance of the ArtifactHub project that is hosted with CNFC resources and maintained by ArtifactHub project
+An instance of the ArtifactHub project that is hosted with CNCF resources and maintained by ArtifactHub project
 maintainers.
 
 ### [OCI (or Cloud Native) Artifact](https://opencontainers.org/posts/blog/2024-03-13-image-and-distribution-1-1/#artifacts)
