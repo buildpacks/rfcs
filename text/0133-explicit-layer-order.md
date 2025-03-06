@@ -30,7 +30,7 @@ The ordering of layers is important, and the current ordering mechanism (alphanu
 
 Layers need to be loaded in several locations:
 
-- At "build" time, multiple buildpacks can run simultaneously. If a layer is created with `build=true` in its TOML, it will be loaded and visible to buildpacks that run after it.
+- At "build" time, multiple buildpacks can run sequentially. If a layer is created with `build=true` in its TOML, it will be loaded and visible to buildpacks that run after it.
 - At "launch" time. When an image is finalized, if a layer is created with `launch=true`, it is TOML and will be loaded when the image is launched (such as `docker run`).
 - Inside of the same buildpack. A large buildpack may generate several layers that depend on each other. For example the `heroku/ruby` buildpack first downloads a ruby executable and places it in a `ruby` layer. It then executes code such as `gem install` and `bundle install` that depend on that ruby executable. It's a buildpack author's responsibility to make sure any environment variable modifications needed at `build` or `launch` time are also tracked and re-exported (or passed) to code running in the same buildpack.
 
