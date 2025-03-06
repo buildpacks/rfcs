@@ -166,11 +166,21 @@ The current implementation uses the layer name as the identity of a layer and it
 
 This scheme would be difficult to implement via a wrapper library (i.e., libcnb.rs could fairly safely auto-add a `load_order=1` based on the order of execution, but it would be surprising if it prepended `0001_<name>` to an identity). This feature would also introduce some ambiguity around the purpose and difference between a layer "name" and a layer "identity." It might be more generally useful for some future unspecified purpose. This proposal suggests that we investigate and introduce a specific solution if that need arises.
 
-### Store the data somewhere that's other than the existing TOML file
+### Store the data in a TOML file other than the existing TOML file
 
 We could introduce a `<buildpack-name>/order.toml` or some other file so that its name could be appended to the bottom of the order when a new layer is created.
 
 Doing this in bash is difficult if the value is a TOML array. If the value is a TOML table, then it would have a meaningless value, which would be confusing. It is easier to forget needing to write two values to two files than to remember to write two values to one file (the existing `<layer>.toml` file).
+
+### Store the data in a non-TOML file
+
+We could introduce a non-toml file such as a `layers/<layer-dir>/CNB_LAUNCH_LAYER_ORDER_INDEX` where the contents are empty or an integer.
+
+An upside is suggested in the comments that "Being a file on disk means it doesn't have to be handled in intermediate files or show up in OCI image labels." [link](https://github.com/buildpacks/rfcs/pull/322#discussion_r1947223453).
+
+A downside is that we're mixing logic and data i.e. the contents of `<layer-dir>` currently can be utilized however a buildpack author wants/needs. There may be some edge case where the contents of that directory are sensitive to injecting an unexpected file. Hypothetical senarios might include: A binary that runs a checksum on it's directory at boot or a templating library that expects all files in a directory to be templates and exposes them to the end user.
+
+A similar concept, but alternative location could be `layers/<layer-name>.order.integer`. This would put the file outside of the layers directory which would get rid of the prior stated biggest downside. The other downside would be: Two files need to be written to disk instead of one.
 
 ### Non-toml alternative: Finalize layer binary
 
