@@ -46,7 +46,7 @@ It is not presently possible for a different buildpack that runs subsequently to
 
 As described in the Motivation section, there are cases where this would be helpful and this RFC aims to make this both possible buildpack authors and safe for buildpack users.
 
-The proposal is that any subsequent buildpack can modify a previous buildpacks' process types by defining a process in `launch.toml` with the same type and a transform section that defines the changes to be made. This will allow the subsequent buildpack to change the command, args, working directory, and indicate a reason for the change.
+The proposal is that any subsequent buildpack can modify a previous buildpacks' process types by defining a transformation in `launch.toml` with the same type. The transformation defines the changes to be made. This will allow the subsequent buildpack to change the command, args, working directory, and indicate a reason for the change. The reason may be logged by tooling to help users understand why changes are being made.
 
 Because a subsequent buildpack does not know what a previous buildpack has defined for the command, args, and working directory the following place holders may be used to reference those values:
 
@@ -93,10 +93,8 @@ Buildpack B runs and wants to modify the previously defined tasks.
 1. It wants to add arguments to the web task, so it writes:
 
     ```
-    [[processes]]
+    [[transformations]]
     type = "web" # reference original process type
-
-    [processes.transform]
     args = [$ARGS, "--production"]
     reason = "adding additional arguments"
     ```
@@ -117,10 +115,8 @@ Buildpack B runs and wants to modify the previously defined tasks.
 2. It wants to wrap the task process type with `time` so we can track how long the task takes to run.
 
     ```
-    [[processes]]
+    [[transformations]]
     type = "task" # reference original process type
-
-    [processes.transform]
     command = ["time", $CMD]
     reason = "Wrapping start command to log time spent"
     ```
@@ -141,10 +137,8 @@ Buildpack B runs and wants to modify the previously defined tasks.
 3. It wants to wrap the migration process type and run it in a bash shell.
 
     ```
-    [[processes]]
+    [[transformations]]
     type = "migration" # reference original process type
-
-    [processes.transform]
     command = ["bash", "-c '$CMD_STRING'"]
     reason = "Wrapping to run through Bash"
     ```
@@ -200,46 +194,11 @@ This topic has been discussed previously, but no formal RFC was written up. See 
 - Should we allow modification of the `default` property on a process type? 
 - Do buildpack authors need to see the actual data of the process type that was previously defined? or are placeholders sufficient?
 - Does this introduce any new security concerns?
-- Which exact syntax to do people like for specifying these in `launch.toml`?
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-This RFC would require changes to `launch.toml`. Entries in the `[[processes]]` block could now have a property `transform` that has the properties `command`, `args`, `working-dir`, and `reason`. All of the properties in `transform` are optional.
-
-For example:
-
-```
-[[processes]]
-type = "task"
-
-[processes.transform]
-command = ["time", $CMD]
-args = ["more", "args"]
-working-dir = "/somewhere-else"
-reason = "Reason for transformation"
-```
-
-When `transform` is present, the `command`, `default`, `args`, and `working-dir` properties on the process itself should not be set, just the `type`.
-
-An alternate syntax for this could be to include a `transform` property that is a bool, defaulting to `false`. When `true`, that would initiate the transformation behavior.
-
-For example:
-
-```
-[[processes]]
-type = "task"
-transform = true
-command = ["time", $CMD]
-args = ["more", "args"]
-working-dir = "/somewhere-else"
-```
-
-This would result in the same transformation as the other two examples.
-
-This alternative syntax is a bit more compact and may deserialize a bit easier into Go structs as it would not require a nested struct.
-
-One more alternate format would be to not change the `[[processes]]` block but to just add a `[[transforms]]` block. The transforms block would be the same as `[[processes]]` except it would defined transformations (which have all the same properties, except transformations do not have the `default` property).
+This RFC would require changes to `launch.toml`. This does not change change the `[[processes]]` block but introduces a new `[[transforms]]` block. The transforms block would be the same as `[[processes]]` except it would defined transformations (which have all the same properties, except transformations do not have the `default` property and transformations have a `reason`).
 
 For example:
 
@@ -249,9 +208,8 @@ type = "task"
 command = ["time", $CMD]
 args = ["more", "args"]
 working-dir = "/somewhere-else"
+reason = "Wrap original command with `time`"
 ```
-
-This would result in the same transformation as the other two examples.
 
 # History
 [history]: #history
