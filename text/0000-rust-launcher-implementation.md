@@ -53,7 +53,7 @@ The `launcher` will be implemented as a statically linked, lightweight Rust bina
 1. Process Replacement: To seamlessly replace the launcher process with the user's application, the implementation uses `std::os::unix::process::CommandExt::exec()`. This maps directly to the `execve` syscall, completely clearing the launcher from the process tree and memory, analogous to Go's `syscall.Exec`.
 1. Strict Exit Code Mapping: The implementation uses Rust's `Result` type and a centralized `LaunchError` enum to strictly map internal failures (e.g., parsing errors, environment failures) to the exact integer exit codes mandated by the CNB API (like `PlatformApiIncompatible` or `BuildpackApiIncompatible`).
 
-The `launcher` will live in a separate repo from the current `lifecycle` repo and will live at <https://github.com/heroku/launcher-rs>. This provides a few benefits:
+The `launcher` will live in a separate repo from the current `lifecycle` repo and will live at <https://github.com/buildpacks/launcher-rs>. This provides a few benefits:
 
 - keep language specific ecosystem tooling separate
 - opens the door for component maintainers for Rust :pray:
