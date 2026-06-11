@@ -27,7 +27,7 @@ As it stands, when CVEs are discovered within the Go standard library (such as n
 Looking at the recent security advisories in recent years, the CVEs flagged against the Go standard library and compiler fall into a couple of buckets:
 
 - HTTP/2 & Networking Layer (Largest bucket) - the largest volume of high-severity CVEs are flagged against `net/http`, `net/http/httputil`, and `crypto/tls`.
-- Privilege Escalation & Unix - CVE-2023-29403 exhibited a case where `setuid` / `setgid` did not alter the behavior.
+- Privilege Escalation & Unix - [CVE-2023-29403](https://nvd.nist.gov/vuln/detail/cve-2023-29403) exhibited a case where `setuid` / `setgid` did not alter the behavior.
 
 While Rust is not immune to CVEs or security patches, but there are fewer because Rust's standard library is much smaller which decreases the attack surface area. It does not include an HTTP server, TLS stack, or a JSON parser. Instead, this is pushed to the crate dependencies in a Rust stack. In addition, Rust has a minimalist runtime that doesn't include a garbage collector or a runtime scheduler. Rust maps tasks to native OS threads which removes this abstraction between the code and the OS, trading Go's runtime scheduling for a reduced attack surface area.
 
