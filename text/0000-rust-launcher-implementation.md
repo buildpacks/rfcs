@@ -31,7 +31,7 @@ Looking at the recent security advisories in recent years, the CVEs flagged agai
 
 While Rust is not immune to CVEs or security patches, but there are fewer because Rust's standard library is much smaller which decreases the attack surface area. It does not include an HTTP server, TLS stack, or a JSON parser. Instead, this is pushed to the crate dependencies in a Rust stack. In addition, Rust has a minimalist runtime that doesn't include a garbage collector or a runtime scheduler. Rust maps tasks to native OS threads which removes this abstraction between the code and the OS, trading Go's runtime scheduling for a reduced attack surface area.
 
-The biggest core Rust vulnerability in recent years was CVE-2024-24576 where the Rust standard library's `std::process::Command` did not properly escape arguments when invoking batch files (`.bat` and `.cmd`). This allowed attackers to inject arbitrary shell commands since Windows passes arguments as a single raw string.
+The biggest core Rust vulnerability in recent years was [CVE-2024-24576](https://nvd.nist.gov/vuln/detail/cve-2024-24576) where the Rust standard library's `std::process::Command` did not properly escape arguments when invoking batch files (`.bat` and `.cmd`). This allowed attackers to inject arbitrary shell commands since Windows passes arguments as a single raw string.
 
 The core crates that will likely be used for this have 0 CVEs in recent years: `serde`, `toml`, and `libc`.
 
