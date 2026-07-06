@@ -12,7 +12,9 @@
 # Summary
 [summary]: #summary
 
-This RFC proposes migrating the lifecycle project's test suite from the `sclevine/spec` BDD testing framework to native Go testing using `t.Run` subtests, `t.Cleanup`, and the existing `go-cmp` based assertion helpers. The migration covers 89 test files comprising approximately 24,500 lines of test code, 929 individual test cases, and 856 grouping blocks. The primary motivation is eliminating an unmaintained external dependency, improving contributor accessibility, and achieving full compatibility with standard Go tooling without introducing a new framework dependency.
+This RFC proposes migrating the test suites of all Go repositories in the [buildpacks](https://github.com/buildpacks) organization that depend on `sclevine/spec` -- including `lifecycle`, `pack`, `libcnb`, `imgutil`, `registry-api`, and `github-actions` -- from the `sclevine/spec` BDD testing framework to native Go testing using `t.Run` subtests, `t.Cleanup`, and each repo's existing assertion helpers (typically `go-cmp` based). The lifecycle repo alone covers 89 test files comprising approximately 24,500 lines of test code, 929 individual test cases, and 856 grouping blocks; the other repos add roughly 150 additional test files. The primary motivation is eliminating an unmaintained external dependency across the organization, improving contributor accessibility, and achieving full compatibility with standard Go tooling without introducing a new framework dependency.
+
+Lifecycle is used as the reference implementation throughout this RFC because it is the largest and most complex user of `sclevine/spec` in the organization; the same patterns, tooling, and phasing apply to the other repos with adjusted scope.
 
 # Definitions
 [definitions]: #definitions
@@ -28,22 +30,33 @@ This RFC proposes migrating the lifecycle project's test suite from the `sclevin
 # Motivation
 [motivation]: #motivation
 
-- **Unmaintained dependency**: `sclevine/spec` has not had a tagged release since v1.4.0 (2019) and has minimal recent activity. For a critical piece of CNCF infrastructure, depending on a single-maintainer, dormant package introduces long-term maintenance risk.
-- **Contributor onboarding friction**: The `when`/`it` BDD pattern is uncommon in the Go ecosystem. New contributors (a frequent occurrence in CNCF projects) must learn an unfamiliar testing DSL before they can write or modify tests.
+- **Unmaintained dependency**: `sclevine/spec` has not had a tagged release since v1.4.0 (2019) and has minimal recent activity. For critical pieces of CNCF infrastructure, depending on a single-maintainer, dormant package introduces long-term maintenance risk. Every buildpacks Go repository that uses spec inherits this risk.
+- **Contributor onboarding friction**: The `when`/`it` BDD pattern is uncommon in the Go ecosystem. New contributors (a frequent occurrence in CNCF projects) must learn an unfamiliar testing DSL before they can write or modify tests -- and today that friction repeats across every buildpacks repo that depends on `sclevine/spec`.
 - **Tooling gaps**: IDE test runners (VS Code with gopls, GoLand) cannot natively discover and run individual `it()` blocks with full click-to-run support. Coverage tools, `go test -json`, and CI integrations work best with standard subtests.
-- **Supply-chain simplification**: Removing `sclevine/spec` and its `spec/report` sub-package eliminates external test framework code from the dependency graph entirely.
-- **Expected outcome**: A test suite that any Go developer can immediately read, navigate, and run using only `go test` and standard IDE features, with zero external test framework dependencies.
+- **Supply-chain simplification**: Removing `sclevine/spec` and its `spec/report` sub-package eliminates external test framework code from the dependency graph of every affected repo.
+- **Expected outcome**: A consistent test style across the affected repos that any Go developer can immediately read, navigate, and run using only `go test` and standard IDE features, with zero external test framework dependencies in any of the repos this RFC covers.
 
 # What it is
 [what-it-is]: #what-it-is
 
-A migration of all 89 test files from `sclevine/spec` BDD-style tests to idiomatic Go subtests using the standard `testing` package. The migration preserves the existing `testhelpers` package (for domain-specific utilities like Docker helpers, tar helpers, and temp directory management) while replacing the framework-specific patterns with native Go equivalents. The existing `go-cmp` based assertion helpers (`h.AssertEq`, `h.AssertNil`, etc.) are retained and improved rather than replaced with a third-party assertion library.
+A migration of every `sclevine/spec` test file across the buildpacks organization to idiomatic Go subtests using the standard `testing` package. In lifecycle -- the reference case used throughout this RFC -- this covers 89 test files. The other affected repos are:
+
+| Repo | Approx. test files using `sclevine/spec` |
+|---|---|
+| `buildpacks/lifecycle` | 89 |
+| `buildpacks/pack` | 100+ |
+| `buildpacks/libcnb` | ~22 |
+| `buildpacks/github-actions` | ~16 |
+| `buildpacks/imgutil` | ~12 |
+| `buildpacks/registry-api` | ~2 |
+
+The migration preserves each repo's existing test-helper package (for domain-specific utilities like Docker helpers, tar helpers, and temp directory management) while replacing the framework-specific patterns with native Go equivalents. Existing assertion helpers (`h.AssertEq`, `h.AssertNil`, etc.) are retained rather than replaced with a third-party assertion library.
 
 This is NOT:
 - A rewrite of test logic or coverage
 - An introduction of a new testing framework (testify/suite, Ginkgo)
-- A change to the `testhelpers` utility functions (file helpers, Docker helpers)
-- A change to mock generation (gomock remains)
+- A change to any repo's testhelpers utility functions (file helpers, Docker helpers)
+- A change to mock generation (gomock remains where used)
 
 # How it Works
 [how-it-works]: #how-it-works
@@ -100,11 +113,11 @@ t.Run("app image exists", func(t *testing.T) {
 
 ## Handling the `each()` Helper
 
-The custom `each()` helper in `buildpack/build_test.go` (which takes `spec.S` as a parameter to generate multiple `it()` calls) will be converted to accept `*testing.T` and use `t.Run` internally, or restructured as a table-driven test pattern.
+The custom `each()` helper in lifecycle's `buildpack/build_test.go` (which takes `spec.S` as a parameter to generate multiple `it()` calls) will be converted to accept `*testing.T` and use `t.Run` internally, or restructured as a table-driven test pattern. Other repos with analogous helpers follow the same pattern.
 
 ## Assertion Helpers
 
-The existing `testhelpers` assertion functions (`h.AssertEq`, `h.AssertNil`, `h.AssertStringContains`, etc.) remain unchanged. They already accept `*testing.T` and use `go-cmp` for comparison output. No third-party assertion library is introduced.
+Each repo's existing `testhelpers` assertion functions (`h.AssertEq`, `h.AssertNil`, `h.AssertStringContains`, etc.) remain unchanged. They already accept `*testing.T` and use `go-cmp` (or the local equivalent) for comparison output. No third-party assertion library is introduced.
 
 ## Example Conversion
 
@@ -147,7 +160,7 @@ func TestRebaser(t *testing.T) {
 # Migration
 [migration]: #migration
 
-## Effort Estimate
+## Effort Estimate (lifecycle)
 
 | File Category | Count | Per-File Estimate | Total |
 |---|---|---|---|
@@ -156,10 +169,14 @@ func TestRebaser(t *testing.T) {
 | Large files (500-1000 lines) | ~12 | 2-3 hours | 24-36 hours |
 | Very large files (1000+ lines) | 7 | 4-6 hours | 28-42 hours |
 
-**Base estimate: 15-18 person-days** for mechanical transformation and testing.
+**Base estimate for lifecycle: 15-18 person-days** for mechanical transformation and testing.
 **With scoped-before analysis buffer: 18-22 person-days** (accounting for the 223 scoped `it.Before` blocks that require human judgment about mutation patterns).
 
-## Phased Plan
+The other affected repos scale roughly with test-file count. Very rough estimates: `pack` is comparable to lifecycle (15-25 person-days); `libcnb`, `imgutil`, and `github-actions` each 3-6 person-days; `registry-api` is a single afternoon. Precise numbers should come from a per-repo file-size survey before starting.
+
+## Phased Plan (lifecycle reference)
+
+The following phases apply to lifecycle. Each other buildpacks repo follows the same overall shape -- tooling, small/medium files, large files, cleanup -- with duration compressed to match its size. Some repos may collapse phases 2 and 3 into one when their file counts are small.
 
 ### Phase 1: Tooling and Validation (2-3 days)
 - Develop an AST-based transformation tool that handles mechanical conversions:
@@ -171,6 +188,8 @@ func TestRebaser(t *testing.T) {
   - Add `t.Parallel()` where `spec.Parallel()` was used
 - Validate tool output on the 5 smallest files
 - Establish CI gate: `go test -v -count=5 -race ./...`
+
+The tool is written once and reused (unchanged, or with minor per-repo tweaks) for every other buildpacks repo listed above.
 
 ### Phase 2: Small and Medium Files (5-7 days)
 - Apply the transformation tool to the ~70 files under 500 lines
@@ -194,9 +213,13 @@ func TestRebaser(t *testing.T) {
 - Run full CI pipeline validation
 - Final PR review
 
+### Applying the Plan to Other Repos
+
+For `pack`, `libcnb`, `imgutil`, `github-actions`, and `registry-api`, a similar phased process will be used: a Phase 1 that adapts the transformation tool (typically zero code changes needed), one or two middle phases that convert the files by size, and a final cleanup phase that removes `sclevine/spec` from the repo's `go.mod`. Each repo is owned by that repo's maintainers and can proceed independently once the tool and patterns are established in lifecycle.
+
 ### Coexistence During Migration
 
-Both patterns can coexist since they both ultimately produce standard `*testing.T` subtests. Migration can proceed package-by-package without blocking other development work. The existing test suite continues to pass at every intermediate stage.
+Both patterns can coexist since they both ultimately produce standard `*testing.T` subtests. Migration can proceed package-by-package (and repo-by-repo) without blocking other development work. The existing test suite continues to pass at every intermediate stage.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -209,7 +232,7 @@ Both patterns can coexist since they both ultimately produce standard `*testing.
 
 **The `each()` helper requires non-trivial refactoring.** It currently accepts `spec.S` and dynamically generates `it()` calls. Converting this to table-driven tests or a `t.Run`-based helper changes the test structure, not just syntax.
 
-**Opportunity cost.** 18-22 person-days of engineering time spent on migration is time not spent on features, bug fixes, or other improvements to the lifecycle project.
+**Opportunity cost.** Aggregate migration time across all affected repos is meaningful (roughly 40-60 person-days total across the organization) -- time not spent on features, bug fixes, or other improvements. Per-repo cost is proportional and can be scheduled independently.
 
 **No improvement to assertion ergonomics.** Unlike testify or Gomega, this migration does not upgrade assertion capabilities. The existing `h.Assert*` helpers remain, with their current error message quality (already good via `go-cmp`, but not as rich as dedicated assertion libraries).
 
@@ -277,10 +300,10 @@ Both patterns can coexist since they both ultimately produce standard `*testing.
 ## Impact of Not Doing This
 
 If no migration occurs:
-- The project continues depending on an unmaintained framework (last release 2019)
-- Contributors continue facing an unfamiliar testing DSL
+- Every buildpacks repo currently using `sclevine/spec` continues depending on an unmaintained framework (last release 2019)
+- Contributors continue facing an unfamiliar testing DSL in each of those repos
 - IDE test integration remains suboptimal
-- The framework will eventually become incompatible with a future Go version, forcing an emergency migration under time pressure
+- The framework will eventually become incompatible with a future Go version, forcing an emergency migration across multiple repos simultaneously, under time pressure
 
 # Prior Art
 [prior-art]: #prior-art
@@ -301,16 +324,19 @@ If no migration occurs:
 
 3. **What is the threshold for choosing Option A (per-test setup function) vs. Option B (top-of-closure setup)?** A clear guideline is needed for the 223 scoped `it.Before` blocks to ensure consistency across the codebase.
 
-4. **Should the AST transformation tool be contributed to the community?** Other projects using `sclevine/spec` may benefit from a migration tool.
+4. **Should the AST transformation tool be contributed to the community?** Other projects outside the buildpacks organization that use `sclevine/spec` may benefit from a migration tool. Within the organization, the tool will live in `lifecycle/tools/spec-migrate` during the migration and be removed once all repos are converted (or, alternatively, promoted to a small standalone repo before removal).
 
-5. **How should the `each()` helper in `buildpack/build_test.go` be restructured?** Table-driven tests are the most idiomatic approach but change the test's conceptual structure.
+5. **How should the `each()` helper in `buildpack/build_test.go` (lifecycle) be restructured?** Table-driven tests are the most idiomatic approach but change the test's conceptual structure. Similar helpers in other repos follow the same decision.
+
+6. **What order should the repos be migrated in?** Lifecycle is the natural first target because it exercises every pattern (deep nesting, scoped setup, custom helpers). After lifecycle, order is flexible; small repos (`registry-api`, `imgutil`) offer quick wins, while `pack` benefits most from the settled tooling.
 
 # Spec. Changes (OPTIONAL)
 [spec-changes]: #spec-changes
 
-No changes to the CNB specification are required. This RFC affects only the lifecycle project's internal test infrastructure.
+No changes to the CNB specification are required. This RFC affects only the internal test infrastructure of the buildpacks repositories that depend on `sclevine/spec`.
 
 # History
 [history]: #history
 
-- 2026-06-22: Initial RFC draft synthesized from technical debate between advocates for native Go testing, testify/suite, and Ginkgo/Gomega.
+- 2026-06-22: Initial RFC draft synthesized from technical debate between advocates for native Go testing, testify/suite, and Ginkgo/Gomega. Initial scope: `lifecycle` only.
+- 2026-07-06: Broadened scope to cover all Go repositories in the buildpacks organization that depend on `sclevine/spec` (`lifecycle`, `pack`, `libcnb`, `imgutil`, `github-actions`, `registry-api`). Lifecycle remains the reference implementation and the primary case study for phasing.
