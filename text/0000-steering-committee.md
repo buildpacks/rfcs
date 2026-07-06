@@ -12,7 +12,7 @@
 # Summary
 [summary]: #summary
 
-This RFC proposes restructuring the Technical Oversight Committee (TOC) into a Steering Committee (SC) focused on strategic governance, and formally establishing the Project Maintainers as the collective body owning technical specifications and implementation. The proposal expands the Steering Committee to five seats: three Maintainers elected by the maintainers, and two End-Users representing organizations listed in `ADOPTERS.md`, appointed via lazy consensus. Finally, it enforces a strict 40% corporate representation cap on the Steering Committee, including a circuit breaker to temporarily make excess corporate seats non-voting in the event of vacancies.
+This RFC proposes restructuring the Technical Oversight Committee (TOC) into a Steering Committee (SC) focused on strategic governance, and formally establishing the Project Maintainers as the collective body owning technical specifications and implementation. The proposal expands the Steering Committee to five seats: three Maintainers elected by the maintainers, and two End-Users representing organizations listed in `ADOPTERS.md`, appointed via lazy consensus. Finally, it enforces a strict 50% corporate representation cap on the Steering Committee, including a circuit breaker to temporarily make excess corporate seats non-voting in the event of vacancies.
 
 # Definitions
 [definitions]: #definitions
@@ -76,7 +76,7 @@ If a vote is triggered (more candidates than open seats), candidates are require
 [how-it-works]: #how-it-works
 
 ### 1. Corporate Representation Cap
-* At no time shall individuals employed by the same corporate entity (including its affiliates and subsidiaries) occupy more than 40% of the total seats on the Steering Committee.
+* At no time shall individuals employed by the same corporate entity (including its affiliates and subsidiaries) occupy more than 50% of the total seats on the Steering Committee.
 * **Active Seat Circuit Breaker:** No single corporate entity may hold a majority of the active, filled voting seats on the Steering Committee. In the event that vacancies or job changes cause a single organization to exceed this limit, the excess seat(s) from that organization shall temporarily become non-voting until balance is restored.
 
 ### 2. Elections and Appointments on GitHub
