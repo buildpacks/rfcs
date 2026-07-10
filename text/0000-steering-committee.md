@@ -66,8 +66,10 @@ The Steering Committee will consist of 5 voting seats:
 * **Staggering:** Terms are staggered to ensure continuity. Under normal operations, elections and appointments will occur annually, staggering the seats so that approximately half of the committee faces election or appointment each year.
 * **Term Limits:** There are **no term limits**; members may serve consecutive terms if re-nominated and re-elected or re-appointed by the maintainer pool.
 
-### 3. End-User Criteria
-Candidates for the End-User seats must represent an organization listed in the project's `ADOPTERS.md` file. If their organization is not yet listed, they must submit a PR to add themselves to `ADOPTERS.md` as part of the nomination process.
+### 3. Committee Seat Criteria
+
+* **Maintainer Seats:** Candidacy is open to any active project maintainer who is not in emeritus status at the time of nomination. Candidates may self-nominate or be nominated by a peer.
+* **End-User Seats:** Candidates must represent an organization listed in the project's `ADOPTERS.md` file. If their organization is not yet listed, they must submit a Pull Request to add themselves to `ADOPTERS.md` as part of the nomination process.
 
 ### 4. Candidate Profiles
 If a vote is triggered (more candidates than open seats), candidates are required to post a crisp 1–2 sentence statement directly in the election issue thread explaining who they are and why they are running.
