@@ -1,4 +1,6 @@
 # Cloud Native Buildpacks RFCs - [Active RFCs](https://github.com/buildpacks/rfcs/pulls?q=is%3Apr+is%3Aopen+archived%3Afalse+-label%3Ahold+draft%3Afalse), [Finalizing RFCs](https://github.com/buildpacks/rfcs/pulls?q=is%3Apr+is%3Aopen+archived%3Afalse+label%3A%22Final+Comment+Period%22+draft%3Afalse+)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fbuildpacks%2Frfcs.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fbuildpacks%2Frfcs?ref=badge_shield)
+
 
 Want to suggest a change to the Cloud Native Buildpacks project? Awesome!
 
@@ -64,3 +66,7 @@ Each `<issue>` should be of the form `<org>/<repo>#<number>` (e.g. `buildpacks/s
 After running the `merge-rfc.sh` script:
 * Manually verify the output before pushing changes.
 * Create a [tracking issue](https://github.com/buildpacks/rfcs/issues/new?assignees=&labels=type%2Ftracking&template=tracking.md&title=%5BRFC+%23%3CINSERT+RFC+NUMBER+-+e.g.%2C+0099%3E%5D+-+%3CINSERT+RFC+TITLE%3E).
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fbuildpacks%2Frfcs.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fbuildpacks%2Frfcs?ref=badge_large)
