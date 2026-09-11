@@ -824,11 +824,19 @@ Notes on the boundary:
   drawback). The daemon-only output concepts it does NOT implement (`-daemon`/
   docker-socket access, load-to-local-daemon, the launch cache, and local `--layout`/
   OCI export) are simply not part of this backend rather than rejected flags.
-- **Extensions (`--extension`, Dockerfiles / image extension)** are intentionally OUT
-  OF SCOPE for this change, to limit complexity. This backend executes a fixed
-  analyzer → detector → builder → exporter and does not run the extender/kaniko phase,
-  so order-defined extensions are not applied. Supporting them would be separate future
-  work, not part of this proposal.
+- **Extensions (`--extension`, image extension) ARE supported.** When the resolved
+  order includes extensions, the backend runs the generator (the `generate` phase)
+  and applies the emitted build- and run-image Dockerfiles by translating each
+  Dockerfile instruction directly into LLB, so the extend happens **inside the build
+  engine with no separate extender/kaniko phase** (kaniko-free). The build-image
+  Dockerfile extends the environment the buildpacks then detect/build against; the
+  run-image Dockerfile extends the base the final app image is assembled `FROM`. A
+  documented subset of ten Dockerfile instructions is translated —
+  `FROM`, `ADD`, `ARG`, `COPY`, `ENV`, `LABEL`, `RUN`, `SHELL`, `USER`, `WORKDIR` —
+  which covers the instructions CNB image extensions are permitted to emit. Because
+  each instruction becomes LLB, the extend is applied per platform within the same
+  emit graph as the rest of the build, so extensions participate in BuildKit's cache
+  and multi-arch assembly like every other phase.
 - **`--trust-extra-buildpacks` is not applicable** to this backend. On the daemon it
   only chooses between the single-container "creator" and the multi-phase flow when
   extra buildpacks are added; the buildkit backend always runs its own fixed 5-phase
