@@ -3,8 +3,8 @@
 - Name: Steering Committee
 - Start Date: 2026-06-18
 - Author(s): @hone
-- Status: Draft
-- RFC Pull Request: (leave blank)
+- Status: Approved
+- RFC Pull Request: [rfcs#339](https://github.com/buildpacks/rfcs/pull/339)
 - CNB Pull Request: (leave blank)
 - CNB Issue: (leave blank)
 - Supersedes: N/A
